@@ -1,8 +1,6 @@
 import Stripe from "stripe";
 
-export const config = {
-    runtime: "edge",
-};
+// Node.js runtime is used by default to avoid Edge bundling issues with Stripe/@vercel/og
 
 export default async function handler(req: Request) {
     if (req.method !== "POST") {

@@ -1,10 +1,8 @@
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-export const config = {
-    // We use Edge runtime to benefit from simple Request/Response and async WebCrypto
-    runtime: "edge",
-};
+// Node.js runtime is used by default for better compatibility with Stripe
+// export const config = { runtime: "edge" };
 
 export default async function handler(req: Request) {
     if (req.method !== "POST") {

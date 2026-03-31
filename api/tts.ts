@@ -1,8 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-export const config = {
-    runtime: "edge",
-};
+// Node.js runtime is used by default for better compatibility
+// export const config = { runtime: "edge" };
 
 export default async function handler(req: Request) {
     if (req.method !== "POST") {

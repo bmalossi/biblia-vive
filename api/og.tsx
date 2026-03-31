@@ -9,9 +9,9 @@ export default async function functionHandler(req: Request) {
         const { searchParams } = new URL(req.url);
 
         // Parameters
-        const title = searchParams.get("title") ?? "Bíblia Viva";
+        const title = searchParams.get("title") ?? "Bíblia Vive";
         const verse = searchParams.get("verse") ?? "A intimidade com a Palavra";
-        const reference = searchParams.get("ref") ?? "Leia online em bibliaviva.com.br";
+        const reference = searchParams.get("ref") ?? "Leia online em bibliavive.com.br";
         const isCurated = searchParams.get("curated") === "true";
 
         return new ImageResponse(
@@ -127,7 +127,7 @@ export default async function functionHandler(req: Request) {
                             zIndex: 1,
                         }}
                     >
-                        <span style={{ color: "#C8A564" }}>✦</span> Bíblia Viva
+                        <span style={{ color: "#C8A564" }}>✦</span> Bíblia Vive
                     </div>
                 </div>
             ),
