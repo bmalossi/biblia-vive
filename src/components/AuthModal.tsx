@@ -60,7 +60,7 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
         >
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
-            <div className="relative z-10 w-full max-w-sm mx-4 rounded-2xl bg-app-base border border-border shadow-2xl p-6 space-y-5">
+            <div className="relative z-10 w-full max-w-sm mx-4 rounded-2xl bg-app-surface border border-border shadow-2xl p-6 space-y-5">
                 {/* Close */}
                 <button
                     type="button"
@@ -83,7 +83,7 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
-                        <label className="text-[0.75rem] text-app-text-muted mb-1 block" htmlFor="auth-email">
+                        <label className="text-[0.75rem] font-medium text-app-text/80 mb-1.5 block" htmlFor="auth-email">
                             {t('auth.email')}
                         </label>
                         <input
@@ -99,7 +99,7 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
                     </div>
 
                     <div>
-                        <label className="text-[0.75rem] text-app-text-muted mb-1 block" htmlFor="auth-password">
+                        <label className="text-[0.75rem] font-medium text-app-text/80 mb-1.5 block" htmlFor="auth-password">
                             {t('auth.password')}
                         </label>
                         <input
@@ -128,7 +128,7 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
                 </form>
 
                 {/* Switch mode */}
-                <p className="text-center text-[0.78rem] text-app-text-muted">
+                <p className="text-center text-[0.8rem] text-app-text/70">
                     {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}{' '}
                     <button
                         type="button"
