@@ -1,0 +1,42 @@
+{
+  "name": "Bíblia Viva",
+  "short_name": "Bíblia Viva",
+  "description": "A melhor experiência de leitura da Bíblia em português",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8f4ed",
+  "theme_color": "#9a6e1e",
+  "lang": "pt-BR",
+  "categories": ["books", "education", "religion"],
+  "icons": [
+    { "src": "/icons/icon-72.png", "sizes": "72x72", "type": "image/png" },
+    { "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" },
+    { "src": "/icons/icon-128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "/icons/icon-144.png", "sizes": "144x144", "type": "image/png" },
+    { "src": "/icons/icon-152.png", "sizes": "152x152", "type": "image/png" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "/screenshots/home.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide" },
+    { "src": "/screenshots/reading.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Continuar Leitura",
+      "short_name": "Continuar",
+      "description": "Retomar de onde parou",
+      "url": "/?action=continue",
+      "icons": [{ "src": "/icons/shortcut-book.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Buscar Versículo",
+      "short_name": "Buscar",
+      "description": "Buscar na Bíblia",
+      "url": "/busca",
+      "icons": [{ "src": "/icons/shortcut-search.png", "sizes": "96x96" }]
+    }
+  ]
+}

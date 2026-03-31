@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline · Bíblia Viva</title>
+    <style>
+      body { font-family: "DM Sans", sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f8f4ed; color: #2a2218; }
+      .card { width: min(680px, 92vw); border: 1px solid #d6c8ad; border-radius: 16px; background: #fffaf0; padding: 24px; }
+      h1 { margin: 0 0 8px; font-family: "Lora", serif; color: #7c5c1e; }
+      p { margin: 0 0 16px; }
+      a { color: #7c5c1e; text-decoration: none; }
+      li { margin: 8px 0; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>✦ Bíblia Viva</h1>
+      <p>Você está offline. Os capítulos que você já leu ainda estão disponíveis.</p>
+      <h2>Últimos capítulos lidos</h2>
+      <ul id="recent-list"></ul>
+    </main>
+
+    <script>
+      const list = document.getElementById("recent-list");
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("bv-chapter-cache-v1:")) keys.push(key);
+      }
+
+      keys.slice(-10).reverse().forEach((item) => {
+        const [, , version, book, chapter] = item.split(":");
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `/${version}/${book}/${chapter}`;
+        link.textContent = `${version.toUpperCase()} · ${book.toUpperCase()} ${chapter}`;
+        li.appendChild(link);
+        list.appendChild(li);
+      });
+
+      if (!list.children.length) {
+        const li = document.createElement("li");
+        li.textContent = "Abra alguns capítulos online para acessá-los offline depois.";
+        list.appendChild(li);
+      }
+    </script>
+  </body>
+</html>

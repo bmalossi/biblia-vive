@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#9a6e1e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Bíblia Vive" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <script>
+      (function () {
+        try {
+          const font = localStorage.getItem("bv_font") || "lora";
+          const fontSize = Number(localStorage.getItem("bv_font_size")) || 18;
+          const verseSpacing = Number(localStorage.getItem("bv_verse_spacing")) || 0.8;
+          const columnWidth = localStorage.getItem("bv_column_width") || "normal";
+
+          const fontMap = {
+            lora: '"Lora", serif',
+            "dm-sans": '"DM Sans", system-ui, sans-serif',
+            "open-dyslexic": '"OpenDyslexic", "Open Dyslexic", "Comic Sans MS", sans-serif',
+          };
+
+          if (font === "open-dyslexic") {
+            const preload = document.createElement("link");
+            preload.rel = "preload";
+            preload.href = "https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff2";
+            preload.as = "font";
+            preload.type = "font/woff2";
+            preload.crossOrigin = "anonymous";
+            document.head.appendChild(preload);
+          }
+
+          if (font === "open-dyslexic" && !document.getElementById("bv-open-dyslexic-font")) {
+            const style = document.createElement("style");
+            style.id = "bv-open-dyslexic-font";
+            style.textContent = '@font-face{font-family:"OpenDyslexic";src:url("https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap;}';
+            document.head.appendChild(style);
+          }
+
+          const root = document.documentElement;
+          root.style.setProperty("--font-reading", fontMap[font] || fontMap.lora);
+          root.style.setProperty("--font-size-reading", `${Math.min(28, Math.max(14, Math.round(fontSize)))}px`);
+          root.style.setProperty("--verse-spacing", `${Math.min(1.6, Math.max(0.4, verseSpacing))}rem`);
+          root.style.setProperty(
+            "--column-width",
+            columnWidth === "narrow" ? "520px" : columnWidth === "wide" ? "860px" : "680px",
+          );
+        } catch {
+          // ignore
+        }
+      })();
+    </script>
+    <style>
+      /* Critical styles for skip-link and background to prevent FOUC */
+      body {
+        background-color: #f3f0e8; /* Matches sepia theme background */
+        margin: 0;
+      }
+      .skip-link {
+        position: fixed;
+        top: 0.5rem;
+        left: 0.5rem;
+        z-index: 999;
+        transform: translateY(-150%);
+        background: #73541c; /* Matches gold color */
+        color: #f3f0e8;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        font-family: sans-serif;
+        text-decoration: none;
+        transition: transform 0.2s;
+      }
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap"
+      />
+    </noscript>
+    <title>Bíblia Viva — Leia a Bíblia em Português</title>
+    <meta name="description" content="A melhor experiência de leitura da Bíblia em português" />
+    <meta name="author" content="Bíblia Viva" />
+
+    <meta property="og:title" content="Bíblia Viva" />
+    <meta property="og:description" content="A melhor experiência de leitura da Bíblia em português" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og/home.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og/home.png" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main-content">Ir para o conteúdo</a>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

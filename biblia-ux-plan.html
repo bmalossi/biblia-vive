@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bíblia Viva — Plano UX/UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0c0a;
+    --surface: #161410;
+    --surface2: #1e1b17;
+    --surface3: #252118;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --text: #f0ebe0;
+    --text-muted: #8a8070;
+    --text-soft: #c4b89a;
+    --accent: #7c6d52;
+    --red: #c25c3e;
+    --teal: #4a9e8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  
+  /* NAV */
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(14,12,10,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .nav-logo { font-family: 'Lora', serif; font-size: 1.1rem; color: var(--gold); letter-spacing: 0.05em; }
+  .nav-links { display: flex; gap: 0; }
+  .nav-link { font-size: 0.78rem; color: var(--text-muted); padding: 0 0.8rem; height: 52px; display: flex; align-items: center; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; letter-spacing: 0.03em; text-transform: uppercase; }
+  .nav-link:hover, .nav-link.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* HERO */
+  .hero { padding: 5rem 2rem 4rem; text-align: center; max-width: 860px; margin: 0 auto; }
+  .hero-badge { display: inline-block; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,0.3); padding: 0.3rem 0.9rem; border-radius: 20px; margin-bottom: 2rem; }
+  .hero h1 { font-family: 'Lora', serif; font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 400; line-height: 1.15; color: var(--text); margin-bottom: 1.2rem; }
+  .hero h1 em { color: var(--gold); font-style: italic; }
+  .hero p { font-size: 1.05rem; color: var(--text-soft); max-width: 560px; margin: 0 auto 3rem; font-weight: 300; line-height: 1.8; }
+
+  /* SECTION */
+  section { padding: 3.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
+  .section-title { font-family: 'Lora', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 400; color: var(--text); margin-bottom: 1rem; line-height: 1.3; }
+  .section-desc { font-size: 0.95rem; color: var(--text-soft); max-width: 620px; line-height: 1.8; margin-bottom: 2.5rem; font-weight: 300; }
+  .divider { width: 100%; height: 1px; background: var(--border); margin: 1rem 0 3rem; }
+
+  /* CRITIQUE */
+  .critique-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 3rem; }
+  .critique-item { background: var(--surface); padding: 1.4rem 1.6rem; }
+  .critique-item .label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .label-bad { color: var(--red); }
+  .label-good { color: var(--teal); }
+  .critique-item h4 { font-size: 0.92rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text); }
+  .critique-item p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* PRINCIPLES */
+  .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+  .principle { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.4rem; position: relative; overflow: hidden; }
+  .principle::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0.4; }
+  .principle .num { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 0.8rem; }
+  .principle h4 { font-size: 0.9rem; font-weight: 500; color: var(--text); margin-bottom: 0.5rem; }
+  .principle p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* IA TREE */
+  .ia-tree { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; }
+  .ia-tree h3 { font-family: 'Lora', serif; font-size: 1rem; color: var(--gold); margin-bottom: 1.5rem; font-weight: 400; }
+  .ia-level { margin-left: 0; list-style: none; }
+  .ia-level li { padding: 0.35rem 0; font-size: 0.85rem; color: var(--text-soft); position: relative; padding-left: 1.2rem; }
+  .ia-level li::before { content: '—'; position: absolute; left: 0; color: var(--gold); opacity: 0.5; }
+  .ia-level ul { margin-left: 1.5rem; margin-top: 0.3rem; }
+  .ia-level ul li { font-size: 0.78rem; color: var(--text-muted); }
+  .ia-level ul li::before { color: var(--accent); }
+  .ia-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+
+  /* SCREENS */
+  .screen-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .screen-tab { font-size: 0.78rem; padding: 0.4rem 0.9rem; border: 1px solid var(--border2); border-radius: 6px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; background: var(--surface); }
+  .screen-tab.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+  .screen-tab:hover:not(.active) { border-color: var(--border2); color: var(--text-soft); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* MOCKUP FRAME */
+  .mockup-frame { border: 1px solid var(--border2); border-radius: 14px; overflow: hidden; background: #f8f4ed; margin-bottom: 2rem; }
+  .mockup-bar { background: #ede9e0; border-bottom: 1px solid #d4cfc4; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+  .mockup-url { flex: 1; background: white; border-radius: 5px; font-size: 0.7rem; color: #888; padding: 0.2rem 0.6rem; margin: 0 0.5rem; font-family: 'DM Mono', monospace; }
+  .mockup-body { padding: 0; }
+
+  /* SCREEN 1: HOME */
+  .m-home { background: #f8f4ed; min-height: 480px; }
+  .m-nav { background: rgba(248,244,237,0.95); border-bottom: 1px solid #e0d9cc; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+  .m-logo { font-family: 'Lora', serif; font-size: 1rem; color: #7c5c1e; letter-spacing: 0.04em; }
+  .m-nav-links { display: flex; gap: 1.5rem; }
+  .m-nav-link { font-size: 0.72rem; color: #9a8c78; letter-spacing: 0.06em; text-transform: uppercase; }
+  .m-hero-section { text-align: center; padding: 3rem 2rem 2rem; }
+  .m-tagline { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: #b08d3a; margin-bottom: 1rem; }
+  .m-h1 { font-family: 'Lora', serif; font-size: 2rem; color: #2a2218; font-weight: 400; margin-bottom: 0.8rem; line-height: 1.2; }
+  .m-h1 em { color: #9a6e1e; font-style: italic; }
+  .m-search { margin: 1.5rem auto; max-width: 420px; display: flex; background: white; border: 1.5px solid #d4ccc0; border-radius: 50px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+  .m-search input { flex: 1; border: none; padding: 0.7rem 1.2rem; font-size: 0.85rem; outline: none; background: transparent; font-family: 'DM Sans', sans-serif; color: #3a3020; }
+  .m-search button { background: #9a6e1e; border: none; padding: 0 1.2rem; color: white; font-size: 0.75rem; letter-spacing: 0.05em; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .m-quick { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .m-chip { font-size: 0.68rem; padding: 0.3rem 0.7rem; border: 1px solid #d4ccc0; border-radius: 20px; color: #8a7b65; cursor: pointer; background: white; }
+  .m-books { padding: 1.5rem 2rem; }
+  .m-books-title { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #9a8c78; margin-bottom: 1rem; }
+  .m-books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
+  .m-book-btn { background: white; border: 1px solid #e0d9cc; border-radius: 8px; padding: 0.5rem 0.4rem; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .m-book-btn:hover { background: #fdf8f0; border-color: #b08d3a; }
+  .m-book-name { font-size: 0.7rem; color: #3a3020; font-weight: 500; display: block; }
+  .m-book-chapters { font-size: 0.6rem; color: #a09580; display: block; margin-top: 2px; }
+  .m-testament-tag { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; display: inline-block; margin-bottom: 6px; color: #b08d3a; }
+
+  /* SCREEN 2: READING */
+  .m-read { background: #f8f4ed; min-height: 600px; }
+  .m-read-nav { background: rgba(248,244,237,0.98); border-bottom: 1px solid #e0d9cc; padding: 0.7rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .m-breadcrumb { font-size: 0.72rem; color: #9a8c78; display: flex; align-items: center; gap: 0.4rem; flex: 1; }
+  .m-breadcrumb span { color: #3a3020; }
+  .m-breadcrumb .sep { color: #c4bbb0; }
+  .m-read-tools { display: flex; gap: 0.5rem; }
+  .m-tool-btn { width: 28px; height: 28px; border: 1px solid #d4ccc0; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; color: #8a7b65; }
+  .m-read-body { display: grid; grid-template-columns: 1fr 280px; gap: 0; min-height: 560px; }
+  .m-text-area { padding: 2.5rem 2.5rem 2.5rem 3rem; border-right: 1px solid #e0d9cc; }
+  .m-chapter-title { font-family: 'Lora', serif; font-size: 1.2rem; color: #2a2218; margin-bottom: 1.5rem; font-weight: 400; }
+  .m-verse { display: flex; gap: 0.6rem; margin-bottom: 0.6rem; cursor: pointer; border-radius: 6px; padding: 0.3rem 0.4rem; margin-left: -0.4rem; transition: background 0.1s; }
+  .m-verse:hover { background: rgba(176,141,58,0.08); }
+  .m-verse.selected { background: rgba(176,141,58,0.12); }
+  .m-verse-num { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: #b08d3a; min-width: 18px; padding-top: 2px; }
+  .m-verse-text { font-family: 'Lora', serif; font-size: 0.92rem; color: #2a2218; line-height: 1.75; }
+  .m-verse.highlighted .m-verse-text { background: rgba(176,141,58,0.2); border-radius: 3px; padding: 0 2px; }
+  .m-nav-chapters { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2.5rem; border-top: 1px solid #e0d9cc; }
+  .m-nav-btn { font-size: 0.78rem; color: #9a6e1e; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+  .m-chapter-indicator { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #9a8c78; }
+
+  /* STUDY PANEL */
+  .m-study-panel { background: white; padding: 1.2rem 1.4rem; overflow-y: auto; }
+  .m-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+  .m-panel-title { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #9a8c78; }
+  .m-panel-tabs { display: flex; gap: 0; border: 1px solid #e0d9cc; border-radius: 6px; overflow: hidden; }
+  .m-ptab { font-size: 0.65rem; padding: 0.25rem 0.5rem; cursor: pointer; color: #9a8c78; background: white; border: none; font-family: 'DM Sans', sans-serif; }
+  .m-ptab.active { background: #9a6e1e; color: white; }
+  .m-verse-ref { font-family: 'Lora', serif; font-size: 0.88rem; color: #2a2218; padding: 0.8rem; background: #fdf8f0; border-radius: 8px; border-left: 3px solid #b08d3a; margin-bottom: 1rem; font-style: italic; line-height: 1.6; }
+  .m-study-section { margin-bottom: 1.2rem; }
+  .m-study-section h5 { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #b08d3a; margin-bottom: 0.5rem; }
+  .m-study-section p { font-size: 0.78rem; color: #5a5040; line-height: 1.65; }
+  .m-cross-ref { font-size: 0.75rem; color: #9a6e1e; margin: 0.25rem 0; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; }
+  .m-cross-ref::before { content: '→'; font-size: 0.65rem; }
+  .m-note-box { background: #f8f4ed; border: 1px solid #e0d9cc; border-radius: 6px; padding: 0.6rem 0.8rem; font-size: 0.75rem; color: #8a7b65; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+  .m-note-box::before { content: '+'; color: #b08d3a; font-size: 1rem; }
+
+  /* VERSE ACTION POPUP */
+  .m-popup { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background: #2a2218; border-radius: 10px; padding: 0.5rem; display: flex; gap: 0.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+  .m-pop-btn { background: rgba(255,255,255,0.08); border: none; border-radius: 6px; padding: 0.35rem 0.65rem; font-size: 0.68rem; color: #e0d9cc; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .m-pop-btn:hover { background: rgba(201,168,76,0.2); color: #e8c97a; }
+  .m-verse-with-popup { position: relative; }
+
+  /* SCREEN 3: MOBILE */
+  .m-mobile-wrap { display: flex; justify-content: center; padding: 1.5rem; background: #f0ece4; }
+  .m-phone { width: 280px; background: #f8f4ed; border-radius: 36px; border: 8px solid #2a2218; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+  .m-phone-notch { background: #2a2218; height: 28px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; }
+  .m-phone-notch-inner { width: 80px; height: 6px; background: #1a1612; border-radius: 3px; }
+  .m-phone-content { padding: 0; min-height: 520px; }
+  .m-pnav { background: rgba(248,244,237,0.98); border-bottom: 1px solid #e0d9cc; padding: 0.8rem 1rem; display: flex; align-items: center; justify-content: space-between; }
+  .m-plogo { font-family: 'Lora', serif; font-size: 0.9rem; color: #7c5c1e; }
+  .m-pbtn { width: 28px; height: 28px; background: white; border: 1px solid #d4ccc0; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; color: #8a7b65; }
+  .m-ptext { padding: 1.5rem 1.2rem; }
+  .m-pchap { font-family: 'Lora', serif; font-size: 1rem; color: #2a2218; margin-bottom: 1rem; font-weight: 400; }
+  .m-pverse { display: flex; gap: 0.5rem; margin-bottom: 0.8rem; }
+  .m-pnum { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #b08d3a; min-width: 14px; padding-top: 2px; }
+  .m-pvtext { font-family: 'Lora', serif; font-size: 0.78rem; color: #2a2218; line-height: 1.7; }
+  .m-pbottombar { background: rgba(248,244,237,0.98); border-top: 1px solid #e0d9cc; padding: 0.6rem 1rem; display: flex; justify-content: space-around; }
+  .m-btab { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+  .m-btab-icon { font-size: 14px; color: #9a8c78; }
+  .m-btab-label { font-size: 0.55rem; color: #9a8c78; letter-spacing: 0.05em; }
+  .m-btab.active .m-btab-icon, .m-btab.active .m-btab-label { color: #9a6e1e; }
+
+  /* SCREEN 4: COMPARE */
+  .m-compare { background: #f8f4ed; min-height: 480px; }
+  .m-cmp-nav { background: rgba(248,244,237,0.98); border-bottom: 1px solid #e0d9cc; padding: 0.8rem 2rem; display: flex; align-items: center; gap: 1rem; }
+  .m-cmp-chip { font-size: 0.7rem; padding: 0.25rem 0.7rem; border: 1px solid #d4ccc0; border-radius: 20px; color: #9a6e1e; background: rgba(176,141,58,0.08); }
+  .m-cmp-add { font-size: 0.7rem; padding: 0.25rem 0.7rem; border: 1px dashed #d4ccc0; border-radius: 20px; color: #9a8c78; cursor: pointer; }
+  .m-cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .m-cmp-col { padding: 2rem 1.5rem; border-right: 1px solid #e0d9cc; }
+  .m-cmp-col:last-child { border-right: none; }
+  .m-cmp-version { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #b08d3a; margin-bottom: 1rem; }
+  .m-cmp-verse { margin-bottom: 1rem; display: flex; gap: 0.5rem; }
+  .m-cmp-num { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #b08d3a; min-width: 14px; padding-top: 3px; }
+  .m-cmp-text { font-family: 'Lora', serif; font-size: 0.85rem; color: #2a2218; line-height: 1.75; }
+  .m-cmp-diff { background: rgba(176,141,58,0.12); border-radius: 3px; padding: 0 2px; }
+
+  /* FEATURES */
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+  .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .feature-card .icon { font-size: 1.4rem; margin-bottom: 0.8rem; }
+  .feature-card h4 { font-size: 0.92rem; font-weight: 500; color: var(--text); margin-bottom: 0.5rem; }
+  .feature-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.65; }
+  .feature-card ul { font-size: 0.78rem; color: var(--text-muted); padding-left: 1rem; margin-top: 0.5rem; }
+  .feature-card ul li { margin-bottom: 0.25rem; line-height: 1.5; }
+
+  /* TYPOGRAPHY */
+  .type-showcase { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+  .type-row { display: flex; align-items: baseline; gap: 2rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .type-row:last-child { border-bottom: none; }
+  .type-meta { width: 140px; flex-shrink: 0; }
+  .type-meta .name { font-size: 0.7rem; color: var(--text-muted); }
+  .type-meta .size { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent); }
+  .t-body { font-family: 'Lora', serif; font-size: 1rem; color: var(--text-soft); line-height: 1.8; }
+  .t-ui { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text-muted); }
+  .t-display { font-family: 'Lora', serif; font-size: 1.5rem; color: var(--text); font-weight: 400; }
+  .t-verse-num { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--gold); }
+
+  /* COLORS */
+  .color-palette { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .swatch { border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.7rem; font-family: 'DM Mono', monospace; }
+
+  /* TECH */
+  .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .tech-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+  .tech-card h5 { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; }
+  .tech-card ul { font-size: 0.8rem; color: var(--text-muted); padding-left: 1rem; }
+  .tech-card ul li { margin-bottom: 0.3rem; }
+
+  /* KEYBOARD */
+  .kbd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.6rem; }
+  .kbd-row { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem; background: var(--surface); border-radius: 6px; }
+  .kbd { font-family: 'DM Mono', monospace; font-size: 0.7rem; background: var(--surface3); border: 1px solid var(--border2); border-radius: 4px; padding: 0.15rem 0.4rem; color: var(--gold); white-space: nowrap; }
+  .kbd-desc { font-size: 0.78rem; color: var(--text-muted); }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .m-read-body { grid-template-columns: 1fr; }
+    .m-study-panel { display: none; }
+    .m-cmp-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  /* SCROLL ANIMATIONS */
+  .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; }
+  .fade-up.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">✦ Bíblia Viva</div>
+  <div class="nav-links">
+    <div class="nav-link active" onclick="scrollTo(s1)">Análise</div>
+    <div class="nav-link" onclick="scrollTo(s2)">Princípios</div>
+    <div class="nav-link" onclick="scrollTo(s3)">Arquitetura</div>
+    <div class="nav-link" onclick="scrollTo(s4)">Telas</div>
+    <div class="nav-link" onclick="scrollTo(s5)">Sistema</div>
+    <div class="nav-link" onclick="scrollTo(s6)">Features</div>
+    <div class="nav-link" onclick="scrollTo(s7)">Técnico</div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Plano de UX/UI Completo</div>
+  <h1>O melhor site de<br><em>leitura da Bíblia</em><br>do mundo</h1>
+  <p>Uma análise completa do estado atual, seguida do planejamento detalhado para construir a experiência mais limpa, acessível e poderosa de leitura bíblica online.</p>
+</div>
+
+<!-- ANÁLISE -->
+<section id="s1">
+  <div class="section-label">01 — Análise do Concorrente</div>
+  <div class="section-title">O que o BíbliaOnline.com.br<br>acerta e erra</div>
+  <div class="section-desc">Após estudar o site líder, identificamos pontos críticos de UX que afastam o usuário de uma experiência de leitura profunda e contemplativa.</div>
+
+  <div class="critique-grid">
+    <div class="critique-item">
+      <div class="label label-bad">⚠ Problema Crítico</div>
+      <h4>Anúncios interrompem a leitura</h4>
+      <p>Publicidade no meio do texto sagrado cria dissonância cognitiva severa. O usuário perde o fluxo de leitura toda vez que um anúncio aparece.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-bad">⚠ Problema Crítico</div>
+      <h4>Homepage poluída</h4>
+      <p>Dezenas de seções competindo por atenção. O usuário que quer apenas ler um capítulo tem que scrollar muito antes de chegar ao conteúdo.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-bad">⚠ Problema Crítico</div>
+      <h4>Navegação entre capítulos fragmentada</h4>
+      <p>Não há uma barra persistente de capítulos. Voltar ao índice de capítulos requer múltiplos cliques e recarregamentos de página.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-bad">⚠ Problema Sério</div>
+      <h4>Nenhum modo de leitura focada</h4>
+      <p>Não existe opção para esconder tudo exceto o texto. Elementos de navegação, rodapés e sidebar distraem durante a leitura.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-bad">⚠ Problema Sério</div>
+      <h4>Ferramentas de estudo desconectadas</h4>
+      <p>Para estudar um versículo, o usuário precisa abrir outra aba ou sair da página. Não há painel de estudo integrado à leitura.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-bad">⚠ Problema Sério</div>
+      <h4>Typography inadequada para leitura longa</h4>
+      <p>Fontes sem serifa, tamanho pequeno e line-height apertado. Leitura de capítulos longos se torna fatigante em minutos.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-good">✓ Acerto</div>
+      <h4>150+ versões disponíveis</h4>
+      <p>Excelente cobertura de traduções. É um diferencial real que deve ser mantido e melhorado na interface de seleção.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-good">✓ Acerto</div>
+      <h4>Recursos bíblicos complementares</h4>
+      <p>Devocionais, estudos por tema e artigos agregam valor. A ideia é boa, porém a execução interfere com a jornada principal de leitura.</p>
+    </div>
+    <div class="critique-item">
+      <div class="label label-good">✓ Acerto</div>
+      <h4>Versículo do dia</h4>
+      <p>Ponto de entrada emocional valioso para usuários recorrentes. Deve ser mantido mas de forma muito mais elegante e discreta.</p>
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2rem;"><div class="divider"></div></div>
+
+<!-- PRINCÍPIOS -->
+<section id="s2">
+  <div class="section-label">02 — Princípios de Design</div>
+  <div class="section-title">As 6 leis que governam<br>cada decisão de design</div>
+  <div class="section-desc">Cada pixel, cada interação e cada feature é filtrado por esses princípios. Se não passa pelo filtro, não entra.</div>
+
+  <div class="principles">
+    <div class="principle">
+      <div class="num">01</div>
+      <h4>O texto é sagrado</h4>
+      <p>Nada compete com o texto bíblico. UI, anúncios, notificações e elementos decorativos sempre ficam subordinados ao conteúdo.</p>
+    </div>
+    <div class="principle">
+      <div class="num">02</div>
+      <h4>Zero fricção para ler</h4>
+      <p>Do momento que o usuário chega ao site até o primeiro versículo lido: máximo 2 cliques. Sempre.</p>
+    </div>
+    <div class="principle">
+      <div class="num">03</div>
+      <h4>Onde estou, nunca me perco</h4>
+      <p>O usuário sabe exatamente em que livro, capítulo e versículo está, em qualquer tela e tamanho de dispositivo.</p>
+    </div>
+    <div class="principle">
+      <div class="num">04</div>
+      <h4>Estudo integrado, não separado</h4>
+      <p>Ferramentas de estudo aparecem onde e quando o usuário precisa, sem sair da página ou interromper o fluxo.</p>
+    </div>
+    <div class="principle">
+      <div class="num">05</div>
+      <h4>Acessibilidade não é opcional</h4>
+      <p>Funciona perfeitamente para idosos, pessoas com baixa visão, daltonismo, e usuários com dispositivos antigos.</p>
+    </div>
+    <div class="principle">
+      <div class="num">06</div>
+      <h4>Mobile first, sempre</h4>
+      <p>80% dos acessos são mobile. Cada decisão começa pela tela do celular e expande para desktop — nunca o contrário.</p>
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2rem;"><div class="divider"></div></div>
+
+<!-- ARQUITETURA -->
+<section id="s3">
+  <div class="section-label">03 — Arquitetura de Informação</div>
+  <div class="section-title">Estrutura de navegação<br>ultra-clara</div>
+  <div class="section-desc">A hierarquia é simples: máximo 3 níveis de profundidade para acessar qualquer conteúdo. Sem labirintos.</div>
+
+  <div class="ia-tree">
+    <div class="ia-columns">
+      <div>
+        <h3>📖 Leitura</h3>
+        <ul class="ia-level">
+          <li>Início (busca + versículo do dia)
+            <ul><li>Busca por texto</li><li>Busca por referência</li><li>Busca por tema</li></ul>
+          </li>
+          <li>Livros
+            <ul><li>Antigo Testamento (39)</li><li>Novo Testamento (27)</li></ul>
+          </li>
+          <li>Capítulo
+            <ul><li>Seletor de capítulo</li><li>Modo leitura livre</li><li>Modo focado</li></ul>
+          </li>
+          <li>Versículo (ação ao clicar)
+            <ul><li>Destacar</li><li>Estudar</li><li>Copiar / Compartilhar</li><li>Comparar versões</li></ul>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>🔬 Estudo</h3>
+        <ul class="ia-level">
+          <li>Painel lateral (integrado)
+            <ul><li>Contexto histórico</li><li>Referências cruzadas</li><li>Língua original</li><li>Comentários</li></ul>
+          </li>
+          <li>Planos de Leitura
+            <ul><li>Bíblia em 1 ano</li><li>Novo Testamento em 90 dias</li><li>Temáticos</li></ul>
+          </li>
+          <li>Minhas Notas
+            <ul><li>Por versículo</li><li>Por capítulo</li><li>Exportar</li></ul>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>⚙️ Configurações</h3>
+        <ul class="ia-level">
+          <li>Aparência
+            <ul><li>Tema: Claro / Escuro / Sépia</li><li>Tamanho da fonte</li><li>Família da fonte</li></ul>
+          </li>
+          <li>Versão da Bíblia
+            <ul><li>150+ traduções</li><li>Múltiplas colunas</li></ul>
+          </li>
+          <li>Acessibilidade
+            <ul><li>Alto contraste</li><li>Fonte OpenDyslexic</li><li>Áudio / TTS</li></ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2rem;"><div class="divider"></div></div>
+
+<!-- TELAS -->
+<section id="s4">
+  <div class="section-label">04 — Mockups das Telas</div>
+  <div class="section-title">As 4 telas principais<br>em detalhe</div>
+  <div class="section-desc">Cada tela foi desenhada para maximizar clareza e minimizar distração. Clique nas abas para ver cada tela.</div>
+
+  <div class="screen-tabs">
+    <div class="screen-tab active" onclick="showScreen('home', this)">🏠 Homepage</div>
+    <div class="screen-tab" onclick="showScreen('reading', this)">📖 Leitura + Estudo</div>
+    <div class="screen-tab" onclick="showScreen('mobile', this)">📱 Mobile</div>
+    <div class="screen-tab" onclick="showScreen('compare', this)">⇄ Comparar Versões</div>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="screen-home" class="screen active">
+    <div class="mockup-frame">
+      <div class="mockup-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="mockup-url">bibliaviva.com.br</div>
+      </div>
+      <div class="mockup-body m-home">
+        <div class="m-nav">
+          <div class="m-logo">✦ Bíblia Viva</div>
+          <div class="m-nav-links">
+            <div class="m-nav-link">Livros</div>
+            <div class="m-nav-link">Temas</div>
+            <div class="m-nav-link">Planos</div>
+            <div class="m-nav-link">Versões</div>
+          </div>
+        </div>
+        <div class="m-hero-section">
+          <div class="m-tagline">Versículo de Hoje · Salmos 9:20</div>
+          <div class="m-h1">"Põe-os em medo, Senhor,<br>para que saibam as nações<br>que são <em>formadas por meros homens.</em>"</div>
+          <div style="font-size: 0.75rem; color: #9a8c78; margin-top: 0.5rem; margin-bottom: 1.5rem;">— Salmos 9:20 · ACF</div>
+          <div class="m-search">
+            <input placeholder="Buscar versículo, tema ou referência..." />
+            <button>Buscar</button>
+          </div>
+          <div class="m-quick">
+            <div class="m-chip">João 3:16</div>
+            <div class="m-chip">Salmos 23</div>
+            <div class="m-chip">Romanos 8</div>
+            <div class="m-chip">Provérbios 3:5</div>
+            <div class="m-chip">Hebreus 11</div>
+          </div>
+        </div>
+        <div class="m-books">
+          <div class="m-books-title">Antigo Testamento</div>
+          <div class="m-books-grid">
+            <div class="m-book-btn"><span class="m-book-name">Gênesis</span><span class="m-book-chapters">50 cap.</span></div>
+            <div class="m-book-btn"><span class="m-book-name">Êxodo</span><span class="m-book-chapters">40 cap.</span></div>
+            <div class="m-book-btn"><span class="m-book-name">Levítico</span><span class="m-book-chapters">27 cap.</span></div>
+            <div class="m-book-btn"><span class="m-book-name">Números</span><span class="m-book-chapters">36 cap.</span></div>
+            <div class="m-book-btn"><span class="m-book-name">Deuteron.</span><span class="m-book-chapters">34 cap.</span></div>
+            <div class="m-book-btn"><span class="m-book-name">Josué</span><span class="m-book-chapters">24 cap.</span></div>
+            <div class="m-book-btn" style="background:#fdf8f0; border-color:#b08d3a;"><span class="m-book-name" style="color:#9a6e1e;">Salmos</span><span class="m-book-chapters">150 cap.</span></div>
+            <div class="m-book-btn"><span class="m-book-name">Provérbios</span><span class="m-book-chapters">31 cap.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+      <strong style="color: var(--text-soft);">Decisões de design nesta tela:</strong> O versículo do dia assume posição de destaque como âncora emocional. A busca é o elemento mais proeminente — porque a maioria dos usuários chega com uma referência em mente. Os chips de acesso rápido reduzem o caminho para os conteúdos mais buscados. A grade de livros usa fontes menores com número de capítulos para orientação rápida. Zero anúncios. Zero distrações.
+    </div>
+  </div>
+
+  <!-- READING SCREEN -->
+  <div id="screen-reading" class="screen">
+    <div class="mockup-frame">
+      <div class="mockup-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="mockup-url">bibliaviva.com.br/acf/jo/3</div>
+      </div>
+      <div class="mockup-body m-read">
+        <div class="m-read-nav">
+          <div class="m-breadcrumb">
+            <span style="color:#b08d3a;">Livros</span>
+            <span class="sep">›</span>
+            <span>João</span>
+            <span class="sep">›</span>
+            <span style="font-weight:500;">Capítulo 3</span>
+          </div>
+          <div style="font-size:0.72rem; color:#b08d3a; margin-right: auto; margin-left: 1rem; background: rgba(176,141,58,0.1); padding: 0.2rem 0.6rem; border-radius: 12px;">ACF</div>
+          <div class="m-read-tools">
+            <div class="m-tool-btn" title="Tamanho da fonte">Aa</div>
+            <div class="m-tool-btn" title="Modo focado">⊞</div>
+            <div class="m-tool-btn" title="Áudio">♪</div>
+            <div class="m-tool-btn" title="Comparar versões">⇄</div>
+          </div>
+        </div>
+        <div class="m-read-body">
+          <div class="m-text-area">
+            <div class="m-chapter-title">João · Capítulo 3</div>
+            <div class="m-verse">
+              <span class="m-verse-num">1</span>
+              <span class="m-verse-text">Havia entre os fariseus um homem chamado Nicodemos, um dos líderes dos judeus.</span>
+            </div>
+            <div class="m-verse">
+              <span class="m-verse-num">2</span>
+              <span class="m-verse-text">Este foi ter com Jesus de noite e disse-lhe: Rabi, sabemos que és um mestre que veio da parte de Deus; porque ninguém pode fazer estes sinais que tu fazes, se Deus não for com ele.</span>
+            </div>
+            <div class="m-verse highlighted">
+              <span class="m-verse-num">3</span>
+              <span class="m-verse-text">Respondeu-lhe Jesus: Em verdade, em verdade te digo que aquele que não nascer de novo não pode ver o reino de Deus.</span>
+            </div>
+            <div class="m-verse selected" style="position:relative;">
+              <span class="m-verse-num">16</span>
+              <span class="m-verse-text">Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.</span>
+              <div class="m-popup">
+                <button class="m-pop-btn">✎ Anotar</button>
+                <button class="m-pop-btn">⚑ Destacar</button>
+                <button class="m-pop-btn">⇄ Comparar</button>
+                <button class="m-pop-btn">↗ Compartilhar</button>
+              </div>
+            </div>
+            <div class="m-verse">
+              <span class="m-verse-num">17</span>
+              <span class="m-verse-text">Porque Deus não enviou o seu Filho ao mundo para condenar o mundo, mas para que o mundo seja salvo por ele.</span>
+            </div>
+            <div class="m-nav-chapters">
+              <div class="m-nav-btn">← João 2</div>
+              <div class="m-chapter-indicator">3 / 21</div>
+              <div class="m-nav-btn">João 4 →</div>
+            </div>
+          </div>
+          <div class="m-study-panel">
+            <div class="m-panel-header">
+              <div class="m-panel-title">Painel de Estudo</div>
+              <div class="m-panel-tabs">
+                <button class="m-ptab active">Contexto</button>
+                <button class="m-ptab">Língua</button>
+                <button class="m-ptab">Notas</button>
+              </div>
+            </div>
+            <div class="m-verse-ref">"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito..." — Jo 3:16</div>
+            <div class="m-study-section">
+              <h5>Contexto Histórico</h5>
+              <p>Este versículo é o epicentro teológico do Evangelho de João e possivelmente de toda a Bíblia. Escrito por volta de 90 d.C., reflete a maturidade teológica da comunidade joanina.</p>
+            </div>
+            <div class="m-study-section">
+              <h5>Referências Cruzadas</h5>
+              <div class="m-cross-ref">João 1:14 — O Verbo se fez carne</div>
+              <div class="m-cross-ref">Romanos 5:8 — Amor incondicional</div>
+              <div class="m-cross-ref">1 João 4:9 — Deus é amor</div>
+              <div class="m-cross-ref">Efésios 2:4-5 — Rico em misericórdia</div>
+            </div>
+            <div class="m-study-section">
+              <h5>Língua Original (Grego)</h5>
+              <p style="font-family:'DM Mono',monospace; font-size:0.75rem; color:#9a6e1e;">ἠγάπησεν (agapao) — amar<br>μονογενής (monogenes) — unigênito</p>
+            </div>
+            <div class="m-note-box">Adicionar nota pessoal...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+      <strong style="color: var(--text-soft);">Decisões de design nesta tela:</strong> Layout dividido 65%/35% — o texto domina. O painel de estudo desliza pelo lado direito sem cobrir o texto. O popup de ação surge ao clicar em qualquer versículo. Navegação entre capítulos sempre visível no rodapé. A versão (ACF) é sempre visível no breadcrumb. Modo focado esconde o painel de estudo e o header para imersão total.
+    </div>
+  </div>
+
+  <!-- MOBILE SCREEN -->
+  <div id="screen-mobile" class="screen">
+    <div class="mockup-frame">
+      <div class="mockup-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="mockup-url">bibliaviva.com.br — iPhone 15</div>
+      </div>
+      <div class="m-mobile-wrap">
+        <div class="m-phone">
+          <div class="m-phone-notch"><div class="m-phone-notch-inner"></div></div>
+          <div class="m-phone-content">
+            <div class="m-pnav">
+              <div style="font-size:0.7rem; color:#9a8c78;">← João</div>
+              <div class="m-plogo">Cap. 3</div>
+              <div class="m-pbtn">Aa</div>
+            </div>
+            <div class="m-ptext">
+              <div class="m-pchap">João · Capítulo 3</div>
+              <div class="m-pverse"><span class="m-pnum">1</span><span class="m-pvtext">Havia entre os fariseus um homem chamado Nicodemos, um dos líderes dos judeus.</span></div>
+              <div class="m-pverse"><span class="m-pnum">2</span><span class="m-pvtext">Este foi ter com Jesus de noite e disse-lhe: Rabi, sabemos que és um mestre que veio da parte de Deus.</span></div>
+              <div class="m-pverse" style="background:rgba(176,141,58,0.08); border-radius:6px; padding:0.3rem; margin-left:-0.3rem;"><span class="m-pnum">16</span><span class="m-pvtext">Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.</span></div>
+              <div class="m-pverse"><span class="m-pnum">17</span><span class="m-pvtext">Porque Deus não enviou o seu Filho ao mundo para condenar o mundo.</span></div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding: 0.8rem 1.2rem; border-top: 1px solid #e0d9cc; background: rgba(248,244,237,0.98);">
+              <div style="font-size:0.7rem; color:#9a6e1e;">← Cap. 2</div>
+              <div style="display:flex; gap:0.5rem;">
+                <div style="width:6px; height:6px; border-radius:50%; background:#d4ccc0;"></div>
+                <div style="width:6px; height:6px; border-radius:50%; background:#d4ccc0;"></div>
+                <div style="width:8px; height:8px; border-radius:50%; background:#b08d3a;"></div>
+                <div style="width:6px; height:6px; border-radius:50%; background:#d4ccc0;"></div>
+                <div style="width:6px; height:6px; border-radius:50%; background:#d4ccc0;"></div>
+              </div>
+              <div style="font-size:0.7rem; color:#9a6e1e;">Cap. 4 →</div>
+            </div>
+            <div class="m-pbottombar">
+              <div class="m-btab"><div class="m-btab-icon">⌂</div><div class="m-btab-label">Início</div></div>
+              <div class="m-btab active"><div class="m-btab-icon" style="color:#9a6e1e;">📖</div><div class="m-btab-label" style="color:#9a6e1e;">Ler</div></div>
+              <div class="m-btab"><div class="m-btab-icon">🔍</div><div class="m-btab-label">Buscar</div></div>
+              <div class="m-btab"><div class="m-btab-icon">📋</div><div class="m-btab-label">Planos</div></div>
+              <div class="m-btab"><div class="m-btab-icon">☰</div><div class="m-btab-label">Menu</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+      <strong style="color: var(--text-soft);">Decisões de design no mobile:</strong> Bottom navigation bar com 5 itens (padrão mobile). Fonte Lora em 15px mínimo — legibilidade prioritária. Swipe horizontal entre capítulos (gesto nativo). Tap em qualquer versículo abre um bottom sheet de ações. O painel de estudo vira um bottom sheet deslizável de baixo para cima. Sem sidebar. Sem menus ocultos difíceis de descobrir.
+    </div>
+  </div>
+
+  <!-- COMPARE SCREEN -->
+  <div id="screen-compare" class="screen">
+    <div class="mockup-frame">
+      <div class="mockup-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="mockup-url">bibliaviva.com.br/comparar/jo/3</div>
+      </div>
+      <div class="mockup-body m-compare">
+        <div class="m-cmp-nav">
+          <div style="font-family:'Lora',serif; font-size:0.9rem; color:#2a2218;">João 3 — Comparar versões</div>
+          <div style="display:flex; gap:0.4rem; margin-left: auto;">
+            <div class="m-cmp-chip">ACF</div>
+            <div class="m-cmp-chip">NVI</div>
+            <div class="m-cmp-chip">ARA</div>
+            <div class="m-cmp-add">+ versão</div>
+          </div>
+        </div>
+        <div style="background: rgba(176,141,58,0.06); border-bottom: 1px solid #e0d9cc; padding: 0.6rem 2rem; font-size: 0.72rem; color: #8a7b65; display:flex; align-items:center; gap: 0.6rem;">
+          <div style="width:10px; height:10px; background:rgba(176,141,58,0.3); border-radius:2px;"></div>
+          Diferenças entre traduções destacadas em dourado
+        </div>
+        <div class="m-cmp-grid">
+          <div class="m-cmp-col">
+            <div class="m-cmp-version">Almeida Corrigida Fiel (ACF)</div>
+            <div class="m-cmp-verse"><span class="m-cmp-num">3</span><span class="m-cmp-text">Respondeu-lhe Jesus: Em verdade, em verdade te digo que aquele que não <span class="m-cmp-diff">nascer de novo</span> não pode ver o reino de Deus.</span></div>
+            <div class="m-cmp-verse"><span class="m-cmp-num">16</span><span class="m-cmp-text">Porque Deus amou o mundo de tal maneira que deu o seu Filho <span class="m-cmp-diff">unigênito</span>, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.</span></div>
+            <div class="m-cmp-verse"><span class="m-cmp-num">17</span><span class="m-cmp-text">Porque Deus não enviou o seu Filho ao mundo para condenar o mundo, mas para que o mundo seja salvo por ele.</span></div>
+          </div>
+          <div class="m-cmp-col">
+            <div class="m-cmp-version">Nova Versão Internacional (NVI)</div>
+            <div class="m-cmp-verse"><span class="m-cmp-num">3</span><span class="m-cmp-text">Jesus respondeu: "Eu lhe afirmo solenemente que ninguém pode ver o Reino de Deus sem <span class="m-cmp-diff">nascer de novo.</span>"</span></div>
+            <div class="m-cmp-verse"><span class="m-cmp-num">16</span><span class="m-cmp-text">"Deus amou o mundo de tal maneira que deu o seu Filho <span class="m-cmp-diff">único</span>, para que todo aquele que nele crer não pereça, mas tenha a vida eterna.</span></div>
+            <div class="m-cmp-verse"><span class="m-cmp-num">17</span><span class="m-cmp-text">Deus não enviou o seu Filho ao mundo para condenar o mundo, mas sim para salvá-lo por meio dele.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;">
+      <strong style="color: var(--text-soft);">Decisões de design — Comparar:</strong> Colunas sincronizadas — scroll em uma move a outra. Diferenças entre traduções são automaticamente destacadas com IA. Até 4 colunas simultâneas no desktop, 2 no mobile. Chips clicáveis para adicionar ou remover traduções em tempo real. Acesso a este modo por botão no topo da tela de leitura ou ao clicar em um versículo.
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2rem;"><div class="divider"></div></div>
+
+<!-- SISTEMA DE DESIGN -->
+<section id="s5">
+  <div class="section-label">05 — Sistema de Design</div>
+  <div class="section-title">Tipografia, cores e<br>consistência visual</div>
+  <div class="section-desc">Um sistema coeso que transmite reverência, clareza e modernidade — sem ser genérico.</div>
+
+  <div style="margin-bottom: 2rem;">
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Paleta de cores — Tema Sépia (padrão)</div>
+    <div class="color-palette">
+      <div class="swatch" style="background:#f8f4ed; border:1px solid #e0d9cc; color:#3a3020;">#f8f4ed<br><span style="font-size:0.6rem">Fundo</span></div>
+      <div class="swatch" style="background:#ede9e0; color:#3a3020;">#ede9e0<br><span style="font-size:0.6rem">Superfície</span></div>
+      <div class="swatch" style="background:#9a6e1e; color:white;">#9a6e1e<br><span style="font-size:0.6rem">Ouro primário</span></div>
+      <div class="swatch" style="background:#b08d3a; color:white;">#b08d3a<br><span style="font-size:0.6rem">Ouro secundário</span></div>
+      <div class="swatch" style="background:#2a2218; color:#e0d9cc;">#2a2218<br><span style="font-size:0.6rem">Texto escuro</span></div>
+      <div class="swatch" style="background:#9a8c78; color:white;">#9a8c78<br><span style="font-size:0.6rem">Texto suave</span></div>
+      <div class="swatch" style="background:#1a1612; color:#e0d9cc;">#1a1612<br><span style="font-size:0.6rem">Dark: Fundo</span></div>
+      <div class="swatch" style="background:#c9a84c; color:#1a1612;">#c9a84c<br><span style="font-size:0.6rem">Dark: Ouro</span></div>
+    </div>
+  </div>
+
+  <div class="type-showcase">
+    <div class="type-row">
+      <div class="type-meta"><div class="name">Display / Título</div><div class="size">Lora / 2rem / 400</div></div>
+      <div class="t-display">João · Capítulo 3</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="name">Texto do versículo</div><div class="size">Lora / 1rem / 400</div></div>
+      <div class="t-body">Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="name">Interface / UI</div><div class="size">DM Sans / 0.85rem / 400</div></div>
+      <div class="t-ui">Antigo Testamento · 39 livros · Selecionar versão</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="name">Numeração</div><div class="size">DM Mono / 0.7rem / 400</div></div>
+      <div class="t-verse-num">3 · 16 · 17 · ACF · NVI</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 1.5rem;">
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Atalhos de teclado (power users)</div>
+    <div class="kbd-grid">
+      <div class="kbd-row"><div class="kbd">←  →</div><div class="kbd-desc">Capítulo anterior / próximo</div></div>
+      <div class="kbd-row"><div class="kbd">G</div><div class="kbd-desc">Ir para (Go to) — abre buscador</div></div>
+      <div class="kbd-row"><div class="kbd">F</div><div class="kbd-desc">Modo focado on/off</div></div>
+      <div class="kbd-row"><div class="kbd">Cmd+F</div><div class="kbd-desc">Buscar no capítulo atual</div></div>
+      <div class="kbd-row"><div class="kbd">+  -</div><div class="kbd-desc">Aumentar / diminuir fonte</div></div>
+      <div class="kbd-row"><div class="kbd">D</div><div class="kbd-desc">Alternar tema claro/escuro</div></div>
+      <div class="kbd-row"><div class="kbd">C</div><div class="kbd-desc">Modo comparar versões</div></div>
+      <div class="kbd-row"><div class="kbd">Esc</div><div class="kbd-desc">Fechar painéis / voltar</div></div>
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2rem;"><div class="divider"></div></div>
+
+<!-- FEATURES -->
+<section id="s6">
+  <div class="section-label">06 — Features Diferenciadoras</div>
+  <div class="section-title">O que nenhum outro<br>site bíblico tem</div>
+  <div class="section-desc">Features que transformam uma leitura passiva em estudo ativo — todas integradas na experiência principal, sem abas extras.</div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">🤖</div>
+      <h4>Assistente de Estudo com IA</h4>
+      <p>Selecione qualquer versículo e pergunte: "O que significa este versículo?", "Qual o contexto histórico?", "Como outros livros falam sobre isto?" A IA responde no painel lateral.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⇄</div>
+      <h4>Comparação paralela de versões</h4>
+      <p>Até 4 traduções lado a lado, com diferenças destacadas automaticamente. Sincronização de scroll entre colunas. Disponível para 150+ versões.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🗺️</div>
+      <h4>Mapa de leitura interativo</h4>
+      <p>Visualize onde você está na Bíblia como um todo. Um mapa visual mostra o progresso, capítulos lidos, livros concluídos — como um videogame.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">✎</div>
+      <h4>Notas e destaques pessoais</h4>
+      <p>Anote em qualquer versículo. Destaque com 5 cores diferentes. Exporte para PDF, Notion ou WhatsApp. Sincronização cross-device via conta gratuita.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔗</div>
+      <h4>Referências cruzadas visuais</h4>
+      <p>Versículos conectados aparecem visualmente. Clique em um versículo para ver uma teia de referências relacionadas em outros livros — navegação sem perder o contexto.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">♪</div>
+      <h4>Áudio com Text-to-Speech nativo</h4>
+      <p>Ouça o capítulo com voz natural em PT-BR. Controle de velocidade, voz masculina/feminina. Ideal para dirijir ou fazer exercícios enquanto lê.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📅</div>
+      <h4>Planos de leitura personalizados</h4>
+      <p>Bíblia em 1 ano, NT em 90 dias, Salmos em um mês, ou crie o seu. Notificações gentis, sem pressão. Progresso visual como um streak.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">♿</div>
+      <h4>Acessibilidade de primeiro nível</h4>
+      <p>Fonte OpenDyslexic, alto contraste WCAG AAA, tamanho de fonte de 12 a 32px, compatível com leitores de tela, navegação 100% por teclado.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📤</div>
+      <h4>Compartilhamento rico</h4>
+      <p>Gere um card visual bonito do versículo para Instagram, WhatsApp ou Twitter. Fundo com textura de papel, tipografia cuidada, pronto para postar.</p>
+    </div>
+  </div>
+</section>
+
+<div style="max-width:1100px; margin: 0 auto; padding: 0 2rem;"><div class="divider"></div></div>
+
+<!-- TÉCNICO -->
+<section id="s7">
+  <div class="section-label">07 — Stack Técnica Recomendada</div>
+  <div class="section-title">Tecnologia a serviço<br>da experiência</div>
+  <div class="section-desc">Escolhas técnicas que garantem performance de 100ms de carregamento, offline-first e zero dependência de conexão para quem já visitou.</div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <h5>Frontend</h5>
+      <ul>
+        <li>Next.js 15 (App Router)</li>
+        <li>React 19 + TypeScript</li>
+        <li>Tailwind CSS v4</li>
+        <li>Framer Motion (animações)</li>
+        <li>Radix UI (acessibilidade)</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <h5>Performance</h5>
+      <ul>
+        <li>ISR — geração estática por capítulo</li>
+        <li>Service Worker (offline-first)</li>
+        <li>Route prefetching automático</li>
+        <li>Edge Functions (Vercel/CF)</li>
+        <li>Core Web Vitals: todos verdes</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <h5>Backend / Dados</h5>
+      <ul>
+        <li>PostgreSQL + Prisma ORM</li>
+        <li>API REST + tRPC</li>
+        <li>Redis para cache de versículos</li>
+        <li>150+ versões bíblicas em JSON</li>
+        <li>Full-text search com Postgres</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <h5>IA & Estudo</h5>
+      <ul>
+        <li>Claude API (Anthropic)</li>
+        <li>RAG com corpus bíblico</li>
+        <li>Embeddings para cruzamentos</li>
+        <li>TTS com ElevenLabs / Web Speech</li>
+        <li>Cache de respostas frequentes</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <h5>Conta & Sync</h5>
+      <ul>
+        <li>Auth: NextAuth v5</li>
+        <li>Login via Google / Email</li>
+        <li>Notas em Supabase Realtime</li>
+        <li>Export: PDF, JSON, Markdown</li>
+        <li>PWA instalável no celular</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <h5>Analytics & SEO</h5>
+      <ul>
+        <li>Metadata dinâmica por versículo</li>
+        <li>Structured Data (Bible markup)</li>
+        <li>Sitemap auto-gerado (31k+ páginas)</li>
+        <li>Posthog (analytics ético)</li>
+        <li>Lighthouse score alvo: 100</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem;">
+    <div style="font-size: 0.8rem; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem;">Estimativa de desenvolvimento</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+      <div>
+        <div style="font-size: 0.7rem; color: var(--text-muted);">MVP (leitura + busca)</div>
+        <div style="font-size: 1.3rem; color: var(--text); font-weight: 500; margin-top: 0.3rem;">4–6 semanas</div>
+      </div>
+      <div>
+        <div style="font-size: 0.7rem; color: var(--text-muted);">V1 completo (+ estudo + IA)</div>
+        <div style="font-size: 1.3rem; color: var(--text); font-weight: 500; margin-top: 0.3rem;">3–4 meses</div>
+      </div>
+      <div>
+        <div style="font-size: 0.7rem; color: var(--text-muted);">Time ideal</div>
+        <div style="font-size: 1.3rem; color: var(--text); font-weight: 500; margin-top: 0.3rem;">2 devs + 1 designer</div>
+      </div>
+      <div>
+        <div style="font-size: 0.7rem; color: var(--text-muted);">Custo infra/mês (10k users)</div>
+        <div style="font-size: 1.3rem; color: var(--text); font-weight: 500; margin-top: 0.3rem;">~$80–$150</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="text-align: center; padding: 4rem 2rem; border-top: 1px solid var(--border); margin-top: 2rem;">
+  <div style="font-family: 'Lora', serif; font-size: 1.2rem; color: var(--gold); margin-bottom: 0.5rem; font-style: italic;">"A palavra de Deus merece a melhor experiência possível."</div>
+  <div style="font-size: 0.78rem; color: var(--text-muted);">Plano UX/UI — Bíblia Viva · Gerado com Claude (Anthropic) · 2026</div>
+</div>
+
+<script>
+function showScreen(id, tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  tab.classList.add('active');
+}
+
+// Scroll animations
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Nav highlight
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = ['s1','s2','s3','s4','s5','s6','s7'];
+window.addEventListener('scroll', () => {
+  let current = 0;
+  sections.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 100) current = i;
+  });
+  navLinks.forEach((l, i) => l.classList.toggle('active', i === current));
+});
+</script>
+</body>
+</html>

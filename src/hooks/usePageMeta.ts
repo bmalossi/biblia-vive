@@ -1,0 +1,67 @@
+import { useEffect } from "react";
+
+interface PageMeta {
+  canonical?: string;
+  description?: string;
+  image?: string;
+  jsonLd?: Record<string, unknown>;
+  robots?: string;
+  title: string;
+  type?: string;
+}
+
+const upsertMeta = (name: string, content: string, property = false) => {
+  const selector = property ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+  let tag = document.head.querySelector<HTMLMetaElement>(selector);
+  if (!tag) {
+    tag = document.createElement("meta");
+    if (property) tag.setAttribute("property", name);
+    else tag.setAttribute("name", name);
+    document.head.appendChild(tag);
+  }
+  tag.content = content;
+};
+
+export function usePageMeta({ title, description, canonical, image, type = "website", robots, jsonLd }: PageMeta) {
+  useEffect(() => {
+    const origin = window.location.origin;
+    document.title = title;
+
+    if (description) {
+      upsertMeta("description", description);
+      upsertMeta("og:description", description, true);
+      upsertMeta("twitter:description", description);
+    }
+
+    upsertMeta("og:title", title, true);
+    upsertMeta("twitter:title", title);
+    upsertMeta("og:type", type, true);
+    if (robots) upsertMeta("robots", robots);
+    if (image) {
+      const absoluteImage = image.startsWith("http") ? image : `${origin}${image}`;
+      upsertMeta("og:image", absoluteImage, true);
+      upsertMeta("twitter:image", absoluteImage);
+    }
+
+    const canonicalHref = canonical ? (canonical.startsWith("http") ? canonical : `${origin}${canonical}`) : `${origin}${window.location.pathname}`;
+    let canonicalTag = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonicalTag) {
+      canonicalTag = document.createElement("link");
+      canonicalTag.rel = "canonical";
+      document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.href = canonicalHref;
+
+    const id = "bv-json-ld";
+    const previousScript = document.getElementById(id);
+    if (previousScript) previousScript.remove();
+
+    if (jsonLd) {
+      const script = document.createElement("script");
+      script.id = id;
+      script.type = "application/ld+json";
+      script.textContent = JSON.stringify(jsonLd);
+      document.head.appendChild(script);
+    }
+  }, [canonical, description, image, jsonLd, robots, title, type]);
+}

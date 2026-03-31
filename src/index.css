@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --font-serif: "Lora", serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+    --font-mono: "DM Mono", monospace;
+    --font-reading: "Lora", serif;
+    --font-size-reading: 18px;
+    --verse-spacing: 0.8rem;
+    --column-width: 680px;
+
+    --bg: 42 32% 94%;
+    --bg-surface: 44 30% 91%;
+    --bg-raised: 44 26% 88%;
+    --text: 28 25% 19%;
+    --text-muted: 30 13% 40%;
+    --gold: 38 46% 45%;
+    --gold-bg: 40 57% 87%;
+
+    --background: var(--bg);
+    --foreground: var(--text);
+
+    --card: var(--bg-raised);
+    --card-foreground: var(--text);
+
+    --popover: var(--bg-surface);
+    --popover-foreground: var(--text);
+
+    --primary: var(--gold);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: var(--bg-surface);
+    --secondary-foreground: var(--text);
+
+    --muted: var(--bg-raised);
+    --muted-foreground: var(--text-muted);
+
+    --accent: var(--gold-bg);
+    --accent-foreground: var(--text);
+
+    --destructive: 2 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 23% 78%;
+    --input: var(--bg-raised);
+    --ring: var(--gold);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: var(--bg-surface);
+    --sidebar-foreground: var(--text);
+    --sidebar-primary: var(--gold);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--gold-bg);
+    --sidebar-accent-foreground: var(--text);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--gold);
+    --reading-panel-bg: 39 88% 95%;
+    --toast-success: 130 35% 34%;
+    --toast-success-bg: 130 44% 92%;
+    --toast-success-fg: 130 35% 20%;
+    --toast-info: var(--gold);
+    --toast-info-bg: var(--gold-bg);
+    --toast-info-fg: var(--text);
+    --toast-error: var(--destructive);
+    --toast-error-bg: 2 80% 93%;
+    --toast-error-fg: 2 60% 24%;
+  }
+
+  [data-theme="light"] {
+    --bg: 0 0% 99%;
+    --bg-surface: 42 20% 96%;
+    --bg-raised: 38 16% 93%;
+    --text: 222 18% 14%;
+    --text-muted: 222 8% 34%;
+    --gold: 40 62% 44%;
+    --gold-bg: 42 80% 89%;
+    --border: 210 15% 85%;
+    --reading-panel-bg: 0 0% 100%;
+  }
+
+  [data-theme="dark"],
+  .dark {
+    --bg: 30 13% 10%;
+    --bg-surface: 28 12% 14%;
+    --bg-raised: 30 11% 18%;
+    --text: 42 36% 92%;
+    --text-muted: 35 16% 74%;
+    --gold: 41 60% 56%;
+    --gold-bg: 39 35% 25%;
+    --border: 30 11% 28%;
+
+    --background: var(--bg);
+    --foreground: var(--text);
+    --card: var(--bg-raised);
+    --card-foreground: var(--text);
+    --popover: var(--bg-surface);
+    --popover-foreground: var(--text);
+    --primary: var(--gold);
+    --primary-foreground: 20 14% 10%;
+    --secondary: var(--bg-surface);
+    --secondary-foreground: var(--text);
+    --muted: var(--bg-raised);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--gold-bg);
+    --accent-foreground: var(--text);
+    --destructive: 3 64% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --input: var(--bg-raised);
+    --ring: var(--gold);
+    --sidebar-background: var(--bg-surface);
+    --sidebar-foreground: var(--text);
+    --sidebar-primary: var(--gold);
+    --sidebar-primary-foreground: 20 14% 10%;
+    --sidebar-accent: var(--gold-bg);
+    --sidebar-accent-foreground: var(--text);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--gold);
+    --reading-panel-bg: 26 14% 9%;
+    --toast-success: 130 48% 64%;
+    --toast-success-bg: 132 22% 20%;
+    --toast-success-fg: 132 40% 89%;
+    --toast-error-bg: 2 34% 24%;
+    --toast-error-fg: 2 64% 88%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .font-editorial {
+    font-family: var(--font-serif);
+  }
+
+  .font-reading {
+    font-family: var(--font-sans);
+  }
+
+  .font-micro {
+    font-family: var(--font-mono);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--gold) / 0.3);
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold) / 0.6);
+  }
+}
+

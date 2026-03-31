@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bíblia Viva — Roadmap de Desenvolvimento</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #09080a;
+  --s1: #111013;
+  --s2: #1a181d;
+  --s3: #232027;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --border3: rgba(255,255,255,0.18);
+  --text: #ede8f5;
+  --soft: #b8aecf;
+  --muted: #6b6280;
+  --faint: #3a3547;
+
+  --gold: #d4a843;
+  --gold2: #f0c870;
+  --gold-bg: rgba(212,168,67,0.1);
+
+  --violet: #9b7fe8;
+  --violet2: #c4aaff;
+  --violet-bg: rgba(155,127,232,0.1);
+
+  --teal: #3ec9a4;
+  --teal2: #7ee8cb;
+  --teal-bg: rgba(62,201,164,0.1);
+
+  --rose: #e8637c;
+  --rose2: #f5a0b0;
+  --rose-bg: rgba(232,99,124,0.1);
+
+  --blue: #4a9de8;
+  --blue2: #90c4f5;
+  --blue-bg: rgba(74,157,232,0.1);
+
+  --green: #5dba74;
+  --green2: #9ddaab;
+  --green-bg: rgba(93,186,116,0.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+/* ─── NAV ─── */
+.top-nav { position: sticky; top: 0; z-index: 200; background: rgba(9,8,10,0.96); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+.nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { font-family: 'Lora', serif; font-size: 1rem; color: var(--gold); display: flex; align-items: center; gap: 0.5rem; }
+.nav-logo span { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.5rem; border: 1px solid var(--border2); border-radius: 20px; }
+.nav-phases { display: flex; gap: 0; }
+.nav-phase { font-size: 0.72rem; color: var(--muted); padding: 0 0.8rem; height: 52px; display: flex; align-items: center; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; letter-spacing: 0.02em; white-space: nowrap; }
+.nav-phase:hover { color: var(--soft); }
+.nav-phase.p0 { --c: var(--violet); }
+.nav-phase.p1 { --c: var(--gold); }
+.nav-phase.p2 { --c: var(--teal); }
+.nav-phase.p3 { --c: var(--blue); }
+.nav-phase.p4 { --c: var(--rose); }
+.nav-phase.p5 { --c: var(--green); }
+.nav-phase.active { color: var(--c); border-bottom-color: var(--c); }
+
+/* ─── HERO ─── */
+.hero { max-width: 1200px; margin: 0 auto; padding: 5rem 2rem 3rem; }
+.hero-eyebrow { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
+.hero-eyebrow::before { content: ''; display: inline-block; width: 28px; height: 1px; background: var(--gold); }
+.hero h1 { font-family: 'Lora', serif; font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 400; line-height: 1.1; color: var(--text); margin-bottom: 1.5rem; }
+.hero h1 em { color: var(--gold); font-style: italic; }
+.hero-sub { font-size: 1rem; color: var(--soft); max-width: 580px; font-weight: 300; line-height: 1.8; margin-bottom: 3rem; }
+
+/* Timeline overview */
+.timeline-overview { display: flex; gap: 0; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 4rem; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.tl-phase { flex: 1; min-width: 120px; padding: 1.2rem 1rem; border-right: 1px solid var(--border); cursor: pointer; transition: background 0.2s; position: relative; }
+.tl-phase:last-child { border-right: none; }
+.tl-phase:hover { background: rgba(255,255,255,0.03); }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-bottom: 0.7rem; }
+.tl-num { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted); margin-bottom: 0.3rem; }
+.tl-name { font-size: 0.78rem; font-weight: 500; margin-bottom: 0.25rem; }
+.tl-dur { font-size: 0.68rem; color: var(--muted); }
+.tl-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+
+/* ─── SECTION ─── */
+.section { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+.section-header { margin-bottom: 3rem; }
+.phase-badge { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.35rem 0.8rem; border-radius: 20px; margin-bottom: 1.2rem; font-weight: 500; }
+.section-title { font-family: 'Lora', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 400; line-height: 1.2; margin-bottom: 0.8rem; }
+.section-desc { font-size: 0.95rem; color: var(--soft); max-width: 600px; font-weight: 300; line-height: 1.8; }
+
+/* ─── SPRINT GRID ─── */
+.sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.sprint-card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.sprint-header { padding: 1.2rem 1.4rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.sprint-number { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 0.3rem; }
+.sprint-title { font-size: 0.92rem; font-weight: 500; color: var(--text); line-height: 1.3; }
+.sprint-week { font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 10px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+.sprint-body { padding: 1rem 1.4rem 1.2rem; }
+.task-list { list-style: none; }
+.task-list li { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.3rem 0; font-size: 0.8rem; color: var(--soft); border-bottom: 1px solid var(--border); }
+.task-list li:last-child { border-bottom: none; }
+.task-icon { font-size: 0.7rem; margin-top: 2px; flex-shrink: 0; }
+.task-primary { color: var(--text); }
+.task-note { font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem; }
+.deliverable { margin-top: 1rem; padding: 0.7rem 0.9rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border); }
+.deliverable-label { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+.deliverable-text { font-size: 0.78rem; color: var(--soft); }
+
+/* ─── MILESTONE ─── */
+.milestone { background: var(--s1); border: 1px solid var(--border2); border-radius: 14px; padding: 2rem; margin: 2rem 0; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }
+.milestone-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.milestone-title { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 400; margin-bottom: 0.5rem; }
+.milestone-desc { font-size: 0.85rem; color: var(--soft); line-height: 1.7; }
+.milestone-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.metric { background: var(--s2); border-radius: 8px; padding: 0.8rem 1rem; }
+.metric-val { font-size: 1.4rem; font-weight: 500; line-height: 1; margin-bottom: 0.25rem; }
+.metric-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ─── LOVABLE TIPS ─── */
+.lovable-block { background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; margin: 1.5rem 0; }
+.lovable-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem; }
+.lovable-icon { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ee0979); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: white; font-weight: 600; flex-shrink: 0; }
+.lovable-title { font-size: 0.75rem; font-weight: 500; color: var(--soft); }
+.lovable-prompt { font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--teal2); background: rgba(62,201,164,0.06); border: 1px solid rgba(62,201,164,0.15); border-radius: 8px; padding: 0.8rem 1rem; line-height: 1.6; margin-top: 0.5rem; white-space: pre-wrap; }
+.lovable-tip { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+/* ─── TECH STACK CARD ─── */
+.tech-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem; margin-bottom: 1.5rem; }
+.tech-item { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1rem; }
+.tech-item-name { font-size: 0.82rem; font-weight: 500; color: var(--text); margin-bottom: 0.2rem; }
+.tech-item-role { font-size: 0.7rem; color: var(--muted); }
+
+/* ─── DIVIDER ─── */
+.divider { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.divider hr { border: none; border-top: 1px solid var(--border); }
+
+/* ─── CHECKLIST ─── */
+.checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.5rem; }
+.check-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.8rem; background: var(--s1); border-radius: 8px; border: 1px solid var(--border); }
+.check-box { width: 16px; height: 16px; border: 1.5px solid var(--border2); border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+.check-text { font-size: 0.8rem; color: var(--soft); line-height: 1.4; }
+.check-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+
+/* ─── POST-MVP TABLE ─── */
+.version-grid { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.version-row { display: grid; grid-template-columns: 160px 1fr 120px 120px; gap: 0; background: var(--s1); }
+.version-row.header { background: var(--s2); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.version-cell { padding: 1rem 1.2rem; border-right: 1px solid var(--border); font-size: 0.82rem; }
+.version-cell:last-child { border-right: none; }
+.v-name { font-weight: 500; color: var(--text); }
+.v-badge { display: inline-block; font-size: 0.62rem; padding: 0.15rem 0.4rem; border-radius: 8px; margin-top: 0.25rem; }
+
+/* ─── TIMELINE VISUAL ─── */
+.big-timeline { position: relative; padding-left: 2rem; }
+.big-timeline::before { content: ''; position: absolute; left: 7px; top: 12px; bottom: 12px; width: 1px; background: var(--border2); }
+.btl-item { position: relative; padding: 0 0 2.5rem 2rem; }
+.btl-item:last-child { padding-bottom: 0; }
+.btl-dot { position: absolute; left: -2rem; top: 4px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid; display: flex; align-items: center; justify-content: center; }
+.btl-dot-inner { width: 5px; height: 5px; border-radius: 50%; }
+.btl-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+.btl-phase { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.btl-duration { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+.btl-title { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 0.4rem; }
+.btl-features { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.btl-feat { font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 10px; }
+
+/* ─── COLORS BY PHASE ─── */
+.c-violet { --phase-c: var(--violet); --phase-bg: var(--violet-bg); --phase-c2: var(--violet2); }
+.c-gold { --phase-c: var(--gold); --phase-bg: var(--gold-bg); --phase-c2: var(--gold2); }
+.c-teal { --phase-c: var(--teal); --phase-bg: var(--teal-bg); --phase-c2: var(--teal2); }
+.c-blue { --phase-c: var(--blue); --phase-bg: var(--blue-bg); --phase-c2: var(--blue2); }
+.c-rose { --phase-c: var(--rose); --phase-bg: var(--rose-bg); --phase-c2: var(--rose2); }
+.c-green { --phase-c: var(--green); --phase-bg: var(--green-bg); --phase-c2: var(--green2); }
+
+.phase-badge { background: var(--phase-bg); color: var(--phase-c); border: 1px solid var(--phase-c); }
+.sprint-week { background: var(--phase-bg); color: var(--phase-c2); border: 1px solid rgba(255,255,255,0.1); }
+.tl-dot { background: var(--phase-c); }
+.tl-bar { background: var(--phase-c); opacity: 0.6; }
+.btl-dot { border-color: var(--phase-c); }
+.btl-dot-inner { background: var(--phase-c); }
+.btl-phase { color: var(--phase-c); }
+.milestone-label { color: var(--phase-c); }
+.milestone-title { color: var(--phase-c2); }
+.btl-feat { background: var(--phase-bg); color: var(--phase-c2); }
+.v-badge { background: var(--phase-bg); color: var(--phase-c2); }
+.deliverable-text { color: var(--phase-c2); }
+
+/* ─── FOOTER ─── */
+.footer { text-align: center; padding: 4rem 2rem; border-top: 1px solid var(--border); max-width: 1200px; margin: 0 auto; }
+.footer-quote { font-family: 'Lora', serif; font-size: 1.1rem; font-style: italic; color: var(--gold); margin-bottom: 0.5rem; }
+.footer-sub { font-size: 0.75rem; color: var(--muted); }
+
+@media (max-width: 768px) {
+  .nav-phases { display: none; }
+  .milestone { grid-template-columns: 1fr; }
+  .version-row { grid-template-columns: 1fr; }
+  .version-row.header { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <div class="nav-inner">
+    <div class="nav-logo">✦ Bíblia Viva <span>Roadmap 2026</span></div>
+    <div class="nav-phases">
+      <div class="nav-phase p0 active" onclick="scrollSec('p0')">00 · Setup</div>
+      <div class="nav-phase p1" onclick="scrollSec('p1')">01 · MVP</div>
+      <div class="nav-phase p2" onclick="scrollSec('p2')">02 · Estudo</div>
+      <div class="nav-phase p3" onclick="scrollSec('p3')">03 · IA</div>
+      <div class="nav-phase p4" onclick="scrollSec('p4')">04 · Comunidade</div>
+      <div class="nav-phase p5" onclick="scrollSec('p5')">05 · Escala</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Roadmap de Desenvolvimento · Bíblia Viva</div>
+  <h1>De zero ao<br>melhor site bíblico<br><em>do mundo</em></h1>
+  <div class="hero-sub">6 fases, 12 sprints, do Lovable ao produto completo. Cada tarefa com prompt sugerido para o Lovable e critérios claros de conclusão.</div>
+
+  <!-- Timeline overview -->
+  <div class="timeline-overview">
+    <div class="tl-phase c-violet" onclick="scrollSec('p0')" style="background: rgba(155,127,232,0.05);">
+      <div class="tl-dot"></div>
+      <div class="tl-num">FASE 00</div>
+      <div class="tl-name" style="color:var(--violet2);">Fundação</div>
+      <div class="tl-dur">1 semana</div>
+      <div class="tl-bar"></div>
+    </div>
+    <div class="tl-phase c-gold" onclick="scrollSec('p1')" style="background: rgba(212,168,67,0.05);">
+      <div class="tl-dot"></div>
+      <div class="tl-num">FASE 01</div>
+      <div class="tl-name" style="color:var(--gold2);">MVP</div>
+      <div class="tl-dur">5 semanas</div>
+      <div class="tl-bar"></div>
+    </div>
+    <div class="tl-phase c-teal" onclick="scrollSec('p2')" style="background: rgba(62,201,164,0.05);">
+      <div class="tl-dot"></div>
+      <div class="tl-num">FASE 02</div>
+      <div class="tl-name" style="color:var(--teal2);">Estudo</div>
+      <div class="tl-dur">4 semanas</div>
+      <div class="tl-bar"></div>
+    </div>
+    <div class="tl-phase c-blue" onclick="scrollSec('p3')" style="background: rgba(74,157,232,0.05);">
+      <div class="tl-dot"></div>
+      <div class="tl-num">FASE 03</div>
+      <div class="tl-name" style="color:var(--blue2);">IA & Pessoal</div>
+      <div class="tl-dur">4 semanas</div>
+      <div class="tl-bar"></div>
+    </div>
+    <div class="tl-phase c-rose" onclick="scrollSec('p4')" style="background: rgba(232,99,124,0.05);">
+      <div class="tl-dot"></div>
+      <div class="tl-num">FASE 04</div>
+      <div class="tl-name" style="color:var(--rose2);">Comunidade</div>
+      <div class="tl-dur">4 semanas</div>
+      <div class="tl-bar"></div>
+    </div>
+    <div class="tl-phase c-green" onclick="scrollSec('p5')" style="background: rgba(93,186,116,0.05);">
+      <div class="tl-dot"></div>
+      <div class="tl-num">FASE 05</div>
+      <div class="tl-name" style="color:var(--green2);">Escala</div>
+      <div class="tl-dur">Contínuo</div>
+      <div class="tl-bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FASE 00 — FUNDAÇÃO -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section c-violet" id="p0">
+  <div class="section-header">
+    <div class="phase-badge">Fase 00 · 1 semana · Antes de abrir o Lovable</div>
+    <div class="section-title">Fundação &<br>Preparação</div>
+    <div class="section-desc">Tudo que precisa ser decidido e preparado antes de escrever a primeira linha de código no Lovable. Pular esta fase significa refazer depois.</div>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-card c-violet">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">SPRINT 00-A</div>
+          <div class="sprint-title">Dados bíblicos & Decisões técnicas</div>
+        </div>
+        <div class="sprint-week">Dias 1–3</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">📦</span><div><div class="task-primary task-note">Baixar Bible API open-source (API.Bible ou scripture.api.bible)</div><div class="task-note">Gratuita até 5.000 req/dia · Tem ACF, ARA, NVI, KJV e mais</div></div></li>
+          <li><span class="task-icon">📄</span><div><div class="task-primary task-note">Preparar JSON local com os 66 livros + capítulos + número de versículos</div><div class="task-note">Isso vira o "índice" offline da navegação</div></div></li>
+          <li><span class="task-icon">🎨</span><div><div class="task-primary task-note">Definir tokens de design: cores sépia/dark, fontes Lora + DM Sans</div><div class="task-note">Criar arquivo design-tokens.css para usar no Lovable</div></div></li>
+          <li><span class="task-icon">🔑</span><div><div class="task-primary task-note">Criar conta na API.Bible e gerar chave de API</div><div class="task-note">Guardar no .env: VITE_BIBLE_API_KEY=...</div></div></li>
+          <li><span class="task-icon">📁</span><div><div class="task-primary task-note">Definir estrutura de URL do site</div><div class="task-note">/[versao]/[livro]/[capitulo] → ex: /acf/jo/3</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">API key configurada · JSON de índice bíblico pronto · Tokens de design definidos</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-violet">
+      <div class="sprint-header">
+        <div>
+          <div class="sprint-number">SPRINT 00-B</div>
+          <div class="sprint-title">Setup Lovable + Repositório</div>
+        </div>
+        <div class="sprint-week">Dias 4–7</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🚀</span><div><div class="task-primary task-note">Criar projeto no Lovable com template React + Supabase</div><div class="task-note">Usar o template "Blank with Supabase" para máximo controle</div></div></li>
+          <li><span class="task-icon">🔗</span><div><div class="task-primary task-note">Conectar repositório GitHub ao Lovable</div><div class="task-note">Permite editar código fora do Lovable quando necessário</div></div></li>
+          <li><span class="task-icon">⚙️</span><div><div class="task-primary task-note">Configurar variáveis de ambiente no Lovable</div><div class="task-note">BIBLE_API_KEY · SUPABASE_URL · SUPABASE_ANON_KEY</div></div></li>
+          <li><span class="task-icon">🎨</span><div><div class="task-primary task-note">Injetar design tokens e fontes Google no projeto base</div><div class="task-note">Adicionar Lora + DM Sans + DM Mono no index.html</div></div></li>
+          <li><span class="task-icon">📱</span><div><div class="task-primary task-note">Configurar domínio + deploy automático</div><div class="task-note">Lovable publica automaticamente a cada commit</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Projeto rodando em preview · GitHub conectado · Supabase ativo · Deploy automático funcionando</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lovable-block c-violet">
+    <div class="lovable-header">
+      <div class="lovable-icon">L</div>
+      <div class="lovable-title">Prompt de início para o Lovable</div>
+    </div>
+    <div class="lovable-prompt">Crie um projeto de site de leitura da Bíblia chamado "Bíblia Viva". 
+
+Stack: React + TypeScript + Tailwind CSS + React Router v6.
+Fontes: Lora (serif, para texto bíblico) e DM Sans (sans-serif, para UI).
+
+Estrutura de rotas inicial:
+- "/" → Homepage
+- "/:versao/:livro/:capitulo" → Página de leitura (ex: /acf/jo/3)
+- "/busca" → Busca
+
+Crie um arquivo src/lib/bibleApi.ts com uma função fetchChapter(version, book, chapter) que 
+consome a API https://api.scripture.api.bible/v1/ com a chave em import.meta.env.VITE_BIBLE_API_KEY.
+
+Paleta de cores no tailwind.config.js:
+- parchment: '#f8f4ed' (fundo)
+- gold: '#9a6e1e' (primário)  
+- ink: '#2a2218' (texto)
+- muted: '#9a8c78' (texto suave)</div>
+    <div class="lovable-tip" style="margin-top:0.8rem;">💡 Dica: Seja específico sobre stack e rotas logo no primeiro prompt. Mudar o roteamento depois no Lovable é trabalhoso.</div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FASE 01 — MVP -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section c-gold" id="p1">
+  <div class="section-header">
+    <div class="phase-badge">Fase 01 · Semanas 2–6 · O MVP</div>
+    <div class="section-title">MVP — Leitura<br>sem fricção</div>
+    <div class="section-desc">O produto mínimo que já é melhor que o BíbliaOnline.com.br. Foco total em leitura limpa, navegação fluida e busca funcional. Sem features extras.</div>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-card c-gold">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 1</div><div class="sprint-title">Homepage + Navegação de Livros</div></div>
+        <div class="sprint-week">Semana 2</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🏠</span><div><div class="task-primary">Layout da homepage com Versículo do Dia</div><div class="task-note">Busca como elemento central, grid de livros abaixo</div></div></li>
+          <li><span class="task-icon">📚</span><div><div class="task-primary">Componente BookGrid com 66 livros</div><div class="task-note">Separados em AT e NT · Nome + número de capítulos</div></div></li>
+          <li><span class="task-icon">🔄</span><div><div class="task-primary">Seletor de versão da Bíblia</div><div class="task-note">Dropdown no header · Persiste via localStorage</div></div></li>
+          <li><span class="task-icon">🎨</span><div><div class="task-primary">3 temas: Sépia (padrão), Claro, Escuro</div><div class="task-note">Toggle no header · CSS variables por tema</div></div></li>
+          <li><span class="task-icon">📱</span><div><div class="task-primary">Layout responsivo completo</div><div class="task-note">Bottom nav no mobile · Hamburger menu</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Homepage publicada · Todos os 66 livros clicáveis · Troca de tema funcionando</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-gold">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 2</div><div class="sprint-title">Seletor de Capítulo + Leitura Básica</div></div>
+        <div class="sprint-week">Semana 3</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">📖</span><div><div class="task-primary">Página de capítulo com texto da API</div><div class="task-note">Fonte Lora 18px · line-height 1.8 · numeração discreta</div></div></li>
+          <li><span class="task-icon">🔢</span><div><div class="task-primary">Seletor visual de capítulos</div><div class="task-note">Grid numérico modal ao clicar no título do capítulo</div></div></li>
+          <li><span class="task-icon">⬅️</span><div><div class="task-primary">Navegação prev/next entre capítulos</div><div class="task-note">Botões no rodapé · Atalhos ← → no teclado</div></div></li>
+          <li><span class="task-icon">🍞</span><div><div class="task-primary">Breadcrumb sempre visível</div><div class="task-note">Versão · Livro · Capítulo — com links clicáveis</div></div></li>
+          <li><span class="task-icon">⚡</span><div><div class="task-primary">Loading skeleton durante fetch da API</div><div class="task-note">Evita CLS (Cumulative Layout Shift)</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Leitura completa funcionando · Navegar entre capítulos em 1 clique · URL atualiza corretamente</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-gold">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 3</div><div class="sprint-title">Busca + Ações por Versículo</div></div>
+        <div class="sprint-week">Semana 4</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🔍</span><div><div class="task-primary">Busca full-text usando API.Bible search</div><div class="task-note">Resultados com contexto · Highlight do termo buscado</div></div></li>
+          <li><span class="task-icon">🔗</span><div><div class="task-primary">Busca por referência direta</div><div class="task-note">"João 3:16" vai direto para o versículo</div></div></li>
+          <li><span class="task-icon">👆</span><div><div class="task-primary">Click em versículo abre popup de ações</div><div class="task-note">Copiar · Compartilhar · Anotar (disabled por enquanto)</div></div></li>
+          <li><span class="task-icon">📋</span><div><div class="task-primary">Copiar versículo com referência formatada</div><div class="task-note">"Texto do versículo" — Livro capítulo:versículo (Versão)</div></div></li>
+          <li><span class="task-icon">📤</span><div><div class="task-primary">Compartilhar via Web Share API</div><div class="task-note">Funciona no mobile nativamente · Fallback para clipboard</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Busca funcional · Popup de ações aparece ao clicar · Copiar e compartilhar operacionais</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-gold">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 4</div><div class="sprint-title">Personalização de Leitura</div></div>
+        <div class="sprint-week">Semana 5</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🔠</span><div><div class="task-primary">Controle de tamanho de fonte (12–32px)</div><div class="task-note">Slider no painel de configurações · Persiste no localStorage</div></div></li>
+          <li><span class="task-icon">⊞</span><div><div class="task-primary">Modo focado (Focus Mode)</div><div class="task-note">Esconde header e footer · Tecla F ou botão no topo</div></div></li>
+          <li><span class="task-icon">🔤</span><div><div class="task-primary">Opções de fonte: Lora / DM Sans / OpenDyslexic</div><div class="task-note">OpenDyslexic via CDN para acessibilidade</div></div></li>
+          <li><span class="task-icon">⏮️</span><div><div class="task-primary">Retomar de onde parou</div><div class="task-note">Salva último capítulo lido no localStorage</div></div></li>
+          <li><span class="task-icon">🎵</span><div><div class="task-primary">Text-to-speech básico com Web Speech API</div><div class="task-note">Gratuito · Botão play/pause no header da leitura</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Personalização completa · Site "lembra" preferências · TTS funcionando em PT-BR</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-gold">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 5</div><div class="sprint-title">Polimento MVP + Publicação</div></div>
+        <div class="sprint-week">Semana 6</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">📱</span><div><div class="task-primary">PWA: manifest.json + Service Worker</div><div class="task-note">Installable no Android/iOS · Cache dos últimos capítulos</div></div></li>
+          <li><span class="task-icon">♿</span><div><div class="task-primary">Auditoria de acessibilidade (Lighthouse)</div><div class="task-note">ARIA labels · navegação por teclado · contraste WCAG AA</div></div></li>
+          <li><span class="task-icon">🚀</span><div><div class="task-primary">Otimização de performance</div><div class="task-note">LCP < 2.5s · FID < 100ms · CLS < 0.1</div></div></li>
+          <li><span class="task-icon">🗺️</span><div><div class="task-primary">SEO: meta tags dinâmicas por capítulo</div><div class="task-note">Title: "João 3 - Bíblia Viva (ACF)" · OG tags para compartilhamento</div></div></li>
+          <li><span class="task-icon">🌐</span><div><div class="task-primary">Deploy em domínio próprio</div><div class="task-note">Configurar domínio no Lovable/Vercel · SSL automático</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">MVP público · Lighthouse > 90 · PWA instalável · SEO básico funcionando</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MVP MILESTONE -->
+  <div class="milestone c-gold">
+    <div>
+      <div class="milestone-label">🏁 Marco — Fim da Fase 01</div>
+      <div class="milestone-title">MVP ao ar — Semana 6</div>
+      <div class="milestone-desc">Um site funcional, bonito e rápido para leitura da Bíblia. Já supera o BíbliaOnline.com.br em experiência de leitura, performance e acessibilidade. Pronto para receber os primeiros usuários reais e coletar feedback.</div>
+    </div>
+    <div class="milestone-metrics">
+      <div class="metric"><div class="metric-val" style="color:var(--gold2);">66</div><div class="metric-label">Livros navegáveis</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--gold2);">8+</div><div class="metric-label">Versões da Bíblia</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--gold2);">&lt;2s</div><div class="metric-label">Tempo de carregamento</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--gold2);">90+</div><div class="metric-label">Lighthouse Score</div></div>
+    </div>
+  </div>
+
+  <!-- MVP CHECKLIST -->
+  <div style="font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.08em; text-transform: uppercase;">Checklist do MVP — o que deve estar 100% funcionando antes de publicar</div>
+  <div class="checklist">
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Todos 66 livros acessíveis<div class="check-sub">AT e NT completos</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Texto dos versículos correto<div class="check-sub">Comparar com Bíblia física</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Navegação prev/next entre capítulos<div class="check-sub">Sem reload de página</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Busca por referência (Jo 3:16)<div class="check-sub">Vai direto para o versículo</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Busca por texto funcional<div class="check-sub">Retorna versículos relevantes</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">3 temas (sépia/claro/escuro)<div class="check-sub">Persiste ao voltar</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Responsivo em mobile (320px+)<div class="check-sub">Testar em iPhone SE e Galaxy A</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Copiar versículo com referência<div class="check-sub">Formato correto para WhatsApp</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">URL correta e shareável<div class="check-sub">/acf/jo/3 funciona ao abrir</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">PWA instalável no celular<div class="check-sub">Ícone aparece na tela inicial</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Sem erros no console<div class="check-sub">0 erros, 0 warnings críticos</div></div></div>
+    <div class="check-item"><div class="check-box"></div><div class="check-text">Tratamento de erro de API<div class="check-sub">Mensagem amigável se falhar</div></div></div>
+  </div>
+
+  <div class="lovable-block c-gold" style="margin-top:2rem;">
+    <div class="lovable-header">
+      <div class="lovable-icon">L</div>
+      <div class="lovable-title">Prompts-chave para o Lovable no Sprint 2 (Tela de Leitura)</div>
+    </div>
+    <div class="lovable-prompt">Crie a página de leitura de capítulo em src/pages/ReadingPage.tsx.
+
+Layout: header com breadcrumb (Versão · Livro · Capítulo), área de texto central com 
+max-width 680px centralizado, painel lateral de 280px (oculto no mobile).
+
+Para cada versículo, renderize:
+- Número do versículo em DM Mono, dourado, 0.65rem
+- Texto em Lora, 1.05rem (ou variável do user preference), line-height 1.85
+- Ao clicar no versículo: exiba um floating toolbar com os botões: "Copiar", "Destacar", "Anotar", "Compartilhar"
+
+Navegação: no rodapé, botões "← Capítulo Anterior" e "Próximo Capítulo →" centralizados.
+Atalhos de teclado: ArrowLeft = capítulo anterior, ArrowRight = próximo.
+
+Dados: consumir a função fetchChapter() já criada em src/lib/bibleApi.ts</div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FASE 02 — ESTUDO -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section c-teal" id="p2">
+  <div class="section-header">
+    <div class="phase-badge">Fase 02 · Semanas 7–10 · Pós-MVP</div>
+    <div class="section-title">Ferramentas de<br>Estudo Integradas</div>
+    <div class="section-desc">Transformar leitura passiva em estudo ativo. O painel lateral ganha vida com referências cruzadas, notas pessoais e comparação de versões.</div>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-card c-teal">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 6</div><div class="sprint-title">Painel de Estudo + Referências Cruzadas</div></div>
+        <div class="sprint-week">Semana 7</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">📊</span><div><div class="task-primary">Painel lateral deslizável na tela de leitura</div><div class="task-note">Abre ao clicar em "Estudar" no popup do versículo</div></div></li>
+          <li><span class="task-icon">🔗</span><div><div class="task-primary">Referências cruzadas por versículo</div><div class="task-note">Usando dataset open-source (OpenBible.info cross-references)</div></div></li>
+          <li><span class="task-icon">🏛️</span><div><div class="task-primary">Contexto histórico do livro (estático)</div><div class="task-note">JSON com resumos de cada livro + data de escrita</div></div></li>
+          <li><span class="task-icon">αβ</span><div><div class="task-primary">Palavra em língua original (Strong's numbers)</div><div class="task-note">API do Open Scripture · Hover mostra tradução literal</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Painel de estudo aberto em 1 clique · Referências cruzadas clicáveis · Strong's numbers básico</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-teal">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 7</div><div class="sprint-title">Notas & Destaques Pessoais</div></div>
+        <div class="sprint-week">Semana 8</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🔐</span><div><div class="task-primary">Autenticação com Supabase Auth</div><div class="task-note">Login via Google + Email/senha · Sem login = só localStorage</div></div></li>
+          <li><span class="task-icon">✎</span><div><div class="task-primary">Notas por versículo (texto livre)</div><div class="task-note">Salva em Supabase se logado · localStorage se não logado</div></div></li>
+          <li><span class="task-icon">🎨</span><div><div class="task-primary">5 cores de destaque por versículo</div><div class="task-note">Amarelo · Azul · Verde · Rosa · Roxo</div></div></li>
+          <li><span class="task-icon">📋</span><div><div class="task-primary">Página "Minhas Notas" com todas as anotações</div><div class="task-note">Filtro por livro · Ordenar por data</div></div></li>
+          <li><span class="task-icon">📤</span><div><div class="task-primary">Exportar notas em PDF e TXT</div><div class="task-note">Usando jsPDF no frontend</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Usuários podem salvar notas e destaques · Sync cross-device com login · Exportação funcionando</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-teal">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 8</div><div class="sprint-title">Comparação Paralela de Versões</div></div>
+        <div class="sprint-week">Semana 9</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">⇄</span><div><div class="task-primary">Modo de comparação com 2–4 colunas</div><div class="task-note">Cada coluna mostra uma versão diferente</div></div></li>
+          <li><span class="task-icon">🔄</span><div><div class="task-primary">Scroll sincronizado entre colunas</div><div class="task-note">Scroll em qualquer coluna move todas</div></div></li>
+          <li><span class="task-icon">🎯</span><div><div class="task-primary">Destacar diferenças entre versões</div><div class="task-note">Comparação via diff algorithm (palavras diferentes em dourado)</div></div></li>
+          <li><span class="task-icon">➕</span><div><div class="task-primary">Chips para adicionar/remover versões</div><div class="task-note">Dropdown com 50+ versões disponíveis</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Comparação paralela completa · Scroll sync funcionando · Diff visual de palavras diferentes</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-teal">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 9</div><div class="sprint-title">Planos de Leitura</div></div>
+        <div class="sprint-week">Semana 10</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">📅</span><div><div class="task-primary">5 planos prontos: Bíblia em 1 ano, NT em 90 dias, Salmos em 30 dias...</div><div class="task-note">Dados em JSON estático · Cada dia = lista de capítulos</div></div></li>
+          <li><span class="task-icon">📊</span><div><div class="task-primary">Progress tracker visual tipo "streak"</div><div class="task-note">Dias consecutivos · Porcentagem de conclusão · Gráfico de calendário</div></div></li>
+          <li><span class="task-icon">✅</span><div><div class="task-primary">Marcar leitura do dia como concluída</div><div class="task-note">Botão no fim do capítulo · Animação de celebração</div></div></li>
+          <li><span class="task-icon">🔔</span><div><div class="task-primary">Lembrete via Push Notification (PWA)</div><div class="task-note">Horário configurável · "Sua leitura de hoje: João 3"</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Planos de leitura funcionais · Progresso salvo · Notificações push opcionais</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="milestone c-teal">
+    <div>
+      <div class="milestone-label">🏁 Marco — Fim da Fase 02 · Semana 10</div>
+      <div class="milestone-title">Versão 1.0 — Produto Completo</div>
+      <div class="milestone-desc">O site se torna o melhor site de leitura e estudo bíblico do Brasil. Notas, destaques, comparação de versões, planos de leitura e referências cruzadas — tudo integrado na experiência de leitura.</div>
+    </div>
+    <div class="milestone-metrics">
+      <div class="metric"><div class="metric-val" style="color:var(--teal2);">150+</div><div class="metric-label">Versões da Bíblia</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--teal2);">5</div><div class="metric-label">Planos de leitura</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--teal2);">∞</div><div class="metric-label">Notas e destaques</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--teal2);">4col</div><div class="metric-label">Comparação paralela</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FASE 03 — IA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section c-blue" id="p3">
+  <div class="section-header">
+    <div class="phase-badge">Fase 03 · Semanas 11–14 · Diferencial Absoluto</div>
+    <div class="section-title">Assistente de IA &<br>Personalização Profunda</div>
+    <div class="section-desc">A feature que nenhum concorrente tem. Um assistente de estudo bíblico com IA rodando direto no painel lateral, sem sair da página.</div>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-card c-blue">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 10</div><div class="sprint-title">Assistente de IA Integrado</div></div>
+        <div class="sprint-week">Semanas 11–12</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🤖</span><div><div class="task-primary">Integração com Claude API (Anthropic)</div><div class="task-note">Edge Function no Supabase para não expor a chave</div></div></li>
+          <li><span class="task-icon">💬</span><div><div class="task-primary">Chat contextual no painel de estudo</div><div class="task-note">Contexto automático: versículo selecionado + livro atual</div></div></li>
+          <li><span class="task-icon">⚡</span><div><div class="task-primary">Perguntas rápidas pré-definidas</div><div class="task-note">"Explicar versículo" · "Contexto histórico" · "Aplicação prática"</div></div></li>
+          <li><span class="task-icon">💾</span><div><div class="task-primary">Cache de respostas frequentes</div><div class="task-note">Versículos mais acessados têm respostas em cache no Supabase</div></div></li>
+          <li><span class="task-icon">🔢</span><div><div class="task-primary">Limites por plano (free: 10/dia, pro: ilimitado)</div><div class="task-note">Rate limiting na Edge Function</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Chat com IA funcionando no painel · Respostas em PT-BR · Contexto do versículo automático</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-blue">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 11</div><div class="sprint-title">Compartilhamento Rico + Versículo Visual</div></div>
+        <div class="sprint-week">Semanas 13–14</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">🖼️</span><div><div class="task-primary">Gerador de cards visuais de versículos</div><div class="task-note">Canvas/HTML2Canvas · Fundo de papel · Tipografia Lora</div></div></li>
+          <li><span class="task-icon">🎨</span><div><div class="task-primary">5 templates de card para redes sociais</div><div class="task-note">Instagram quadrado · Story vertical · Twitter/X</div></div></li>
+          <li><span class="task-icon">🗺️</span><div><div class="task-primary">Mapa visual de progresso de leitura</div><div class="task-note">Grid dos 66 livros com fill colorido por % lido</div></div></li>
+          <li><span class="task-icon">📊</span><div><div class="task-primary">Estatísticas pessoais de leitura</div><div class="task-note">Versículos lidos · Dias de streak · Livros concluídos</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Gerador de cards funcionando · Download em PNG · Mapa de progresso visual</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lovable-block c-blue">
+    <div class="lovable-header">
+      <div class="lovable-icon">L</div>
+      <div class="lovable-title">Prompt para integração da IA no Lovable</div>
+    </div>
+    <div class="lovable-prompt">Crie uma Supabase Edge Function chamada "bible-ai" que:
+1. Recebe: { verseRef, verseText, question } via POST
+2. Chama a Anthropic API (claude-sonnet-4-20250514) com o contexto do versículo
+3. Retorna a resposta em streaming (text/event-stream)
+
+System prompt: "Você é um assistente de estudo bíblico em português. Responda com base 
+no versículo fornecido. Seja claro, profundo e acessível. Máximo 200 palavras por resposta."
+
+No frontend (StudyPanel.tsx):
+- Exiba 3 botões de ação rápida: "Explicar", "Contexto histórico", "Aplicação prática"  
+- Campo de texto para perguntas livres
+- Renderize a resposta com streaming (typewriter effect)
+- Mostre contador: X/10 perguntas grátis hoje</div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FASE 04 — COMUNIDADE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section c-rose" id="p4">
+  <div class="section-header">
+    <div class="phase-badge">Fase 04 · Semanas 15–18 · Crescimento</div>
+    <div class="section-title">Comunidade &<br>Engajamento</div>
+    <div class="section-desc">Features que transformam leitores individuais em uma comunidade. Versículo do dia curado, comentários, grupos de estudo e monetização sustentável.</div>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-card c-rose">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 12</div><div class="sprint-title">Versículo do Dia + Newsletter</div></div>
+        <div class="sprint-week">Semana 15–16</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">☀️</span><div><div class="task-primary">Versículo do Dia curado editorialmente</div><div class="task-note">Tabela no Supabase · Programado 30 dias à frente</div></div></li>
+          <li><span class="task-icon">📧</span><div><div class="task-primary">Newsletter diária com versículo + reflexão</div><div class="task-note">Resend ou SendGrid · Template em HTML bonito</div></div></li>
+          <li><span class="task-icon">📱</span><div><div class="task-primary">Widget do versículo do dia para sites externos</div><div class="task-note">Iframe embeddable · Gerador de código</div></div></li>
+          <li><span class="task-icon">🔗</span><div><div class="task-primary">OG image dinâmica por página</div><div class="task-note">Vercel OG image para links compartilhados ficarem bonitos</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Newsletter rodando · Versículo do dia programado · OG image dinâmica</div></div>
+      </div>
+    </div>
+
+    <div class="sprint-card c-rose">
+      <div class="sprint-header">
+        <div><div class="sprint-number">SPRINT 13</div><div class="sprint-title">Plano Premium + Monetização</div></div>
+        <div class="sprint-week">Semana 17–18</div>
+      </div>
+      <div class="sprint-body">
+        <ul class="task-list">
+          <li><span class="task-icon">💳</span><div><div class="task-primary">Plano Bíblia Viva Pro (R$9,90/mês)</div><div class="task-note">Stripe Checkout · Webhook para ativar no Supabase</div></div></li>
+          <li><span class="task-icon">⭐</span><div><div class="task-primary">Features Pro: IA ilimitada, áudio premium, planos customizados</div><div class="task-note">Verificação de plano via Supabase RLS</div></div></li>
+          <li><span class="task-icon">📦</span><div><div class="task-primary">Exportar Bíblia completa com notas em PDF</div><div class="task-note">Feature Pro · Geração no servidor</div></div></li>
+          <li><span class="task-icon">🎙️</span><div><div class="task-primary">Áudio premium com ElevenLabs (voz natural)</div><div class="task-note">Feature Pro · Cache de capítulos mais lidos</div></div></li>
+        </ul>
+        <div class="deliverable"><div class="deliverable-label">Entrega</div><div class="deliverable-text">Cobrança via Stripe funcionando · Plano Pro ativado automaticamente · Primeira receita</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FASE 05 — ESCALA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section c-green" id="p5">
+  <div class="section-header">
+    <div class="phase-badge">Fase 05 · Mês 5+ · Crescimento Contínuo</div>
+    <div class="section-title">Escala & Evolução<br>Contínua</div>
+    <div class="section-desc">Com o produto validado e a base de usuários crescendo, estas features ampliam o alcance e a profundidade do produto.</div>
+  </div>
+
+  <div class="big-timeline c-green">
+    <div class="btl-item">
+      <div class="btl-dot"><div class="btl-dot-inner"></div></div>
+      <div class="btl-header">
+        <div class="btl-phase">v2.0 · Mês 5–6</div>
+        <div class="btl-duration">Internacionalização</div>
+      </div>
+      <div class="btl-title">App Mobile Nativo (React Native)</div>
+      <div class="btl-features">
+        <div class="btl-feat">iOS + Android</div>
+        <div class="btl-feat">Modo offline completo</div>
+        <div class="btl-feat">Widget de versículo na tela inicial</div>
+        <div class="btl-feat">Apple Watch (versículo do dia)</div>
+      </div>
+    </div>
+    <div class="btl-item">
+      <div class="btl-dot"><div class="btl-dot-inner"></div></div>
+      <div class="btl-header">
+        <div class="btl-phase">v2.5 · Mês 7–8</div>
+        <div class="btl-duration">Estudo Avançado</div>
+      </div>
+      <div class="btl-title">Comentários & Grupos de Estudo</div>
+      <div class="btl-features">
+        <div class="btl-feat">Comentários por versículo</div>
+        <div class="btl-feat">Grupos de estudo privados</div>
+        <div class="btl-feat">Planos compartilhados</div>
+        <div class="btl-feat">Pastor pode anotar para congregação</div>
+      </div>
+    </div>
+    <div class="btl-item">
+      <div class="btl-dot"><div class="btl-dot-inner"></div></div>
+      <div class="btl-header">
+        <div class="btl-phase">v3.0 · Mês 9–10</div>
+        <div class="btl-duration">IA Avançada</div>
+      </div>
+      <div class="btl-title">Estudo Bíblico Guiado por IA</div>
+      <div class="btl-features">
+        <div class="btl-feat">Planos de estudo gerados por IA</div>
+        <div class="btl-feat">Quiz sobre a leitura</div>
+        <div class="btl-feat">Conexões temáticas automáticas</div>
+        <div class="btl-feat">Resumo de capítulo inteligente</div>
+      </div>
+    </div>
+    <div class="btl-item">
+      <div class="btl-dot"><div class="btl-dot-inner"></div></div>
+      <div class="btl-header">
+        <div class="btl-phase">v3.5 · Mês 11–12</div>
+        <div class="btl-duration">Alcance Global</div>
+      </div>
+      <div class="btl-title">Expansão Internacional</div>
+      <div class="btl-features">
+        <div class="btl-feat">Inglês (EN)</div>
+        <div class="btl-feat">Espanhol (ES)</div>
+        <div class="btl-feat">Bíblias em 50+ idiomas</div>
+        <div class="btl-feat">IA multilíngue</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- VERSÃO SUMMARY TABLE -->
+<div class="section" style="padding-top: 3rem;">
+  <div class="section-header">
+    <div style="font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem;">Resumo Executivo</div>
+    <div class="section-title" style="font-family:'Lora',serif; font-size:2rem; font-weight:400; margin-bottom:0.5rem;">Todas as versões,<br>de uma vez</div>
+  </div>
+
+  <div class="version-grid">
+    <div class="version-row header">
+      <div class="version-cell">Versão</div>
+      <div class="version-cell">O que tem</div>
+      <div class="version-cell">Quando</div>
+      <div class="version-cell">Meta</div>
+    </div>
+    <div class="version-row c-violet">
+      <div class="version-cell"><div class="v-name">Setup</div><div class="v-badge">Pré-Dev</div></div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">API key, design tokens, projeto Lovable configurado, Supabase conectado</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Semana 1</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Base sólida</div>
+    </div>
+    <div class="version-row c-gold">
+      <div class="version-cell"><div class="v-name">MVP</div><div class="v-badge">v0.1</div></div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Leitura limpa, busca, 8+ versões, temas, PWA, TTS básico, copiar/compartilhar</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Semana 6</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">100 usuários/dia</div>
+    </div>
+    <div class="version-row c-teal">
+      <div class="version-cell"><div class="v-name">Estudo</div><div class="v-badge">v1.0</div></div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Notas, destaques, comparação de versões, planos de leitura, referências cruzadas</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Semana 10</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">1.000 usuários/dia</div>
+    </div>
+    <div class="version-row c-blue">
+      <div class="version-cell"><div class="v-name">IA</div><div class="v-badge">v1.5</div></div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Assistente IA no painel lateral, cards visuais de versículo, mapa de progresso</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Semana 14</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">5.000 usuários/dia</div>
+    </div>
+    <div class="version-row c-rose">
+      <div class="version-cell"><div class="v-name">Pro</div><div class="v-badge">v2.0</div></div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Newsletter, Plano Premium, áudio ElevenLabs, exportação PDF completa</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Semana 18</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Primeira receita</div>
+    </div>
+    <div class="version-row c-green">
+      <div class="version-cell"><div class="v-name">Escala</div><div class="v-badge">v3.0+</div></div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">App nativo, grupos de estudo, IA avançada, expansão em EN/ES, widget externo</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">Mês 5–12</div>
+      <div class="version-cell" style="font-size:0.8rem; color:var(--soft);">#1 do Brasil</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-quote">"A palavra de Deus vive e é eficaz." — Hebreus 4:12</div>
+  <div class="footer-sub" style="margin-top:0.4rem; color:var(--muted);">Bíblia Viva · Roadmap de Desenvolvimento · 2026 · Preparado com Claude (Anthropic)</div>
+</div>
+
+<script>
+function scrollSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+const phases = ['p0','p1','p2','p3','p4','p5'];
+const navPhases = document.querySelectorAll('.nav-phase');
+window.addEventListener('scroll', () => {
+  let current = 0;
+  phases.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 80) current = i;
+  });
+  navPhases.forEach((n, i) => n.classList.toggle('active', i === current));
+});
+</script>
+</body>
+</html>
