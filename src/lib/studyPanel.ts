@@ -32,12 +32,22 @@ export interface BookContext {
   chapter_highlights?: Record<string, string>;
 }
 
+export interface Commentary {
+  author: string;
+  era: string;
+  work: string;
+  year: string;
+  text: string;
+  source_url: string | null;
+}
+
 export interface StudyData {
   crossReferences: CrossReference[];
   bookContext: BookContext | null;
   chapterHighlight: string | null;
   verseWords: VerseWord[];
   aiExplanation: string | null; // null = ainda não foi solicitado
+  commentaries: Commentary[] | null; // Novo: múltiplos comentários teológicos
   isLoadingAI: boolean;
 }
 
@@ -70,7 +80,7 @@ async function getSupabaseClient() {
 
 async function getCachedAIResponse(
   verseId: string,
-  questionType: 'explain' | 'history' | 'application'
+  questionType: 'explain' | 'history' | 'application' | 'commentary'
 ): Promise<string | null> {
   try {
     const supabase = await getSupabaseClient();
@@ -81,7 +91,20 @@ async function getCachedAIResponse(
       .eq('verse_id', verseId)
       .eq('question_type', questionType)
       .maybeSingle();
-    return data?.response ?? null;
+
+    if (!data?.response) return null;
+
+    // Tentamos parsear se for comentário para retornar o array,
+    // caso contrário retornamos a string normal.
+    if (questionType === 'commentary') {
+      try {
+        return JSON.parse(data.response);
+      } catch {
+        return data.response; // Fallback se o cache antigo não for JSON
+      }
+    }
+
+    return data.response;
   } catch {
     return null;
   }
@@ -89,7 +112,7 @@ async function getCachedAIResponse(
 
 export async function cacheAIResponse(
   verseId: string,
-  questionType: 'explain' | 'history' | 'application',
+  questionType: 'explain' | 'history' | 'application' | 'commentary',
   response: string
 ): Promise<void> {
   try {
@@ -97,9 +120,54 @@ export async function cacheAIResponse(
     if (!supabase) return;
     await supabase
       .from('ai_study_cache')
-      .upsert({ verse_id: verseId, question_type: questionType, response });
+      .upsert({ verse_id: verseId, question_type: questionType, response, created_at: new Date().toISOString() });
   } catch (error) {
     console.warn('Failed to cache AI response:', error);
+  }
+}
+
+/**
+ * Chama o backend (/api/commentary) para gerar um novo comentário teológico.
+ * Requer assinatura PRO validada no server-side.
+ */
+export async function requestCommentary(
+  params: {
+    bookId: string;
+    chapter: number;
+    verse: number;
+    verseText: string;
+    version: string;
+    language?: string;
+  }
+): Promise<{ response: string; cached: boolean }> {
+  const { supabase } = await import('./supabase');
+  const { data: { session } } = await supabase.auth.getSession();
+
+  const res = await fetch('/api/commentary', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': session ? `Bearer ${session.access_token}` : '',
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody.error || `HTTP error! status: ${res.status}`);
+  }
+
+  const result = await res.json();
+  try {
+    return {
+      commentaries: JSON.parse(result.response),
+      cached: result.cached
+    };
+  } catch {
+    return {
+      commentaries: [],
+      cached: result.cached
+    };
   }
 }
 
@@ -145,10 +213,11 @@ export async function getStudyData(
   const bookIdUpper = bookId.toUpperCase();
 
   // Carregar tudo em paralelo para velocidade máxima
-  const [crossReferences, verseWords, aiExplanation, bookContexts] = await Promise.all([
+  const [crossReferences, verseWords, aiExplanation, commentaries, bookContexts] = await Promise.all([
     getCrossRefs(bookIdUpper, chapter, verse, version),
     getVerseWords(bookIdUpper, chapter, verse),
     getCachedAIResponse(verseId, 'explain'),
+    getCachedAIResponse(verseId, 'commentary'),
     loadBookContexts(),
   ]);
 
@@ -158,6 +227,7 @@ export async function getStudyData(
     chapterHighlight: getChapterHighlight(bookContexts, bookIdUpper, chapter),
     verseWords,
     aiExplanation,
+    commentaries: Array.isArray(commentaries) ? commentaries : null,
     isLoadingAI: false,
   };
 }

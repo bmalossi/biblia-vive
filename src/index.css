@@ -189,17 +189,37 @@ All colors MUST be HSL.
   }
 
   .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+    width: 5px;
+    height: 5px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: hsl(var(--gold) / 0.3);
-    border-radius: 4px;
+    background: hsl(var(--gold) / 0.25);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background-clip: content-box;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--gold) / 0.6);
+    background: hsl(var(--gold) / 0.5);
+    background-clip: content-box;
+  }
+
+  /* Global scrollbar for the app */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--text-muted) / 0.15);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold) / 0.3);
   }
 }
 

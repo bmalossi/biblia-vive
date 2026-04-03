@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BibleVersion, getVersion, isBibleVersion, setVersion, getVersionsForLocale } from "@/lib/themes";
+import { BibleVersion, getVersion, isBibleVersion, setVersion, getVersionsForLocale, getVersionInfo } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export default function VersionSelector() {
   const navigate = useNavigate();
   const location = useLocation();
   const { locale } = useTranslation();
+  const { isPro } = useSubscription();
   const [currentVersion, setCurrentVersion] = useState<BibleVersion>(() => getVersion());
 
   const pathSegments = useMemo(() => location.pathname.split("/").filter(Boolean), [location.pathname]);
@@ -34,6 +36,12 @@ export default function VersionSelector() {
   }, []);
 
   const handleVersionChange = (version: BibleVersion) => {
+    const info = getVersionInfo(version);
+    if (info?.isPro && !isPro) {
+      navigate("/pro");
+      return;
+    }
+
     setCurrentVersion(version);
     setVersion(version);
 

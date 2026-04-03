@@ -147,9 +147,9 @@ export default function Header() {
         }`}
     >
       <div className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 md:px-6 relative">
-        <div className="flex h-full items-center gap-8 z-10">
+        <div className="flex h-full items-center gap-3 sm:gap-8 z-10">
           <Link to="/" className="flex items-center gap-2 group" onClick={onLogoClick}>
-            <span className="text-xl font-serif font-bold text-gold group-hover:scale-105 transition-transform duration-300">
+            <span className="text-lg sm:text-xl font-serif font-bold text-gold group-hover:scale-105 transition-transform duration-300">
               ✦ Bíblia Vive
             </span>
           </Link>

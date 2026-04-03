@@ -158,7 +158,7 @@ export default function ReadingPage() {
   const [error, setError] = useState<string | null>(null);
   const [compareEnabled, setCompareEnabled] = useState(false);
   const [showDiff, setShowDiff] = useState(true);
-  const [compareVersion, setCompareVersion] = useState<BibleVersion>(selectedVersion === "acf" ? "ara" : "acf");
+  const [compareVersion, setCompareVersion] = useState<BibleVersion>(selectedVersion === "acf" ? "nvi" : "acf");
   const [compareData, setCompareData] = useState<Chapter | null>(null);
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareError, setCompareError] = useState<string | null>(null);
@@ -179,6 +179,7 @@ export default function ReadingPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalData, setCardModalData] = useState<CardData | null>(null);
+  const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
   const chapterGridRef = useRef<HTMLDivElement>(null);
@@ -218,6 +219,23 @@ export default function ReadingPage() {
       })
       .catch(() => setBookContext(null));
   }, [selectedBook?.id]);
+
+  // Load red letter verses map
+  useEffect(() => {
+    fetch(`/red_letters_verses.json?v=${new Date().getTime()}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load red letters: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        console.log(`[RedLetters] Loaded mapping for ${Object.keys(data).length} books`);
+        setRedLetterVerses(data);
+      })
+      .catch((err) => {
+        console.error("[RedLetters] Error:", err);
+        setRedLetterVerses(null);
+      });
+  }, []);
 
   const tts = useTTS(preferences.ttsRate);
 
@@ -666,6 +684,71 @@ export default function ReadingPage() {
     </div>
   );
 
+  const renderVerseText = (tokens: DiffToken[] | null, plainText: string, vNumStr: string | number) => {
+    if (!tokens) {
+      if (preferences.wordsOfGod && selectedBook && redLetterVerses) {
+        const bookData = redLetterVerses[selectedBook.slug];
+        const chapterDataForRed = bookData?.[chapterNumber.toString()];
+        const isRedLetter = Array.isArray(chapterDataForRed) && chapterDataForRed.includes(Number(vNumStr));
+
+        if (isRedLetter) {
+          // Heuristic 1: If quote marks or dialogue dashes are present
+          const regex = /([“”"«»].*?[“”"«»]|—.*?(?=$|—))/g;
+          const hasQuotes = regex.test(plainText);
+
+          if (hasQuotes) {
+            // Re-run split since we consumed test
+            const parts = plainText.split(/([“”"«»].*?[“”"«»]|—.*?(?=$|—))/g);
+            return (
+              <span>
+                {parts.map((part, i) =>
+                  i % 2 === 1 ? (
+                    <span className="text-[#c13030] dark:text-[#ff8f8f] transition-colors" key={i}>{part}</span>
+                  ) : (
+                    <span key={i}>{part}</span>
+                  )
+                )}
+              </span>
+            );
+          } else {
+            // Heuristic 2: For ACF/ARC format where dialogue starts after a colon (e.g. Jesus disse: Eu sou)
+            const colonSplit = plainText.split(/:(.+)/s);
+            if (colonSplit.length > 1) {
+              return (
+                <span>
+                  <span>{colonSplit[0]}:</span>
+                  <span className="text-[#c13030] dark:text-[#ff8f8f] transition-colors">{colonSplit[1]}</span>
+                </span>
+              );
+            } else {
+              // If no delimiter is found but it is a red letter verse, color it completely.
+              return <span className="text-[#c13030] dark:text-[#ff8f8f] transition-colors">{plainText}</span>;
+            }
+          }
+        }
+      }
+      return <span>{plainText}</span>;
+    }
+    return (
+      <span>
+        {tokens.map((tok, ti) => (
+          <span key={ti}>{tok.type === "different" ? (
+            <mark
+              style={{
+                background: "hsl(var(--gold) / 0.18)",
+                color: "inherit",
+                borderRadius: "3px",
+                padding: "0 1px",
+              }}
+            >
+              {tok.word}
+            </mark>
+          ) : tok.word}{" "}</span>
+        ))}
+      </span>
+    );
+  };
+
   return (
     <Layout hideHeader={preferences.focusMode} hideMobileNav={preferences.focusMode}>
       <div className="relative" id="reading-root" ref={toolbarLayerRef}>
@@ -681,193 +764,197 @@ export default function ReadingPage() {
           </div>
         )}
 
-        <section className={`mx-auto w-full ${preferences.focusMode ? "max-w-[940px] px-2" : "max-w-6xl px-4 md:px-6"}`}>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">{chapterLabel}</p>
-              <Breadcrumb>
-                <BreadcrumbList className="leading-none">
-                  <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                      <button className="inline-flex items-center font-sans uppercase leading-none tracking-[0.08em]" onClick={() => setIsSettingsOpen(true)} type="button">
-                        {selectedVersion.toUpperCase()}
-                      </button>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    {selectedBook ? (
-                      <BreadcrumbLink asChild>
-                        <Link className="inline-flex items-center leading-none" to={`/${selectedVersion}/${selectedBook.slug}`}>
-                          {selectedBook.name}
-                        </Link>
-                      </BreadcrumbLink>
-                    ) : (
-                      <BreadcrumbPage>{t("reading.book")}</BreadcrumbPage>
-                    )}
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <Dialog onOpenChange={setIsChapterPickerOpen} open={isChapterPickerOpen}>
-                      <DialogTrigger asChild>
-                        <button className="inline-flex items-center font-sans leading-none" type="button">
-                          {t("home.chapter")} {chapterNumber}
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent aria-label={t("reading.selectChapter")} className="max-w-xl border-border bg-app-surface sm:rounded-2xl" role="dialog">
-                        <DialogHeader>
-                          <DialogTitle>{t("reading.selectChapter")}</DialogTitle>
-                          <DialogDescription>
-                            {selectedBook ? t("reading.chooseChapterBook", { book: selectedBook.name }) : t("reading.chooseChapter")}
-                          </DialogDescription>
-                        </DialogHeader>
+        {!preferences.focusMode && (
+          <>
+            <section className={`mx-auto w-full max-w-6xl px-4 md:px-6`}>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">{chapterLabel}</p>
+                  <Breadcrumb>
+                    <BreadcrumbList className="leading-none">
+                      <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                          <button className="inline-flex items-center font-sans uppercase leading-none tracking-[0.08em]" onClick={() => setIsSettingsOpen(true)} type="button">
+                            {selectedVersion.toUpperCase()}
+                          </button>
+                        </BreadcrumbLink>
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        {selectedBook ? (
+                          <BreadcrumbLink asChild>
+                            <Link className="inline-flex items-center leading-none" to={`/${selectedVersion}/${selectedBook.slug}`}>
+                              {selectedBook.name}
+                            </Link>
+                          </BreadcrumbLink>
+                        ) : (
+                          <BreadcrumbPage>{t("reading.book")}</BreadcrumbPage>
+                        )}
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <Dialog onOpenChange={setIsChapterPickerOpen} open={isChapterPickerOpen}>
+                          <DialogTrigger asChild>
+                            <button className="inline-flex items-center font-sans leading-none" type="button">
+                              {t("home.chapter")} {chapterNumber}
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent aria-label={t("reading.selectChapter")} className="max-w-xl border-border bg-app-surface sm:rounded-2xl" role="dialog">
+                            <DialogHeader>
+                              <DialogTitle>{t("reading.selectChapter")}</DialogTitle>
+                              <DialogDescription>
+                                {selectedBook ? t("reading.chooseChapterBook", { book: selectedBook.name }) : t("reading.chooseChapter")}
+                              </DialogDescription>
+                            </DialogHeader>
 
-                        <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
-                          {chapterGrid.map((item) => {
-                            const active = item === chapterNumber;
-                            return (
-                              <Button
-                                aria-current={active ? "true" : undefined}
-                                className={active ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg" : ""}
-                                data-chapter={item}
-                                key={item}
-                                onClick={() => {
-                                  goToChapter(item);
-                                  setIsChapterPickerOpen(false);
-                                }}
-                                size="sm"
-                                type="button"
-                                variant="outline"
-                              >
-                                {item}
-                              </Button>
-                            );
-                          })}
+                            <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
+                              {chapterGrid.map((item) => {
+                                const active = item === chapterNumber;
+                                return (
+                                  <Button
+                                    aria-current={active ? "true" : undefined}
+                                    className={active ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg" : ""}
+                                    data-chapter={item}
+                                    key={item}
+                                    onClick={() => {
+                                      goToChapter(item);
+                                      setIsChapterPickerOpen(false);
+                                    }}
+                                    size="sm"
+                                    type="button"
+                                    variant="outline"
+                                  >
+                                    {item}
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </BreadcrumbItem>
+                    </BreadcrumbList>
+                  </Breadcrumb>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="hidden items-center gap-2 rounded-full border border-border bg-app-surface px-3 py-1 sm:flex">
+                    <Label className="text-xs text-app-text-muted" htmlFor="compare-toggle-inline">
+                      {t("reading.compare")}
+                    </Label>
+                    <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
+                    {compareEnabled && (
+                      <>
+                        <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
+                          <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
+                              <SelectItem key={item} value={item}>
+                                {item.toUpperCase()}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
+                          <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
+                            Difs
+                          </Label>
+                          <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
                         </div>
-                      </DialogContent>
-                    </Dialog>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
+                      </>
+                    )}
+                  </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="hidden items-center gap-2 rounded-full border border-border bg-app-surface px-3 py-1 sm:flex">
-                <Label className="text-xs text-app-text-muted" htmlFor="compare-toggle-inline">
-                  {t("reading.compare")}
-                </Label>
-                <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
-                {compareEnabled && (
-                  <>
-                    <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
-                      <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
-                          <SelectItem key={item} value={item}>
-                            {item.toUpperCase()}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
-                      <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
-                        Difs
-                      </Label>
-                      <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
-                    </div>
-                  </>
-                )}
+                  <AudioPlayer
+                    text={chapterVerses.map(v => v.text).join(" ")}
+                    slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
+                  />
+
+                  <Button
+                    aria-label={t("reading.toggleFocusMode")}
+                    onClick={() => updatePreference("focusMode", !preferences.focusMode)}
+                    size="icon"
+                    type="button"
+                    variant="outline"
+                  >
+                    {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </Button>
+
+                  {notes.length > 0 && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          aria-label="Baixar Notas do Capítulo (PDF)"
+                          size="icon"
+                          type="button"
+                          variant="outline"
+                          title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
+                          className="text-gold border-gold/40 hover:bg-gold/10"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-app-text-muted">
+                            {isPro
+                              ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
+                              : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mt-4">
+                          <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
+                          {isPro ? (
+                            <AlertDialogAction
+                              onClick={() => exportNotesToPDF(notes, true)}
+                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                            >
+                              Sim, Baixar PDF
+                            </AlertDialogAction>
+                          ) : (
+                            <AlertDialogAction
+                              onClick={() => navigate("/pro")}
+                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                            >
+                              Conhecer Premium
+                            </AlertDialogAction>
+                          )}
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+
+                  <Button
+                    aria-label={t("reading.openSettings")}
+                    className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
+                    onClick={() => setIsSettingsOpen(true)}
+                    size="icon"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
+            </section>
 
-              <AudioPlayer
-                text={chapterVerses.map(v => v.text).join(" ")}
-                slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
-              />
-
-              <Button
-                aria-label={t("reading.toggleFocusMode")}
-                onClick={() => updatePreference("focusMode", !preferences.focusMode)}
-                size="icon"
-                type="button"
-                variant="outline"
-              >
-                {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-              </Button>
-
-              {notes.length > 0 && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      aria-label="Baixar Notas do Capítulo (PDF)"
-                      size="icon"
-                      type="button"
-                      variant="outline"
-                      title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
-                      className="text-gold border-gold/40 hover:bg-gold/10"
-                    >
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
-                      </AlertDialogTitle>
-                      <AlertDialogDescription className="text-app-text-muted">
-                        {isPro
-                          ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
-                          : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="mt-4">
-                      <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
-                      {isPro ? (
-                        <AlertDialogAction
-                          onClick={() => exportNotesToPDF(notes, true)}
-                          className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                        >
-                          Sim, Baixar PDF
-                        </AlertDialogAction>
-                      ) : (
-                        <AlertDialogAction
-                          onClick={() => navigate("/pro")}
-                          className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                        >
-                          Conhecer Premium
-                        </AlertDialogAction>
-                      )}
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
-
-              <Button
-                aria-label={t("reading.openSettings")}
-                className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
-                onClick={() => setIsSettingsOpen(true)}
-                size="icon"
-                type="button"
-                variant="outline"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <SettingsPanel
-          hasPortugueseVoice={tts.hasPortugueseVoice}
-          onOpenChange={setIsSettingsOpen}
-          onReset={() => {
-            resetPreferences();
-            toast({ message: t("reading.preferencesRestored"), type: "info" });
-          }}
-          open={isSettingsOpen}
-          preferences={preferences}
-          updatePreference={updatePreference}
-        />
+            <SettingsPanel
+              hasPortugueseVoice={tts.hasPortugueseVoice}
+              onOpenChange={setIsSettingsOpen}
+              onReset={() => {
+                resetPreferences();
+                toast({ message: t("reading.preferencesRestored"), type: "info" });
+              }}
+              open={isSettingsOpen}
+              preferences={preferences}
+              updatePreference={updatePreference}
+            />
+          </>
+        )}
 
         {error ? (
           <div className="mx-auto flex min-h-[360px] w-full max-w-[680px] flex-col items-center justify-center px-4 text-center md:px-6">
@@ -893,7 +980,9 @@ export default function ReadingPage() {
               <h1 className="mb-4 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
               <div className={compareEnabled ? "grid gap-6 lg:grid-cols-2" : "block"}>
                 <section>
-                  <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.08em] text-app-text-muted">{selectedVersion.toUpperCase()}</p>
+                  {!preferences.focusMode && (
+                    <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.08em] text-app-text-muted">{selectedVersion.toUpperCase()}</p>
+                  )}
                   {loading ? (
                     <div aria-label={t("reading.loadingChapter")}>
                       <LoadingLines />
@@ -927,28 +1016,6 @@ export default function ReadingPage() {
                           compareEnabled && showDiff && primaryText && compareVerseText
                             ? diffVerses(primaryText, compareVerseText).tokensA
                             : null;
-
-                        const renderVerseText = (tokens: DiffToken[] | null, plainText: string) => {
-                          if (!tokens) return <span>{plainText}</span>;
-                          return (
-                            <span>
-                              {tokens.map((tok, ti) => (
-                                <span key={ti}>{tok.type === "different" ? (
-                                  <mark
-                                    style={{
-                                      background: "hsl(var(--gold) / 0.18)",
-                                      color: "inherit",
-                                      borderRadius: "3px",
-                                      padding: "0 1px",
-                                    }}
-                                  >
-                                    {tok.word}
-                                  </mark>
-                                ) : tok.word}{" "}</span>
-                              ))}
-                            </span>
-                          );
-                        };
 
                         const verseContent = (
                           <div
@@ -999,7 +1066,7 @@ export default function ReadingPage() {
                               <span className="mr-2 inline-block w-6 align-top font-mono text-[0.65rem] text-gold transition-opacity duration-100 group-hover:opacity-100" style={{ opacity: isHovered ? 1 : 0.6 }}>
                                 {verseNumber}
                               </span>
-                              {renderVerseText(primaryDiffTokens, primaryText)}
+                              {renderVerseText(primaryDiffTokens, primaryText, verseNumber)}
                             </p>
                           </div>
                         );
@@ -1087,24 +1154,7 @@ export default function ReadingPage() {
                                 }}
                               >
                                 <span className="mr-2 inline-block w-6 align-top font-mono text-[0.65rem] text-gold">{verseNumber}</span>
-                                {compareDiffTokens ? (
-                                  <span>
-                                    {compareDiffTokens.map((tok, ti) => (
-                                      <span key={ti}>{tok.type === "different" ? (
-                                        <mark
-                                          style={{
-                                            background: "hsl(var(--gold) / 0.18)",
-                                            color: "inherit",
-                                            borderRadius: "3px",
-                                            padding: "0 1px",
-                                          }}
-                                        >
-                                          {tok.word}
-                                        </mark>
-                                      ) : tok.word}{" "}</span>
-                                    ))}
-                                  </span>
-                                ) : <span>{cleanedContent}</span>}
+                                {renderVerseText(compareDiffTokens, cleanedContent, verseNumber)}
                               </p>
                             </div>
                           );
@@ -1129,9 +1179,11 @@ export default function ReadingPage() {
             {!compareEnabled && selectedBook && (
               <aside className="hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 w-[140px] xl:w-[180px] 2xl:w-[220px]">
                 <div className="flex flex-col items-center pb-8 pt-2 w-full">
-                  <span className="text-[0.6rem] font-mono text-app-text-muted uppercase tracking-widest mb-4 opacity-70">
-                    Capítulos
-                  </span>
+                  {!preferences.focusMode && (
+                    <span className="text-[0.6rem] font-mono text-app-text-muted uppercase tracking-widest mb-4 opacity-70">
+                      Capítulos
+                    </span>
+                  )}
                   <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2 xl:gap-2.5 w-full justify-items-center">
                     {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(c => (
                       <button
@@ -1182,7 +1234,7 @@ export default function ReadingPage() {
           position={toolbarPosition}
           shareLabel={shareLabel}
           studyOpen={studyVerse !== null}
-          visible={!!selectedVerse}
+          visible={!!selectedVerse && !preferences.focusMode}
         />
 
         {studyVerse !== null && selectedBook && (
@@ -1258,13 +1310,15 @@ export default function ReadingPage() {
           </div>
         )}
       </div>
-      {cardModalData && (
-        <VerseCardModal
-          isOpen={isCardModalOpen}
-          onClose={() => { setIsCardModalOpen(false); setCardModalData(null); }}
-          data={cardModalData}
-        />
-      )}
-    </Layout>
+      {
+        cardModalData && (
+          <VerseCardModal
+            isOpen={isCardModalOpen}
+            onClose={() => { setIsCardModalOpen(false); setCardModalData(null); }}
+            data={cardModalData}
+          />
+        )
+      }
+    </Layout >
   );
 }

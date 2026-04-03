@@ -1,4 +1,4 @@
-import { findBookById } from "@/lib/books";
+import { findBookById, OLD_TESTAMENT } from "@/lib/books";
 import { getVersionLangPath } from "@/lib/themes";
 
 const API_BASE = "https://api.scripture.api.bible/v1";
@@ -8,7 +8,6 @@ const API_KEY = import.meta.env.VITE_BIBLE_API_KEY;
 // API IDs only used for text search (searchVerses) — chapter reads use local data
 export const VERSION_IDS: Record<string, string> = {
   acf: "bc70ef1b3b4ee1f3-01",
-  ara: "39a3b4f2c05d6650-01",
   arc: "a6a28cf2a6c7f48e-01",
   nvi: "5091c557b5b4c3e5-01",
   kjv: "de4e12af7f28f599-02",
@@ -178,12 +177,12 @@ async function requestApi<T>(path: string, signal?: AbortSignal): Promise<T> {
 
 // ─── GitHub (tertiary fallback) ─────────────────────────────────────
 const GITHUB_VERSION_SLUGS: Record<string, string> = {
-  acf: "acf", ara: "ara", arc: "arc", nvi: "nvi",
+  acf: "acf", arc: "arc", nvi: "nvi",
   aa: "aa", kja: "kja", kjv: "kjv", bbe: "bbe", rvr: "rvr",
 };
 
 const GITHUB_LANG_PATHS: Record<string, string> = {
-  acf: "pt-br", ara: "pt-br", arc: "pt-br", nvi: "pt-br",
+  acf: "pt-br", arc: "pt-br", nvi: "pt-br",
   aa: "pt-br", kja: "pt-br",
   kjv: "en", bbe: "en",
   rvr: "es",
@@ -194,6 +193,99 @@ const normalize = (value: string) =>
 
 const githubVersionIndexCache = new Map<string, Promise<LocalBook[]>>();
 const githubBookCache = new Map<string, Promise<LocalBook>>();
+
+// ─── Original Language (Hebrew OT / Greek NT) ───────────────────────
+type OrigLangVerse = { verse: number; text: string };
+type OrigLangChapter = { chapter: number; verses: OrigLangVerse[] };
+type OrigLangBook = { book: string; chapters: OrigLangChapter[] };
+
+let hebrewData: OrigLangBook[] | null = null;
+let greekData: OrigLangBook[] | null = null;
+
+async function getOriginalLangData(testament: "old" | "new"): Promise<OrigLangBook[]> {
+  if (testament === "old") {
+    if (!hebrewData) {
+      const res = await fetch("/bible/antigo_testamento_hebraico.json");
+      if (!res.ok) throw { message: "Could not load Hebrew data." } satisfies BibleApiError;
+      hebrewData = await res.json() as OrigLangBook[];
+    }
+    return hebrewData;
+  } else {
+    if (!greekData) {
+      const res = await fetch("/bible/novo_testamento_grego.json");
+      if (!res.ok) throw { message: "Could not load Greek data." } satisfies BibleApiError;
+      greekData = await res.json() as OrigLangBook[];
+    }
+    return greekData;
+  }
+}
+
+// Map of English book names (as in the JSON) to our slugs
+const ORIG_LANG_NAME_MAP: Record<string, string> = {
+  Genesis: "gn", Exodus: "ex", Leviticus: "lv", Numbers: "nm", Deuteronomy: "dt",
+  Joshua: "js", Judges: "jz", Ruth: "rt", "1 Samuel": "1sm", "2 Samuel": "2sm",
+  "1 Kings": "1rs", "2 Kings": "2rs", "1 Chronicles": "1cr", "2 Chronicles": "2cr",
+  Ezra: "ed", Nehemiah: "ne", Esther: "et", Job: "jo", Psalms: "sl",
+  Proverbs: "pv", Ecclesiastes: "ec", "Song of Solomon": "ct", Isaiah: "is",
+  Jeremiah: "jr", Lamentations: "lm", Ezekiel: "ez", Daniel: "dn",
+  Hosea: "os", Joel: "jl", Amos: "am", Obadiah: "ob", Jonah: "jn",
+  Micah: "mq", Nahum: "na", Habakkuk: "hc", Zephaniah: "sf", Haggai: "ag",
+  Zechariah: "zc", Malachi: "ml",
+  Matthew: "mt", Mark: "mc", Luke: "lc", John: "joa", Acts: "atos",
+  Romans: "rm", "1 Corinthians": "1co", "2 Corinthians": "2co",
+  Galatians: "gl", Ephesians: "ef", Philippians: "fp", Colossians: "cl",
+  "1 Thessalonians": "1ts", "2 Thessalonians": "2ts",
+  "1 Timothy": "1tm", "2 Timothy": "2tm",
+  Titus: "tt", Philemon: "fm", Hebrews: "hb", James: "tg",
+  "1 Peter": "1pe", "2 Peter": "2pe",
+  "1 John": "1jo", "2 John": "2jo", "3 John": "3jo",
+  Jude: "jd", Revelation: "ap",
+};
+
+async function fetchChapterFromOriginalLanguage(bookId: string, chapter: string): Promise<Chapter> {
+  const book = findBookById(bookId);
+  const slug = book?.slug ?? bookId.toLowerCase();
+  const bookName = book?.name ?? slug;
+  const isOT = OLD_TESTAMENT.some((b) => b.id === bookId);
+  const testament: "old" | "new" = isOT ? "old" : "new";
+  const data = await getOriginalLangData(testament);
+
+  // Find the matching book entry
+  const bookEntry =
+    data.find((b) => ORIG_LANG_NAME_MAP[b.book] === slug) ??
+    data.find((b) => b.book.toLowerCase().includes(slug.toLowerCase()));
+
+  if (!bookEntry) {
+    throw { message: `Book "${bookId}" not found in original language data.` } satisfies BibleApiError;
+  }
+
+  const chapterNum = Number(chapter);
+  const chapterEntry = bookEntry.chapters.find((c) => c.chapter === chapterNum);
+
+  if (!chapterEntry) {
+    throw { message: `Chapter ${chapter} not found in original language data.` } satisfies BibleApiError;
+  }
+
+  const langLabel = isOT ? "Hebraico" : "Grego";
+
+  return {
+    id: `${slug}.${chapter}`,
+    bookId: slug,
+    number: chapter,
+    reference: `${bookName} ${chapter} (${langLabel})`,
+    source: "local" as const,
+    verses: chapterEntry.verses.map((v) => ({
+      id: `${slug}.${chapter}.${v.verse}`,
+      orgId: "original-lang",
+      bookId: slug,
+      chapterId: `${slug}.${chapter}`,
+      content: v.text,
+      reference: `${bookName} ${chapter}:${v.verse}`,
+      number: v.verse,
+      text: v.text,
+    })),
+  };
+}
 
 async function requestGithub<T>(path: string): Promise<T> {
   const response = await fetch(`${GITHUB_BASE}${path}`);
@@ -275,39 +367,37 @@ async function fetchChapterFromGithub(version: string, bookSlug: string, chapter
   });
 }
 
-// ─── Public API ─────────────────────────────────────────────────────
-
 /**
- * Fetch a chapter with fallback chain: Local → API → GitHub
+ * Fetch a chapter with fallback chain: Original Language → Local → API → GitHub
  */
 export async function fetchChapter(version: string, bookId: string, chapter: string): Promise<Chapter> {
-  // bookId here is the ID from the API (e.g., "GEN", "EXO")
+  // Special case: 'org' version fetches from Hebrew/Greek original language JSONs
+  if (version === "org") {
+    return fetchChapterFromOriginalLanguage(bookId, chapter);
+  }
+
   const book = findBookById(bookId);
   const bookSlug = book ? book.slug : bookId.toLowerCase();
 
-  // 1. Try local data first (always available)
   try {
     return await fetchChapterFromLocal(version, bookSlug, chapter);
   } catch {
-    // Local failed, try next source
+    // Local failed
   }
 
-  // 2. Try API (only if key is configured and version has an API ID)
   const bibleId = VERSION_IDS[version];
   if (API_KEY && bibleId) {
     try {
-      // The API uses book IDs like "GEN", but the chapter ID format is "{bookId}.{chapter}"
       const chapterId = `${bookId}.${chapter}`;
       const payload = await requestApi<{ data: Chapter }>(
         `/bibles/${bibleId}/chapters/${chapterId}?content-type=json&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true&include-verse-spans=false`,
       );
       return normalizeChapter({ ...payload.data, source: "api" });
     } catch {
-      // API failed, try next source
+      // API failed
     }
   }
 
-  // 3. Try GitHub as last resort
   try {
     return await fetchChapterFromGithub(version, bookSlug, chapter);
   } catch {
@@ -317,28 +407,122 @@ export async function fetchChapter(version: string, bookId: string, chapter: str
   }
 }
 
-export async function searchVerses(version: string, query: string, limit = 20, signal?: AbortSignal): Promise<Verse[]> {
-  if (!API_KEY) {
-    throw {
-      message:
-        "Text search is currently unavailable. Chapter reading is available offline.",
-    } satisfies BibleApiError;
-  }
+// ─── Public API ─────────────────────────────────────────────────────
 
-  const bibleId = VERSION_IDS[version] ?? VERSION_IDS.acf;
-
+/**
+ * Verify if a specific verse exists in the local data
+ */
+export async function checkVerseExists(version: string, bookSlug: string, chapter: number, verse?: number): Promise<boolean> {
   try {
-    const payload = await requestApi<{ data?: { verses?: Verse[] } }>(
-      `/bibles/${bibleId}/search?query=${encodeURIComponent(query)}&limit=${limit}&sort=relevance`,
-      signal,
-    );
+    const localId = getLocalBookId(bookSlug);
+    const book = await fetchLocalBook(version, localId);
 
-    return payload.data?.verses ?? [];
+    const chapterIndex = chapter - 1;
+    if (chapterIndex < 0 || chapterIndex >= book.chapters.length) return false;
+
+    if (verse !== undefined) {
+      const versesInChapter = book.chapters[chapterIndex];
+      return verse > 0 && verse <= versesInChapter.length;
+    }
+
+    return true;
   } catch {
-    throw {
-      message: "Text search is temporarily unavailable.",
-    } satisfies BibleApiError;
+    return false;
   }
+}
+
+/**
+ * Search terms in local Bible data
+ */
+export async function searchLocalBible(
+  version: string,
+  query: string,
+  limit = 50,
+  signal?: AbortSignal
+): Promise<{ verses: Verse[]; total: number }> {
+  const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  if (!normalizedQuery) return { verses: [], total: 0 };
+
+  // 1. Check for scope (e.g., "amor em sl" or "faith in gn")
+  let scopeBookSlug: string | undefined;
+  let searchTerm = normalizedQuery;
+
+  const scopeMatch = normalizedQuery.match(/^(.+?)\s+(?:em|in|en)\s+([a-z0-9]+)$/);
+  if (scopeMatch) {
+    searchTerm = scopeMatch[1].trim();
+    const rawScope = scopeMatch[2].trim();
+    // Try to find book by slug/abbrev
+    const book = findBookById(undefined) || { slug: rawScope }; // Minimal fallback
+    // We actually need the books list to resolve aliases accurately, but for now we'll use the raw scope
+    scopeBookSlug = rawScope;
+  }
+
+  const langPath = getVersionLangPath(version as any);
+  const allResults: Verse[] = [];
+
+  // 2. Identify books to search
+  const booksToSearch = scopeBookSlug
+    ? [findBookById(getLocalBookId(scopeBookSlug))?.slug || scopeBookSlug]
+    : (await import("@/data/books.json")).default.old_testament.concat((await import("@/data/books.json")).default.new_testament).map((b: any) => b.slug);
+
+  for (const bookSlug of booksToSearch) {
+    if (signal?.aborted) break;
+
+    try {
+      const localId = getLocalBookId(bookSlug);
+      const bookData = await fetchLocalBook(version, localId);
+
+      bookData.chapters.forEach((chapterVerses, cIndex) => {
+        const chapterNum = cIndex + 1;
+        chapterVerses.forEach((content, vIndex) => {
+          const verseNum = vIndex + 1;
+          const plainText = stripHtml(content).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+          if (plainText.includes(searchTerm)) {
+            allResults.push({
+              id: `${bookSlug}.${chapterNum}.${verseNum}`,
+              orgId: "local-search",
+              bookId: bookSlug,
+              chapterId: `${bookSlug}.${chapterNum}`,
+              content: content,
+              reference: `${bookData.name} ${chapterNum}:${verseNum}`,
+              number: verseNum,
+              text: stripHtml(content)
+            });
+          }
+        });
+      });
+    } catch (e) {
+      console.warn(`Search failed for book ${bookSlug}:`, e);
+    }
+  }
+
+  return {
+    verses: allResults.slice(0, limit),
+    total: allResults.length
+  };
+}
+
+export async function searchVerses(version: string, query: string, limit = 20, signal?: AbortSignal): Promise<Verse[]> {
+  // If we have an API key, try the remote search first as it's faster than scanning 66 JSONs sequentially
+  if (API_KEY) {
+    const bibleId = VERSION_IDS[version] ?? VERSION_IDS.acf;
+    try {
+      const payload = await requestApi<{ data?: { verses?: Verse[] } }>(
+        `/bibles/${bibleId}/search?query=${encodeURIComponent(query)}&limit=${limit}&sort=relevance`,
+        signal,
+      );
+      if (payload.data?.verses?.length) {
+        return payload.data.verses;
+      }
+    } catch (e) {
+      console.warn("Remote search failed, falling back to local:", e);
+    }
+  }
+
+  // Fallback to local search
+  const localResult = await searchLocalBible(version, query, limit, signal);
+  return localResult.verses;
 }
 
 export async function searchBible(version: string, query: string, limit = 20, signal?: AbortSignal): Promise<Verse[]> {

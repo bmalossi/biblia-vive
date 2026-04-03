@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchResultCard from "@/components/SearchResultCard";
-import { getFriendlyApiError, searchVerses, type Verse } from "@/lib/bibleApi";
+import { checkVerseExists, getFriendlyApiError, searchVerses, type Verse } from "@/lib/bibleApi";
 import { BOOK_ALIASES, normalizeBookAlias } from "@/lib/bookAliases";
 import { ALL_BOOKS, findBookById, type Book } from "@/lib/books";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
@@ -121,8 +121,25 @@ export default function SearchPage() {
     if (!query.trim() || parsedReference) return null;
 
     const normalized = normalizeText(query);
-    const chunks = normalized.match(/^(.+?)\s+(\d+)(?:\s*[:.]\s*(\d+))?$/);
-    const rawBookTerm = chunks?.[1] ?? normalized;
+    const scopeMatch = normalized.match(/^(.+?)\s+(?:em|in|en)\s+([a-z0-9]+(?:\s+[a-z0-9]+)?)$/);
+    let searchTerm = normalized;
+    let scopeBookSlug: string | undefined;
+
+    if (scopeMatch) {
+      const potentialTerm = scopeMatch[1].trim();
+      const rawScope = scopeMatch[2].trim().replace(/\s+/g, "");
+
+      const normalizedScope = normalizeText(rawScope);
+      const bookId = BOOK_ALIASES[normalizedScope];
+
+      if (bookId) {
+        searchTerm = potentialTerm;
+        scopeBookSlug = bookId.toLowerCase();
+      }
+    }
+
+    const chunks = searchTerm.match(/^(.+?)\s+(\d+)(?:\s*[:.]\s*(\d+))?$/);
+    const rawBookTerm = chunks?.[1] ?? searchTerm;
     const chapter = chunks?.[2] ? Number(chunks[2]) : undefined;
     const verse = chunks?.[3] ? Number(chunks[3]) : undefined;
 
@@ -139,6 +156,17 @@ export default function SearchPage() {
       label,
     };
   }, [parsedReference, query]);
+
+  const [referenceExists, setReferenceExists] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (parsedReference) {
+      checkVerseExists(selectedVersion, parsedReference.slug, parsedReference.chapter, parsedReference.verse)
+        .then(setReferenceExists);
+    } else {
+      setReferenceExists(null);
+    }
+  }, [parsedReference, selectedVersion]);
 
   const chapterPreview = useMemo(() => {
     const primary = instantBookSuggestions[0];
@@ -336,18 +364,45 @@ export default function SearchPage() {
 
       {parsedReference && (
         <button
-          className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-app-surface px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold"
-          onClick={goToReference}
+          className={`mt-4 flex w-full items-center justify-between rounded-xl border border-border bg-app-surface px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold ${referenceExists === false ? "opacity-90" : ""
+            }`}
+          onClick={() => {
+            if (referenceExists === false) {
+              navigate(`/${selectedVersion}/${parsedReference.slug}/${parsedReference.chapter}`);
+            } else {
+              goToReference();
+            }
+          }}
           type="button"
         >
-          {t("search.goTo", { reference: referenceLabel })} <ArrowRight className="h-4 w-4 text-gold" />
+          <span className="flex items-center gap-2">
+            {referenceExists === false ? (
+              <>
+                <SearchX className="h-4 w-4 text-app-text-muted" />
+                <span>
+                  {t("search.verseNotFound", {
+                    verse: parsedReference.verse,
+                    book: findBookById(parsedReference.bookId)?.name || parsedReference.bookId,
+                    chapter: parsedReference.chapter,
+                    chapterRef: `${findBookById(parsedReference.bookId)?.name || parsedReference.bookId} ${parsedReference.chapter}`
+                  })}
+                </span>
+              </>
+            ) : (
+              <>
+                <ArrowRight className="h-4 w-4 text-gold" />
+                {t("search.goTo", { reference: referenceLabel })}
+              </>
+            )}
+          </span>
+          <ArrowRight className="h-4 w-4 text-gold" />
         </button>
       )}
 
       {error && (
-        <Alert className="mt-6 border-border bg-app-surface">
+        <Alert className="mt-6 border-border bg-app-surface" variant="destructive">
           <AlertTitle>{t("search.errorTitle")}</AlertTitle>
-          <AlertDescription>{t("search.errorDescription")}</AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
           <Button className="mt-3" onClick={() => setReloadToken((value) => value + 1)} size="sm" type="button" variant="outline">
             {t("reading.retry")}
           </Button>
@@ -415,9 +470,16 @@ export default function SearchPage() {
               </p>
             </div>
           ) : (
-            memoizedResults.map((verse) => (
-              <SearchResultCard key={verse.id} onNavigate={() => navigate(getResultRoute(verse))} query={queryParam} verse={verse} />
-            ))
+            <>
+              <div className="flex items-center justify-between pb-2 px-1">
+                <p className="font-sans text-[0.65rem] uppercase tracking-[0.1em] text-app-text-muted">
+                  {results.length === 1 ? t("search.resultCount") : t("search.resultsCount", { count: results.length })}
+                </p>
+              </div>
+              {memoizedResults.map((verse) => (
+                <SearchResultCard key={verse.id} onNavigate={() => navigate(getResultRoute(verse))} query={queryParam} verse={verse} />
+              ))}
+            </>
           )}
         </div>
       )}

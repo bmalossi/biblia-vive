@@ -3,7 +3,7 @@ import path from "node:path";
 import books from "../data/books.json" with { type: "json" };
 
 const allBooks = [...books.old_testament, ...books.new_testament];
-const VERSION_OPTIONS = ["acf", "ara", "arc", "nvi", "kjv"];
+const VERSION_OPTIONS = ["acf", "arc", "nvi", "kjv"];
 
 const baseUrl = process.env.SITEMAP_BASE_URL || "https://example.com";
 const now = new Date().toISOString().split("T")[0];

@@ -2,7 +2,7 @@ import type { Locale, TranslationDict } from "../index";
 
 const ptBR: TranslationDict = {
   // General
-  "app.name": "Bíblia Viva",
+  "app.name": "Bíblia Vive",
   "app.tagline": "Leia a Bíblia em Português",
 
   // Navigation
@@ -65,6 +65,9 @@ const ptBR: TranslationDict = {
   "search.noResultsHint": 'Tente palavras diferentes ou busque por uma referência como "Jo 3:16"',
   "search.errorTitle": "Falha na busca",
   "search.errorDescription": "Não foi possível buscar agora. Verifique sua conexão e tente novamente.",
+  "search.resultCount": "1 resultado encontrado",
+  "search.resultsCount": "{count} resultados encontrados",
+  "search.verseNotFound": "Versículo {verse} não encontrado em {book} {chapter}. Ir para {chapterRef}",
   "search.popularToday": "Versículos mais buscados hoje:",
   "search.selectedVersion": "Versão selecionada",
   "search.searchDescription": "Busque versículos em toda a Bíblia por palavras ou referências como João 3:16. Resultados instantâneos em mais de 8 versões.",
@@ -142,10 +145,11 @@ const ptBR: TranslationDict = {
   "misc.goToContent": "Ir para o conteúdo",
   "misc.version": "Versão",
 
-  // Study Panel (Sprint 6)
+  // Study Panel (Sprint 6 & 18)
   "study.tabContext": "Contexto",
   "study.tabRefs": "Referências",
   "study.tabLanguage": "Língua",
+  "study.tabCommentary": "Comentários",
   "study.panelTitle": "Painel de Estudo",
   "study.panelLabel": "Painel de estudo bíblico",
   "study.closePanel": "Fechar painel de estudo",
@@ -161,6 +165,10 @@ const ptBR: TranslationDict = {
   "study.noStrongs": "Análise do idioma original não disponível para este versículo.",
   "study.noStrongsHint": "Selecione versículos-chave como Jo 3:16 para ver a análise",
   "study.strongsSource": "Fonte: Strong's Expanded Lexicon",
+  "study.getCommentary": "Buscar Comentários",
+  "study.commentarySource": "Fonte: Comentaristas Teólogos (Bíblia Vive AI)",
+  "study.commentaryLoading": "Consultando comentaristas...",
+  "study.commentaryIntro": "Análise profunda deste versículo baseada em contextos históricos e teológicos.",
   "toolbar.study": "Estudar",
   "toolbar.ariaStudy": "Estudar versículo {ref}",
 

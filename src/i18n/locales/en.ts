@@ -64,7 +64,10 @@ const en: TranslationDict = {
     "search.noResults": 'No verses found for "{query}"',
     "search.noResultsHint": 'Try different words or search for a reference like "Jn 3:16"',
     "search.errorTitle": "Search failed",
-    "search.errorDescription": "Could not search right now. Check your connection and try again.",
+    "search.errorDescription": "Search is currently unavailable. Please check your connection and try again.",
+    "search.resultCount": "1 result found",
+    "search.resultsCount": "{count} results found",
+    "search.verseNotFound": "Verse {verse} not found in {book} {chapter}. Go to {chapterRef}",
     "search.popularToday": "Most searched verses today:",
     "search.selectedVersion": "Selected version",
     "search.searchDescription": "Search verses across the entire Bible by words or references like John 3:16. Instant results in over 8 versions.",
@@ -142,10 +145,11 @@ const en: TranslationDict = {
     "misc.goToContent": "Skip to content",
     "misc.version": "Version",
 
-    // Study Panel (Sprint 6)
+    // Study Panel (Sprint 6 & 18)
     "study.tabContext": "Context",
     "study.tabRefs": "References",
     "study.tabLanguage": "Language",
+    "study.tabCommentary": "Commentary",
     "study.panelTitle": "Study Panel",
     "study.panelLabel": "Biblical study panel",
     "study.closePanel": "Close study panel",
@@ -161,6 +165,10 @@ const en: TranslationDict = {
     "study.noStrongs": "Original language analysis not available for this verse.",
     "study.noStrongsHint": "Select key verses like John 3:16 to see the analysis",
     "study.strongsSource": "Source: Strong's Expanded Lexicon",
+    "study.getCommentary": "Get Commentary",
+    "study.commentarySource": "Source: Theological Commentators (Living Bible AI)",
+    "study.commentaryLoading": "Consulting commentators...",
+    "study.commentaryIntro": "Deep analysis of this verse based on historical and theological contexts.",
     "toolbar.study": "Study",
     "toolbar.ariaStudy": "Study verse {ref}",
 

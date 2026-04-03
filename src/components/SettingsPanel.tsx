@@ -217,6 +217,21 @@ function PanelBody({ preferences, updatePreference, onReset, hasPortugueseVoice 
             onCheckedChange={(checked) => updatePreference("focusMode", checked)}
           />
         </div>
+
+        <div className="flex items-center justify-between rounded-lg border border-border bg-app-bg px-3 py-2">
+          <div className="flex flex-col">
+            <Label className="text-sm text-gold font-medium" htmlFor="words-of-god-toggle">
+              Destacar Palavras de Deus
+            </Label>
+            <span className="text-[0.65rem] text-app-text-muted mt-0.5">Realça aspas identificadas após falas divinas (Experimental)</span>
+          </div>
+          <Switch
+            checked={preferences.wordsOfGod}
+            id="words-of-god-toggle"
+            onCheckedChange={(checked) => updatePreference("wordsOfGod", checked)}
+            className="data-[state=checked]:bg-gold"
+          />
+        </div>
       </section>
 
       <section className="rounded-xl border border-border bg-app-bg px-4 py-3">

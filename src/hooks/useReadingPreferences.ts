@@ -11,6 +11,7 @@ export interface ReadingPreferences {
   columnWidth: ReadingColumnWidth;
   focusMode: boolean;
   ttsRate: ReadingTtsRate;
+  wordsOfGod: boolean;
 }
 
 const STORAGE_KEYS = {
@@ -20,6 +21,7 @@ const STORAGE_KEYS = {
   columnWidth: "bv_column_width",
   focusMode: "bv_focus_mode",
   ttsRate: "bv_tts_rate",
+  wordsOfGod: "bv_words_of_god",
 } as const;
 
 const DEFAULT_PREFERENCES: ReadingPreferences = {
@@ -29,6 +31,7 @@ const DEFAULT_PREFERENCES: ReadingPreferences = {
   columnWidth: "normal",
   focusMode: false,
   ttsRate: 1,
+  wordsOfGod: false,
 };
 
 const FONT_MAP: Record<ReadingFont, string> = {
@@ -61,6 +64,7 @@ const parsePreferenceState = (): ReadingPreferences => {
     columnWidth: columnRaw === "narrow" || columnRaw === "normal" || columnRaw === "wide" ? columnRaw : DEFAULT_PREFERENCES.columnWidth,
     focusMode: localStorage.getItem(STORAGE_KEYS.focusMode) === "true",
     ttsRate: ttsRaw === 0.75 || ttsRaw === 1 || ttsRaw === 1.25 || ttsRaw === 1.5 ? ttsRaw : DEFAULT_PREFERENCES.ttsRate,
+    wordsOfGod: localStorage.getItem(STORAGE_KEYS.wordsOfGod) === "true",
   };
 };
 
@@ -121,6 +125,7 @@ export function useReadingPreferences({ rootId = "reading-root" }: UseReadingPre
     localStorage.setItem(STORAGE_KEYS.columnWidth, DEFAULT_PREFERENCES.columnWidth);
     localStorage.setItem(STORAGE_KEYS.focusMode, String(DEFAULT_PREFERENCES.focusMode));
     localStorage.setItem(STORAGE_KEYS.ttsRate, String(DEFAULT_PREFERENCES.ttsRate));
+    localStorage.setItem(STORAGE_KEYS.wordsOfGod, String(DEFAULT_PREFERENCES.wordsOfGod));
   }, []);
 
   return useMemo(

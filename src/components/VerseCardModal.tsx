@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { Download, Share2, Shuffle, X, Loader2 } from "lucide-react";
+import { Download, Share2, Shuffle, X, Loader2, Facebook, Linkedin, Twitter, MessageCircle, Copy, Send, Pin, Instagram, Music } from "lucide-react";
+import { toast } from "@/hooks/useToast";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,24 +33,16 @@ interface VerseCardModalProps {
 export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModalProps) {
     const [selected, setSelected] = useState<TemplateId>("pergaminho");
     const [downloading, setDownloading] = useState(false);
-
     const [sharing, setSharing] = useState(false);
+    const [downloadingForShare, setDownloadingForShare] = useState<string | null>(null);
 
-    // The ref lives on the INNER card div (no transform applied to it).
-    // The parent div has the scale transform for visual preview.
-    // html-to-image captures the ref element at its NATURAL (full) size.
     const cardRef = useRef<HTMLDivElement>(null);
 
     if (!isOpen) return null;
 
-    /**
-     * Returns the selected template node (no ref — purely visual).
-     * Used inside the scaled preview wrapper.
-     */
     const renderTemplate = (withRef = false) => {
         const props = { data };
         if (withRef) {
-            // Wrap in a div to hold the ref; the template itself stays unmodified
             return (
                 <div ref={cardRef} style={{ display: "inline-block" }}>
                     {selected === "pergaminho" && <TemplatePergaminho {...props} />}
@@ -70,12 +63,7 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
     const generateImageBlob = async (): Promise<Blob | null> => {
         if (!cardRef.current) return null;
         try {
-            const dataUrl = await toPng(cardRef.current, {
-                quality: 1,
-                pixelRatio: 2,
-                skipFonts: false,
-            });
-            // Convert DataURI to Blob
+            const dataUrl = await toPng(cardRef.current, { quality: 1, pixelRatio: 2, skipFonts: false });
             const response = await fetch(dataUrl);
             return await response.blob();
         } catch (err) {
@@ -84,15 +72,32 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
         }
     };
 
+    const downloadImageForPlatform = async (platform: string) => {
+        setDownloadingForShare(platform);
+        try {
+            const blob = await generateImageBlob();
+            if (!blob) throw new Error("Falha ao gerar imagem");
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `biblia-vive-${data.bookName.toLowerCase()}-${data.chapter}-${data.verseNumber}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast({ message: `Imagem baixada! Agora poste no ${platform}.`, type: "success" });
+        } catch {
+            toast({ message: "Erro ao gerar imagem.", type: "error" });
+        } finally {
+            setDownloadingForShare(null);
+        }
+    };
+
     const handleShare = async () => {
         setSharing(true);
         try {
             const blob = await generateImageBlob();
             if (!blob) throw new Error("Falha ao gerar blob da imagem");
-
             const fileName = `biblia-viva-${data.bookName.toLowerCase()}-${data.chapter}-${data.verseNumber}.png`;
             const file = new File([blob], fileName, { type: "image/png" });
-
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     title: "Bíblia Vive",
@@ -100,8 +105,6 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
                     files: [file],
                 });
             } else {
-                // Fallback for browsers that don't support file sharing 
-                // We'll just trigger the download instead
                 handleDownload();
             }
         } catch (err) {
@@ -116,7 +119,6 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
         try {
             const blob = await generateImageBlob();
             if (!blob) return;
-
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
@@ -132,7 +134,38 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
 
     const handleCopyText = () => {
         const text = `"${data.verseText}"\n— ${data.bookName} ${data.chapter}:${data.verseNumber} (${data.version.toUpperCase()}) | Bíblia Vive`;
-        navigator.clipboard.writeText(text).catch(() => { });
+        navigator.clipboard.writeText(text)
+            .then(() => toast({ message: "Texto copiado com sucesso!", type: "success" }))
+            .catch(() => toast({ message: "Erro ao copiar texto", type: "error" }));
+    };
+
+    const copyImageToClipboard = async () => {
+        try {
+            const blob = await generateImageBlob();
+            if (!blob) throw new Error("Falha ao gerar imagem");
+            await navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': blob })
+            ]);
+            toast({ message: "Imagem copiada para a área de transferência!", type: "success" });
+            return true;
+        } catch (err) {
+            console.error("Erro ao copiar imagem:", err);
+            toast({ message: "Não foi possível copiar a imagem automaticamente. Tente baixar o arquivo.", type: "error" });
+            return false;
+        }
+    };
+
+    const shareOnSocial = (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin' | 'telegram') => {
+        const text = `"${data.verseText}" - ${data.bookName} ${data.chapter}:${data.verseNumber} | Bíblia Vive`;
+        const url = window.location.origin;
+        const urls = {
+            whatsapp: `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`,
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+            twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+            telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+        };
+        window.open(urls[platform], '_blank', 'width=600,height=400');
     };
 
     return (
@@ -143,7 +176,7 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
             aria-modal="true"
             aria-label="Gerador de Card do Versículo"
         >
-            <div className="relative w-full max-w-2xl max-h-[95dvh] overflow-y-auto rounded-2xl bg-app-surface border border-border shadow-2xl">
+            <div className="relative w-full max-w-2xl max-h-[95dvh] overflow-y-auto custom-scrollbar rounded-2xl bg-app-surface border border-border shadow-2xl">
                 {/* Header */}
                 <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-app-surface px-6 py-4">
                     <div>
@@ -182,21 +215,12 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
                         </div>
                     </div>
 
-                    {/*
-                        Preview area.
-                        The OUTER wrapper applies scale(0.72) for visual compression.
-                        The INNER div (via renderTemplate(true)) holds cardRef and has NO transform.
-                        html-to-image will capture cardRef at its natural (full) pixel dimensions.
-                        This is the key trick: transform on PARENT = visual only; 
-                        the child element is captured at its real size.
-                    */}
+                    {/* Preview */}
                     <div className="flex justify-center bg-app-raised/40 rounded-xl p-6 overflow-hidden">
                         <div
                             style={{
                                 transform: "scale(0.72)",
                                 transformOrigin: "top center",
-                                // Collapse the space the full-size card would normally occupy
-                                // (scale doesn't shrink layout box, so we do it manually)
                                 marginBottom: selected === "story" ? "-180px" : "-150px",
                             }}
                         >
@@ -205,81 +229,129 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-3" style={{ marginTop: "1.5rem" }}>
-
-                        {/* Native Share / Apps */}
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <button
-                                    disabled={sharing || downloading}
-                                    className="flex-1 flex items-center justify-center gap-2 rounded-full bg-app-text px-6 py-3 font-sans text-sm font-medium text-app-surface transition-opacity hover:opacity-90 disabled:opacity-50"
-                                >
-                                    {sharing ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Share2 className="h-4 w-4" />
-                                    )}
-                                    {sharing ? "Preparando..." : "Compartilhar..."}
-                                </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Compartilhar Imagem?</AlertDialogTitle>
-                                    <AlertDialogDescription className="text-app-text-muted">
-                                        Deseja gerar a imagem do versículo para compartilhamento externo?
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter className="mt-4">
-                                    <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={handleShare}
-                                        className="bg-app-text text-app-bg hover:opacity-90 rounded-lg"
+                    <div className="flex flex-col gap-4" style={{ marginTop: "1.5rem" }}>
+                        {/* Primary: Share image + Download */}
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <button
+                                        disabled={sharing || downloading}
+                                        className="flex-1 flex items-center justify-center gap-2 rounded-full bg-app-text px-6 py-3 font-sans text-sm font-medium text-app-surface transition-opacity hover:opacity-90 disabled:opacity-50"
                                     >
-                                        Compartilhar
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                        {sharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+                                        {sharing ? "Preparando..." : "Compartilhar Imagem"}
+                                    </button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Compartilhar nas Redes?</AlertDialogTitle>
+                                        <AlertDialogDescription className="text-app-text-muted">
+                                            A imagem foi gerada e copiada para sua área de transferência. Selecione a rede social abaixo e use <strong>Ctrl+V</strong> para colá-la.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
 
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <button
-                                    disabled={sharing || downloading}
-                                    className="flex-1 flex items-center justify-center gap-2 rounded-full border border-border bg-transparent px-6 py-3 font-sans text-sm font-medium text-app-text transition-colors hover:bg-app-raised disabled:opacity-50"
-                                >
-                                    {downloading ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Download className="h-4 w-4" />
-                                    )}
-                                    {downloading ? "Baixando..." : "Baixar PNG"}
-                                </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Baixar Imagem?</AlertDialogTitle>
-                                    <AlertDialogDescription className="text-app-text-muted">
-                                        Isso irá gerar e baixar este design como uma imagem PNG de alta resolução. Deseja iniciar o download?
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter className="mt-4">
-                                    <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={handleDownload}
-                                        className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                                    >
-                                        Baixar Imagem
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                    <div className="flex flex-wrap gap-2 py-4 justify-center">
+                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('whatsapp'); }}
+                                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/20 text-xs font-medium">
+                                            <MessageCircle className="h-4 w-4" /> WhatsApp
+                                        </button>
+                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('facebook'); }}
+                                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2]/20 transition-colors border border-[#1877F2]/20 text-xs font-medium">
+                                            <Facebook className="h-4 w-4" /> Facebook
+                                        </button>
+                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('twitter'); }}
+                                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-black/5 text-app-text hover:bg-black/10 transition-colors border border-border text-xs font-medium">
+                                            <Twitter className="h-4 w-4" /> Twitter/X
+                                        </button>
+                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('telegram'); }}
+                                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20 transition-colors border border-[#26A5E4]/20 text-xs font-medium">
+                                            <Send className="h-4 w-4" /> Telegram
+                                        </button>
+                                    </div>
 
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg w-full">Voltar</AlertDialogCancel>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
+                            <button
+                                disabled={sharing || downloading}
+                                onClick={handleDownload}
+                                className="flex-1 flex items-center justify-center gap-2 rounded-full border border-border bg-transparent px-6 py-3 font-sans text-sm font-medium text-app-text transition-colors hover:bg-app-raised disabled:opacity-50"
+                            >
+                                {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                                {downloading ? "Baixando..." : "Baixar PNG"}
+                            </button>
+                        </div>
+
+                        {/* Copy Text */}
                         <button
                             onClick={handleCopyText}
-                            className="flex-1 flex items-center justify-center gap-2 rounded-full border border-border bg-transparent px-6 py-3 font-sans text-sm font-medium text-app-text transition-colors hover:bg-app-raised disabled:opacity-50"
+                            className="w-full flex items-center justify-center gap-2 rounded-full border border-border bg-transparent px-6 py-2.5 font-sans text-sm font-medium text-app-text transition-colors hover:bg-app-raised"
                         >
+                            <Copy className="h-4 w-4" />
                             Copiar Texto
                         </button>
+
+                        {/* Social share: text-based - HIDDEN ON DESKTOP */}
+                        <div className="border-t border-border/50 pt-4 block sm:hidden">
+                            <p className="text-[0.65rem] font-mono uppercase tracking-widest text-app-text-muted mb-3">Compartilhar texto nas redes</p>
+                            <div className="flex flex-wrap gap-2">
+                                <button onClick={() => shareOnSocial('whatsapp')}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/20 text-[0.72rem] font-medium">
+                                    <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+                                </button>
+                                <button onClick={() => shareOnSocial('facebook')}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2]/20 transition-colors border border-[#1877F2]/20 text-[0.72rem] font-medium">
+                                    <Facebook className="h-3.5 w-3.5" /> Facebook
+                                </button>
+                                <button onClick={() => shareOnSocial('twitter')}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/5 text-app-text hover:bg-black/10 transition-colors border border-border text-[0.72rem] font-medium">
+                                    <Twitter className="h-3.5 w-3.5" /> Twitter/X
+                                </button>
+                                <button onClick={() => shareOnSocial('telegram')}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20 transition-colors border border-[#26A5E4]/20 text-[0.72rem] font-medium">
+                                    <Send className="h-3.5 w-3.5" /> Telegram
+                                </button>
+                                <button onClick={() => shareOnSocial('linkedin')}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0077B5]/10 text-[#0077B5] hover:bg-[#0077B5]/20 transition-colors border border-[#0077B5]/20 text-[0.72rem] font-medium">
+                                    <Linkedin className="h-3.5 w-3.5" /> LinkedIn
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Image-based platforms: download then post - HIDDEN ON DESKTOP (Moved to sub-modal or instructions) */}
+                        <div className="border-t border-border/50 pt-4 block sm:hidden">
+                            <p className="text-[0.65rem] font-mono uppercase tracking-widest text-app-text-muted mb-1">Baixar imagem e postar em</p>
+                            <p className="text-[0.62rem] text-app-text-muted/60 mb-3">Estas redes não permitem envio automático — baixe a imagem e anexe na postagem.</p>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => downloadImageForPlatform('Instagram')}
+                                    disabled={downloadingForShare === 'Instagram'}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#f9ce34]/10 via-[#ee2a7b]/10 to-[#6228d7]/10 text-[#ee2a7b] hover:opacity-80 transition-all border border-[#ee2a7b]/20 text-[0.72rem] font-medium disabled:opacity-50"
+                                >
+                                    {downloadingForShare === 'Instagram' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Instagram className="h-3.5 w-3.5" />}
+                                    Instagram
+                                </button>
+                                <button
+                                    onClick={() => downloadImageForPlatform('TikTok')}
+                                    disabled={downloadingForShare === 'TikTok'}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/5 text-app-text hover:bg-black/10 transition-colors border border-border text-[0.72rem] font-medium disabled:opacity-50"
+                                >
+                                    {downloadingForShare === 'TikTok' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Music className="h-3.5 w-3.5" />}
+                                    TikTok
+                                </button>
+                                <button
+                                    onClick={() => downloadImageForPlatform('Pinterest')}
+                                    disabled={downloadingForShare === 'Pinterest'}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#e60023]/10 text-[#e60023] hover:bg-[#e60023]/20 transition-colors border border-[#e60023]/20 text-[0.72rem] font-medium disabled:opacity-50"
+                                >
+                                    {downloadingForShare === 'Pinterest' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Pin className="h-3.5 w-3.5" />}
+                                    Pinterest
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

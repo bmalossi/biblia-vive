@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, HelpCircle, Sparkles, Lock } from "lucide-react";
+import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, Hash, HelpCircle, Sparkles, Lock, Quote, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 import { useNavigate } from "react-router-dom";
-import { useStudyData } from "@/lib/studyPanel";
+import { useStudyData, requestCommentary } from "@/lib/studyPanel";
 import { getStrongsEntry, getLanguageLabel, getOriginalVerseText, type StrongsEntry } from "@/lib/strongs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { fetchChapter } from "@/lib/bibleApi";
 import type { CrossReference } from "@/lib/crossReferences";
 import { useSubscription } from "@/hooks/useSubscription";
+import { BiblicalCommentary } from "./BiblicalCommentary";
 
 // Helper to strip Greek and Hebrew diacritics/vowels for pure consonant matching
 function normalizeText(text: string) {
@@ -18,16 +19,17 @@ function normalizeText(text: string) {
 }
 
 function HighlightOriginalText({ text, hoveredWord, clickedWord, isHebrew }: { text: string, hoveredWord: string | null, clickedWord: string | null, isHebrew: boolean }) {
-    if (!hoveredWord && !clickedWord) return <p className="text-app-text leading-relaxed text-[1.2rem]">{text}</p>;
+    // FONT SIZE: Change 'text-[0.9rem]' below to adjust the original text size.
+    // File: src/components/StudyPanel.tsx — function HighlightOriginalText
+    if (!hoveredWord && !clickedWord) return <p className="text-app-text leading-relaxed text-[0.9rem]">{text}</p>;
 
     const wordsToHighlight = [hoveredWord, clickedWord].filter(Boolean) as string[];
-    // create a normalized mapping to find matching substrings
     let parts: { text: string, type: 'normal' | 'hover' | 'click' }[] = [{ text: text, type: 'normal' }];
 
-    // Apply splits iteratively for clicked then hovered
     for (const hw of wordsToHighlight) {
-        const cleanHw = normalizeText(hw);
-        if (!cleanHw || cleanHw.length < 2) continue;
+        // Strip only diacritics (not the base chars themselves) for matching
+        const cleanHw = hw.normalize("NFD").replace(/[\u0300-\u036f\u0591-\u05C7]/g, "");
+        if (!cleanHw || cleanHw.length < 1) continue;
 
         const escaped = cleanHw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -38,24 +40,32 @@ function HighlightOriginalText({ text, hoveredWord, clickedWord, isHebrew }: { t
                 continue;
             }
 
-            // We find all occurrences of cleanHw in part.text (ignoring case)
+            // Normalize the source text the same way
+            const normalizedPart = part.text.normalize("NFD").replace(/[\u0300-\u036f\u0591-\u05C7]/g, "");
             const regex = new RegExp(`(${escaped})`, 'gi');
-            const subParts = part.text.split(regex);
+            const matches = [...normalizedPart.matchAll(regex)];
 
-            subParts.forEach((sp) => {
-                if (!sp) return;
-                if (normalizeText(sp) === cleanHw) {
-                    newParts.push({ text: sp, type: hw === clickedWord ? 'click' : 'hover' });
-                } else {
-                    newParts.push({ text: sp, type: 'normal' });
-                }
-            });
+            if (matches.length === 0) {
+                newParts.push(part);
+                continue;
+            }
+
+            // Re-build from original text using match indices
+            let lastIndex = 0;
+            for (const match of matches) {
+                const start = match.index!;
+                const end = start + match[0].length;
+                if (start > lastIndex) newParts.push({ text: part.text.slice(lastIndex, start), type: 'normal' });
+                newParts.push({ text: part.text.slice(start, end), type: hw === clickedWord ? 'click' : 'hover' });
+                lastIndex = end;
+            }
+            if (lastIndex < part.text.length) newParts.push({ text: part.text.slice(lastIndex), type: 'normal' });
         }
         parts = newParts;
     }
 
     return (
-        <p className="text-app-text leading-relaxed text-[1.2rem]">
+        <p className="text-app-text leading-relaxed text-[0.9rem]">
             {parts.map((p, i) => {
                 if (p.type === 'click') {
                     return <mark key={i} className={cn("bg-gold text-app-bg font-bold rounded-sm px-0.5", isHebrew && "inline-block")}>{p.text}</mark>;
@@ -69,7 +79,7 @@ function HighlightOriginalText({ text, hoveredWord, clickedWord, isHebrew }: { t
     );
 }
 
-type TabId = "context" | "crossref" | "language" | "ai";
+type TabId = "context" | "crossref" | "language" | "commentary";
 
 export interface StudyPanelProps {
     bookId: string;
@@ -84,7 +94,11 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const { t, locale } = useTranslation();
     const navigate = useNavigate();
     const { isPro } = useSubscription();
+    const { data, loading, error } = useStudyData(bookId, chapter, verse!, version);
+
     const [activeTab, setActiveTab] = useState<TabId>("context");
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [localCommentary, setLocalCommentary] = useState<string | null>(null);
     const [strongsCache, setStrongsCache] = useState<Record<string, StrongsEntry>>({});
     const [strongsLoading, setStrongsLoading] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -98,7 +112,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const [hoveredWord, setHoveredWord] = useState<string | null>(null);
     const [clickedWord, setClickedWord] = useState<string | null>(null);
 
-    const { data, loading, error } = useStudyData(bookId, chapter, verse, version);
+
 
     const handleRefClick = async (ref: CrossReference) => {
         setSelectedRef(ref);
@@ -166,11 +180,43 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     }, []);
 
     const tabs: { id: TabId; icon: React.ReactNode; label: string }[] = [
-        { id: "context", icon: <Book className="h-3.5 w-3.5" />, label: t("study.tabContext") },
-        { id: "crossref", icon: <Link2 className="h-3.5 w-3.5" />, label: t("study.tabRefs") },
-        { id: "language", icon: <Languages className="h-3.5 w-3.5" />, label: t("study.tabLanguage") },
-        { id: "ai", icon: <Sparkles className="h-3.5 w-3.5" />, label: "Assistente IA" },
+        { id: "context", label: t("study.tabContext"), icon: <Info className="h-3 w-3" /> },
+        { id: "crossref", label: t("study.tabRefs"), icon: <Hash className="h-3 w-3" /> },
+        { id: "language", label: t("study.tabLanguage"), icon: <Languages className="h-3 w-3" /> },
+        { id: "commentary", label: t("study.tabCommentary"), icon: <Quote className="h-3 w-3" /> },
     ];
+
+    const handleGenerateCommentary = async () => {
+        if (!isPro) {
+            navigate('/pro');
+            return;
+        }
+
+        try {
+            setIsGenerating(true);
+            const { commentaries } = await requestCommentary({
+                bookId,
+                chapter,
+                verse: verse!,
+                verseText,
+                version,
+                language: String(locale).startsWith('pt') ? 'pt' : 'en'
+            });
+
+            setLocalCommentary(JSON.stringify(commentaries));
+            toast.success("Comentários gerados com sucesso!");
+        } catch (err: any) {
+            console.error(err);
+            toast.error("Erro ao gerar comentários: " + err.message);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    // Reset local commentary when verse changes
+    useEffect(() => {
+        setLocalCommentary(null);
+    }, [bookId, chapter, verse]);
 
     return (
         <>
@@ -223,14 +269,14 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                 </div>
 
                 {/* Tabs */}
-                <div className="flex shrink-0 border-b border-border">
+                <div className="grid grid-cols-4 shrink-0 border-b border-border">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             type="button"
                             onClick={() => setActiveTab(tab.id)}
                             className={cn(
-                                "flex flex-1 items-center justify-center gap-1.5 px-2 py-2.5 text-[0.7rem] font-medium transition-colors border-b-2",
+                                "flex items-center justify-center gap-1 px-0.5 py-2.5 text-[0.62rem] font-medium transition-colors border-b-2 leading-none",
                                 activeTab === tab.id
                                     ? "border-gold text-gold"
                                     : "border-transparent text-app-text-muted hover:text-app-text",
@@ -245,7 +291,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                 </div>
 
                 {/* Tab Content */}
-                <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5" role="tabpanel">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-4 pb-28 lg:pb-8 space-y-5" role="tabpanel">
 
                     {loading ? (
                         <div className="flex justify-center items-center py-10 opacity-60">
@@ -267,8 +313,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                     <p className="mb-1 flex items-center gap-1.5 font-mono text-[0.6rem] uppercase tracking-widest text-gold">
                                                         Destaque do Capítulo
                                                     </p>
-                                                    <p className="font-medium text-[0.85rem] text-app-text mb-1">{data.chapterHighlight.title}</p>
-                                                    <p className="text-[0.8rem] text-app-text-muted leading-relaxed">{data.chapterHighlight.summary}</p>
+                                                    <p className="text-[0.82rem] text-app-text leading-relaxed">{data.chapterHighlight}</p>
                                                 </div>
                                             )}
 
@@ -361,38 +406,42 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                             {/* Language Tab */}
                             {activeTab === "language" && (
                                 <div className="space-y-4">
-                                    {/* Language badge */}
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className={cn(
-                                            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.65rem] font-mono uppercase tracking-widest",
-                                            getLanguageLabel(bookId) === 'Grego'
-                                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                                                : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
-                                        )}>
-                                            <Languages className="h-3 w-3" />
-                                            Idioma original: {getLanguageLabel(bookId)}
-                                        </span>
+                                    {/* Sticky header for Language tab */}
+                                    <div className="sticky -top-4 z-10 bg-app-bg pt-2 pb-4 -mx-4 px-4 border-b border-border/40 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05)]">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className={cn(
+                                                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.65rem] font-mono uppercase tracking-widest",
+                                                getLanguageLabel(bookId) === 'Grego'
+                                                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+                                            )}>
+                                                <Languages className="h-3 w-3" />
+                                                Idioma original: {getLanguageLabel(bookId)}
+                                            </span>
+                                        </div>
+
+                                        {originalTextLoading ? (
+                                            <div className="animate-pulse h-12 bg-app-raised rounded-xl" />
+                                        ) : originalText ? (
+                                            <div
+                                                className="p-4 rounded-xl bg-app-raised/40 border border-border font-serif transition-colors"
+                                                dir={getLanguageLabel(bookId) === 'Hebraico' ? 'rtl' : 'ltr'}
+                                            >
+                                                <HighlightOriginalText
+                                                    text={originalText}
+                                                    hoveredWord={hoveredWord}
+                                                    clickedWord={clickedWord}
+                                                    isHebrew={getLanguageLabel(bookId) === 'Hebraico'}
+                                                />
+                                            </div>
+                                        ) : null}
                                     </div>
 
-                                    {originalTextLoading ? (
-                                        <div className="animate-pulse h-12 bg-app-raised rounded-xl mt-2 mb-4" />
-                                    ) : originalText ? (
-                                        <div
-                                            className="mt-3 mb-5 p-4 rounded-xl bg-app-raised/40 border border-border font-serif transition-colors"
-                                            dir={getLanguageLabel(bookId) === 'Hebraico' ? 'rtl' : 'ltr'}
-                                        >
-                                            <HighlightOriginalText
-                                                text={originalText}
-                                                hoveredWord={hoveredWord}
-                                                clickedWord={clickedWord}
-                                                isHebrew={getLanguageLabel(bookId) === 'Hebraico'}
-                                            />
-                                        </div>
-                                    ) : null}
-
-                                    <p className="text-[0.75rem] leading-relaxed text-app-text-muted mb-2">
-                                        {t("study.languageIntro")}
-                                    </p>
+                                    <div className="pt-2">
+                                        <p className="text-[0.75rem] leading-relaxed text-app-text-muted mb-2">
+                                            {t("study.languageIntro")}
+                                        </p>
+                                    </div>
 
                                     {strongsLoading ? (
                                         <div className="flex justify-center items-center py-6 opacity-60">
@@ -424,8 +473,10 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                 {validWords.map((word, index) => {
                                                     const entry = strongsCache[word.strongs!];
                                                     const isGreek = word.strongs?.startsWith('G');
-                                                    const wordOriginalText = entry?.word || word.text;
-                                                    const isSelected = clickedWord === wordOriginalText;
+                                                    // Use entry.word (Greek/Hebrew chars) as the highlight target.
+                                                    // Fallback to null if word is empty (functional words with no original text)
+                                                    const wordOriginalText = (entry?.word && entry.word.trim().length > 0) ? entry.word.trim() : null;
+                                                    const isSelected = wordOriginalText !== null && clickedWord === wordOriginalText;
 
                                                     return (
                                                         <div
@@ -436,15 +487,17 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                                     ? "border-gold bg-gold-bg/10 shadow-[0_0_15px_rgba(212,175,55,0.1)]"
                                                                     : "border-border bg-app-surface hover:border-gold/40"
                                                             )}
-                                                            onClick={() => setClickedWord(isSelected ? null : wordOriginalText)}
-                                                            onMouseEnter={() => setHoveredWord(wordOriginalText)}
+                                                            onClick={() => {
+                                                                if (wordOriginalText) setClickedWord(isSelected ? null : wordOriginalText);
+                                                            }}
+                                                            onMouseEnter={() => { if (wordOriginalText) setHoveredWord(wordOriginalText); }}
                                                             onMouseLeave={() => setHoveredWord(null)}
                                                         >
                                                             {/* Word + code badge */}
                                                             <div className="flex items-start justify-between gap-2">
                                                                 <p className={cn(
                                                                     "font-mono tracking-wider leading-tight transition-transform",
-                                                                    isSelected ? "text-[1.2rem] text-gold" : "text-[1.1rem]",
+                                                                    isSelected ? "text-[1.2rem] text-gold" : "text-[0.95rem]",
                                                                     !isSelected && (isGreek ? "text-blue-600 dark:text-blue-400" : "text-amber-700 dark:text-amber-400")
                                                                 )}>
                                                                     {wordOriginalText}
@@ -495,8 +548,8 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                 </div>
                             )}
 
-                            {/* AI Assistant Tab */}
-                            {activeTab === "ai" && (
+                            {/* Commentary Tab */}
+                            {activeTab === "commentary" && (
                                 <div className="space-y-4">
                                     {!isPro ? (
                                         <div className="rounded-xl border border-gold/20 bg-gold-bg/10 p-6 text-center space-y-4">
@@ -506,7 +559,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                             <div className="space-y-1.5">
                                                 <h3 className="text-sm font-semibold text-app-text">Recurso Exclusivo PRO</h3>
                                                 <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                    Tenha acesso a explicações profundas e estudos teológicos instantâneos gerados por nossa Inteligência Artificial Premium.
+                                                    Tenha acesso a comentários teológicos profundos gerados por nossa Inteligência Artificial orientada por grandes comentaristas.
                                                 </p>
                                             </div>
                                             <Button
@@ -518,36 +571,40 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                         </div>
                                     ) : (
                                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className="flex -space-x-1">
-                                                    <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
-                                                        <Sparkles className="h-2.5 w-2.5 text-blue-500" />
-                                                    </div>
-                                                </div>
-                                                <span className="text-[0.65rem] font-bold uppercase tracking-widest text-blue-500">
-                                                    Estudo com IA Ativo
-                                                </span>
-                                            </div>
-
-                                            {data?.aiExplanation ? (
-                                                <div className="rounded-lg border border-border bg-app-surface p-4 space-y-3">
-                                                    <p className="text-[0.85rem] leading-relaxed text-app-text whitespace-pre-wrap italic">
-                                                        {data.aiExplanation}
-                                                    </p>
-                                                    <p className="text-[0.6rem] text-app-text-muted/50 text-right uppercase">
-                                                        Fonte: Bíblia Vive AI Assistant
-                                                    </p>
-                                                </div>
+                                            {(data?.commentaries || localCommentary) ? (
+                                                <BiblicalCommentary
+                                                    commentaries={
+                                                        localCommentary
+                                                            ? JSON.parse(localCommentary)
+                                                            : (data?.commentaries || [])
+                                                    }
+                                                />
                                             ) : (
-                                                <div className="p-8 text-center space-y-3">
-                                                    <div className="w-12 h-12 bg-app-raised rounded-full flex items-center justify-center mx-auto opacity-40">
-                                                        <Sparkles className="h-6 w-6 text-gold" />
+                                                <div className="p-8 text-center space-y-4 bg-app-surface/40 rounded-2xl border border-border/50">
+                                                    <div className="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center mx-auto">
+                                                        <MessageSquare className="h-7 w-7 text-gold" />
                                                     </div>
-                                                    <p className="text-[0.8rem] text-app-text-muted">
-                                                        Solicite uma análise profunda deste versículo baseado em contextos históricos e linguísticos.
-                                                    </p>
-                                                    <Button className="bg-app-raised text-app-text border-border hover:bg-app-raised/80">
-                                                        Gerar Estudo (Em Breve)
+                                                    <div className="space-y-2">
+                                                        <p className="text-sm font-bold text-app-text">
+                                                            {t("study.commentaryIntro")}
+                                                        </p>
+                                                        <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
+                                                            Acesse perspectivas bíblicas de teólogos renomados sobre este versículo específico.
+                                                        </p>
+                                                    </div>
+                                                    <Button
+                                                        className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold shadow-lg shadow-gold/20"
+                                                        onClick={handleGenerateCommentary}
+                                                        disabled={isGenerating}
+                                                    >
+                                                        {isGenerating ? (
+                                                            <>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                {t("study.commentaryLoading")}
+                                                            </>
+                                                        ) : (
+                                                            t("study.getCommentary")
+                                                        )}
                                                     </Button>
                                                 </div>
                                             )}

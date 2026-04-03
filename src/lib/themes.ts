@@ -6,9 +6,10 @@ export const THEME_KEY = "bv-theme";
 export const VERSION_KEY = "bv-version";
 
 export const VERSION_OPTIONS = [
-  "aa", "acf", "ara", "arc", "nvi", "kja",
+  "aa", "acf", "arc", "nvi", "kja",
   "bbe", "kjv",
   "rvr",
+  "org",
 ] as const;
 
 export type BibleVersion = (typeof VERSION_OPTIONS)[number];
@@ -16,14 +17,14 @@ export type BibleVersion = (typeof VERSION_OPTIONS)[number];
 export interface VersionInfo {
   id: BibleVersion;
   name: string;
-  language: Locale;
+  language: Locale | "he-gr";
   languageLabel: string;
   langPath: string;
+  isPro?: boolean;
 }
 
 export const VERSION_CATALOG: VersionInfo[] = [
   { id: "acf", name: "Almeida Corrigida Fiel", language: "pt-BR", languageLabel: "Português", langPath: "pt-br" },
-  { id: "ara", name: "Almeida Revista e Atualizada", language: "pt-BR", languageLabel: "Português", langPath: "pt-br" },
   { id: "arc", name: "Almeida Revista e Corrigida", language: "pt-BR", languageLabel: "Português", langPath: "pt-br" },
   { id: "nvi", name: "Nova Versão Internacional", language: "pt-BR", languageLabel: "Português", langPath: "pt-br" },
   { id: "aa", name: "Almeida Revisada Imprensa Bíblica", language: "pt-BR", languageLabel: "Português", langPath: "pt-br" },
@@ -31,13 +32,14 @@ export const VERSION_CATALOG: VersionInfo[] = [
   { id: "kjv", name: "King James Version", language: "en", languageLabel: "English", langPath: "en" },
   { id: "bbe", name: "Bible in Basic English", language: "en", languageLabel: "English", langPath: "en" },
   { id: "rvr", name: "Reina Valera", language: "es", languageLabel: "Español", langPath: "es" },
+  { id: "org", name: "Idioma Original (He/Gr)", language: "he-gr", languageLabel: "Originais", langPath: "org", isPro: true },
 ];
 
 export function getVersionInfo(version: BibleVersion): VersionInfo | undefined {
   return VERSION_CATALOG.find((v) => v.id === version);
 }
 
-export function getVersionLanguage(version: BibleVersion): Locale {
+export function getVersionLanguage(version: BibleVersion): Locale | "he-gr" {
   return getVersionInfo(version)?.language ?? "pt-BR";
 }
 
@@ -46,7 +48,7 @@ export function getVersionLangPath(version: BibleVersion): string {
 }
 
 export function getVersionsForLocale(locale: Locale): VersionInfo[] {
-  return VERSION_CATALOG.filter((v) => v.language === locale);
+  return VERSION_CATALOG.filter((v) => v.language === (locale as string) || v.language === "he-gr");
 }
 
 export function getDefaultVersionForLocale(locale: Locale): BibleVersion {
