@@ -134,8 +134,8 @@ export async function requestCommentary(
   params: {
     bookId: string;
     chapter: number;
-    verse: number;
-    verseText: string;
+    verse?: number | null;
+    verseText?: string;
     version: string;
     language?: string;
   }

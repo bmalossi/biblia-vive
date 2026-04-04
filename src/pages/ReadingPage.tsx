@@ -63,6 +63,8 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "@/i18n";
 import { exportNotesToPDF } from "@/lib/notesHighlights";
 import { cn } from "@/lib/utils";
+import { BiblicalCommentary } from "@/components/BiblicalCommentary";
+import { requestCommentary } from "@/lib/studyPanel";
 
 interface BookContextData {
   name: string;
@@ -180,6 +182,8 @@ export default function ReadingPage() {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalData, setCardModalData] = useState<CardData | null>(null);
   const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
+  const [chapterCommentaries, setChapterCommentaries] = useState<any[] | null>(null);
+  const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
   const chapterGridRef = useRef<HTMLDivElement>(null);
@@ -493,6 +497,7 @@ export default function ReadingPage() {
     setSelectedVerse(null);
     setToolbarPosition(null);
     setHoveredVerseNumber(null);
+    setChapterCommentaries(null);
     tts.stop();
   }, [chapterNumber, compareEnabled, compareVersion, selectedVersion, tts.stop]);
 
@@ -662,6 +667,30 @@ export default function ReadingPage() {
     setStudyVerse(Number(selectedVerse.verseNumber));
     setStudyVerseText(selectedVerse.text);
     setIsStudyPanelOpen((prev) => !prev);
+  };
+
+  const handleChapterCommentary = async () => {
+    if (!isPro) {
+      navigate('/pro');
+      return;
+    }
+    if (!selectedBook) return;
+    setIsChapterCommentaryLoading(true);
+    try {
+      const { commentaries } = await requestCommentary({
+        bookId: selectedBook.id,
+        chapter: chapterNumber,
+        verse: null,
+        verseText: "",
+        version: selectedVersion,
+        language: String(locale).startsWith("pt") ? "pt" : "en",
+      });
+      setChapterCommentaries(commentaries);
+    } catch (e: any) {
+      toast({ message: "Erro: " + e.message, type: "error" });
+    } finally {
+      setIsChapterCommentaryLoading(false);
+    }
   };
 
   const chapterLabel = useMemo(() => {
@@ -1164,6 +1193,34 @@ export default function ReadingPage() {
                   </section>
                 )}
               </div>
+
+              {/* NEW CHAPTER COMMENTARY SECTION */}
+              {!loading && !error && selectedBook && !preferences.focusMode && (
+                <div className="mt-8 mb-4 flex flex-col items-center justify-center w-full lg:max-w-4xl mx-auto px-4 opacity-95">
+                  {!chapterCommentaries ? (
+                    <Button
+                      onClick={handleChapterCommentary}
+                      disabled={isChapterCommentaryLoading}
+                      className="bg-gold-bg/40 text-gold hover:bg-gold-bg/60 border border-gold/30 rounded-full px-6 transition-all"
+                      variant="outline"
+                    >
+                      {isChapterCommentaryLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <FileText className="mr-2 h-4 w-4" />
+                      )}
+                      {isChapterCommentaryLoading ? "Analisando Capítulo..." : "Contexto e Comentário do Capítulo"}
+                    </Button>
+                  ) : (
+                    <div className="w-full text-left bg-app-surface/60 rounded-2xl p-6 border border-border shadow-sm">
+                      <h3 className="text-xl font-serif text-app-text mb-6 border-b border-border/50 pb-3 flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-gold" /> Acervo Teológico do Capítulo
+                      </h3>
+                      <BiblicalCommentary commentaries={chapterCommentaries} />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {!loading && !error && isPartOfTodayReading && activePlan && (
                 <DailyReadingBadge

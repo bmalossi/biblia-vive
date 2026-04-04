@@ -23,10 +23,17 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
 
     // Auto cleanup audio object URL if we loaded local blobs
     useEffect(() => {
+        // Pre-load native voices to avoid OS cold-start delay
+        if (window.speechSynthesis) {
+            window.speechSynthesis.getVoices();
+        }
         return () => {
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current = null;
+            }
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
             }
         };
     }, [slug]);
@@ -38,8 +45,13 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
             return;
         }
 
-        if (isPlaying && audioRef.current) {
-            audioRef.current.pause();
+        if (isPlaying) {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0; // Return to start as requested
+            } else if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel(); // Clears queue, returning to start
+            }
             setIsPlaying(false);
             return;
         }

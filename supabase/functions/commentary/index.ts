@@ -1,3 +1,4 @@
+// @ts-nocheck
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from "npm:@supabase/supabase-js@2.39.3"
 import OpenAI from "npm:openai@4.28.0"
@@ -32,19 +33,21 @@ Deno.serve(async (req) => {
         const body = await req.json().catch(() => ({}));
         const { bookId, chapter, verse, verseText, version } = body;
 
-        if (!bookId || !chapter || verse === undefined) {
+        if (!bookId || !chapter) {
             return new Response("Missing parameters", { status: 400, headers: corsHeaders });
         }
 
         const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!);
-        const verseId = `${bookId.toUpperCase()}.${chapter}.${verse}`;
+        const isChapterLevel = verse === null || verse === undefined || verse === 0;
+        const verseId = isChapterLevel ? `${bookId.toUpperCase()}.${chapter}.ALL` : `${bookId.toUpperCase()}.${chapter}.${verse}`;
+        const questionType = isChapterLevel ? "chapter_commentary" : "commentary";
 
         // 1. Check Cache FIRST
         const { data: cached } = await supabase
             .from("ai_study_cache")
             .select("response")
             .eq("verse_id", verseId)
-            .eq("question_type", "commentary")
+            .eq("question_type", questionType)
             .maybeSingle();
 
         if (cached?.response) {
@@ -84,14 +87,20 @@ Deno.serve(async (req) => {
 
         const openai = new OpenAI({ apiKey: openaiKey });
 
-        const systemPrompt = `Você é um curador de comentários bíblicos protestantes históricos. Retorne um JSON com até 2 comentários de teólogos reais (Calvino, Spurgeon, Henry, Lutero, etc.). NUNCA invente comentaristas.
+        const systemPrompt = `Você é um curador de comentários bíblicos protestantes históricos. Retorne um JSON com até 2 comentários de teólogos reais (Spurgeon, Henry, Lutero, etc.). NUNCA invente comentaristas.
+
+CRÍTICO SOBRE ASPAS: 
+Se for um resumo seu sobre o que o teólogo disse, NÃO USE aspas. 
+Use aspas APENAS se for uma citação direta literal transcrita do livro.
 
 JSON obrigatório:
 {"commentaries":[{"author":"Nome","era":"Época","work":"Obra","year":"Ano","text":"Texto (máx 400 chars)","source_url":null}]}
 
 Se não houver comentários confiáveis: {"commentaries":[]}`;
 
-        const userPrompt = `${bookId} ${chapter}:${verse} (${version}): "${verseText?.slice(0, 200) ?? ""}"`;
+        const userPrompt = isChapterLevel
+            ? `Tema Central e Visão Geral: Por favor, dê comentários exegéticos sobre o capítulo inteiro de ${bookId} ${chapter}. Foco no contexto geral do capítulo.`
+            : `${bookId} ${chapter}:${verse} (${version}): "${verseText?.slice(0, 200) ?? ""}"`;
 
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
@@ -110,7 +119,7 @@ Se não houver comentários confiáveis: {"commentaries":[]}`;
         // 4. Save to Cache
         supabase.from("ai_study_cache").upsert({
             verse_id: verseId,
-            question_type: "commentary",
+            question_type: questionType,
             response: commentaryJson,
             created_at: new Date().toISOString()
         }, { onConflict: "verse_id,question_type" }).then(() => { }).catch(() => { });
