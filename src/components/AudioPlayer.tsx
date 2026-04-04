@@ -65,43 +65,56 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
             });
 
             if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                if (res.status === 402) {
-                    navigate("/pro");
-                    return;
-                }
-                throw new Error(err.error || "Failed to fetch audio");
+                throw new Error("Failed to fetch audio");
             }
 
-            const contentType = res.headers.get("Content-Type");
-            let finalUrl = "";
+            const data = await res.json();
 
-            if (contentType?.includes("application/json")) {
-                const data = await res.json();
-                finalUrl = data.url;
-            } else if (contentType?.includes("audio/mpeg")) {
-                const blob = await res.blob();
-                finalUrl = URL.createObjectURL(blob);
-            } else {
-                throw new Error("Formato de áudio não suportado");
+            // Fallback: use browser Web Speech API (free tier or no ElevenLabs key)
+            if (data.fallback) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "pt-BR";
+                utterance.rate = 0.9;
+                utterance.onend = () => setIsPlaying(false);
+
+                // Pick a Portuguese voice if available
+                const voices = window.speechSynthesis.getVoices();
+                const ptVoice = voices.find(v => v.lang.startsWith("pt"));
+                if (ptVoice) utterance.voice = ptVoice;
+
+                window.speechSynthesis.speak(utterance);
+                setIsPlaying(true);
+                setIsFetching(false);
+                return;
             }
 
-            setAudioUrl(finalUrl);
-
-            const audio = new Audio(finalUrl);
-            audio.onended = () => setIsPlaying(false);
-
-            audioRef.current = audio;
-            await audio.play();
-            setIsPlaying(true);
+            // PRO: ElevenLabs URL from Supabase storage
+            if (data.url) {
+                setAudioUrl(data.url);
+                const audio = new Audio(data.url);
+                audio.onended = () => setIsPlaying(false);
+                audioRef.current = audio;
+                await audio.play();
+                setIsPlaying(true);
+            }
 
         } catch (error) {
             console.error(error);
-            alert("Erro ao carregar áudio. Tente novamente.");
+            // Last resort: try browser TTS
+            try {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "pt-BR";
+                utterance.onend = () => setIsPlaying(false);
+                window.speechSynthesis.speak(utterance);
+                setIsPlaying(true);
+            } catch {
+                alert("Erro ao carregar áudio. Tente novamente.");
+            }
         } finally {
             setIsFetching(false);
         }
     };
+
 
     if (proLoading) {
         return <div className="animate-pulse h-12 bg-app-raised rounded-xl" />;

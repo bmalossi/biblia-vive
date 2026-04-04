@@ -11,13 +11,21 @@ export default async function handler(req: Request) {
         const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         const body = await req.json().catch(() => ({}));
-        const { text, slug } = body;
+        const { text, slug, voiceId } = body;
 
         if (!text || !slug) {
             return new Response("Missing parameters", { status: 400 });
         }
 
-        // Determine Pro status (optional — non-blocking, free users will use Google fallback)
+        // If ElevenLabs key is not configured → tell client to use browser fallback
+        if (!elevenLabsKey) {
+            return new Response(
+                JSON.stringify({ fallback: true, reason: "elevenlabs_not_configured" }),
+                { status: 200, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        // Verify PRO status (non-blocking: if auth fails, falls back to browser)
         let isPro = false;
         if (supabaseUrl && supabaseServiceRoleKey) {
             const authHeader = req.headers.get("Authorization");
@@ -37,61 +45,57 @@ export default async function handler(req: Request) {
             }
         }
 
-        // PRO MODE: ElevenLabs with Supabase caching
-        if (isPro && elevenLabsKey && supabaseUrl && supabaseServiceRoleKey) {
-            const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-            const checkPath = `${slug}.mp3`;
-            const { data: publicUrlData } = supabase.storage.from("audio_cache").getPublicUrl(checkPath);
-
-            const cacheCheck = await fetch(publicUrlData.publicUrl, { method: "HEAD" });
-            if (cacheCheck.ok) {
-                return new Response(JSON.stringify({ url: publicUrlData.publicUrl, cached: true, isPro: true }), {
-                    status: 200, headers: { "Content-Type": "application/json" }
-                });
-            }
-
-            const voiceId = body.voiceId || "ErXwobaYiN019PkySvjV";
-            const elevenResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-                method: "POST",
-                headers: { "xi-api-key": elevenLabsKey, "Content-Type": "application/json" },
-                body: JSON.stringify({ text: text.slice(0, 5000), model_id: "eleven_multilingual_v2" })
-            });
-
-            if (!elevenResponse.ok) throw new Error("ElevenLabs failed");
-            const audioBuffer = await elevenResponse.arrayBuffer();
-
-            await supabase.storage.from("audio_cache").upload(checkPath, audioBuffer, {
-                contentType: "audio/mpeg", upsert: true
-            });
-
-            const { data: finalUrl } = supabase.storage.from("audio_cache").getPublicUrl(checkPath);
-            return new Response(JSON.stringify({ url: finalUrl.publicUrl, cached: false, isPro: true }), {
-                status: 200, headers: { "Content-Type": "application/json" }
-            });
+        if (!isPro) {
+            // Not PRO → tell client to use browser TTS fallback
+            return new Response(
+                JSON.stringify({ fallback: true, reason: "not_pro" }),
+                { status: 200, headers: { "Content-Type": "application/json" } }
+            );
         }
 
-        // FREE MODE: Google TTS fallback (first 200 chars, no caching required)
-        const testText = encodeURIComponent(text.slice(0, 200));
-        const googleUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${testText}&tl=pt-BR&client=tw-ob`;
-        const googleResponse = await fetch(googleUrl, {
-            headers: { "User-Agent": "Mozilla/5.0" }
+        // PRO MODE: Check Supabase cache first
+        const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!);
+        const checkPath = `${slug}.mp3`;
+        const { data: publicUrlData } = supabase.storage.from("audio_cache").getPublicUrl(checkPath);
+
+        const cacheCheck = await fetch(publicUrlData.publicUrl, { method: "HEAD" });
+        if (cacheCheck.ok) {
+            return new Response(
+                JSON.stringify({ url: publicUrlData.publicUrl, cached: true, isPro: true }),
+                { status: 200, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        // PRO MODE: Generate via ElevenLabs
+        const selectedVoiceId = voiceId || "ErXwobaYiN019PkySvjV";
+        const elevenResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}`, {
+            method: "POST",
+            headers: { "xi-api-key": elevenLabsKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text.slice(0, 5000), model_id: "eleven_multilingual_v2" })
         });
 
-        if (!googleResponse.ok) throw new Error("Google TTS fallback failed");
-        const audioBuffer = await googleResponse.arrayBuffer();
+        if (!elevenResponse.ok) throw new Error("ElevenLabs API failed");
 
-        console.log(`[TTS Free Preview] slug=${slug} chars=${text.length}`);
+        const audioBuffer = await elevenResponse.arrayBuffer();
 
-        return new Response(audioBuffer, {
-            status: 200,
-            headers: {
-                "Content-Type": "audio/mpeg",
-                "X-Audio-Mode": "free-preview",
-                "Cache-Control": "no-store",
-            }
-        });
+        // Upload to Supabase Storage (fire and forget)
+        supabase.storage.from("audio_cache").upload(checkPath, audioBuffer, {
+            contentType: "audio/mpeg", upsert: true
+        }).then(() => { }).catch(() => { });
+
+        const { data: finalUrl } = supabase.storage.from("audio_cache").getPublicUrl(checkPath);
+
+        return new Response(
+            JSON.stringify({ url: finalUrl.publicUrl, cached: false, isPro: true }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+        );
 
     } catch (err: any) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+        console.error("[TTS Error]:", err);
+        // On any error, tell client to fall back to browser TTS
+        return new Response(
+            JSON.stringify({ fallback: true, reason: err.message }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+        );
     }
 }

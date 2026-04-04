@@ -143,21 +143,15 @@ export async function requestCommentary(
   const { supabase } = await import('./supabase');
   const { data: { session } } = await supabase.auth.getSession();
 
-  const res = await fetch('/api/commentary', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': session ? `Bearer ${session.access_token}` : '',
-    },
-    body: JSON.stringify(params),
+  // Chamada Edge Function Supabase (evita o timeout da Vercel)
+  const { data: result, error } = await supabase.functions.invoke('commentary', {
+    body: params,
+    headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
   });
 
-  if (!res.ok) {
-    const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.error || `HTTP error! status: ${res.status}`);
+  if (error) {
+    throw new Error(error.message || 'Erro na chamada da Edge Function');
   }
-
-  const result = await res.json();
   try {
     return {
       commentaries: JSON.parse(result.response),
