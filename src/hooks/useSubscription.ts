@@ -34,7 +34,7 @@ export function useSubscription() {
                     .from("user_subscriptions")
                     .select("status, current_period_end")
                     .eq("user_id", user.id)
-                    .single();
+                    .maybeSingle();
 
                 if (error || !data) {
                     setSubscription({ status: "none", current_period_end: null });
