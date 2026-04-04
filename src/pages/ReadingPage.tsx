@@ -57,7 +57,7 @@ import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
 import { findBookBySlug } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
-import { Maximize2, Minimize2, Settings, FileText } from "lucide-react";
+import { Maximize2, Minimize2, Settings, FileText, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "@/i18n";
@@ -182,7 +182,7 @@ export default function ReadingPage() {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalData, setCardModalData] = useState<CardData | null>(null);
   const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
-  const [chapterCommentaries, setChapterCommentaries] = useState<any[] | null>(null);
+  const [localChapterCommentary, setLocalChapterCommentary] = useState<string | null>(null);
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
@@ -497,7 +497,7 @@ export default function ReadingPage() {
     setSelectedVerse(null);
     setToolbarPosition(null);
     setHoveredVerseNumber(null);
-    setChapterCommentaries(null);
+    setLocalChapterCommentary(null);
     tts.stop();
   }, [chapterNumber, compareEnabled, compareVersion, selectedVersion, tts.stop]);
 
@@ -685,7 +685,7 @@ export default function ReadingPage() {
         version: selectedVersion,
         language: String(locale).startsWith("pt") ? "pt" : "en",
       });
-      setChapterCommentaries(commentaries);
+      setLocalChapterCommentary(JSON.stringify(commentaries));
     } catch (e: any) {
       toast({ message: "Erro: " + e.message, type: "error" });
     } finally {
@@ -1194,33 +1194,7 @@ export default function ReadingPage() {
                 )}
               </div>
 
-              {/* NEW CHAPTER COMMENTARY SECTION */}
-              {!loading && !error && selectedBook && !preferences.focusMode && (
-                <div className="mt-8 mb-4 flex flex-col items-center justify-center w-full lg:max-w-4xl mx-auto px-4 opacity-95">
-                  {!chapterCommentaries ? (
-                    <Button
-                      onClick={handleChapterCommentary}
-                      disabled={isChapterCommentaryLoading}
-                      className="bg-gold-bg/40 text-gold hover:bg-gold-bg/60 border border-gold/30 rounded-full px-6 transition-all"
-                      variant="outline"
-                    >
-                      {isChapterCommentaryLoading ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <FileText className="mr-2 h-4 w-4" />
-                      )}
-                      {isChapterCommentaryLoading ? "Analisando Capítulo..." : "Contexto e Comentário do Capítulo"}
-                    </Button>
-                  ) : (
-                    <div className="w-full text-left bg-app-surface/60 rounded-2xl p-6 border border-border shadow-sm">
-                      <h3 className="text-xl font-serif text-app-text mb-6 border-b border-border/50 pb-3 flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-gold" /> Acervo Teológico do Capítulo
-                      </h3>
-                      <BiblicalCommentary commentaries={chapterCommentaries} />
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Removido do bottom conforme o pedido do usuário para jogar para sidebar direita */}
 
               {!loading && !error && isPartOfTodayReading && activePlan && (
                 <DailyReadingBadge
@@ -1259,6 +1233,34 @@ export default function ReadingPage() {
                         {c}
                       </button>
                     ))}
+                  </div>
+
+                  {/* Chapter Commentary Button in Sidebar */}
+                  <div className="w-full mt-8 border-t border-border/50 pt-6 flex flex-col items-center justify-center">
+                    <Button
+                      onClick={handleChapterCommentary}
+                      disabled={isChapterCommentaryLoading}
+                      type="button"
+                      className={cn(
+                        "w-full h-auto py-3.5 flex-col gap-2 text-center rounded-xl transition-all shadow-sm",
+                        isChapterCommentaryLoading
+                          ? "bg-app-raised/50 border border-border cursor-not-allowed"
+                          : "bg-gold-bg/20 text-gold hover:bg-gold-bg/40 border-gold/30 border hover:border-gold/50"
+                      )}
+                      variant="outline"
+                    >
+                      {isChapterCommentaryLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-app-text-muted" />
+                      ) : (
+                        <FileText className="h-5 w-5" />
+                      )}
+                      <span className={cn(
+                        "text-[0.68rem] uppercase tracking-wide leading-tight",
+                        isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
+                      )}>
+                        {isChapterCommentaryLoading ? "Analisando..." : "Comentário do Capítulo"}
+                      </span>
+                    </Button>
                   </div>
                 </div>
               </aside>
@@ -1376,6 +1378,32 @@ export default function ReadingPage() {
           />
         )
       }
+
+      {/* Chapter Commentary overlay - shown as popover below the sidebar button, not in a Dialog to avoid nested Radix Dialog issues */}
+      {localChapterCommentary && (
+        <div className="fixed inset-0 z-50 flex" onClick={() => setLocalChapterCommentary(null)}>
+          <div
+            className="ml-auto mr-[156px] xl:mr-[196px] 2xl:mr-[236px] mt-24 max-h-[calc(100vh-120px)] w-[380px] bg-app-surface border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-gold/5 shrink-0">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-gold" />
+                <span className="font-serif font-semibold text-app-text">Acervo Teológico do Capítulo</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLocalChapterCommentary(null)}
+                className="h-7 w-7 rounded-full hover:bg-app-raised flex items-center justify-center text-app-text-muted hover:text-app-text transition-colors"
+              >✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+              <p className="text-[0.72rem] text-app-text-muted mb-4 font-mono uppercase tracking-wide">{selectedBook?.name} {chapterNumber}</p>
+              <BiblicalCommentary commentaries={JSON.parse(localChapterCommentary)} />
+            </div>
+          </div>
+        </div>
+      )}
     </Layout >
   );
 }

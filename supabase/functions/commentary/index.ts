@@ -87,20 +87,27 @@ Deno.serve(async (req) => {
 
         const openai = new OpenAI({ apiKey: openaiKey });
 
-        const systemPrompt = `Você é um curador de comentários bíblicos protestantes históricos. Retorne um JSON com até 2 comentários de teólogos reais (Spurgeon, Henry, Lutero, etc.). NUNCA invente comentaristas.
+        const systemPrompt = `Você é um especialista em comentários bíblicos protestantes clássicos.
+Sua missão é trazer o TEXTO REAL e COMPLETO que teólogos históricamente reconhecidos escreveram sobre o trecho ou capítulo solicitado.
 
-CRÍTICO SOBRE ASPAS: 
-Se for um resumo seu sobre o que o teólogo disse, NÃO USE aspas. 
-Use aspas APENAS se for uma citação direta literal transcrita do livro.
+REGRAS ABSOLUTAS:
+- NUNCA invente ou parafraseie atribuindo a um autor — apenas transcreva o que ele de fato escreveu.
+- Se você não tiver certeza de que o texto é autêntico, NÃO INCLUA esse comentarista. Retorne array vazio.
+- Fontes aceitas: Calvino (Institutos / Comentários), Spurgeon (Treasury of David, comentários), Matthew Henry (Comentário Completo), Jonathan Edwards, Martinho Lutero, Charles Hodge, Adam Clarke, John Wesley e similares de igual calibre histórico.
 
-JSON obrigatório:
-{"commentaries":[{"author":"Nome","era":"Época","work":"Obra","year":"Ano","text":"Texto (máx 400 chars)","source_url":null}]}
+SOBRE ASPAS — REGRA CRÍTICA:
+- Use aspas duplas ("...") SOMENTE para citações literais e diretas do texto original do comentarista.
+- Caso o texto seja sua introdução ou descrição contextual, NÃO use aspas.
+- Não truncar citações com reticências ou resumo, traga o trecho completo como escrito.
 
-Se não houver comentários confiáveis: {"commentaries":[]}`;
+FORMATO JSON obrigatório:
+{"commentaries":[{"author":"Nome do Teólogo","era":"Século XIX, etc","work":"Nome exato da obra","year":"Ano da obra","text":"Texto completo do comentarista sobre este trecho","source_url":null}]}
+
+Se não houver comentários reais e confiáveis disponíveis: {"commentaries":[]}`;
 
         const userPrompt = isChapterLevel
-            ? `Tema Central e Visão Geral: Por favor, dê comentários exegéticos sobre o capítulo inteiro de ${bookId} ${chapter}. Foco no contexto geral do capítulo.`
-            : `${bookId} ${chapter}:${verse} (${version}): "${verseText?.slice(0, 200) ?? ""}"`;
+            ? `Traga comentários exegéticos completos de teólogos reais sobre o capítulo inteiro de ${bookId.toUpperCase()} ${chapter}. Inclua o máximo de texto original possível, sem resumir. Contexto histórico e teológico bem fundamentado.`
+            : `Traga o texto completo e direto do comentário de teólogos sobre ${bookId.toUpperCase()} ${chapter}:${verse} (versão: ${version}). Texto do versículo: "${verseText ?? ""}". Não resuma — transcreva o quanto mais do texto original do comentarista.`;
 
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
@@ -110,7 +117,7 @@ Se não houver comentários confiáveis: {"commentaries":[]}`;
             ],
             response_format: { type: "json_object" },
             temperature: 0,
-            max_tokens: 800,
+            max_tokens: 2000,
         });
 
         const result = JSON.parse(completion.choices[0]?.message?.content || "{}");

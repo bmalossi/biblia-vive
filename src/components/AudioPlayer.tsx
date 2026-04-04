@@ -88,6 +88,11 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
                 utterance.lang = "pt-BR";
                 utterance.rate = 0.9;
                 utterance.onend = () => setIsPlaying(false);
+                utterance.onerror = () => { setIsPlaying(false); setIsFetching(false); };
+                utterance.onstart = () => {
+                    setIsPlaying(true);
+                    setIsFetching(false);
+                };
 
                 // Pick a Portuguese voice if available
                 const voices = window.speechSynthesis.getVoices();
@@ -95,8 +100,6 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
                 if (ptVoice) utterance.voice = ptVoice;
 
                 window.speechSynthesis.speak(utterance);
-                setIsPlaying(true);
-                setIsFetching(false);
                 return;
             }
 
@@ -108,6 +111,7 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
                 audioRef.current = audio;
                 await audio.play();
                 setIsPlaying(true);
+                setIsFetching(false);
             }
 
         } catch (error) {
@@ -117,13 +121,16 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = "pt-BR";
                 utterance.onend = () => setIsPlaying(false);
+                utterance.onerror = () => { setIsPlaying(false); setIsFetching(false); };
+                utterance.onstart = () => {
+                    setIsPlaying(true);
+                    setIsFetching(false);
+                };
                 window.speechSynthesis.speak(utterance);
-                setIsPlaying(true);
             } catch {
+                setIsFetching(false);
                 alert("Erro ao carregar áudio. Tente novamente.");
             }
-        } finally {
-            setIsFetching(false);
         }
     };
 

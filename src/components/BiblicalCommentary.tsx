@@ -54,8 +54,8 @@ export const BiblicalCommentary: React.FC<BiblicalCommentaryProps> = ({ commenta
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center opacity-60">
                 <Info className="mb-3 h-8 w-8 text-gold" />
-                <p className="text-sm font-medium">{t("study.noCommentary") || "Nenhum comentário disponível para este versículo."}</p>
-                <p className="mt-1 text-xs">{t("study.noCommentaryHint") || "Tente um versículo clássico como João 3:16"}</p>
+                <p className="text-sm font-medium">Nenhum comentário histórico encontrado para este trecho.</p>
+                <p className="mt-1 text-xs">Tente versículos clássicos como João 3:16, Salmos 23, Romanos 8.</p>
             </div>
         );
     }

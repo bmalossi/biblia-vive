@@ -143,24 +143,28 @@ export async function requestCommentary(
   const { supabase } = await import('./supabase');
   const { data: { session } } = await supabase.auth.getSession();
 
-  // Chamada Edge Function Supabase (evita o timeout da Vercel)
   const { data: result, error } = await supabase.functions.invoke('commentary', {
     body: params,
     headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
   });
 
-  if (error) {
-    throw new Error(error.message || 'Erro na chamada da Edge Function');
+  if (error || result?.error) {
+    throw new Error(error?.message || result?.error || 'Erro na chamada da API de IA');
   }
+
   try {
+    const parsed = JSON.parse(result.response || "[]");
     return {
-      commentaries: JSON.parse(result.response),
-      cached: result.cached
+      commentaries: Array.isArray(parsed)
+        ? parsed.filter((c: any) => c && typeof c === 'object' && c.author)
+        : [],
+      cached: result.cached || false
     };
-  } catch {
+  } catch (parseError) {
+    console.error("Erro ao fazer parse dos comentários", parseError);
     return {
       commentaries: [],
-      cached: result.cached
+      cached: false
     };
   }
 }
