@@ -73,10 +73,22 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
                 throw new Error(err.error || "Failed to fetch audio");
             }
 
-            const data = await res.json();
-            setAudioUrl(data.url);
+            const contentType = res.headers.get("Content-Type");
+            let finalUrl = "";
 
-            const audio = new Audio(data.url);
+            if (contentType?.includes("application/json")) {
+                const data = await res.json();
+                finalUrl = data.url;
+            } else if (contentType?.includes("audio/mpeg")) {
+                const blob = await res.blob();
+                finalUrl = URL.createObjectURL(blob);
+            } else {
+                throw new Error("Formato de áudio não suportado");
+            }
+
+            setAudioUrl(finalUrl);
+
+            const audio = new Audio(finalUrl);
             audio.onended = () => setIsPlaying(false);
 
             audioRef.current = audio;

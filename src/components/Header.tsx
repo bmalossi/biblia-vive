@@ -7,7 +7,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Input } from "@/components/ui/input";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
 import { getVersion } from "@/lib/themes";
-import { Clock3, LogIn, LogOut, Search, SearchX, Sparkles } from "lucide-react";
+import { Clock3, LogIn, LogOut, Search, SearchX } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { Link, NavLink } from "react-router-dom";
 import { FormEvent, MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -149,9 +149,11 @@ export default function Header() {
       <div className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 md:px-6 relative">
         <div className="flex h-full items-center gap-3 sm:gap-8 z-10">
           <Link to="/" className="flex items-center gap-2 group" onClick={onLogoClick}>
-            <span className="text-lg sm:text-xl font-serif font-bold text-gold group-hover:scale-105 transition-transform duration-300">
-              ✦ Bíblia Vive
-            </span>
+            <img
+              src="/logo-transparente-lateral.png"
+              alt="Bíblia Vive"
+              className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           <nav aria-label="Navegação principal" className="hidden h-full items-center gap-6 lg:flex">
@@ -260,7 +262,9 @@ export default function Header() {
             {!proLoading && (
               isPro ? (
                 <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-full select-none cursor-default">
-                  <Sparkles className="w-3.5 h-3.5 text-gold" />
+                  <svg className="w-3.5 h-3.5 text-gold" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
+                  </svg>
                   <span className="text-xs font-serif font-medium text-gold tracking-wide">PRO</span>
                 </div>
               ) : (
@@ -268,7 +272,9 @@ export default function Header() {
                   onClick={() => navigate("/pro")}
                   className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-app-raised hover:bg-gold/10 border border-border hover:border-gold/30 rounded-full transition-colors group"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-app-text-muted group-hover:text-gold transition-colors" />
+                  <svg className="w-3.5 h-3.5 text-app-text-muted group-hover:text-gold transition-colors" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
+                  </svg>
                   <span className="text-xs font-medium text-app-text-muted group-hover:text-gold transition-colors tracking-wide">Premium</span>
                 </button>
               )

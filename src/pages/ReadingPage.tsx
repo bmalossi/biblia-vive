@@ -1234,7 +1234,7 @@ export default function ReadingPage() {
           position={toolbarPosition}
           shareLabel={shareLabel}
           studyOpen={studyVerse !== null}
-          visible={!!selectedVerse && !preferences.focusMode}
+          visible={!!selectedVerse}
         />
 
         {studyVerse !== null && selectedBook && (

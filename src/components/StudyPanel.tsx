@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, Hash, HelpCircle, Sparkles, Lock, Quote, MessageSquare } from "lucide-react";
+import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, Hash, HelpCircle, Lock, Quote, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
@@ -12,6 +12,7 @@ import { fetchChapter } from "@/lib/bibleApi";
 import type { CrossReference } from "@/lib/crossReferences";
 import { useSubscription } from "@/hooks/useSubscription";
 import { BiblicalCommentary } from "./BiblicalCommentary";
+import { toast } from "@/hooks/useToast";
 
 // Helper to strip Greek and Hebrew diacritics/vowels for pure consonant matching
 function normalizeText(text: string) {
@@ -204,10 +205,10 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
             });
 
             setLocalCommentary(JSON.stringify(commentaries));
-            toast.success("Comentários gerados com sucesso!");
+            toast({ message: "Comentários gerados com sucesso!", type: "success" });
         } catch (err: any) {
             console.error(err);
-            toast.error("Erro ao gerar comentários: " + err.message);
+            toast({ message: "Erro ao gerar comentários: " + err.message, type: "error" });
         } finally {
             setIsGenerating(false);
         }
@@ -559,7 +560,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                             <div className="space-y-1.5">
                                                 <h3 className="text-sm font-semibold text-app-text">Recurso Exclusivo PRO</h3>
                                                 <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                    Tenha acesso a comentários teológicos profundos gerados por nossa Inteligência Artificial orientada por grandes comentaristas.
+                                                    Tenha acesso a comentários teológicos profundos gerados por nossa análise teológica orientada por grandes comentaristas.
                                                 </p>
                                             </div>
                                             <Button

@@ -56,7 +56,7 @@ export default function PricingPage() {
                             <div>
                                 <h3 className="text-xl font-medium text-app-text mb-2">Áudio com Voz Humana Real</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Ouça os capítulos narrados com precisão e emoção cristalina pela inteligência da ElevenLabs. Sem vozes robóticas, apenas uma narração profunda e natural.
+                                    Ouça os capítulos narrados com precisão e emoção cristalina pela tecnologia da ElevenLabs. Sem vozes robóticas, apenas uma narração profunda e natural.
                                 </p>
                             </div>
                         </div>
@@ -66,7 +66,7 @@ export default function PricingPage() {
                                 <Sparkles className="h-5 w-5 text-violet-400" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Estudo com IA Ilimitado</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Análise Teológica Ilimitada</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
                                     Sem limites de mensagens diárias. Discuta teologia, contexto histórico e aplicações práticas de cada versículo profundamente com o seu assistente de estudo 24/7.
                                 </p>
@@ -125,7 +125,7 @@ export default function PricingPage() {
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Perguntas Ilimitadas à Inteligência Artificial</span>
+                                <span>Consultas e Pesquisas Teológicas Ilimitadas</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />

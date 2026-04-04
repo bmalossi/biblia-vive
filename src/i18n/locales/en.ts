@@ -166,7 +166,7 @@ const en: TranslationDict = {
     "study.noStrongsHint": "Select key verses like John 3:16 to see the analysis",
     "study.strongsSource": "Source: Strong's Expanded Lexicon",
     "study.getCommentary": "Get Commentary",
-    "study.commentarySource": "Source: Theological Commentators (Living Bible AI)",
+    "study.commentarySource": "Source: Theological Commentators (Theological Analysis)",
     "study.commentaryLoading": "Consulting commentators...",
     "study.commentaryIntro": "Deep analysis of this verse based on historical and theological contexts.",
     "toolbar.study": "Study",

@@ -46,9 +46,9 @@ export interface StudyData {
   bookContext: BookContext | null;
   chapterHighlight: string | null;
   verseWords: VerseWord[];
-  aiExplanation: string | null; // null = ainda não foi solicitado
+  theologicalExplanation: string | null; // null = ainda não foi solicitado
   commentaries: Commentary[] | null; // Novo: múltiplos comentários teológicos
-  isLoadingAI: boolean;
+  isLoadingStudy: boolean;
 }
 
 // ─── Cache do book-contexts.json ─────────────────────────────────────────────
@@ -78,7 +78,7 @@ async function getSupabaseClient() {
   }
 }
 
-async function getCachedAIResponse(
+async function getCachedStudyResponse(
   verseId: string,
   questionType: 'explain' | 'history' | 'application' | 'commentary'
 ): Promise<string | null> {
@@ -110,7 +110,7 @@ async function getCachedAIResponse(
   }
 }
 
-export async function cacheAIResponse(
+export async function cacheStudyResponse(
   verseId: string,
   questionType: 'explain' | 'history' | 'application' | 'commentary',
   response: string
@@ -122,7 +122,7 @@ export async function cacheAIResponse(
       .from('ai_study_cache')
       .upsert({ verse_id: verseId, question_type: questionType, response, created_at: new Date().toISOString() });
   } catch (error) {
-    console.warn('Failed to cache AI response:', error);
+    console.warn('Failed to cache Study response:', error);
   }
 }
 
@@ -139,7 +139,7 @@ export async function requestCommentary(
     version: string;
     language?: string;
   }
-): Promise<{ response: string; cached: boolean }> {
+): Promise<{ commentaries: Commentary[]; cached: boolean }> {
   const { supabase } = await import('./supabase');
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -213,11 +213,11 @@ export async function getStudyData(
   const bookIdUpper = bookId.toUpperCase();
 
   // Carregar tudo em paralelo para velocidade máxima
-  const [crossReferences, verseWords, aiExplanation, commentaries, bookContexts] = await Promise.all([
+  const [crossReferences, verseWords, theologicalExplanation, commentaries, bookContexts] = await Promise.all([
     getCrossRefs(bookIdUpper, chapter, verse, version),
     getVerseWords(bookIdUpper, chapter, verse),
-    getCachedAIResponse(verseId, 'explain'),
-    getCachedAIResponse(verseId, 'commentary'),
+    getCachedStudyResponse(verseId, 'explain'),
+    getCachedStudyResponse(verseId, 'commentary'),
     loadBookContexts(),
   ]);
 
@@ -226,9 +226,9 @@ export async function getStudyData(
     bookContext: bookContexts[bookIdUpper] ?? null,
     chapterHighlight: getChapterHighlight(bookContexts, bookIdUpper, chapter),
     verseWords,
-    aiExplanation,
+    theologicalExplanation,
     commentaries: Array.isArray(commentaries) ? commentaries : null,
-    isLoadingAI: false,
+    isLoadingStudy: false,
   };
 }
 

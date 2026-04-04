@@ -166,7 +166,7 @@ const es: TranslationDict = {
     "study.noStrongsHint": "Selecciona versículos clave como Jn 3:16 para ver el análisis",
     "study.strongsSource": "Fuente: Strong's Expanded Lexicon",
     "study.getCommentary": "Buscar Comentarios",
-    "study.commentarySource": "Fuente: Comentaristas Teólogos (Biblia Vive AI)",
+    "study.commentarySource": "Fuente: Comentaristas Teólogos (Análisis Teológico)",
     "study.commentaryLoading": "Consultando comentaristas...",
     "study.commentaryIntro": "Análisis profundo de este versículo basado en contextos históricos y teológicos.",
     "toolbar.study": "Estudiar",

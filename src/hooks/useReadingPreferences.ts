@@ -31,7 +31,7 @@ const DEFAULT_PREFERENCES: ReadingPreferences = {
   columnWidth: "normal",
   focusMode: false,
   ttsRate: 1,
-  wordsOfGod: false,
+  wordsOfGod: true,
 };
 
 const FONT_MAP: Record<ReadingFont, string> = {

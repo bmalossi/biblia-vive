@@ -166,7 +166,7 @@ const ptBR: TranslationDict = {
   "study.noStrongsHint": "Selecione versículos-chave como Jo 3:16 para ver a análise",
   "study.strongsSource": "Fonte: Strong's Expanded Lexicon",
   "study.getCommentary": "Buscar Comentários",
-  "study.commentarySource": "Fonte: Comentaristas Teólogos (Bíblia Vive AI)",
+  "study.commentarySource": "Fonte: Comentaristas Teólogos (Análise Teológica)",
   "study.commentaryLoading": "Consultando comentaristas...",
   "study.commentaryIntro": "Análise profunda deste versículo baseada em contextos históricos e teológicos.",
   "toolbar.study": "Estudar",

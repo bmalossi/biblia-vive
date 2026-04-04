@@ -84,29 +84,7 @@ export default function HomePage() {
       <section className="space-y-10 pb-4">
         <VerseOfDay />
 
-        {!isPro && (
-          <div
-            onClick={() => navigate('/pro')}
-            className="group relative overflow-hidden rounded-2xl border border-gold/30 bg-gold-bg/10 p-5 cursor-pointer hover:bg-gold-bg/20 transition-all"
-          >
-            <div className="relative z-10 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold group-hover:scale-110 transition-transform">
-                  <Sparkles className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-app-text">Conheça o Bíblia Vive PRO</h3>
-                  <p className="text-[0.8rem] text-app-text-muted leading-relaxed">
-                    Áudios ultra-realistas, Inteligência Artificial ilimitada e exportação de estudos em PDF.
-                  </p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-gold group-hover:translate-x-1 transition-transform" />
-            </div>
-            {/* Minimalist background accent */}
-            <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gold/5 blur-2xl" />
-          </div>
-        )}
+
 
         <SearchBar />
 
