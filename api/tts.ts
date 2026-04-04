@@ -31,7 +31,7 @@ export default async function handler(req: Request) {
                         .from("user_subscriptions")
                         .select("status")
                         .eq("user_id", user.id)
-                        .single();
+                        .maybeSingle();
                     isPro = isAdmin || !!(sub && (sub.status === "active" || sub.status === "trialing"));
                 }
             }

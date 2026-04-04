@@ -1,0 +1,16 @@
+{
+    "functions": {
+        "api/checkout.ts": {
+            "maxDuration": 30
+        },
+        "api/commentary.ts": {
+            "maxDuration": 60
+        },
+        "api/tts.ts": {
+            "maxDuration": 60
+        },
+        "api/webhook.ts": {
+            "maxDuration": 30
+        }
+    }
+}
