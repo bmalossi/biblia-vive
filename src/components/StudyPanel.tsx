@@ -574,11 +574,14 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
                                             {(data?.commentaries || localCommentary) ? (
                                                 <BiblicalCommentary
-                                                    commentaries={
-                                                        localCommentary
-                                                            ? JSON.parse(localCommentary)
-                                                            : (data?.commentaries || [])
-                                                    }
+                                                    commentaries={(function () {
+                                                        try {
+                                                            const parsed = localCommentary ? JSON.parse(localCommentary) : (data?.commentaries || []);
+                                                            return Array.isArray(parsed) ? parsed : (parsed.commentaries || []);
+                                                        } catch {
+                                                            return [];
+                                                        }
+                                                    })()}
                                                 />
                                             ) : (
                                                 <div className="p-8 text-center space-y-4 bg-app-surface/40 rounded-2xl border border-border/50">

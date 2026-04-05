@@ -1246,7 +1246,10 @@ export default function ReadingPage() {
 
             {/* Sticky Chapter Sidebar on Desktop */}
             {!compareEnabled && selectedBook && (
-              <aside className="hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 w-[140px] xl:w-[180px] 2xl:w-[220px]">
+              <aside className={cn(
+                "hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 transition-[width] duration-500",
+                cachedChapterCommentary ? "w-[320px] xl:w-[380px] 2xl:w-[420px]" : "w-[140px] xl:w-[180px] 2xl:w-[220px]"
+              )}>
                 <div className="flex flex-col items-center pb-8 pt-2 w-full">
                   {!preferences.focusMode && (
                     <span className="text-[0.6rem] font-mono text-app-text-muted uppercase tracking-widest mb-4 opacity-70">
@@ -1299,6 +1302,37 @@ export default function ReadingPage() {
                         {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentário" : "Comentar Capítulo"}
                       </span>
                     </Button>
+
+                    {cachedChapterCommentary && (
+                      <div id="chapter-commentary-section" className="w-full mt-8 animate-in fade-in duration-700">
+                        <div className="flex flex-col items-center text-center gap-2 mb-6">
+                          <div className="flex justify-center w-full mt-2">
+                            <div className="h-0.5 w-12 bg-gold/30 rounded-full mb-4"></div>
+                          </div>
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold shadow-sm ring-1 ring-gold/20">
+                            <FileText className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-serif text-[1.1rem] font-bold text-app-text leading-tight mt-1">Acervo Teológico</h3>
+                            <p className="text-[0.65rem] text-app-text-muted uppercase tracking-widest font-mono mt-1">
+                              {selectedBook?.name} {chapterNumber}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="pb-8">
+                          <BiblicalCommentary
+                            commentaries={(function () {
+                              try {
+                                const parsed = JSON.parse(cachedChapterCommentary);
+                                return Array.isArray(parsed) ? parsed : (parsed.commentaries || []);
+                              } catch {
+                                return [];
+                              }
+                            })()}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </aside>
@@ -1377,31 +1411,6 @@ export default function ReadingPage() {
           onClose={() => setIsAuthModalOpen(false)}
         />
 
-        {cachedChapterCommentary && (
-          <section id="chapter-commentary-section" className="mx-auto mt-16 mb-8 w-full max-w-[680px] border-t border-border pt-12 px-4 md:px-6 animate-in fade-in duration-700">
-            <div className="flex flex-col items-center justify-center text-center gap-3 mb-10">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/10 text-gold shadow-sm ring-1 ring-gold/20">
-                <FileText className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-serif text-2xl font-bold text-app-text">Acervo Teológico</h3>
-                <p className="text-[0.8rem] text-app-text-muted mt-1 uppercase tracking-widest font-mono">
-                  {selectedBook?.name} {chapterNumber}
-                </p>
-              </div>
-            </div>
-            <BiblicalCommentary
-              commentaries={(function () {
-                try {
-                  const parsed = JSON.parse(cachedChapterCommentary);
-                  return Array.isArray(parsed) ? parsed : (parsed.commentaries || []);
-                } catch {
-                  return [];
-                }
-              })()}
-            />
-          </section>
-        )}
 
         {selectedBook && !preferences.focusMode && (
           <footer className="mx-auto mt-2 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-12 md:px-6" role="contentinfo">

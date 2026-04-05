@@ -95,9 +95,9 @@ Deno.serve(async (req) => {
 Sua única missão é localizar e transcrever com fidelidade absoluta o que comentaristas teológicos históricos de reconhecida autoridade escreveram sobre o versículo ou trecho solicitado.
 
 ─────────────────────────────────────────
-POOL DE COMENTARISTAS AUTORIZADOS
+POOL DE COMENTARISTAS RECOMENDADOS (MAS NÃO EXCLUSIVOS)
 ─────────────────────────────────────────
-Utilize exclusivamente comentaristas desta lista, priorizando sempre a maior diversidade possível de tradições, épocas e perspectivas teológicas entre si:
+Priorize os comentaristas desta lista. Se não localizar trechos excelentes e autênticos deles para a passagem, VOCÊ TEM LIBERDADE E DEVE AMPLIAR A BUSCA incluindo QUAISQUER outros comentaristas teológicos de renome, antigos ou atuais (desta época). O importante é NUNCA deixar de trazer um comentário exegético real:
 
 Tradição Reformada / Presbiteriana:
 - Charles Hodge — Commentary on Romans, Commentary on Ephesians, Systematic Theology
@@ -140,7 +140,7 @@ REGRAS DE AUTENTICIDADE — INEGOCIÁVEIS
 ─────────────────────────────────────────
 1. NUNCA invente, componha, parafraseie ou atribua texto que o autor não escreveu de fato.
 2. NUNCA construa uma citação "no estilo" de um autor — apenas transcreva o que ele escreveu.
-3. Se você não tiver certeza absoluta de que o texto é autêntico e verificável, EXCLUA esse comentarista inteiramente. É preferível retornar menos de 3 comentaristas a retornar 1 texto duvidoso.
+3. Se um comentarista da lista recomendada não abordou o trecho ou você não tiver certeza da precisão da citação, VOCÊ DEVE buscar citações de OUTROS autores (modernos ou do passado) que o comentaram. Evite retornar vazio. SÓ retorne vazio se o versículo realmente não existir ou for impossível encontrar um teólogo sobre ele. Sua meta é encontrar sempre conhecimento!
 4. Cada comentário deve ser retirado de uma obra específica e identificável — sem referências vagas como "em seus escritos".
 5. Transcreva o trecho mais relevante e representativo que o autor dedicou àquele versículo ou passagem — completo, sem truncamentos, sem reticências no meio da frase.
 
@@ -207,38 +207,44 @@ Estrutura quando nenhum comentário puder ser verificado com certeza:
         const systemPromptFinal = systemPrompt + langSuffix;
 
         const userPrompt = isChapterLevel
-            ? `Bring the exact and complete introductory overview, thematic introduction, or general commentary that authorized pool theologians wrote specifically about the ENTIRE chapter of ${bookId.toUpperCase()} ${chapter}. If they wrote a specific introduction to this chapter, transcribe it exactly. Translate the commentators' text to ${langLabel}. Include as much original text as possible. Do not summarize.`
-            : `Bring the complete and direct commentary of authorized pool theologians on ${bookId.toUpperCase()} ${chapter}:${verse} (version: ${version}). Verse text: "${verseText ?? ""}". Do not summarize — transcribe faithfully the commentator's original text, translated to ${langLabel}.`;
+            ? `Bring the exact and complete introductory overview, thematic introduction, or general commentary that theologians (prioritize the recommended pool, but use ANY other trusted historical or modern theologian if necessary) wrote specifically about the ENTIRE chapter of ${bookId.toUpperCase()} ${chapter}. If they wrote a specific introduction to this chapter, transcribe it exactly. Translate the commentators' text to ${langLabel}. Include as much original text as possible. Do not summarize.`
+            : `Bring the complete and direct commentary of reliable theologians (prioritize the recommended pool, but use ANY other trusted historical or modern theologian if necessary) on ${bookId.toUpperCase()} ${chapter}:${verse} (version: ${version}). Verse text: "${verseText ?? ""}". Do not summarize — transcribe faithfully the commentator's original text, translated to ${langLabel}.`;
 
+        // @ts-ignore: web_search_options is required by gpt-4o-search-preview but might not be in standard SDK types
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4o-search-preview",
             messages: [
                 { role: "system", content: systemPromptFinal },
                 { role: "user", content: userPrompt }
             ],
-            response_format: { type: "json_object" },
-            temperature: 0,
-            max_tokens: 4000,
+            web_search_options: {},
+            max_completion_tokens: 4000,
         });
 
         const result = JSON.parse(completion.choices[0]?.message?.content || "{}");
-        const commentaryJson = JSON.stringify(result.commentaries || []);
+        const commentariesArray = result.commentaries || [];
+        const commentaryJson = JSON.stringify(result);
 
-        // 4. Save to Cache
-        supabase.from("ai_study_cache").upsert({
-            verse_id: verseId,
-            question_type: questionType,
-            response: commentaryJson,
-            created_at: new Date().toISOString()
-        }, { onConflict: "verse_id,question_type" }).then(() => { }).catch(() => { });
+        // 4. Save to Cache ONLY if we found actual commentaries
+        if (commentariesArray.length > 0 && result.status !== "unavailable") {
+            supabase.from("ai_study_cache").upsert({
+                verse_id: verseId,
+                question_type: questionType,
+                response: commentaryJson,
+                created_at: new Date().toISOString()
+            }, { onConflict: "verse_id,question_type" }).then(() => { }).catch(() => { });
+        }
 
         return new Response(JSON.stringify({ response: commentaryJson, cached: false }), {
             status: 200, headers: corsHeaders
         });
 
     } catch (err: any) {
-        console.error("[Commentary API Error]:", err);
-        return new Response(JSON.stringify({ error: err.message }), {
+        console.error("[Commentary API Error] status:", err?.status);
+        console.error("[Commentary API Error] message:", err?.message);
+        console.error("[Commentary API Error] full:", JSON.stringify(err, Object.getOwnPropertyNames(err)));
+
+        return new Response(JSON.stringify({ error: err.message || "Internal Server Error" }), {
             status: 500,
             headers: {
                 'Access-Control-Allow-Origin': '*',

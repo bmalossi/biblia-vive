@@ -157,7 +157,9 @@ export async function requestCommentary(
     return {
       commentaries: Array.isArray(parsed)
         ? parsed.filter((c: any) => c && typeof c === 'object' && c.author)
-        : [],
+        : Array.isArray(parsed?.commentaries)
+          ? parsed.commentaries.filter((c: any) => c && typeof c === 'object' && c.author)
+          : [],
       cached: result.cached || false
     };
   } catch (parseError) {
