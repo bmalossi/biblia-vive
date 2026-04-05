@@ -182,7 +182,7 @@ export default function ReadingPage() {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [cardModalData, setCardModalData] = useState<CardData | null>(null);
   const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
-  const [localChapterCommentary, setLocalChapterCommentary] = useState<string | null>(null);
+  const [cachedChapterCommentary, setCachedChapterCommentary] = useState<string | null>(null);
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
@@ -240,6 +240,35 @@ export default function ReadingPage() {
         setRedLetterVerses(null);
       });
   }, []);
+
+  // Pre-load chapter commentary if cached
+  useEffect(() => {
+    if (!selectedBook) return;
+    setCachedChapterCommentary(null); // Reset when chapter changes
+    let isMounted = true;
+    const fetchCachedCommentary = async () => {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const lang = String(locale).startsWith("pt") ? "pt" : "en";
+        const baseId = `${selectedBook.id.toUpperCase()}.${chapterNumber}.ALL`;
+        const verseId = lang !== 'en' ? `${baseId}:${lang}` : baseId;
+        const { data } = await supabase
+          .from('ai_study_cache')
+          .select('response')
+          .eq('verse_id', verseId)
+          .eq('question_type', 'chapter_commentary')
+          .maybeSingle();
+
+        if (isMounted && data?.response && data.response !== "[]") {
+          setCachedChapterCommentary(data.response);
+        }
+      } catch (err) {
+        // Silently ignore cache check failures
+      }
+    };
+    fetchCachedCommentary();
+    return () => { isMounted = false; };
+  }, [selectedBook?.id, chapterNumber]);
 
   const tts = useTTS(preferences.ttsRate);
 
@@ -497,7 +526,7 @@ export default function ReadingPage() {
     setSelectedVerse(null);
     setToolbarPosition(null);
     setHoveredVerseNumber(null);
-    setLocalChapterCommentary(null);
+    setCachedChapterCommentary(null);
     tts.stop();
   }, [chapterNumber, compareEnabled, compareVersion, selectedVersion, tts.stop]);
 
@@ -675,6 +704,12 @@ export default function ReadingPage() {
       return;
     }
     if (!selectedBook) return;
+
+    if (cachedChapterCommentary) {
+      document.getElementById('chapter-commentary-section')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
     setIsChapterCommentaryLoading(true);
     try {
       const { commentaries } = await requestCommentary({
@@ -685,7 +720,10 @@ export default function ReadingPage() {
         version: selectedVersion,
         language: String(locale).startsWith("pt") ? "pt" : "en",
       });
-      setLocalChapterCommentary(JSON.stringify(commentaries));
+      setCachedChapterCommentary(JSON.stringify(commentaries));
+      setTimeout(() => {
+        document.getElementById('chapter-commentary-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } catch (e: any) {
       toast({ message: "Erro: " + e.message, type: "error" });
     } finally {
@@ -1258,7 +1296,7 @@ export default function ReadingPage() {
                         "text-[0.68rem] uppercase tracking-wide leading-tight",
                         isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
                       )}>
-                        {isChapterCommentaryLoading ? "Analisando..." : "Comentário do Capítulo"}
+                        {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentário" : "Comentar Capítulo"}
                       </span>
                     </Button>
                   </div>
@@ -1339,6 +1377,32 @@ export default function ReadingPage() {
           onClose={() => setIsAuthModalOpen(false)}
         />
 
+        {cachedChapterCommentary && (
+          <section id="chapter-commentary-section" className="mx-auto mt-16 mb-8 w-full max-w-[680px] border-t border-border pt-12 px-4 md:px-6 animate-in fade-in duration-700">
+            <div className="flex flex-col items-center justify-center text-center gap-3 mb-10">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/10 text-gold shadow-sm ring-1 ring-gold/20">
+                <FileText className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-serif text-2xl font-bold text-app-text">Acervo Teológico</h3>
+                <p className="text-[0.8rem] text-app-text-muted mt-1 uppercase tracking-widest font-mono">
+                  {selectedBook?.name} {chapterNumber}
+                </p>
+              </div>
+            </div>
+            <BiblicalCommentary
+              commentaries={(function () {
+                try {
+                  const parsed = JSON.parse(cachedChapterCommentary);
+                  return Array.isArray(parsed) ? parsed : (parsed.commentaries || []);
+                } catch {
+                  return [];
+                }
+              })()}
+            />
+          </section>
+        )}
+
         {selectedBook && !preferences.focusMode && (
           <footer className="mx-auto mt-2 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-12 md:px-6" role="contentinfo">
             <div className="flex w-full items-center justify-center gap-3">
@@ -1379,31 +1443,7 @@ export default function ReadingPage() {
         )
       }
 
-      {/* Chapter Commentary overlay - shown as popover below the sidebar button, not in a Dialog to avoid nested Radix Dialog issues */}
-      {localChapterCommentary && (
-        <div className="fixed inset-0 z-50 flex" onClick={() => setLocalChapterCommentary(null)}>
-          <div
-            className="ml-auto mr-[156px] xl:mr-[196px] 2xl:mr-[236px] mt-24 max-h-[calc(100vh-120px)] w-[380px] bg-app-surface border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-gold/5 shrink-0">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-gold" />
-                <span className="font-serif font-semibold text-app-text">Acervo Teológico do Capítulo</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setLocalChapterCommentary(null)}
-                className="h-7 w-7 rounded-full hover:bg-app-raised flex items-center justify-center text-app-text-muted hover:text-app-text transition-colors"
-              >✕</button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-              <p className="text-[0.72rem] text-app-text-muted mb-4 font-mono uppercase tracking-wide">{selectedBook?.name} {chapterNumber}</p>
-              <BiblicalCommentary commentaries={JSON.parse(localChapterCommentary)} />
-            </div>
-          </div>
-        </div>
-      )}
+
     </Layout >
   );
 }

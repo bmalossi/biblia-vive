@@ -25,18 +25,23 @@ const CommentaryCard: React.FC<CommentaryCardProps> = ({ commentary, onClick }) 
                     </div>
                     <div>
                         <h4 className="text-[0.85rem] font-bold text-app-text">{commentary.author}</h4>
-                        <p className="font-mono text-[0.6rem] uppercase tracking-wider text-app-text-muted">{commentary.era}</p>
+                        <p className="font-mono text-[0.6rem] uppercase tracking-wider text-app-text-muted">
+                            {(commentary as any).tradition ?? commentary.era}
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <p className="line-clamp-3 font-serif text-[0.8rem] italic leading-relaxed text-app-text-muted transition-colors group-hover:text-app-text">
-                "{commentary.text}"
+            <p className="line-clamp-3 font-serif text-[0.8rem] leading-relaxed text-app-text-muted transition-colors group-hover:text-app-text">
+                {commentary.text}
             </p>
 
             <div className="mt-3 flex items-center gap-2 border-t border-border/50 pt-2 opacity-60">
                 <BookOpen className="h-3 w-3" />
-                <span className="text-[0.65rem] truncate font-medium">{commentary.work}</span>
+                <span className="text-[0.65rem] truncate font-medium">{commentary.work} {commentary.year && `• ${commentary.year}`}</span>
+                {(commentary as any).original_language && (
+                    <span className="ml-auto text-[0.6rem] text-app-text-muted/60">{(commentary as any).original_language}</span>
+                )}
             </div>
         </div>
     );
@@ -50,7 +55,9 @@ export const BiblicalCommentary: React.FC<BiblicalCommentaryProps> = ({ commenta
     const { t } = useTranslation();
     const [selected, setSelected] = useState<Commentary | null>(null);
 
-    if (commentaries.length === 0) {
+    const safeCommentaries = Array.isArray(commentaries) ? commentaries : [];
+
+    if (safeCommentaries.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center opacity-60">
                 <Info className="mb-3 h-8 w-8 text-gold" />
@@ -63,7 +70,7 @@ export const BiblicalCommentary: React.FC<BiblicalCommentaryProps> = ({ commenta
     return (
         <div className="space-y-4">
             <div className="grid gap-4">
-                {commentaries.map((c, idx) => (
+                {safeCommentaries.map((c, idx) => (
                     <CommentaryCard key={idx} commentary={c} onClick={setSelected} />
                 ))}
             </div>
@@ -88,13 +95,16 @@ export const BiblicalCommentary: React.FC<BiblicalCommentaryProps> = ({ commenta
                             <DialogDescription className="text-sm font-medium flex items-center gap-2 text-app-text-muted italic">
                                 <BookOpen className="h-3.5 w-3.5" />
                                 {selected?.work} {selected?.year && `(${selected.year})`}
+                                {(selected as any)?.original_language && (
+                                    <span className="ml-auto text-[0.65rem] font-mono normal-case not-italic">{(selected as any).original_language}</span>
+                                )}
                             </DialogDescription>
                         </DialogHeader>
                     </div>
 
                     <div className="p-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
-                        <p className="font-serif text-[0.95rem] leading-relaxed text-app-text whitespace-pre-wrap italic">
-                            "{selected?.text}"
+                        <p className="font-serif text-[0.95rem] leading-relaxed text-app-text whitespace-pre-wrap">
+                            {selected?.text}
                         </p>
 
                         {selected?.source_url && (
@@ -112,7 +122,7 @@ export const BiblicalCommentary: React.FC<BiblicalCommentaryProps> = ({ commenta
 
                     <div className="bg-app-bg px-6 py-4 border-t border-border">
                         <p className="text-[0.65rem] leading-relaxed text-app-text-muted italic text-center">
-                            Estes comentários representam perspectivas históricas individuais da tradição protestante e não refletem necessariamente a posição editorial deste site.
+                            Estes comentários representam perspectivas históricas individuais de diferentes tradições do pensamento cristão e não refletem necessariamente a posição editorial deste site.
                         </p>
                     </div>
                 </DialogContent>
