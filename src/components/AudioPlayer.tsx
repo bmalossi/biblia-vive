@@ -62,75 +62,31 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
             return;
         }
 
-        // Fetch audio from TTS API
+        // Use browser Web Speech API directly (free tier)
         setIsFetching(true);
         try {
-            const token = user?.id ? (await supabase.auth.getSession()).data.session?.access_token : "";
-
-            const res = await fetch("/api/tts", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({ text, slug }),
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to fetch audio");
-            }
-
-            const data = await res.json();
-
-            // Fallback: use browser Web Speech API (free tier or no ElevenLabs key)
-            if (data.fallback) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "pt-BR";
-                utterance.rate = 0.9;
-                utterance.onend = () => setIsPlaying(false);
-                utterance.onerror = () => { setIsPlaying(false); setIsFetching(false); };
-                utterance.onstart = () => {
-                    setIsPlaying(true);
-                    setIsFetching(false);
-                };
-
-                // Pick a Portuguese voice if available
-                const voices = window.speechSynthesis.getVoices();
-                const ptVoice = voices.find(v => v.lang.startsWith("pt"));
-                if (ptVoice) utterance.voice = ptVoice;
-
-                window.speechSynthesis.speak(utterance);
-                return;
-            }
-
-            // PRO: ElevenLabs URL from Supabase storage
-            if (data.url) {
-                setAudioUrl(data.url);
-                const audio = new Audio(data.url);
-                audio.onended = () => setIsPlaying(false);
-                audioRef.current = audio;
-                await audio.play();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = "pt-BR";
+            utterance.rate = 0.9;
+            utterance.onend = () => setIsPlaying(false);
+            utterance.onerror = () => {
+                setIsPlaying(false);
+                setIsFetching(false);
+            };
+            utterance.onstart = () => {
                 setIsPlaying(true);
                 setIsFetching(false);
-            }
+            };
 
-        } catch (error) {
-            console.error(error);
-            // Last resort: try browser TTS
-            try {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "pt-BR";
-                utterance.onend = () => setIsPlaying(false);
-                utterance.onerror = () => { setIsPlaying(false); setIsFetching(false); };
-                utterance.onstart = () => {
-                    setIsPlaying(true);
-                    setIsFetching(false);
-                };
-                window.speechSynthesis.speak(utterance);
-            } catch {
-                setIsFetching(false);
-                alert("Erro ao carregar áudio. Tente novamente.");
-            }
+            // Pick a Portuguese voice if available
+            const voices = window.speechSynthesis.getVoices();
+            const ptVoice = voices.find(v => v.lang.startsWith("pt"));
+            if (ptVoice) utterance.voice = ptVoice;
+
+            window.speechSynthesis.speak(utterance);
+        } catch {
+            setIsFetching(false);
+            alert("Erro ao carregar áudio. Tente novamente.");
         }
     };
 
@@ -163,7 +119,7 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
                 </div>
                 <p className="text-xs text-app-text-muted leading-relaxed">
                     {isPro
-                        ? "Narração ElevenLabs em alta qualidade."
+                        ? "Narração em alta qualidade."
                         : "Escute este capítulo narrado por voz humana realista."}
                 </p>
                 {!isPro && (

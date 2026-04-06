@@ -146,9 +146,10 @@ export default function Header() {
       className={`fixed inset-x-0 top-0 z-50 border-b border-border transition-colors duration-200 ${isScrolled ? "bg-app-bg/85 backdrop-blur-md" : "bg-app-bg"
         }`}
     >
-      <div className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 md:px-6 relative">
-        <div className="flex h-full items-center gap-3 sm:gap-8 z-10">
-          <Link to="/" className="flex items-center gap-2 group" onClick={onLogoClick}>
+      <div className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 md:px-6">
+        {/* Left Section: Logo & Nav (Weight 1) */}
+        <div className="flex-1 flex items-center gap-3 sm:gap-6 min-w-0">
+          <Link to="/" className="flex-shrink-0 flex items-center gap-2 group" onClick={onLogoClick}>
             <img
               src="/logo-transparente-lateral.png"
               alt="Bíblia Vive"
@@ -156,11 +157,11 @@ export default function Header() {
             />
           </Link>
 
-          <nav aria-label="Navegação principal" className="hidden h-full items-center gap-6 lg:flex">
+          <nav aria-label="Navegação principal" className="hidden h-full items-center gap-4 lg:flex overflow-hidden">
             {navItems.map((item) => (
               <NavLink
                 className={({ isActive }) =>
-                  `flex h-full items-center font-sans text-[0.8rem] font-medium transition-colors hover:text-app-text ${isActive ? "text-app-text border-b-2 border-gold" : "text-app-text-muted"
+                  `flex h-full items-center font-sans text-[0.8rem] font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive ? "text-app-text border-b-2 border-gold" : "text-app-text-muted"
                   }`
                 }
                 key={item.label}
@@ -172,7 +173,7 @@ export default function Header() {
             {userRole === "admin" && (
               <NavLink
                 className={({ isActive }) =>
-                  `flex h-full items-center font-sans text-[0.8rem] font-medium transition-colors hover:text-app-text ${isActive ? "text-app-text border-b-2 border-gold" : "text-app-text-muted"
+                  `flex h-full items-center font-sans text-[0.8rem] font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive ? "text-app-text border-b-2 border-gold" : "text-app-text-muted"
                   }`
                 }
                 to="/admin"
@@ -183,68 +184,71 @@ export default function Header() {
           </nav>
         </div>
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[360px] hidden md:block z-0" ref={searchWrapperRef}>
+        {/* Center Section: Search Bar (Weight Auto) */}
+        <div className="hidden md:flex flex-initial justify-center items-center px-4" ref={searchWrapperRef}>
+          <div className="w-full min-w-[200px] max-w-[360px] relative">
+            <form onSubmit={handleSubmit}>
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
+              <Input
+                aria-autocomplete="list"
+                aria-controls="header-search-suggestions"
+                aria-describedby="header-search-help"
+                aria-expanded={showDesktopDropdown}
+                aria-label="Buscar na Bíblia"
+                className="h-9 rounded-full border-border bg-app-surface pl-9 w-full"
+                onChange={(event) => setQuery(event.target.value)}
+                onFocus={openSearch}
+                placeholder="Buscar ( / )"
+                ref={inputRef}
+                role="combobox"
+                value={query}
+              />
+              <span className="sr-only" id="header-search-help">
+                Digite um versículo como Jo 3:16 ou busque por palavras
+              </span>
+            </form>
 
-          <form onSubmit={handleSubmit}>
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
-            <Input
-              aria-autocomplete="list"
-              aria-controls="header-search-suggestions"
-              aria-describedby="header-search-help"
-              aria-expanded={showDesktopDropdown}
-              aria-label="Buscar na Bíblia"
-              className="h-9 rounded-full border-border bg-app-surface pl-9"
-              onChange={(event) => setQuery(event.target.value)}
-              onFocus={openSearch}
-              placeholder="Buscar ( / )"
-              ref={inputRef}
-              role="combobox"
-              value={query}
-            />
-            <span className="sr-only" id="header-search-help">
-              Digite um versículo como Jo 3:16 ou busque por palavras
-            </span>
-          </form>
+            {showDesktopDropdown && (
+              <div className="absolute left-0 right-0 top-11 z-50 rounded-xl border border-border bg-app-surface p-2 shadow-md" id="header-search-suggestions" role="listbox">
+                {parsedReference && (
+                  <button
+                    className="mb-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-app-text hover:bg-app-raised"
+                    onClick={goToReference}
+                    role="option"
+                    type="button"
+                  >
+                    {t("search.goTo", { reference: parsedReferenceLabel })}
+                  </button>
+                )}
 
-          {showDesktopDropdown && (
-            <div className="absolute left-0 right-0 top-11 z-50 rounded-xl border border-border bg-app-surface p-2 shadow-md" id="header-search-suggestions" role="listbox">
-              {parsedReference && (
-                <button
-                  className="mb-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-app-text hover:bg-app-raised"
-                  onClick={goToReference}
-                  role="option"
-                  type="button"
-                >
-                  {t("search.goTo", { reference: parsedReferenceLabel })}
-                </button>
-              )}
-
-              {history.length > 0 ? (
-                <div className="space-y-1">
-                  {history.map((item) => (
-                    <button
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-app-text-muted hover:bg-app-raised hover:text-app-text"
-                      key={item}
-                      onClick={() => {
-                        setQuery(item);
-                        runSearch(item);
-                      }}
-                      role="option"
-                      type="button"
-                    >
-                      <Clock3 className="h-3.5 w-3.5" />
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="px-3 py-2 text-xs text-app-text-muted">{t("search.noRecentHistory")}</p>
-              )}
-            </div>
-          )}
+                {history.length > 0 ? (
+                  <div className="space-y-1">
+                    {history.map((item) => (
+                      <button
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                        key={item}
+                        onClick={() => {
+                          setQuery(item);
+                          runSearch(item);
+                        }}
+                        role="option"
+                        type="button"
+                      >
+                        <Clock3 className="h-3.5 w-3.5" />
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="px-3 py-2 text-xs text-app-text-muted">{t("search.noRecentHistory")}</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 z-10">
+        {/* Right Section: Controls (Weight 1) */}
+        <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
           <button
             aria-label="Abrir busca"
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-app-surface text-app-text md:hidden transition-colors hover:bg-app-raised"
@@ -257,11 +261,11 @@ export default function Header() {
             <Search className="h-4 w-4" />
           </button>
 
-          <div className="flex items-center gap-1.5 pl-2">
+          <div className="flex items-center gap-1.5">
             {/* Pro Badge or Upgrade Button */}
             {!proLoading && (
               isPro ? (
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-full select-none cursor-default">
+                <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-full select-none cursor-default">
                   <svg className="w-3.5 h-3.5 text-gold" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
                   </svg>
@@ -270,7 +274,7 @@ export default function Header() {
               ) : (
                 <button
                   onClick={() => navigate("/pro")}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-app-raised hover:bg-gold/10 border border-border hover:border-gold/30 rounded-full transition-colors group"
+                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-app-raised hover:bg-gold/10 border border-border hover:border-gold/30 rounded-full transition-colors group flex-shrink-0"
                 >
                   <svg className="w-3.5 h-3.5 text-app-text-muted group-hover:text-gold transition-colors" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
@@ -282,8 +286,8 @@ export default function Header() {
 
             {/* Auth Button */}
             {user ? (
-              <div className="flex items-center gap-1">
-                <span className="hidden sm:block text-xs text-app-text-muted max-w-[100px] truncate">
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <span className="hidden xl:block text-xs text-app-text-muted max-w-[100px] truncate">
                   {user.email?.split("@")[0]}
                 </span>
                 <button
@@ -299,7 +303,7 @@ export default function Header() {
               <button
                 aria-label="Entrar na conta"
                 onClick={() => setAuthModalOpen(true)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-gold/50 bg-transparent px-3 text-xs font-medium text-gold transition-colors hover:bg-gold-bg"
+                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-gold/50 bg-transparent px-3 text-xs font-medium text-gold transition-colors hover:bg-gold-bg flex-shrink-0"
               >
                 <LogIn className="h-3.5 w-3.5" />
                 <span className="hidden sm:block">Entrar</span>

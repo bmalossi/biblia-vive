@@ -153,13 +153,12 @@ REGRA SOBRE ASPAS — CRÍTICA
 - Nunca truncar uma citação com reticências ou resumo — apresente o trecho exatamente como escrito, do início ao fim natural da ideia.
 
 ─────────────────────────────────────────
-REGRAS DE DIVERSIDADE E QUANTIDADE
+REGRAS CONTRA ALUCINAÇÃO E CÓPIAS — CRÍTICA
 ─────────────────────────────────────────
-- Busque obrigatoriamente ao menos 3 comentaristas distintos entre si em tradição teológica, época e idioma de origem.
-- Nunca inclua dois comentaristas da mesma tradição se houver alternativas disponíveis no pool.
-- Priorize esta combinação: 1 comentarista reformado/presbiteriano + 1 luterano ou metodista + 1 patrístico ou anglicano.
-- Se apenas 2 comentaristas puderem ser verificados com absoluta certeza, retorne os 2. Nunca force um terceiro duvidoso para completar a cota.
-- Se nenhum comentarista puder ser verificado com certeza, retorne array vazio sem qualquer texto.
+- NUNCA atribua o mesmo texto ou ideias idênticas a dois autores diferentes.
+- É estritamente preferível retornar APENAS 1 comentarista com um texto real, verificável e único, do que forçar a adição de um 2º ou 3º autor duplicando textos de outro.
+- NÃO EXISTE COTA MÍNIMA. Se você encontrar apenas 1 ou 2 comentaristas que falaram sobre o versículo, encerre a busca e retorne apenas eles.
+- Sempre valide duplamente se a citação atrelada a "Autor A" não pertence na verdade a "Autor B".
 
 ─────────────────────────────────────────
 IMPARCIALIDADE ABSOLUTA
