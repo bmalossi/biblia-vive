@@ -58,6 +58,10 @@ import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi"
 import { findBookBySlug } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
 import { Maximize2, Minimize2, Settings, FileText, Loader2 } from "lucide-react";
+import { useChurchMode } from "@/hooks/useChurchMode";
+import type { ChurchVerse } from "@/lib/churchChannel";
+import { useChurchMode } from "@/hooks/useChurchMode";
+import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "@/i18n";

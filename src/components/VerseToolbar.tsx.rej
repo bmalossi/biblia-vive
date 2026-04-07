@@ -1,0 +1,48 @@
+--- src/components/VerseToolbar.tsx
++++ src/components/VerseToolbar.tsx
+@@ -1,6 +1,6 @@
+ import { Button } from "@/components/ui/button";
+ import { cn } from "@/lib/utils";
+-import { Clipboard, Highlighter, PencilLine, Share2, BookOpen } from "lucide-react";
++import { Clipboard, Highlighter, PencilLine, Share2, BookOpen, Monitor } from "lucide-react";
+ import { useEffect, useRef, useState } from "react";
+ import { useTranslation } from "@/i18n";
+ import HighlightPicker, { HIGHLIGHT_CLASSES } from "@/components/HighlightPicker";
+@@ -22,6 +22,8 @@ interface VerseToolbarProps {
+   studyOpen?: boolean;
+   activeHighlight?: HighlightColor | null;
+   hasNote?: boolean;
++  churchModeActive?: boolean;
++  onSendToChurch?: () => void;
+ }
+ 
+ export default function VerseToolbar({
+@@ -33,6 +35,8 @@ export default function VerseToolbar({
+   studyOpen = false,
+   activeHighlight = null,
+   hasNote = false,
++  churchModeActive = false,
++  onSendToChurch,
+ }: VerseToolbarProps) {
+   const firstButtonRef = useRef<HTMLButtonElement>(null);
+   const { t } = useTranslation();
+@@ -150,6 +154,19 @@ export default function VerseToolbar({
+           {t("toolbar.note")}
+         </Button>
+ 
++        {churchModeActive && onSendToChurch && (
++          <Button
++            aria-label="Enviar para telão"
++            className="h-9 gap-1.5 border-gold/60 text-gold hover:bg-gold-bg/20"
++            onClick={onSendToChurch}
++            size="sm"
++            type="button"
++            variant="outline"
++          >
++            <Monitor className="h-3.5 w-3.5" />
++            {t("toolbar.sendToChurch", { defaultValue: "Enviar para telão" })}
++          </Button>
++        )}
+       </div>
+     </div>
+   );

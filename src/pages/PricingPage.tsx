@@ -11,21 +11,21 @@ export default function PricingPage() {
     const { t } = useTranslation();
     const { isPro, loading, checkout } = useSubscription();
     const { user } = useAuth();
-    const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [isCheckingOut, setIsCheckingOut] = useState<'pro' | 'templo' | null>(null);
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
-    const handleSubscribeClick = async () => {
+    const handleSubscribeClick = async (plan: 'pro' | 'templo') => {
         if (!user) {
             setAuthModalOpen(true);
             return;
         }
-        setIsCheckingOut(true);
+        setIsCheckingOut(plan);
         try {
-            await checkout();
+            await checkout(plan);
         } catch (err: any) {
             console.error(err);
             alert("Erro ao iniciar o checkout: " + err.message);
-            setIsCheckingOut(false);
+            setIsCheckingOut(null);
         }
     };
 
@@ -46,9 +46,137 @@ export default function PricingPage() {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-start">
-                    {/* Features List */}
-                    <div className="space-y-8">
+                {/* Pricing Cards - Moved to Top */}
+                <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 items-start">
+                    {/* Card PRO */}
+                    <div className="bg-app-surface border border-border rounded-3xl p-8 lg:p-10 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-gold/10 rounded-full blur-[100px] pointer-events-none -mr-32 -mt-32" />
+
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-serif text-app-text">Plano PRO</h3>
+                            <div className="bg-gold/20 text-gold text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                                Mensal
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <span className="text-5xl font-bold text-app-text tracking-tight">R$4,90</span>
+                            <span className="text-app-text-muted ml-2">/mês</span>
+                        </div>
+
+                        <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
+                            Acesso a todas as ferramentas cristãs focadas no seu estudo pessoal e devoção.
+                        </p>
+
+                        <ul className="space-y-4 mb-8">
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
+                                <span>Acesso a narrações em áudio realista</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
+                                <span>Consultas e Pesquisas Teológicas Ilimitadas</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
+                                <span>Selo Pro no perfil</span>
+                            </li>
+                        </ul>
+
+                        {loading ? (
+                            <Button className="w-full h-14 bg-app-raised font-semibold rounded-xl" disabled>
+                                Carregando...
+                            </Button>
+                        ) : isPro ? (
+                            <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
+                                <ShieldCheck className="w-5 h-5" /> Você já é Pro!
+                            </div>
+                        ) : (
+                            <Button
+                                onClick={() => handleSubscribeClick('pro')}
+                                disabled={isCheckingOut !== null}
+                                className={`w-full h-14 bg-gold hover:bg-gold2 text-white font-bold transition-all shadow-lg hover:shadow-gold/20 rounded-xl px-2 ${isCheckingOut === 'pro' ? 'text-xs sm:text-sm whitespace-normal leading-tight' : 'text-base'}`}
+                            >
+                                {isCheckingOut === 'pro' ? "Redirecionando de forma segura..." : "Assinar Plano PRO"}
+                            </Button>
+                        )}
+                    </div>
+
+                    {/* Card Templo */}
+                    <div className="bg-app-surface border border-violet-500/20 rounded-3xl p-8 lg:p-10 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-violet-500/10 rounded-full blur-[100px] pointer-events-none -mr-32 -mt-32" />
+
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-serif text-app-text">Plano Templo</h3>
+                            <div className="relative flex items-center gap-2 px-3 pt-1.5 pb-1 bg-gradient-to-r from-[#242254] to-[#1a1845] border border-[#3b387e] rounded-md shadow-md">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#837dfa] animate-pulse"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e0deff]">
+                                    Para Igrejas
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <span className="text-5xl font-bold text-app-text tracking-tight">R$19,90</span>
+                            <span className="text-app-text-muted ml-2">/mês</span>
+                        </div>
+
+                        <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
+                            Tudo do Plano PRO + Ferramentas avançadas para projeção em cultos e reuniões.
+                        </p>
+
+                        <ul className="space-y-4 mb-8">
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
+                                <span>Tudo o que está incluso no Plano PRO</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
+                                <span>Recurso de Projeção em Telão Padrão Igreja</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
+                                <span>Visuais adaptados para alto contraste</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
+                                <span>Selo EXCLUSIVO "Templo" no perfil</span>
+                            </li>
+                        </ul>
+
+                        {loading ? (
+                            <Button className="w-full h-14 bg-app-raised font-semibold rounded-xl" disabled>
+                                Carregando...
+                            </Button>
+                        ) : isPro ? (
+                            <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
+                                <ShieldCheck className="w-5 h-5" /> Plano Ativado!
+                            </div>
+                        ) : (
+                            <Button
+                                onClick={() => handleSubscribeClick('templo')}
+                                disabled={isCheckingOut !== null}
+                                className={`w-full h-14 bg-violet-600 hover:bg-violet-700 text-white font-bold transition-all shadow-lg hover:shadow-violet-500/20 rounded-xl px-2 ${isCheckingOut === 'templo' ? 'text-xs sm:text-sm whitespace-normal leading-tight' : 'text-base'}`}
+                            >
+                                {isCheckingOut === 'templo' ? "Redirecionando de forma segura..." : "Assinar Plano Templo"}
+                            </Button>
+                        )}
+                    </div>
+                </div>
+
+                <div className="text-center mt-6">
+                    <p className="text-xs text-app-text-muted">
+                        Cancelamento fácil e a qualquer momento.
+                    </p>
+                </div>
+
+                {/* Features List - Moved to Bottom */}
+                <div className="mt-20 max-w-5xl mx-auto border-t border-border/50 pt-16">
+                    <div className="text-center mb-12">
+                        <h2 className="font-serif text-3xl text-app-text">Recursos Inclusos</h2>
+                        <p className="text-app-text-muted mt-2">Visão detalhada de tudo o que sua assinatura oferece</p>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
                         <div className="flex gap-4">
                             <div className="flex-shrink-0 mt-1 h-10 w-10 rounded-full bg-gold/10 flex items-center justify-center border border-gold/20">
                                 <AudioLines className="h-5 w-5 text-gold" />
@@ -96,68 +224,6 @@ export default function PricingPage() {
                                 </p>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Pricing Card */}
-                    <div className="sticky top-24 bg-app-surface border border-border rounded-3xl p-8 lg:p-10 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-gold/10 rounded-full blur-[100px] pointer-events-none -mr-32 -mt-32" />
-
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-2xl font-serif text-app-text">Plano Premium</h3>
-                            <div className="bg-gold/20 text-gold text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
-                                Mensal
-                            </div>
-                        </div>
-
-                        <div className="mb-6">
-                            <span className="text-5xl font-bold text-app-text tracking-tight">R$9,90</span>
-                            <span className="text-app-text-muted ml-2">/mês</span>
-                        </div>
-
-                        <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
-                            Apenas R$0,33 por dia para financiar o desenvolvimento da plataforma e ter acesso a todas as ferramentas cristãs definitivas.
-                        </p>
-
-                        <ul className="space-y-4 mb-8">
-                            <li className="flex items-start gap-3 text-sm text-app-text">
-                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Acesso a narrações em áudio realista</span>
-                            </li>
-                            <li className="flex items-start gap-3 text-sm text-app-text">
-                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Consultas e Pesquisas Teológicas Ilimitadas</span>
-                            </li>
-                            <li className="flex items-start gap-3 text-sm text-app-text">
-                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Backup em Nuvem e Planos Ilimitados</span>
-                            </li>
-                            <li className="flex items-start gap-3 text-sm text-app-text">
-                                <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Selo Pro no perfil</span>
-                            </li>
-                        </ul>
-
-                        {loading ? (
-                            <Button className="w-full h-14 bg-app-raised font-semibold rounded-xl" disabled>
-                                Carregando...
-                            </Button>
-                        ) : isPro ? (
-                            <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
-                                <ShieldCheck className="w-5 h-5" /> Você já é Pro!
-                            </div>
-                        ) : (
-                            <Button
-                                onClick={handleSubscribeClick}
-                                disabled={isCheckingOut}
-                                className="w-full h-14 bg-gold hover:bg-gold2 text-[#141414] text-base font-bold transition-all shadow-lg hover:shadow-gold/20 rounded-xl"
-                            >
-                                {isCheckingOut ? "Redirecionando de forma segura..." : "Assinar Agora"}
-                            </Button>
-                        )}
-
-                        <p className="text-center text-xs text-app-text-muted mt-6 flex items-center justify-center gap-1.5">
-                            Cancelamento fácil e a qualquer momento.
-                        </p>
                     </div>
                 </div>
             </div>

@@ -75,14 +75,22 @@ export function useSubscription() {
     const userRole = (user?.app_metadata as any)?.role;
     const isPro = userRole === "admin" || subscription?.status === "active" || subscription?.status === "trialing";
 
-    // Helper to request a checkout session from Vercel Serverless
-    const checkout = async () => {
+    // Helper to request a checkout session from Supabase Edge Function
+    const checkout = async (planType: 'pro' | 'templo' = 'pro') => {
         if (!user) throw new Error("User must be logged in to checkout.");
 
-        const response = await fetch("/api/checkout", {
+        // Derive the Edge Function URL from the configured Supabase URL
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+        const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+        const edgeFunctionUrl = `${supabaseUrl}/functions/v1/stripe-checkout`;
+
+        const response = await fetch(edgeFunctionUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: user.id, email: user.email }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${anonKey}`,
+            },
+            body: JSON.stringify({ userId: user.id, email: user.email, planType }),
         });
 
         if (!response.ok) {
