@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/lib/supabase";
@@ -21,26 +20,71 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
     const [isFetching, setIsFetching] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Auto cleanup audio object URL if we loaded local blobs
+    // Cleanup when slug changes (chapter navigation)
     useEffect(() => {
-        // Pre-load native voices to avoid OS cold-start delay
-        if (window.speechSynthesis) {
-            window.speechSynthesis.getVoices();
-        }
         return () => {
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current = null;
             }
-            if (window.speechSynthesis && window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-            }
+            setAudioUrl(null);
+            setIsPlaying(false);
         };
     }, [slug]);
 
+    const fetchAndPlay = useCallback(async () => {
+        setIsFetching(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const headers: Record<string, string> = { "Content-Type": "application/json" };
+            if (session?.access_token) {
+                headers["Authorization"] = `Bearer ${session.access_token}`;
+            }
+
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const res = await fetch(`${supabaseUrl}/functions/v1/tts`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ text, slug }),
+            });
+
+            const data = await res.json();
+
+            if (data.fallback) {
+                // Google key not configured yet — use browser synthesis as last resort
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "pt-BR";
+                utterance.rate = 0.9;
+                utterance.onend = () => setIsPlaying(false);
+                utterance.onerror = () => { setIsPlaying(false); setIsFetching(false); };
+                utterance.onstart = () => { setIsPlaying(true); setIsFetching(false); };
+                const voices = window.speechSynthesis?.getVoices() ?? [];
+                const ptVoice = voices.find(v => v.lang.startsWith("pt"));
+                if (ptVoice) utterance.voice = ptVoice;
+                window.speechSynthesis?.speak(utterance);
+                return;
+            }
+
+            if (data.url) {
+                setAudioUrl(data.url);
+                const audio = new Audio(data.url);
+                audioRef.current = audio;
+                audio.onended = () => setIsPlaying(false);
+                audio.onerror = () => { setIsPlaying(false); setIsFetching(false); };
+                await audio.play();
+                setIsPlaying(true);
+            }
+        } catch (err) {
+            console.error("[AudioPlayer] Error:", err);
+            alert("Erro ao carregar áudio. Tente novamente.");
+        } finally {
+            setIsFetching(false);
+        }
+    }, [text, slug]);
+
     const handlePlayPause = async () => {
-        if (!user || (!isPro && !proLoading)) {
-            // Se não for pro, redireciona para PricingPage
+        // Require login to play
+        if (!user) {
             navigate("/pro");
             return;
         }
@@ -48,48 +92,24 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
         if (isPlaying) {
             if (audioRef.current) {
                 audioRef.current.pause();
-                audioRef.current.currentTime = 0; // Return to start as requested
-            } else if (window.speechSynthesis && window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel(); // Clears queue, returning to start
+                audioRef.current.currentTime = 0;
+            } else if (window.speechSynthesis?.speaking) {
+                window.speechSynthesis.cancel();
             }
             setIsPlaying(false);
             return;
         }
 
+        // Resume cached audio element if available
         if (audioRef.current && audioUrl) {
-            audioRef.current.play();
+            audioRef.current.currentTime = 0;
+            await audioRef.current.play();
             setIsPlaying(true);
             return;
         }
 
-        // Use browser Web Speech API directly (free tier)
-        setIsFetching(true);
-        try {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = "pt-BR";
-            utterance.rate = 0.9;
-            utterance.onend = () => setIsPlaying(false);
-            utterance.onerror = () => {
-                setIsPlaying(false);
-                setIsFetching(false);
-            };
-            utterance.onstart = () => {
-                setIsPlaying(true);
-                setIsFetching(false);
-            };
-
-            // Pick a Portuguese voice if available
-            const voices = window.speechSynthesis.getVoices();
-            const ptVoice = voices.find(v => v.lang.startsWith("pt"));
-            if (ptVoice) utterance.voice = ptVoice;
-
-            window.speechSynthesis.speak(utterance);
-        } catch {
-            setIsFetching(false);
-            alert("Erro ao carregar áudio. Tente novamente.");
-        }
+        await fetchAndPlay();
     };
-
 
     if (proLoading) {
         return <div className="animate-pulse h-12 bg-app-raised rounded-xl" />;
@@ -114,13 +134,15 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
 
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-medium text-app-text">Áudio Premium</h4>
+                    <h4 className="text-sm font-medium text-app-text">
+                        {isPro ? "Áudio Premium" : "Áudio Narrado"}
+                    </h4>
                     {!isPro && <Crown className="h-3.5 w-3.5 text-gold" />}
                 </div>
                 <p className="text-xs text-app-text-muted leading-relaxed">
                     {isPro
-                        ? "Narração em alta qualidade."
-                        : "Escute este capítulo narrado por voz humana realista."}
+                        ? "Narração com qualidade."
+                        : "Ouça os versículos narrados assinando o plano PRO."}
                 </p>
                 {!isPro && (
                     <button

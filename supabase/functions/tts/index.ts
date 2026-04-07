@@ -1,27 +1,40 @@
-import { createClient } from "@supabase/supabase-js";
+// @ts-ignore - Deno env
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno&no-check";
 
-export default async function handler(req: Request) {
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req: Request) => {
+    if (req.method === "OPTIONS") {
+        return new Response("ok", { headers: corsHeaders });
+    }
+
     if (req.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
+        return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
     }
 
     try {
-        const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
-        const googleTtsKey = process.env.GOOGLE_TTS_API_KEY;
-        const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-        const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
         const body = await req.json().catch(() => ({}));
-        const { text, slug, voiceId } = body;
+        const { text, slug } = body;
 
         if (!text || !slug) {
-            return new Response("Missing parameters", { status: 400 });
+            return new Response(
+                JSON.stringify({ fallback: true, reason: "missing_params" }),
+                { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
         }
+
+        const elevenLabsKey = Deno.env.get("ELEVENLABS_API_KEY");
+        const googleTtsKey = Deno.env.get("GOOGLE_TTS_API_KEY");
+        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+        const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
         if (!supabaseUrl || !supabaseServiceRoleKey) {
             return new Response(
                 JSON.stringify({ fallback: true, reason: "supabase_not_configured" }),
-                { status: 200, headers: { "Content-Type": "application/json" } }
+                { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
@@ -45,22 +58,21 @@ export default async function handler(req: Request) {
         }
 
         if (isPro && elevenLabsKey) {
-            // ── PRO MODE: ElevenLabs with cache ──────────────────────────────
+            // ── PRO MODE: ElevenLabs with cache ─────────────────────────────
             const proPath = `${slug}.mp3`;
             const { data: proUrlData } = supabase.storage.from("audio_cache").getPublicUrl(proPath);
             const cacheCheck = await fetch(proUrlData.publicUrl, { method: "HEAD" });
             if (cacheCheck.ok) {
                 return new Response(
                     JSON.stringify({ url: proUrlData.publicUrl, cached: true, isPro: true }),
-                    { status: 200, headers: { "Content-Type": "application/json" } }
+                    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
                 );
             }
 
-            const selectedVoiceId = voiceId || "ErXwobaYiN019PkySvjV";
-            const elevenResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}`, {
+            const elevenResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/ErXwobaYiN019PkySvjV`, {
                 method: "POST",
                 headers: { "xi-api-key": elevenLabsKey, "Content-Type": "application/json" },
-                body: JSON.stringify({ text: text.slice(0, 5000), model_id: "eleven_multilingual_v2" })
+                body: JSON.stringify({ text: text.slice(0, 5000), model_id: "eleven_multilingual_v2" }),
             });
 
             if (!elevenResponse.ok) throw new Error("ElevenLabs API failed");
@@ -73,7 +85,7 @@ export default async function handler(req: Request) {
             const { data: finalUrl } = supabase.storage.from("audio_cache").getPublicUrl(proPath);
             return new Response(
                 JSON.stringify({ url: finalUrl.publicUrl, cached: false, isPro: true }),
-                { status: 200, headers: { "Content-Type": "application/json" } }
+                { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
@@ -84,19 +96,17 @@ export default async function handler(req: Request) {
         if (freeCacheCheck.ok) {
             return new Response(
                 JSON.stringify({ url: freeUrlData.publicUrl, cached: true, isPro: false }),
-                { status: 200, headers: { "Content-Type": "application/json" } }
+                { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
         if (!googleTtsKey) {
-            // Google TTS key not yet configured — fall back to browser synthesis
             return new Response(
                 JSON.stringify({ fallback: true, reason: "google_tts_not_configured" }),
-                { status: 200, headers: { "Content-Type": "application/json" } }
+                { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
-        // Call Google Cloud Text-to-Speech REST API
         const googleResponse = await fetch(
             `https://texttospeech.googleapis.com/v1/text:synthesize?key=${googleTtsKey}`,
             {
@@ -104,38 +114,31 @@ export default async function handler(req: Request) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     input: { text: text.slice(0, 5000) },
-                    voice: {
-                        languageCode: "pt-BR",
-                        name: "pt-BR-Standard-B",
-                    },
-                    audioConfig: {
-                        audioEncoding: "MP3",
-                        speakingRate: 0.92,
-                        pitch: 0,
-                    },
+                    voice: { languageCode: "pt-BR", name: "pt-BR-Standard-B" },
+                    audioConfig: { audioEncoding: "MP3", speakingRate: 0.92, pitch: 0 },
                 }),
             }
         );
 
         if (!googleResponse.ok) {
             const errBody = await googleResponse.text();
-            console.error("[TTS] Google API error:", errBody);
+            console.error("[tts] Google API error:", errBody);
             return new Response(
                 JSON.stringify({ fallback: true, reason: "google_api_error" }),
-                { status: 200, headers: { "Content-Type": "application/json" } }
+                { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
         const googleData = await googleResponse.json();
-        // Google returns base64-encoded audio content
         const audioBase64: string = googleData.audioContent;
+
+        // Decode base64 → Uint8Array (Deno-compatible)
         const binaryStr = atob(audioBase64);
         const bytes = new Uint8Array(binaryStr.length);
         for (let i = 0; i < binaryStr.length; i++) {
             bytes[i] = binaryStr.charCodeAt(i);
         }
 
-        // Upload to Supabase Storage (fire-and-forget)
         supabase.storage.from("audio_cache").upload(freePath, bytes.buffer, {
             contentType: "audio/mpeg", upsert: true
         }).catch(() => { });
@@ -143,14 +146,14 @@ export default async function handler(req: Request) {
         const { data: savedUrl } = supabase.storage.from("audio_cache").getPublicUrl(freePath);
         return new Response(
             JSON.stringify({ url: savedUrl.publicUrl, cached: false, isPro: false }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
 
     } catch (err: any) {
-        console.error("[TTS Error]:", err);
+        console.error("[tts] Error:", err?.message, err);
         return new Response(
-            JSON.stringify({ fallback: true, reason: err.message }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
+            JSON.stringify({ fallback: true, reason: err?.message || "internal_error" }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
     }
-}
+});
