@@ -37,6 +37,9 @@ async function pruneBibleCache() {
 }
 
 function withSavedAt(response) {
+  if (response.type === "opaque" || response.status === 0) {
+    return Promise.resolve(response.clone());
+  }
   return response
     .clone()
     .blob()

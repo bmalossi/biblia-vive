@@ -2,12 +2,41 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { findBookBySlug, getTestament } from "@/lib/books";
 import { getVersion, isBibleVersion } from "@/lib/themes";
+import { usePageMeta } from "@/hooks/usePageMeta";
+import { useTranslation } from "@/i18n";
 import { Link, useParams } from "react-router-dom";
 
 export default function BookPage() {
   const { version, book } = useParams();
   const selectedVersion = isBibleVersion(version) ? version : getVersion();
   const selectedBook = findBookBySlug(book);
+  const { t } = useTranslation();
+
+  const title = selectedBook ? `${selectedBook.name} (${selectedVersion.toUpperCase()}) — ${t("app.name")}` : t("app.name");
+  const description = selectedBook ? `Leia o livro de ${selectedBook.name} completo na versão ${selectedVersion.toUpperCase()}. São ${selectedBook.chapters} capítulos do ${getTestament(selectedBook)} para seu estudo bíblico online.` : "";
+
+  usePageMeta({
+    title,
+    description,
+    canonical: `/${selectedVersion}/${selectedBook?.slug}`,
+    jsonLd: selectedBook ? [
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": window.location.origin },
+          { "@type": "ListItem", "position": 2, "name": selectedBook.name, "item": `${window.location.origin}/${selectedVersion}/${selectedBook.slug}` }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "name": selectedBook.name,
+        "numberOfPages": selectedBook.chapters,
+        "inLanguage": "pt-BR"
+      }
+    ] : undefined
+  });
 
   if (!selectedBook) {
     return (

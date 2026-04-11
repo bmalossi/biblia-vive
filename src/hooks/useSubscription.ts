@@ -13,6 +13,8 @@ export interface SubscriptionData {
     | "incomplete_expired"
     | "none";
     current_period_end: string | null;
+    cancel_at_period_end?: boolean;
+    plan_type: "pro" | "templo" | "none";
 }
 
 export function useSubscription() {
@@ -32,17 +34,17 @@ export function useSubscription() {
                 setLoading(true);
                 const { data, error } = await supabase
                     .from("user_subscriptions")
-                    .select("status, current_period_end")
+                    .select("status, current_period_end, plan_type")
                     .eq("user_id", user.id)
                     .maybeSingle();
 
                 if (error || !data) {
-                    setSubscription({ status: "none", current_period_end: null });
+                    setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
                 } else {
                     setSubscription(data as SubscriptionData);
                 }
             } catch (err) {
-                setSubscription({ status: "none", current_period_end: null });
+                setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
             } finally {
                 setLoading(false);
             }
@@ -73,7 +75,11 @@ export function useSubscription() {
     }, [user]);
 
     const userRole = (user?.app_metadata as any)?.role;
-    const isPro = userRole === "admin" || subscription?.status === "active" || subscription?.status === "trialing";
+    const isAdmin = userRole === "admin";
+    const isActive = subscription?.status === "active" || subscription?.status === "trialing";
+
+    const isPro = isAdmin || (isActive && (subscription?.plan_type === "pro" || subscription?.plan_type === "templo"));
+    const isTemplo = isAdmin || (isActive && subscription?.plan_type === "templo");
 
     // Helper to request a checkout session from Supabase Edge Function
     const checkout = async (planType: 'pro' | 'templo' = 'pro') => {
@@ -104,5 +110,28 @@ export function useSubscription() {
         }
     };
 
-    return { subscription, isPro, loading, checkout };
+    // Helper to cancel subscription via Supabase Edge Function
+    const cancelSubscription = async () => {
+        if (!user) throw new Error("User must be logged in.");
+
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+        const { data: { session } } = await supabase.auth.getSession();
+
+        const response = await fetch(`${supabaseUrl}/functions/v1/stripe-cancel`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session?.access_token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.error || "Failed to cancel subscription");
+        }
+
+        return response.json();
+    };
+
+    return { subscription, isPro, isTemplo, isAdmin, loading, checkout, cancelSubscription };
 }

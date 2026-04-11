@@ -57,9 +57,7 @@ import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
 import { findBookBySlug } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
-import { Maximize2, Minimize2, Settings, FileText, Loader2 } from "lucide-react";
-import { useChurchMode } from "@/hooks/useChurchMode";
-import type { ChurchVerse } from "@/lib/churchChannel";
+import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2 } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -163,13 +161,12 @@ export default function ReadingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [compareEnabled, setCompareEnabled] = useState(false);
+  const [compareData, setCompareData] = useState<Chapter | null>(null);
   const [showDiff, setShowDiff] = useState(true);
   const [compareVersion, setCompareVersion] = useState<BibleVersion>(selectedVersion === "acf" ? "nvi" : "acf");
-  const [compareData, setCompareData] = useState<Chapter | null>(null);
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareError, setCompareError] = useState<string | null>(null);
   const [hoveredVerseNumber, setHoveredVerseNumber] = useState<string | null>(null);
-  const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
   const [selectedVerse, setSelectedVerse] = useState<VerseSelection | null>(null);
   const [toolbarPosition, setToolbarPosition] = useState<{ left: number; top: number } | null>(null);
   const [isToolbarMobile, setIsToolbarMobile] = useState(false);
@@ -188,15 +185,18 @@ export default function ReadingPage() {
   const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
   const [cachedChapterCommentary, setCachedChapterCommentary] = useState<string | null>(null);
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
+  const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
   const chapterGridRef = useRef<HTMLDivElement>(null);
   const verseRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { copyState, copyVerse, shareState, shareVerse } = useVerseActions();
+  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
+  const churchMode = useChurchMode();
   const { preferences, updatePreference, resetPreferences } = useReadingPreferences({ rootId: "reading-root" });
   const { t, locale } = useTranslation();
   const { user } = useAuth();
-  const { isPro } = useSubscription();
+  const { isPro, isTemplo } = useSubscription();
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
 
@@ -498,6 +498,21 @@ export default function ReadingPage() {
   ]);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Control" || e.key === "Meta") setIsCtrlPressed(true);
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Control" || e.key === "Meta") setIsCtrlPressed(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!preferences.focusMode) return;
 
     window.history.pushState({ focusMode: true }, "", window.location.href);
@@ -671,16 +686,19 @@ export default function ReadingPage() {
     });
   };
 
-  const handleCopy = () => {
-    if (!selectedVerse) return;
-    void copyVerse({
-      chapter: chapterNumber,
-      pathname: location.pathname,
-      reference: selectedVerse.reference,
-      text: selectedVerse.text,
-      verseNumber: selectedVerse.verseNumber,
-      version: selectedVerse.version,
-    });
+  const handleChurchCheckbox = (verse: { number: number; text: string; version: string }) => {
+    const verseData: ChurchVerse = {
+      number: verse.number,
+      text: verse.text,
+      reference: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber}:${verse.number}`,
+      version: verse.version.toUpperCase(),
+    };
+    const isChecked = churchMode.selectedVerses.some(v => v.number === verseData.number);
+    if (isChecked) {
+      churchMode.removeVerse(verseData.number);
+    } else {
+      churchMode.addVerse(verseData);
+    }
   };
 
   const handleShare = () => {
@@ -694,6 +712,15 @@ export default function ReadingPage() {
     });
     setIsCardModalOpen(true);
   };
+
+  const handleCopy = useCallback(async () => {
+    if (!selectedVerse) return;
+    await copyVerse({
+      reference: selectedVerse.reference,
+      text: selectedVerse.text,
+      version: selectedVerse.version
+    });
+  }, [selectedVerse, copyVerse]);
 
   const handleStudy = () => {
     if (!selectedVerse) return;
@@ -743,6 +770,51 @@ export default function ReadingPage() {
   const hasPrev = !!selectedBook && chapterNumber > 1;
   const hasNext = !!selectedBook && chapterNumber < (selectedBook?.chapters ?? 1);
   const chapterGrid = Array.from({ length: selectedBook?.chapters ?? 0 }, (_, index) => index + 1);
+
+  usePageMeta({
+    title: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber} (${selectedVersion.toUpperCase()}) — ${t("app.name")}`,
+    description: `Leia o capítulo ${chapterNumber} do livro de ${selectedBook?.name ?? ""} na versão ${selectedVersion.toUpperCase()} com dezenas de marcações exclusivas. Estudo online grátis.`,
+    canonical: `/${selectedVersion}/${selectedBook?.slug ?? "gn"}/${chapterNumber}`,
+    jsonLd: selectedBook && chapterVerses.length > 0 ? [
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Início", "item": window.location.origin },
+          { "@type": "ListItem", "position": 2, "name": selectedBook.name, "item": `${window.location.origin}/${selectedVersion}/${selectedBook.slug}` },
+          { "@type": "ListItem", "position": 3, "name": `Capítulo ${chapterNumber}`, "item": `${window.location.origin}/${selectedVersion}/${selectedBook.slug}/${chapterNumber}` }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Chapter",
+        "name": `${selectedBook.name} ${chapterNumber}`,
+        "text": chapterVerses.map(v => `${v.number} ${v.text}`).join(" "),
+        "inLanguage": "pt-BR"
+      },
+      ...(cachedChapterCommentary ? [{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": `Qual o contexto e significado de ${selectedBook.name} capítulo ${chapterNumber}?`,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": ((commentariesStr) => {
+                try {
+                  const items = Array.isArray(JSON.parse(commentariesStr)) ? JSON.parse(commentariesStr) : JSON.parse(commentariesStr).commentaries;
+                  return items?.map((c: any) => c.text).join(" ") || "";
+                } catch {
+                  return "";
+                }
+              })(cachedChapterCommentary)
+            }
+          }
+        ]
+      }] : [])
+    ] : undefined
+  });
 
   const copyLabel = copyState === "copied" ? t("verse.copied") : t("verse.copy");
   const shareLabel = shareState === "link-copied" ? t("verse.linkCopied") : shareState === "shared" ? t("verse.shared") : t("verse.share");
@@ -838,178 +910,239 @@ export default function ReadingPage() {
         {!preferences.focusMode && (
           <>
             <section className={`mx-auto w-full max-w-6xl px-4 md:px-6`}>
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="mb-2 font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">{chapterLabel}</p>
-                  <Breadcrumb>
-                    <BreadcrumbList className="leading-none">
-                      <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                          <button className="inline-flex items-center font-sans uppercase leading-none tracking-[0.08em]" onClick={() => setIsSettingsOpen(true)} type="button">
-                            {selectedVersion.toUpperCase()}
-                          </button>
-                        </BreadcrumbLink>
-                      </BreadcrumbItem>
-                      <BreadcrumbSeparator />
-                      <BreadcrumbItem>
-                        {selectedBook ? (
-                          <BreadcrumbLink asChild>
-                            <Link className="inline-flex items-center leading-none" to={`/${selectedVersion}/${selectedBook.slug}`}>
-                              {selectedBook.name}
-                            </Link>
-                          </BreadcrumbLink>
-                        ) : (
-                          <BreadcrumbPage>{t("reading.book")}</BreadcrumbPage>
-                        )}
-                      </BreadcrumbItem>
-                      <BreadcrumbSeparator />
-                      <BreadcrumbItem>
-                        <Dialog onOpenChange={setIsChapterPickerOpen} open={isChapterPickerOpen}>
-                          <DialogTrigger asChild>
-                            <button className="inline-flex items-center font-sans leading-none" type="button">
-                              {t("home.chapter")} {chapterNumber}
-                            </button>
-                          </DialogTrigger>
-                          <DialogContent aria-label={t("reading.selectChapter")} className="max-w-xl border-border bg-app-surface sm:rounded-2xl" role="dialog">
-                            <DialogHeader>
-                              <DialogTitle>{t("reading.selectChapter")}</DialogTitle>
-                              <DialogDescription>
-                                {selectedBook ? t("reading.chooseChapterBook", { book: selectedBook.name }) : t("reading.chooseChapter")}
-                              </DialogDescription>
-                            </DialogHeader>
-
-                            <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
-                              {chapterGrid.map((item) => {
-                                const active = item === chapterNumber;
-                                return (
-                                  <Button
-                                    aria-current={active ? "true" : undefined}
-                                    className={active ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg" : ""}
-                                    data-chapter={item}
-                                    key={item}
-                                    onClick={() => {
-                                      goToChapter(item);
-                                      setIsChapterPickerOpen(false);
-                                    }}
-                                    size="sm"
-                                    type="button"
-                                    variant="outline"
-                                  >
-                                    {item}
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </BreadcrumbItem>
-                    </BreadcrumbList>
-                  </Breadcrumb>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="hidden items-center gap-2 rounded-full border border-border bg-app-surface px-3 py-1 sm:flex">
-                    <Label className="text-xs text-app-text-muted" htmlFor="compare-toggle-inline">
-                      {t("reading.compare")}
-                    </Label>
-                    <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
-                    {compareEnabled && (
-                      <>
-                        <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
-                          <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
-                              <SelectItem key={item} value={item}>
-                                {item.toUpperCase()}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
-                          <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
-                            Difs
-                          </Label>
-                          <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
-                        </div>
-                      </>
+              {churchMode.isActive && (
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gold/30 bg-gold-bg/10 px-4 py-2">
+                  <div className="flex items-center gap-2">
+                    <Monitor className="h-4 w-4 text-gold" />
+                    <span className="text-sm font-medium text-gold">Modo Igreja ativo</span>
+                    {churchMode.selectedVerses.length > 1 && (
+                      <span className="ml-2 text-xs text-app-text-muted">
+                        {churchMode.selectedVerses.length} versículos selecionados
+                      </span>
                     )}
                   </div>
-
-                  <AudioPlayer
-                    text={chapterVerses.map(v => v.text).join(" ")}
-                    slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
-                  />
-
-                  <Button
-                    aria-label={t("reading.toggleFocusMode")}
-                    onClick={() => updatePreference("focusMode", !preferences.focusMode)}
-                    size="icon"
-                    type="button"
-                    variant="outline"
-                  >
-                    {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  </Button>
-
-                  {notes.length > 0 && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          aria-label="Baixar Notas do Capítulo (PDF)"
-                          size="icon"
-                          type="button"
-                          variant="outline"
-                          title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
-                          className="text-gold border-gold/40 hover:bg-gold/10"
-                        >
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-app-text-muted">
-                            {isPro
-                              ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
-                              : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="mt-4">
-                          <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
-                          {isPro ? (
-                            <AlertDialogAction
-                              onClick={() => exportNotesToPDF(notes, true)}
-                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                            >
-                              Sim, Baixar PDF
-                            </AlertDialogAction>
-                          ) : (
-                            <AlertDialogAction
-                              onClick={() => navigate("/pro")}
-                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                            >
-                              Conhecer Premium
-                            </AlertDialogAction>
-                          )}
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-
-                  <Button
-                    aria-label={t("reading.openSettings")}
-                    className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
-                    onClick={() => setIsSettingsOpen(true)}
-                    size="icon"
-                    type="button"
-                    variant="outline"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    {churchMode.selectedVerses.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={churchMode.clearSelection}
+                        className="text-xs text-app-text-muted hover:text-app-text underline"
+                      >
+                        Limpar seleção
+                      </button>
+                    )}
+                    <Label htmlFor="church-auto-send" className="text-xs text-app-text-muted">
+                      Envio automático
+                    </Label>
+                    <Switch
+                      id="church-auto-send"
+                      checked={churchMode.autoSend}
+                      onCheckedChange={churchMode.toggleAutoSend}
+                    />
+                    <Button
+                      onClick={() => churchMode.sendFullChapter(chapterVerses.map(v => ({
+                        number: v.number,
+                        text: v.text,
+                        reference: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber}:${v.number}`,
+                        version: selectedVersion.toUpperCase()
+                      })))}
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                      className="h-7 text-xs border-gold/40 text-gold hover:bg-gold-bg/20"
+                    >
+                      Enviar capítulo
+                    </Button>
+                  </div>
                 </div>
+              )}
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <Breadcrumb>
+                  <BreadcrumbList className="leading-none">
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <button className="inline-flex items-center font-sans uppercase leading-none tracking-[0.08em]" onClick={() => setIsSettingsOpen(true)} type="button">
+                          {selectedVersion.toUpperCase()}
+                        </button>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      {selectedBook ? (
+                        <BreadcrumbLink asChild>
+                          <Link className="inline-flex items-center leading-none" to={`/${selectedVersion}/${selectedBook.slug}`}>
+                            {selectedBook.name}
+                          </Link>
+                        </BreadcrumbLink>
+                      ) : (
+                        <BreadcrumbPage>{t("reading.book")}</BreadcrumbPage>
+                      )}
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <Dialog onOpenChange={setIsChapterPickerOpen} open={isChapterPickerOpen}>
+                        <DialogTrigger asChild>
+                          <button className="inline-flex items-center font-sans leading-none" type="button">
+                            {t("home.chapter")} {chapterNumber}
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent aria-label={t("reading.selectChapter")} className="max-w-xl border-border bg-app-surface sm:rounded-2xl" role="dialog">
+                          <DialogHeader>
+                            <DialogTitle>{t("reading.selectChapter")}</DialogTitle>
+                            <DialogDescription>
+                              {selectedBook ? t("reading.chooseChapterBook", { book: selectedBook.name }) : t("reading.chooseChapter")}
+                            </DialogDescription>
+                          </DialogHeader>
+
+                          <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
+                            {chapterGrid.map((item) => {
+                              const active = item === chapterNumber;
+                              return (
+                                <Button
+                                  aria-current={active ? "true" : undefined}
+                                  className={active ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg" : ""}
+                                  data-chapter={item}
+                                  key={item}
+                                  onClick={() => {
+                                    goToChapter(item);
+                                    setIsChapterPickerOpen(false);
+                                  }}
+                                  size="sm"
+                                  type="button"
+                                  variant="outline"
+                                >
+                                  {item}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="hidden items-center gap-2 rounded-full border border-border bg-app-surface px-3 py-1 sm:flex">
+                  <Label className="text-xs text-app-text-muted" htmlFor="compare-toggle-inline">
+                    {t("reading.compare")}
+                  </Label>
+                  <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
+                  {compareEnabled && (
+                    <>
+                      <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
+                        <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item.toUpperCase()}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
+                        <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
+                          Difs
+                        </Label>
+                        <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <AudioPlayer
+                  text={chapterVerses.map(v => v.text).join(" ")}
+                  slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
+                />
+
+                <Button
+                  aria-label={t("reading.toggleFocusMode")}
+                  onClick={() => updatePreference("focusMode", !preferences.focusMode)}
+                  size="icon"
+                  type="button"
+                  variant="outline"
+                >
+                  {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </Button>
+
+                {notes.length > 0 && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        aria-label="Baixar Notas do Capítulo (PDF)"
+                        size="icon"
+                        type="button"
+                        variant="outline"
+                        title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
+                        className="text-gold border-gold/40 hover:bg-gold/10"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-app-text-muted">
+                          {isPro
+                            ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
+                            : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="mt-4">
+                        <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
+                        {isPro ? (
+                          <AlertDialogAction
+                            onClick={() => exportNotesToPDF(notes, true)}
+                            className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                          >
+                            Sim, Baixar PDF
+                          </AlertDialogAction>
+                        ) : (
+                          <AlertDialogAction
+                            onClick={() => navigate("/pro")}
+                            className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                          >
+                            Conhecer Premium
+                          </AlertDialogAction>
+                        )}
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+
+                <Button
+                  aria-label={churchMode.isActive ? "Desativar Modo Igreja" : "Ativar Modo Igreja"}
+                  title={churchMode.isActive ? "Desativar Modo Igreja" : isTemplo ? "Modo Igreja — projeta versículos em outra aba" : "Modo Igreja (Exclusivo Plano Templo)"}
+                  onClick={() => {
+                    if (isTemplo) {
+                      churchMode.toggleChurchMode();
+                    } else {
+                      navigate('/pro');
+                    }
+                  }}
+                  size="icon"
+                  type="button"
+                  variant="outline"
+                  className={churchMode.isActive ? "border-gold/50 text-gold bg-gold-bg/20 shadow-gold-glow" : !isTemplo ? "opacity-60" : ""}
+                >
+                  <Monitor className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  aria-label={t("reading.openSettings")}
+                  className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
+                  onClick={() => setIsSettingsOpen(true)}
+                  size="icon"
+                  type="button"
+                  variant="outline"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
               </div>
             </section>
 
@@ -1088,11 +1221,15 @@ export default function ReadingPage() {
                             ? diffVerses(primaryText, compareVerseText).tokensA
                             : null;
 
+                        const isChurchChecked = churchMode.selectedVerses.some(
+                          v => v.number === verse.number
+                        );
+
                         const verseContent = (
                           <div
                             aria-label={`${t("reading.verse")} ${verseNumber}: ${primaryText.split(" ").slice(0, 20).join(" ")}...`}
                             aria-selected={isSelected}
-                            className={`group w-full cursor-pointer rounded-md px-1 py-1 transition-colors ${highlightClass} ${userHighlightClass} ${verseNote ? "border-l-0 pl-0" : ""}`}
+                            className={`group w-full cursor-pointer rounded-md px-1 py-1 transition-colors ${highlightClass} ${userHighlightClass} ${verseNote ? "border-l-0 pl-0" : ""} ${isChurchChecked ? "ring-1 ring-gold/40 bg-gold/5" : ""}`}
                             data-verse-item="true"
                             id={`v${verseNumber}`}
                             key={verse.id}
@@ -1127,14 +1264,29 @@ export default function ReadingPage() {
                             style={{ marginBottom: "var(--verse-spacing)" }}
                           >
                             <p
-                              className="text-app-text"
+                              className="text-app-text flex items-start gap-2"
                               style={{
                                 fontFamily: "var(--font-reading)",
                                 fontSize: "var(--font-size-reading)",
                                 lineHeight: "1.85",
                               }}
                             >
-                              <span className="mr-2 inline-block w-6 align-top font-mono text-[0.65rem] text-gold transition-opacity duration-100 group-hover:opacity-100" style={{ opacity: isHovered ? 1 : 0.6 }}>
+                              {/* Church Mode Checkbox */}
+                              {churchMode.isActive && (
+                                <span
+                                  className="flex-shrink-0 mt-[0.35rem]"
+                                  onClick={(e) => { e.stopPropagation(); handleChurchCheckbox({ number: verse.number, text: primaryText, version: selectedVersion }); }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChurchChecked}
+                                    readOnly
+                                    className="h-4 w-4 rounded cursor-pointer accent-gold"
+                                    aria-label={`Selecionar versículo ${verseNumber} para projeção`}
+                                  />
+                                </span>
+                              )}
+                              <span className="mr-2 inline-block w-6 align-top font-mono text-[0.65rem] text-gold transition-opacity duration-100 group-hover:opacity-100" style={{ opacity: isHovered ? 1 : 0.6, flexShrink: 0 }}>
                                 {verseNumber}
                               </span>
                               {renderVerseText(primaryDiffTokens, primaryText, verseNumber)}
@@ -1344,6 +1496,30 @@ export default function ReadingPage() {
 
           </div>
         )}
+        {/* Floating batch-send button (Church Mode, autoSend OFF) */}
+        {churchMode.isActive && !churchMode.autoSend && churchMode.selectedVerses.length > 0 && (
+          <div className="fixed bottom-20 right-4 z-50 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                churchMode.sendToDisplay(churchMode.selectedVerses);
+                churchMode.clearSelection();
+              }}
+              className="flex items-center gap-2 rounded-full bg-gold text-app-bg px-4 py-2.5 text-sm font-semibold shadow-lg hover:bg-gold/90 transition-colors"
+            >
+              <Monitor className="h-4 w-4" />
+              Enviar {churchMode.selectedVerses.length} versículo{churchMode.selectedVerses.length !== 1 ? 's' : ''}
+            </button>
+            <button
+              type="button"
+              onClick={churchMode.clearSelection}
+              aria-label="Limpar seleção"
+              className="h-9 w-9 rounded-full bg-app-surface border border-border text-app-text-muted flex items-center justify-center hover:bg-app-raised transition-colors"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         <VerseToolbar
           ariaReference={selectedVerse?.reference ?? ""}
@@ -1371,20 +1547,6 @@ export default function ReadingPage() {
           studyOpen={studyVerse !== null}
           visible={!!selectedVerse}
         />
-
-        {studyVerse !== null && selectedBook && (
-          <StudyPanel
-            bookId={selectedBook.id}
-            chapter={chapterNumber}
-            verse={studyVerse}
-            verseText={studyVerseText}
-            version={selectedVersion}
-            onClose={() => {
-              setStudyVerse(null);
-              setStudyVerseText('');
-            }}
-          />
-        )}
 
         <NoteModal
           isOpen={isNoteModalOpen}
@@ -1445,18 +1607,14 @@ export default function ReadingPage() {
             </Button>
           </div>
         )}
-      </div>
-      {
-        cardModalData && (
+        {cardModalData && (
           <VerseCardModal
             isOpen={isCardModalOpen}
             onClose={() => { setIsCardModalOpen(false); setCardModalData(null); }}
             data={cardModalData}
           />
-        )
-      }
-
-
-    </Layout >
+        )}
+      </div>
+    </Layout>
   );
 }

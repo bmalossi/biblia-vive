@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export default function PricingPage() {
     const { t } = useTranslation();
-    const { isPro, loading, checkout } = useSubscription();
+    const { isPro, isTemplo, loading, checkout } = useSubscription();
     const { user } = useAuth();
     const [isCheckingOut, setIsCheckingOut] = useState<'pro' | 'templo' | null>(null);
     const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -89,7 +89,7 @@ export default function PricingPage() {
                             </Button>
                         ) : isPro ? (
                             <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
-                                <ShieldCheck className="w-5 h-5" /> Você já é Pro!
+                                <ShieldCheck className="w-5 h-5" /> Plano Ativo!
                             </div>
                         ) : (
                             <Button
@@ -148,7 +148,7 @@ export default function PricingPage() {
                             <Button className="w-full h-14 bg-app-raised font-semibold rounded-xl" disabled>
                                 Carregando...
                             </Button>
-                        ) : isPro ? (
+                        ) : isTemplo ? (
                             <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
                                 <ShieldCheck className="w-5 h-5" /> Plano Ativado!
                             </div>

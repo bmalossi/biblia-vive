@@ -4,7 +4,7 @@ interface PageMeta {
   canonical?: string;
   description?: string;
   image?: string;
-  jsonLd?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   robots?: string;
   title: string;
   type?: string;

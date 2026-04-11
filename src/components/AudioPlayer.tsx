@@ -135,7 +135,7 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <h4 className="text-sm font-medium text-app-text">
-                        {isPro ? "Áudio Premium" : "Áudio Narrado"}
+                        {isPro ? "Áudio Narrado" : "Áudio Narrado"}
                     </h4>
                     {!isPro && <Crown className="h-3.5 w-3.5 text-gold" />}
                 </div>

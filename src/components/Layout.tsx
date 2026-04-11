@@ -27,9 +27,39 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
       <div className={`transition-opacity duration-200 ${hideHeader ? "pointer-events-none opacity-0" : "opacity-100"}`}>
         <Header />
       </div>
-      <main className={`mx-auto w-full max-w-6xl px-4 md:px-6 md:pb-10 ${hideHeader ? "pb-12 pt-3" : "pb-24 pt-[68px]"}`} id="main-content">
+      <main className={`mx-auto w-full max-w-6xl px-4 md:px-6 md:pb-10 flex-grow ${hideHeader ? "pb-12 pt-3" : "pb-24 pt-[68px]"}`} id="main-content">
         {children}
       </main>
+
+      {!hideHeader && !hideMobileNav && (
+        <footer className="mt-auto border-t border-border bg-app-surface py-12 pb-28 md:pb-12 text-center md:text-left">
+          <div className="mx-auto w-full max-w-6xl px-4 md:px-6 grid gap-8 md:grid-cols-3">
+            <div>
+              <h3 className="text-gold font-serif text-xl mb-3">Bíblia Vive</h3>
+              <p className="text-app-text-muted text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
+                A palavra de Deus em formato digital, focada em precisão, profundo estudo e acessibilidade tecnológica.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-app-text font-medium mb-4 uppercase tracking-wider text-xs">Acesso</h4>
+              <ul className="space-y-3">
+                <li><Link to="/sobre" className="text-sm text-app-text-muted hover:text-gold transition-colors">Sobre Nós & Missão</Link></li>
+                <li><Link to="/pro" className="text-sm text-app-text-muted hover:text-gold transition-colors">Assinatura PRO</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-app-text font-medium mb-4 uppercase tracking-wider text-xs">Páginas Legais</h4>
+              <ul className="space-y-3">
+                <li><Link to="/sobre" className="text-sm text-app-text-muted hover:text-gold transition-colors">Licenças de Tradução</Link></li>
+                <li><span className="text-sm text-app-text-muted opacity-50">Termos de Uso</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="w-full max-w-6xl mx-auto px-4 md:px-6 mt-10 pt-4 border-t border-border/50 text-center">
+            <span className="text-xs text-app-text-muted uppercase tracking-widest font-mono">Bíblia Vive © 2026</span>
+          </div>
+        </footer>
+      )}
 
       <nav
         aria-label="Navegação móvel"

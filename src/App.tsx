@@ -18,6 +18,8 @@ const AdminPage = lazy(() => import("./pages/AdminPage"));
 const WidgetDailyVerse = lazy(() => import("./pages/WidgetDailyVerse"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ChurchDisplayPage = lazy(() => import("./pages/ChurchDisplayPage"));
+const AccountPage = lazy(() => import("./pages/AccountPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,8 @@ const App = () => (
             <Route path="/pro" element={<PricingPage />} />
             <Route path="/widget/daily" element={<WidgetDailyVerse />} />
             <Route path="/church-display" element={<ChurchDisplayPage />} />
+            <Route path="/conta" element={<AccountPage />} />
+            <Route path="/sobre" element={<AboutPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

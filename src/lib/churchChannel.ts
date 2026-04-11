@@ -5,10 +5,16 @@ export interface ChurchVerse {
   version: string
 }
 
+export interface ChurchSettings {
+  churchName: string
+  logoUrl: string | null
+}
+
 export interface ChurchMessage {
-  type: 'VERSES' | 'CLEAR' | 'PING' | 'CLOSE'
+  type: 'VERSES' | 'CLEAR' | 'PING' | 'CLOSE' | 'SETTINGS'
   verses?: ChurchVerse[]
   autoSend?: boolean
+  settings?: ChurchSettings
 }
 
 const CHANNEL_NAME = 'biblia-viva-church'

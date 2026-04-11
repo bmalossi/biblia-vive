@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { sendToChurch, type ChurchVerse } from '@/lib/churchChannel'
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/hooks/useAuth'
 
 interface UseChurchModeReturn {
   isActive: boolean
@@ -20,6 +22,7 @@ export function useChurchMode(): UseChurchModeReturn {
   const [autoSend, setAutoSend] = useState(false)
   const [selectedVerses, setSelectedVerses] = useState<ChurchVerse[]>([])
   const [churchWindow, setChurchWindow] = useState<Window | null>(null)
+  const { user } = useAuth()
 
   useEffect(() => {
     const savedActive = localStorage.getItem('bv_modo_igreja_ativo')
@@ -52,6 +55,28 @@ export function useChurchMode(): UseChurchModeReturn {
     return () => clearInterval(checkInterval)
   }, [churchWindow])
 
+  // Send church settings to the display window after it opens
+  const sendSettings = useCallback(async () => {
+    if (!user) return
+    try {
+      const { data } = await supabase
+        .from('church_settings')
+        .select('church_name, logo_url')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      sendToChurch({
+        type: 'SETTINGS',
+        settings: {
+          churchName: data?.church_name ?? '',
+          logoUrl: data?.logo_url ?? null,
+        },
+      })
+    } catch {
+      // Silently ignore — no settings configured yet
+    }
+  }, [user])
+
   const toggleChurchMode = useCallback(() => {
     if (isActive) {
       sendToChurch({ type: 'CLEAR' })
@@ -63,9 +88,11 @@ export function useChurchMode(): UseChurchModeReturn {
         setChurchWindow(newWindow)
         setIsActive(true)
         localStorage.setItem('bv_modo_igreja_ativo', 'true')
+        // Give the new tab ~1.5s to initialize before sending settings
+        setTimeout(() => sendSettings(), 1500)
       }
     }
-  }, [isActive])
+  }, [isActive, sendSettings])
 
   const toggleAutoSend = useCallback(() => {
     setAutoSend(prev => {
@@ -91,7 +118,7 @@ export function useChurchMode(): UseChurchModeReturn {
       const updated = [...prev, verse]
 
       if (autoSend && isActive) {
-        sendToChurch({ type: 'VERSES', verses: updated, autoSend })
+        sendToChurch({ type: 'VERSES', verses: [verse], autoSend })
       }
 
       return updated
