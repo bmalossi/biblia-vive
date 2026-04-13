@@ -206,8 +206,12 @@ const es: TranslationDict = {
     "highlight.purple": "Morado",
     "highlight.remove": "Eliminar resaltado",
 
-    // Study meaning key (Sprint 6 bugfix)
-    "study.meaning": "Significado",
+   // Study meaning key (Sprint 6 bugfix)
+   "study.meaning": "Significado",
+
+   // Terms Page
+   "terms.title": "Términos de Uso – Bibliavive",
+   "terms.desc": "Términos de uso de Bibliavive - plataforma de estudio bíblico digital",
 };
 
 export default es;

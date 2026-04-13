@@ -206,8 +206,12 @@ const en: TranslationDict = {
     "highlight.purple": "Purple",
     "highlight.remove": "Remove highlight",
 
-    // Study meaning key (Sprint 6 bugfix)
-    "study.meaning": "Meaning",
+   // Study meaning key (Sprint 6 bugfix)
+   "study.meaning": "Meaning",
+
+   // Terms Page
+   "terms.title": "Terms of Use – Bibliavive",
+   "terms.desc": "Terms of use for Bibliavive - digital Bible study platform",
 };
 
 export default en;

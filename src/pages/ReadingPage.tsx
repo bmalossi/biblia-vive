@@ -1614,6 +1614,17 @@ export default function ReadingPage() {
             data={cardModalData}
           />
         )}
+
+        {isStudyPanelOpen && studyVerse && selectedBook && (
+          <StudyPanel
+            bookId={selectedBook.id}
+            chapter={chapterNumber}
+            verse={studyVerse}
+            verseText={studyVerseText}
+            version={selectedVersion}
+            onClose={() => setIsStudyPanelOpen(false)}
+          />
+        )}
       </div>
     </Layout>
   );

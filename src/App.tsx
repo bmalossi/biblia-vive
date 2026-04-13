@@ -6,6 +6,7 @@ import InstallPrompt from "@/components/InstallPrompt";
 import { ToastViewport } from "@/components/Toast";
 import { Loader2 } from "lucide-react";
 import HomePage from "./pages/HomePage";
+import TermsPage from "./pages/TermsPage";
 
 const BookPage = lazy(() => import("./pages/BookPage"));
 const ReadingPage = lazy(() => import("./pages/ReadingPage"));
@@ -49,9 +50,10 @@ const App = () => (
             <Route path="/pro" element={<PricingPage />} />
             <Route path="/widget/daily" element={<WidgetDailyVerse />} />
             <Route path="/church-display" element={<ChurchDisplayPage />} />
-            <Route path="/conta" element={<AccountPage />} />
-            <Route path="/sobre" element={<AboutPage />} />
-            <Route path="*" element={<NotFoundPage />} />
+<Route path="/conta" element={<AccountPage />} />
+<Route path="/sobre" element={<AboutPage />} />
+<Route path="/termos-de-uso" element={<TermsPage />} />
+<Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

@@ -206,8 +206,12 @@ const ptBR: TranslationDict = {
   "highlight.purple": "Roxo",
   "highlight.remove": "Remover destaque",
 
-  // Study meaning key (Sprint 6 bugfix)
-  "study.meaning": "Significado",
+   // Study meaning key (Sprint 6 bugfix)
+   "study.meaning": "Significado",
+
+   // Terms Page
+   "terms.title": "Termos de Uso – Bibliavive",
+   "terms.desc": "Termos de uso do Bibliavive - plataforma de estudo bíblico digital",
 };
 
 export default ptBR;

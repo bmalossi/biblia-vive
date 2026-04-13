@@ -51,7 +51,7 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
               <h4 className="text-app-text font-medium mb-4 uppercase tracking-wider text-xs">Páginas Legais</h4>
               <ul className="space-y-3">
                 <li><Link to="/sobre" className="text-sm text-app-text-muted hover:text-gold transition-colors">Licenças de Tradução</Link></li>
-                <li><span className="text-sm text-app-text-muted opacity-50">Termos de Uso</span></li>
+                <li><Link to="/termos-de-uso" className="text-sm text-app-text-muted hover:text-gold transition-colors">Termos de Uso</Link></li>
               </ul>
             </div>
           </div>

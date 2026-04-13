@@ -39,6 +39,7 @@ export function useSubscription() {
                     .maybeSingle();
 
                 if (error || !data) {
+                    if (error) console.error("[useSubscription] Error fetching subscription:", error);
                     setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
                 } else {
                     setSubscription(data as SubscriptionData);
