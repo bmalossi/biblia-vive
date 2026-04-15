@@ -1,8 +1,16 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
+
+// Instala o Chrome automaticamente se não estiver disponível (ex.: Vercel CI)
+try {
+    execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
+} catch (e) {
+    console.log('[prerender] Aviso: não foi possível instalar o Chrome automaticamente:', e.message);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

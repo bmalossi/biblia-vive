@@ -30,6 +30,7 @@ import {
     type VerseHighlightFull,
     type HighlightColor,
 } from '@/lib/notesHighlights';
+import { findBookById } from '@/lib/books';
 import NoteModal from '@/components/NoteModal';
 import AuthModal from '@/components/AuthModal';
 
@@ -129,7 +130,9 @@ export default function MyStudyPage() {
     }
 
     function navigateToVerse(version: string, bookId: string, chapter: number) {
-        navigate(`/${version || 'acf'}/${bookId}/${chapter}`);
+        const bookObj = findBookById(bookId);
+        const slug = bookObj?.slug || bookId.toLowerCase();
+        navigate(`/${version || 'acf'}/${slug}/${chapter}`);
     }
 
     // ── Tab change resets book filter ──
@@ -186,22 +189,20 @@ export default function MyStudyPage() {
                 <button
                     type="button"
                     onClick={() => handleTabChange('notes')}
-                    className={`px-4 py-2 text-[0.82rem] font-medium transition-colors border-b-2 -mb-px ${
-                        activeTab === 'notes'
-                            ? 'border-gold text-gold'
-                            : 'border-transparent text-app-text-muted hover:text-app-text'
-                    }`}
+                    className={`px-4 py-2 text-[0.82rem] font-medium transition-colors border-b-2 -mb-px ${activeTab === 'notes'
+                        ? 'border-gold text-gold'
+                        : 'border-transparent text-app-text-muted hover:text-app-text'
+                        }`}
                 >
                     {t('myStudy.tabNotes')}
                 </button>
                 <button
                     type="button"
                     onClick={() => handleTabChange('highlights')}
-                    className={`px-4 py-2 text-[0.82rem] font-medium transition-colors border-b-2 -mb-px ${
-                        activeTab === 'highlights'
-                            ? 'border-gold text-gold'
-                            : 'border-transparent text-app-text-muted hover:text-app-text'
-                    }`}
+                    className={`px-4 py-2 text-[0.82rem] font-medium transition-colors border-b-2 -mb-px ${activeTab === 'highlights'
+                        ? 'border-gold text-gold'
+                        : 'border-transparent text-app-text-muted hover:text-app-text'
+                        }`}
                 >
                     {t('myStudy.tabHighlights')}
                 </button>
@@ -284,11 +285,10 @@ export default function MyStudyPage() {
                             aria-label={`Filtrar por ${COLOR_LABEL[color]}`}
                             aria-pressed={filterColor === color}
                             onClick={() => setFilterColor(prev => prev === color ? null : color)}
-                            className={`w-5 h-5 rounded-full border-2 transition-all hover:scale-110 ${
-                                filterColor === color
-                                    ? 'border-app-text scale-110 shadow'
-                                    : 'border-transparent'
-                            }`}
+                            className={`w-5 h-5 rounded-full border-2 transition-all hover:scale-110 ${filterColor === color
+                                ? 'border-app-text scale-110 shadow'
+                                : 'border-transparent'
+                                }`}
                             style={{ backgroundColor: COLOR_HEX[color] }}
                         />
                     ))}
