@@ -109,6 +109,33 @@ describe('Notes & Highlights Service (Dual-Mode)', () => {
             const notes = await getChapterNotes(null, 'GEN', 1);
             expect(notes).toHaveLength(0);
         });
+
+        it('should isolate notes from different chapters (cross-chapter isolation)', async () => {
+            await saveNote(null, {
+                bookId: 'GEN',
+                bookName: 'Gênesis',
+                chapter: 1,
+                verse: 1,
+                content: 'Nota do capítulo 1',
+                version: 'acf',
+                verseText: 'No princípio...',
+            });
+            await saveNote(null, {
+                bookId: 'GEN',
+                bookName: 'Gênesis',
+                chapter: 2,
+                verse: 1,
+                content: 'Nota do capítulo 2',
+                version: 'acf',
+                verseText: 'Assim os céus...',
+            });
+            const ch1 = await getChapterNotes(null, 'GEN', 1);
+            const ch2 = await getChapterNotes(null, 'GEN', 2);
+            expect(ch1).toHaveLength(1);
+            expect(ch1[0].content).toBe('Nota do capítulo 1');
+            expect(ch2).toHaveLength(1);
+            expect(ch2[0].content).toBe('Nota do capítulo 2');
+        });
     });
 
     describe('Logged-in Mode (Supabase)', () => {

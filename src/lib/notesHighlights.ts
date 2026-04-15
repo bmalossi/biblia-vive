@@ -12,6 +12,18 @@ export interface VerseHighlight {
     color: HighlightColor;
 }
 
+export interface VerseHighlightFull {
+    id: string;
+    bookId: string;
+    bookName: string;
+    chapter: number;
+    verse: number;
+    color: HighlightColor;
+    version: string;
+    verseText: string;
+    createdAt: string;
+}
+
 export interface VerseNote {
     id: string;
     bookId: string;
@@ -81,11 +93,21 @@ export async function setHighlight(
     bookId: string,
     chapter: number,
     verse: number,
-    color: HighlightColor
+    color: HighlightColor,
+    meta?: { bookName?: string; version?: string; verseText?: string }
 ): Promise<void> {
     if (userId) {
         await supabase.from('user_highlights').upsert(
-            { user_id: userId, book_id: bookId, chapter, verse, color },
+            {
+                user_id: userId,
+                book_id: bookId,
+                chapter,
+                verse,
+                color,
+                book_name: meta?.bookName,
+                version: meta?.version,
+                verse_text: meta?.verseText,
+            },
             { onConflict: 'user_id,book_id,chapter,verse' }
         );
         return;
@@ -113,6 +135,53 @@ export async function removeHighlight(
     const all = readLocalHighlights();
     delete all[hlKey(bookId, chapter, verse)];
     writeLocalHighlights(all);
+}
+
+// ── HIGHLIGHTS GLOBAL ─────────────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapHighlightRow(row: any): VerseHighlightFull {
+    return {
+        id: row.id,
+        bookId: row.book_id,
+        bookName: row.book_name ?? row.book_id,
+        chapter: row.chapter,
+        verse: row.verse,
+        color: row.color as HighlightColor,
+        version: row.version ?? '',
+        verseText: row.verse_text ?? '',
+        createdAt: row.created_at,
+    };
+}
+
+export async function getAllHighlights(userId: string | null): Promise<VerseHighlightFull[]> {
+    if (userId) {
+        const { data } = await supabase
+            .from('user_highlights')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+        return (data ?? []).map(mapHighlightRow);
+    }
+    // Anônimo: lê localStorage, reconstrói estrutura
+    const all = readLocalHighlights();
+    return Object.entries(all).map(([key, color]) => {
+        const parts = key.split('.');
+        const bookId = parts.slice(0, -2).join('.');
+        const chapter = parseInt(parts[parts.length - 2]);
+        const verse = parseInt(parts[parts.length - 1]);
+        return {
+            id: key,
+            bookId,
+            bookName: bookId, // sem metadados no localStorage; fallback
+            chapter,
+            verse,
+            color,
+            version: '',
+            verseText: '',
+            createdAt: new Date().toISOString(),
+        };
+    }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 // ── NOTES ─────────────────────────────────────────────────────────────────────
@@ -154,19 +223,72 @@ export async function saveNote(
     note: Omit<VerseNote, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<void> {
     if (userId) {
-        await supabase.from('user_notes').upsert(
-            {
-                user_id: userId,
-                book_id: note.bookId,
-                chapter: note.chapter,
-                verse: note.verse,
-                content: note.content,
-                book_name: note.bookName,
-                version: note.version,
-                verse_text: note.verseText,
-            },
-            { onConflict: 'user_id,book_id,chapter,verse' }
-        );
+        // Check if note already exists for this verse
+        const { data: existing, error: selectError } = await supabase
+            .from('user_notes')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('book_id', note.bookId)
+            .eq('chapter', note.chapter)
+            .eq('verse', note.verse)
+            .maybeSingle();
+
+        if (selectError) throw new Error(selectError.message);
+
+        if (existing) {
+            // Update existing note — try with optional fields first
+            const { error: updateError } = await supabase
+                .from('user_notes')
+                .update({
+                    content: note.content,
+                    book_name: note.bookName,
+                    version: note.version,
+                    verse_text: note.verseText,
+                })
+                .eq('id', existing.id);
+
+            if (updateError) {
+                // Fallback: update only the required content field
+                const { error: fallbackError } = await supabase
+                    .from('user_notes')
+                    .update({ content: note.content })
+                    .eq('id', existing.id);
+                if (fallbackError) throw new Error(fallbackError.message);
+            }
+        } else {
+            // Compute verse_id in the format used by the DB: "BOOKID.CHAPTER.VERSE"
+            const verse_id = `${note.bookId.toUpperCase()}.${note.chapter}.${note.verse}`;
+
+            // Insert new note — try with all fields first
+            const { error: insertError } = await supabase
+                .from('user_notes')
+                .insert({
+                    user_id: userId,
+                    book_id: note.bookId,
+                    chapter: note.chapter,
+                    verse: note.verse,
+                    verse_id,
+                    content: note.content,
+                    book_name: note.bookName,
+                    version: note.version,
+                    verse_text: note.verseText,
+                });
+
+            if (insertError) {
+                // Fallback: insert only the core required fields
+                const { error: fallbackError } = await supabase
+                    .from('user_notes')
+                    .insert({
+                        user_id: userId,
+                        book_id: note.bookId,
+                        chapter: note.chapter,
+                        verse: note.verse,
+                        verse_id,
+                        content: note.content,
+                    });
+                if (fallbackError) throw new Error(fallbackError.message);
+            }
+        }
         return;
     }
     const notes = readLocalNotes();
@@ -221,8 +343,15 @@ export async function migrateLocalToSupabase(userId: string): Promise<void> {
     const notes = readLocalNotes();
     if (notes.length > 0) {
         const noteRows = notes.map(n => ({
-            user_id: userId, book_id: n.bookId, chapter: n.chapter, verse: n.verse,
-            content: n.content, book_name: n.bookName, version: n.version, verse_text: n.verseText,
+            user_id: userId,
+            book_id: n.bookId,
+            chapter: n.chapter,
+            verse: n.verse,
+            verse_id: `${n.bookId.toUpperCase()}.${n.chapter}.${n.verse}`,
+            content: n.content,
+            book_name: n.bookName,
+            version: n.version,
+            verse_text: n.verseText,
         }));
         await supabase.from('user_notes').upsert(noteRows, { onConflict: 'user_id,book_id,chapter,verse' });
         localStorage.removeItem(NT_KEY);

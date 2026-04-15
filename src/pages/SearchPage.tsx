@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchResultCard from "@/components/SearchResultCard";
 import { checkVerseExists, getFriendlyApiError, searchVerses, type Verse } from "@/lib/bibleApi";
 import { BOOK_ALIASES, normalizeBookAlias } from "@/lib/bookAliases";
-import { ALL_BOOKS, findBookById, type Book } from "@/lib/books";
+import { ALL_BOOKS, findBookById, findBookBySlug, type Book } from "@/lib/books";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
 import { getVersion, isBibleVersion } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
@@ -98,6 +98,8 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Verse[]>([]);
   const [reloadToken, setReloadToken] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const { t } = useTranslation();
 
   const parsedReference = useMemo(() => parseReference(query), [query]);
@@ -187,6 +189,7 @@ export default function SearchPage() {
   useEffect(() => {
     setQuery(queryParam);
     setMode(modeParam);
+    setCurrentPage(1);
   }, [modeParam, queryParam]);
 
   useEffect(() => {
@@ -202,7 +205,7 @@ export default function SearchPage() {
       setLoading(true);
       setError(null);
 
-      searchVerses(selectedVersion, queryParam, 20, controller.signal)
+      searchVerses(selectedVersion, queryParam, 1000, controller.signal)
         .then((data) => {
           setResults(data);
         })
@@ -251,13 +254,19 @@ export default function SearchPage() {
 
   const getResultRoute = (verse: Verse) => {
     const [bookId, chapterId] = (verse.chapterId || "").split(".");
-    const matchedBook = findBookById(bookId);
+    const matchedBook = findBookBySlug(bookId) || findBookById(bookId);
     const chapter = chapterId || "1";
     const verseNumber = verse.reference.match(/:(\d+)/)?.[1] ?? "1";
     return `/${selectedVersion}/${matchedBook?.slug ?? "gn"}/${chapter}#v${verseNumber}`;
   };
 
   const memoizedResults = useMemo(() => results, [results]);
+  const totalPages = Math.ceil(memoizedResults.length / pageSize);
+  const paginatedResults = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return memoizedResults.slice(startIndex, startIndex + pageSize);
+  }, [memoizedResults, currentPage, pageSize]);
+
   const hasQuery = Boolean(queryParam.trim());
 
   usePageMeta({
@@ -476,9 +485,59 @@ export default function SearchPage() {
                   {results.length === 1 ? t("search.resultCount") : t("search.resultsCount", { count: results.length })}
                 </p>
               </div>
-              {memoizedResults.map((verse) => (
-                <SearchResultCard key={verse.id} onNavigate={() => navigate(getResultRoute(verse))} query={queryParam} verse={verse} />
+              {paginatedResults.map((verse) => (
+                <SearchResultCard key={verse.id} route={getResultRoute(verse)} query={queryParam} verse={verse} />
               ))}
+
+              {results.length > 0 && (
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border pt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-app-text-muted">Resultados por página:</span>
+                    <select
+                      className="bg-app-raised border border-border text-app-text text-sm rounded-md px-2 py-1 outline-none focus:border-gold"
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setCurrentPage(p => Math.max(1, p - 1));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      disabled={currentPage === 1}
+                    >
+                      Anterior
+                    </Button>
+                    <span className="text-xs text-app-text-muted">
+                      Página {currentPage} de {totalPages || 1}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setCurrentPage(p => Math.min(totalPages, p + 1));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      disabled={currentPage >= totalPages}
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

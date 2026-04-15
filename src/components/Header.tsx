@@ -202,7 +202,7 @@ export default function Header() {
                 className="h-9 rounded-full border-border bg-app-surface pl-9 w-full"
                 onChange={(event) => setQuery(event.target.value)}
                 onFocus={openSearch}
-                placeholder="Buscar ( / )"
+                placeholder="Buscar capitulo, versículo ou tema..."
                 ref={inputRef}
                 role="combobox"
                 value={query}
@@ -309,7 +309,7 @@ export default function Header() {
             {user ? (
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <span className="hidden xl:block text-xs text-app-text-muted max-w-[100px] truncate mr-1">
-                  {user.email?.split("@")[0]}
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
                 </span>
                 <NavLink
                   to="/conta"

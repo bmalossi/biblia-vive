@@ -38,11 +38,11 @@ export default function PricingPage() {
                         Bíblia Vive Pro
                     </h2>
                     <h1 className="font-serif text-4xl sm:text-5xl text-app-text mb-6">
-                        Experimente a Palavra com <br className="hidden sm:block" />
-                        <span className="italic text-gold">Profundidade Inédita</span>
+                        Apoie o Projeto e <br className="hidden sm:block" />
+                        <span className="italic text-gold">Espalhe a Palavra</span>
                     </h1>
                     <p className="text-lg text-app-text-muted">
-                        Eleve seu estudo bíblico com ferramentas criadas para transformar a forma como você lê, escuta e interage com as Escrituras.
+                        Sua assinatura ajuda a sustentar o Bíblia Vive, avançar com novas missões e espalhar a Palavra de Deus. Como agradecimento, você desbloqueia comentários teológicos profundos e ferramentas avançadas de estudo.
                     </p>
                 </div>
 
@@ -65,17 +65,17 @@ export default function PricingPage() {
                         </div>
 
                         <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
-                            Acesso a todas as ferramentas cristãs focadas no seu estudo pessoal e devoção.
+                            Ajude a manter o projeto no ar, impulsione missões futuras e, em retorno, acesse ferramentas cristãs para o seu aprofundamento pessoal e devoção.
                         </p>
 
                         <ul className="space-y-4 mb-8">
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Acesso a narrações em áudio realista</span>
+                                <span>Acesso aos Comentários Teológicos Históricos</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Consultas e Pesquisas Teológicas Ilimitadas</span>
+                                <span>Acesso a narrações em áudio realista</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
@@ -194,9 +194,9 @@ export default function PricingPage() {
                                 <Sparkles className="h-5 w-5 text-violet-400" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Análise Teológica Ilimitada</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Comentários Teológicos Históricos</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Sem limites de mensagens diárias. Discuta teologia, contexto histórico e aplicações práticas de cada versículo profundamente com o seu assistente de estudo 24/7.
+                                    Tenha acesso direto a extrações ricas e completas de grandes comentaristas e teólogos históricos (ex: Spurgeon, Matthew Henry, Calvino) para um aprofundamento muito maior da Palavra através do painel de estudo.
                                 </p>
                             </div>
                         </div>

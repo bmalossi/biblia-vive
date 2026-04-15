@@ -205,7 +205,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
             });
 
             setLocalCommentary(JSON.stringify(commentaries));
-            toast({ message: "Comentários gerados com sucesso!", type: "success" });
+            toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
         } catch (err: any) {
             console.error(err);
             toast({ message: "Erro ao gerar comentários: " + err.message, type: "error" });

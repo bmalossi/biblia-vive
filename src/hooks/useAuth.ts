@@ -23,23 +23,25 @@ export function useAuth() {
 
         // Listen to auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event, session) => {
+            async (event, session) => {
                 const nextUser = session?.user ?? null;
                 const prevUser = user;
 
                 setUser(nextUser);
                 setLoading(false);
 
-                // Migrate localStorage data if user just signed in
+                if (event === 'TOKEN_REFRESHED' && nextUser) {
+                    try {
+                        const { data } = await supabase.auth.getUser();
+                        if (data.user) setUser(data.user);
+                    } catch { /* ignore */ }
+                }
+
                 if (!prevUser && nextUser) {
                     try {
-                        // Migrate notes & highlights (Sprint 7)
                         await migrateLocalToSupabase(nextUser.id);
-                        // Migrate reading plan progress (Sprint 12)
                         await migrateLocalPlanToSupabase(nextUser.id);
-                    } catch {
-                        // Non-fatal: migration can be retried
-                    }
+                    } catch { /* non-fatal */ }
                 }
             }
         );

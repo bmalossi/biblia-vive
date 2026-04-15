@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type ToastType = "success" | "info" | "error";
+export type ToastType = "success" | "info" | "error" | "prompt";
 
 export interface ToastInput {
   actionLabel?: string;
@@ -41,7 +41,9 @@ export const toast = ({ type = "info", duration = DEFAULT_DURATION, ...payload }
   toastState = [...toastState, item].slice(-MAX_TOASTS);
   emit();
 
-  window.setTimeout(() => dismissToast(item.id), duration);
+  if (duration !== Infinity) {
+    window.setTimeout(() => dismissToast(item.id), duration);
+  }
   return item.id;
 };
 

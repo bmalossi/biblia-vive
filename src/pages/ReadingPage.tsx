@@ -714,19 +714,24 @@ export default function ReadingPage() {
   };
 
   const handleCopy = useCallback(async () => {
-    if (!selectedVerse) return;
+    if (!selectedVerse || !selectedBook) return;
     await copyVerse({
+      chapter: chapterNumber,
+      pathname: location.pathname,
       reference: selectedVerse.reference,
       text: selectedVerse.text,
+      verseNumber: selectedVerse.verseNumber,
       version: selectedVerse.version
     });
-  }, [selectedVerse, copyVerse]);
+  }, [selectedVerse, copyVerse, chapterNumber, location.pathname, selectedBook]);
 
   const handleStudy = () => {
     if (!selectedVerse) return;
     setStudyVerse(Number(selectedVerse.verseNumber));
     setStudyVerseText(selectedVerse.text);
-    setIsStudyPanelOpen((prev) => !prev);
+    // Always open (never toggle-close) so clicking "Estudar" for a new verse
+    // while the panel is already open does not accidentally close it.
+    setIsStudyPanelOpen(true);
   };
 
   const handleChapterCommentary = async () => {
@@ -752,6 +757,7 @@ export default function ReadingPage() {
         language: String(locale).startsWith("pt") ? "pt" : "en",
       });
       setCachedChapterCommentary(JSON.stringify(commentaries));
+      toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
       setTimeout(() => {
         document.getElementById('chapter-commentary-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -956,7 +962,7 @@ export default function ReadingPage() {
                   </div>
                 </div>
               )}
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <Breadcrumb>
                   <BreadcrumbList className="leading-none">
                     <BreadcrumbItem>
@@ -1021,128 +1027,128 @@ export default function ReadingPage() {
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>
-              </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="hidden items-center gap-2 rounded-full border border-border bg-app-surface px-3 py-1 sm:flex">
-                  <Label className="text-xs text-app-text-muted" htmlFor="compare-toggle-inline">
-                    {t("reading.compare")}
-                  </Label>
-                  <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
-                  {compareEnabled && (
-                    <>
-                      <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
-                        <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
-                            <SelectItem key={item} value={item}>
-                              {item.toUpperCase()}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
-                        <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
-                          Difs
-                        </Label>
-                        <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
-                      </div>
-                    </>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <div className="hidden items-center gap-3 flex-shrink-0 rounded-md h-10 border border-border bg-app-surface px-4 sm:flex">
+                    <Label className="text-xs text-app-text-muted cursor-pointer font-medium" htmlFor="compare-toggle-inline">
+                      {t("reading.compare")}
+                    </Label>
+                    <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
+                    {compareEnabled && (
+                      <>
+                        <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
+                          <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
+                              <SelectItem key={item} value={item}>
+                                {item.toUpperCase()}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
+                          <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
+                            Difs
+                          </Label>
+                          <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <AudioPlayer
+                    text={chapterVerses.map(v => v.text).join(" ")}
+                    slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
+                  />
+
+                  <Button
+                    aria-label={t("reading.toggleFocusMode")}
+                    onClick={() => updatePreference("focusMode", !preferences.focusMode)}
+                    size="icon"
+                    type="button"
+                    variant="outline"
+                  >
+                    {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </Button>
+
+                  {notes.length > 0 && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          aria-label="Baixar Notas do Capítulo (PDF)"
+                          size="icon"
+                          type="button"
+                          variant="outline"
+                          title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
+                          className="text-gold border-gold/40 hover:bg-gold/10"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-app-text-muted">
+                            {isPro
+                              ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
+                              : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mt-4">
+                          <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
+                          {isPro ? (
+                            <AlertDialogAction
+                              onClick={() => exportNotesToPDF(notes, true)}
+                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                            >
+                              Sim, Baixar PDF
+                            </AlertDialogAction>
+                          ) : (
+                            <AlertDialogAction
+                              onClick={() => navigate("/pro")}
+                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                            >
+                              Conhecer Premium
+                            </AlertDialogAction>
+                          )}
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
+
+                  <Button
+                    aria-label={churchMode.isActive ? "Desativar Modo Igreja" : "Ativar Modo Igreja"}
+                    title={churchMode.isActive ? "Desativar Modo Igreja" : isTemplo ? "Modo Igreja — projeta versículos em outra aba" : "Modo Igreja (Exclusivo Plano Templo)"}
+                    onClick={() => {
+                      if (isTemplo) {
+                        churchMode.toggleChurchMode();
+                      } else {
+                        navigate('/pro');
+                      }
+                    }}
+                    size="icon"
+                    type="button"
+                    variant="outline"
+                    className={churchMode.isActive ? "border-gold/50 text-gold bg-gold-bg/20 shadow-gold-glow" : !isTemplo ? "opacity-60" : ""}
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    aria-label={t("reading.openSettings")}
+                    className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
+                    onClick={() => setIsSettingsOpen(true)}
+                    size="icon"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
                 </div>
-
-                <AudioPlayer
-                  text={chapterVerses.map(v => v.text).join(" ")}
-                  slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
-                />
-
-                <Button
-                  aria-label={t("reading.toggleFocusMode")}
-                  onClick={() => updatePreference("focusMode", !preferences.focusMode)}
-                  size="icon"
-                  type="button"
-                  variant="outline"
-                >
-                  {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </Button>
-
-                {notes.length > 0 && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        aria-label="Baixar Notas do Capítulo (PDF)"
-                        size="icon"
-                        type="button"
-                        variant="outline"
-                        title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
-                        className="text-gold border-gold/40 hover:bg-gold/10"
-                      >
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-app-text-muted">
-                          {isPro
-                            ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
-                            : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="mt-4">
-                        <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
-                        {isPro ? (
-                          <AlertDialogAction
-                            onClick={() => exportNotesToPDF(notes, true)}
-                            className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                          >
-                            Sim, Baixar PDF
-                          </AlertDialogAction>
-                        ) : (
-                          <AlertDialogAction
-                            onClick={() => navigate("/pro")}
-                            className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                          >
-                            Conhecer Premium
-                          </AlertDialogAction>
-                        )}
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-
-                <Button
-                  aria-label={churchMode.isActive ? "Desativar Modo Igreja" : "Ativar Modo Igreja"}
-                  title={churchMode.isActive ? "Desativar Modo Igreja" : isTemplo ? "Modo Igreja — projeta versículos em outra aba" : "Modo Igreja (Exclusivo Plano Templo)"}
-                  onClick={() => {
-                    if (isTemplo) {
-                      churchMode.toggleChurchMode();
-                    } else {
-                      navigate('/pro');
-                    }
-                  }}
-                  size="icon"
-                  type="button"
-                  variant="outline"
-                  className={churchMode.isActive ? "border-gold/50 text-gold bg-gold-bg/20 shadow-gold-glow" : !isTemplo ? "opacity-60" : ""}
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
-
-                <Button
-                  aria-label={t("reading.openSettings")}
-                  className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
-                  onClick={() => setIsSettingsOpen(true)}
-                  size="icon"
-                  type="button"
-                  variant="outline"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
               </div>
             </section>
 
@@ -1556,7 +1562,7 @@ export default function ReadingPage() {
           existingNote={selectedVerse ? getNoteForVerse(Number(selectedVerse.verseNumber)) : null}
           onSave={(content) => {
             if (!selectedVerse || !selectedBook) return;
-            void saveNote({
+            saveNote({
               bookId: selectedBook.id,
               bookName: selectedBook.name,
               chapter: chapterNumber,
@@ -1564,6 +1570,10 @@ export default function ReadingPage() {
               content,
               version: selectedVersion,
               verseText: selectedVerse.text,
+            }).then(({ error }) => {
+              if (error) {
+                toast({ message: `Erro ao salvar anotação: ${error}`, type: 'error' });
+              }
             });
           }}
           onDelete={() => {

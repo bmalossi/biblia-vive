@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAllStudyData } from "@/hooks/useAllStudyData";
+import { toast } from "@/hooks/useToast";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { Loader2, CheckCircle, AlertTriangle, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload } from "lucide-react";
+import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen } from "lucide-react";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -27,9 +29,9 @@ function formatDate(iso: string | null) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function SectionCard({ icon, title, children, id }: { icon: React.ReactNode; title: string; children: React.ReactNode; id?: string }) {
     return (
-        <div className="bg-app-surface border border-border rounded-2xl p-6 space-y-5">
+        <div id={id} className="bg-app-surface border border-border rounded-2xl p-6 space-y-5 scroll-mt-24">
             <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-app-raised flex items-center justify-center text-gold">
                     {icon}
@@ -56,12 +58,12 @@ export default function AccountPage() {
     const navigate = useNavigate();
     const { user, loading: authLoading, signOut } = useAuth();
     const { subscription, isPro, isTemplo, isAdmin, loading: subLoading, checkout, cancelSubscription } = useSubscription();
+    const { stats, loading: studyLoading } = useAllStudyData();
 
     // ── Personal Data ──
     const [name, setName] = useState(user?.user_metadata?.full_name ?? "");
     const [email, setEmail] = useState(user?.email ?? "");
     const [personalSaving, setPersonalSaving] = useState(false);
-    const [personalMsg, setPersonalMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
     // ── Password ──
     const [currentPw, setCurrentPw] = useState("");
@@ -69,20 +71,18 @@ export default function AccountPage() {
     const [confirmPw, setConfirmPw] = useState("");
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [pwSaving, setPwSaving] = useState(false);
-    const [pwMsg, setPwMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
     // ── Subscription ──
     const [subSaving, setSubSaving] = useState(false);
-    const [subMsg, setSubMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [showConfirmCancel, setShowConfirmCancel] = useState(false);
 
     // ── Church Settings ──
     const [churchName, setChurchName] = useState("");
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
     const [churchSaving, setChurchSaving] = useState(false);
-    const [churchMsg, setChurchMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [logoUploading, setLogoUploading] = useState(false);
     const logoInputRef = useRef<HTMLInputElement>(null);
+    const [activeTab, setActiveTab] = useState<string>("dados");
 
     useEffect(() => {
         if (!user) return;
@@ -137,13 +137,12 @@ export default function AccountPage() {
 
     const handleSaveName = async () => {
         setPersonalSaving(true);
-        setPersonalMsg(null);
         try {
             const { error } = await supabase.auth.updateUser({ data: { full_name: name.trim() } });
             if (error) throw error;
-            setPersonalMsg({ type: "success", text: "Nome atualizado com sucesso!" });
+            toast({ message: "Nome atualizado com sucesso!", type: "success" });
         } catch (err: any) {
-            setPersonalMsg({ type: "error", text: err.message || "Erro ao atualizar nome." });
+            toast({ message: err.message || "Erro ao atualizar nome.", type: "error" });
         } finally {
             setPersonalSaving(false);
         }
@@ -151,54 +150,51 @@ export default function AccountPage() {
 
     const handleSaveEmail = async () => {
         if (!email.includes("@")) {
-            setPersonalMsg({ type: "error", text: "Formato de e-mail inválido." });
+            toast({ message: "Formato de e-mail inválido.", type: "error" });
             return;
         }
         setPersonalSaving(true);
-        setPersonalMsg(null);
         try {
             const { error } = await supabase.auth.updateUser({ email: email.trim() });
             if (error) throw error;
-            setPersonalMsg({ type: "success", text: "Um e-mail de confirmação foi enviado para o novo endereço." });
+            toast({ message: "Um e-mail de confirmação foi enviado para o novo endereço.", type: "success" });
         } catch (err: any) {
-            setPersonalMsg({ type: "error", text: err.message || "Erro ao atualizar e-mail." });
+            toast({ message: err.message || "Erro ao atualizar e-mail.", type: "error" });
         } finally {
             setPersonalSaving(false);
         }
     };
 
     const handleChangePassword = async () => {
-        setPwMsg(null);
         if (newPw.length < 8) {
-            setPwMsg({ type: "error", text: "A nova senha deve ter ao menos 8 caracteres." });
+            toast({ message: "A nova senha deve ter ao menos 8 caracteres.", type: "error" });
             return;
         }
         if (!/[0-9]/.test(newPw)) {
-            setPwMsg({ type: "error", text: "A nova senha deve conter ao menos um número." });
+            toast({ message: "A nova senha deve conter ao menos um número.", type: "error" });
             return;
         }
         if (newPw !== confirmPw) {
-            setPwMsg({ type: "error", text: "As senhas não coincidem." });
+            toast({ message: "As senhas não coincidem.", type: "error" });
             return;
         }
 
         setPwSaving(true);
         try {
-            // Verify current password first
             const { error: signInError } = await supabase.auth.signInWithPassword({
                 email: user.email!,
                 password: currentPw,
             });
             if (signInError) {
-                setPwMsg({ type: "error", text: "Senha atual incorreta." });
+                toast({ message: "Senha atual incorreta.", type: "error" });
                 return;
             }
             const { error } = await supabase.auth.updateUser({ password: newPw });
             if (error) throw error;
             setCurrentPw(""); setNewPw(""); setConfirmPw("");
-            setPwMsg({ type: "success", text: "Senha alterada com sucesso!" });
+            toast({ message: "Senha alterada com sucesso!", type: "success" });
         } catch (err: any) {
-            setPwMsg({ type: "error", text: err.message || "Erro ao alterar senha." });
+            toast({ message: err.message || "Erro ao alterar senha.", type: "error" });
         } finally {
             setPwSaving(false);
         }
@@ -207,12 +203,11 @@ export default function AccountPage() {
     const handleCancelSubscription = async () => {
         setShowConfirmCancel(false);
         setSubSaving(true);
-        setSubMsg(null);
         try {
             await cancelSubscription();
-            setSubMsg({ type: "success", text: "Assinatura cancelada. Você mantém acesso até o fim do período pago." });
+            toast({ message: "Assinatura cancelada. Você mantém acesso até o fim do período pago.", type: "success" });
         } catch (err: any) {
-            setSubMsg({ type: "error", text: err.message || "Erro ao cancelar assinatura." });
+            toast({ message: err.message || "Erro ao cancelar assinatura.", type: "error" });
         } finally {
             setSubSaving(false);
         }
@@ -236,288 +231,352 @@ export default function AccountPage() {
                     <p className="text-sm text-app-text-muted mt-1">Gerencie seus dados e assinatura</p>
                 </div>
 
-                {/* ── Personal Data ── */}
-                <SectionCard icon={<User className="h-4 w-4" />} title="Dados Pessoais">
-                    <div className="space-y-3">
-                        <div className="space-y-1">
-                            <label className="text-xs text-app-text-muted font-medium">Nome completo</label>
-                            <div className="flex gap-2">
-                                <Input
-                                    value={name}
-                                    onChange={e => setName(e.target.value)}
-                                    placeholder="Seu nome"
-                                    className="flex-1 bg-app-raised border-border"
-                                />
-                                <button
-                                    onClick={handleSaveName}
-                                    disabled={personalSaving}
-                                    className="px-4 py-2 text-xs font-medium bg-gold text-app-bg rounded-lg hover:bg-gold/90 disabled:opacity-50 flex items-center gap-1.5 transition-colors"
-                                >
-                                    {personalSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Salvar"}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-xs text-app-text-muted font-medium">E-mail</label>
-                            <div className="flex gap-2">
-                                <Input
-                                    type="email"
-                                    value={email}
-                                    onChange={e => setEmail(e.target.value)}
-                                    placeholder="seu@email.com"
-                                    className="flex-1 bg-app-raised border-border"
-                                />
-                                <button
-                                    onClick={handleSaveEmail}
-                                    disabled={personalSaving || email === user.email}
-                                    className="px-4 py-2 text-xs font-medium bg-gold text-app-bg rounded-lg hover:bg-gold/90 disabled:opacity-50 flex items-center gap-1.5 transition-colors"
-                                >
-                                    {personalSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Salvar"}
-                                </button>
-                            </div>
-                        </div>
-
-                        {personalMsg && <Alert type={personalMsg.type} message={personalMsg.text} />}
+                {/* ── Quick Navigation ── */}
+                <nav className="sticky top-20 z-30 -mx-4 px-4 py-3 bg-app-bg/80 backdrop-blur-md border-b border-border sm:mx-0 sm:px-0 sm:rounded-xl sm:border sm:top-24">
+                    <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                        {[
+                            { id: "dados", label: "Dados", icon: <User className="h-3 w-3" /> },
+                            { id: "seguranca", label: "Segurança", icon: <Lock className="h-3 w-3" /> },
+                            { id: "plano", label: "Plano", icon: <CreditCard className="h-3 w-3" /> },
+                            ...(isTemploActive ? [{ id: "igreja", label: "Modo Igreja", icon: <Monitor className="h-3 w-3" /> }] : []),
+                            { id: "estudo", label: "Estudo", icon: <BookOpen className="h-3 w-3" /> }
+                        ].map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => setActiveTab(item.id)}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border active:scale-95 whitespace-nowrap ${activeTab === item.id
+                                    ? "bg-gold text-app-bg border-gold shadow-sm"
+                                    : "text-app-text-muted border-transparent hover:text-gold hover:bg-gold/5 hover:border-gold/20"
+                                    }`}
+                            >
+                                {item.icon}
+                                {item.label}
+                            </button>
+                        ))}
                     </div>
-                </SectionCard>
+                </nav>
 
-                {/* ── Security ── */}
-                <SectionCard icon={<Lock className="h-4 w-4" />} title="Segurança">
-                    <div className="space-y-3">
-                        <div className="space-y-1">
-                            <label className="text-xs text-app-text-muted font-medium">Senha atual</label>
-                            <Input
-                                type="password"
-                                value={currentPw}
-                                onChange={e => setCurrentPw(e.target.value)}
-                                placeholder="••••••••"
-                                className="bg-app-raised border-border"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-xs text-app-text-muted font-medium">Nova senha</label>
-                            <Input
-                                type="password"
-                                value={newPw}
-                                onChange={e => setNewPw(e.target.value)}
-                                placeholder="••••••••"
-                                className="bg-app-raised border-border"
-                            />
-                            {newPw.length > 0 && (
-                                <div className="flex items-center gap-2 mt-1">
-                                    <div className="flex gap-1 flex-1">
-                                        {[1, 2, 3, 4].map(i => (
-                                            <div
-                                                key={i}
-                                                className={`h-1 flex-1 rounded-full transition-colors ${i <= strength.score ? strength.color : "bg-app-raised"}`}
-                                            />
-                                        ))}
-                                    </div>
-                                    <span className="text-xs text-app-text-muted">{strength.label}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-xs text-app-text-muted font-medium">Confirmar nova senha</label>
-                            <Input
-                                type="password"
-                                value={confirmPw}
-                                onChange={e => setConfirmPw(e.target.value)}
-                                placeholder="••••••••"
-                                className="bg-app-raised border-border"
-                            />
-                        </div>
-
-                        {pwMsg && <Alert type={pwMsg.type} message={pwMsg.text} />}
-
-                        <button
-                            onClick={handleChangePassword}
-                            disabled={pwSaving || !currentPw || !newPw || !confirmPw}
-                            className="w-full py-2.5 text-sm font-medium bg-app-raised hover:bg-app-surface border border-border rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-                        >
-                            {pwSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                            Alterar Senha
-                        </button>
-                    </div>
-                </SectionCard>
-
-                {/* ── Subscription ── */}
-                <SectionCard icon={<CreditCard className="h-4 w-4" />} title="Gestão de Plano">
-                    {subLoading ? (
-                        <div className="flex items-center gap-2 text-sm text-app-text-muted">
-                            <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {/* Status display */}
-                            {isActive && !isCancelingAtEnd && (
-                                <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gold/10 to-gold/5 border border-gold/20">
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <Crown className="h-4 w-4 text-gold" />
-                                            <span className="font-semibold text-gold text-sm">
-                                                {isLocalAdmin ? "Acesso Total (Admin)" : isTemploActive ? "Plano Templo" : "Plano PRO"}
-                                            </span>
-                                        </div>
-                                        <p className="text-xs text-app-text-muted mt-1">
-                                            {isLocalAdmin ? "Acesso Premium Vitalício" : `Renova em ${formatDate(subscription?.current_period_end ?? null)}`}
-                                        </p>
-                                    </div>
-                                    <span className="px-2.5 py-1 text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20 rounded-full">Ativo</span>
-                                </div>
-                            )}
-
-                            {isCancelingAtEnd && (
-                                <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                                        <span className="text-sm font-medium text-yellow-400">Cancelamento agendado</span>
-                                    </div>
-                                    <p className="text-xs text-app-text-muted">Você mantém acesso PRO até <strong>{formatDate(subscription?.current_period_end ?? null)}</strong>.</p>
-                                </div>
-                            )}
-
-                            {(isCanceled || subscription?.status === "none" || (!isActive && !isCanceled)) && !isCancelingAtEnd && (
-                                <div className="p-4 rounded-xl bg-app-raised border border-border">
-                                    <p className="text-sm text-app-text-muted">
-                                        {isCanceled ? "Sua assinatura PRO foi cancelada." : "Você ainda não tem uma assinatura PRO."}
-                                    </p>
-                                </div>
-                            )}
-
-                            {subMsg && <Alert type={subMsg.type} message={subMsg.text} />}
-
-                            {/* Actions */}
-                            {!isActive && (
-                                <button
-                                    onClick={() => checkout("pro")}
-                                    disabled={subSaving}
-                                    className="w-full py-3 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-                                >
-                                    <Crown className="h-4 w-4" />
-                                    {isCanceled ? "Retomar Assinatura PRO" : "Assinar PRO"}
-                                </button>
-                            )}
-
-                            {isActive && !isCancelingAtEnd && !isLocalAdmin && (
-                                <button
-                                    onClick={() => setShowConfirmCancel(true)}
-                                    disabled={subSaving}
-                                    className="w-full py-2.5 text-sm text-app-text-muted border border-border rounded-xl hover:bg-red-500/5 hover:text-red-400 hover:border-red-500/20 disabled:opacity-50 transition-colors"
-                                >
-                                    Cancelar assinatura
-                                </button>
-                            )}
-
-                            {isCancelingAtEnd && (
-                                <button
-                                    onClick={() => checkout("pro")}
-                                    className="w-full py-3 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 flex items-center justify-center gap-2 transition-colors"
-                                >
-                                    <Crown className="h-4 w-4" />
-                                    Retomar Assinatura PRO
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </SectionCard>
-
-                {/* Church Mode Settings — Templo only */}
-                {isTemplo && (
-                    <SectionCard icon={<Monitor className="h-4 w-4" />} title="Modo Igreja — Configurações do Telão">
-                        <p className="text-xs text-app-text-muted -mt-2">Personalize a tela de espera que aparece no telão antes de projetar.</p>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs text-app-text-muted mb-1.5">Nome da Igreja</label>
-                                <Input
-                                    value={churchName}
-                                    onChange={(e) => setChurchName(e.target.value)}
-                                    placeholder="Ex: Igreja Batista Central"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs text-app-text-muted mb-1.5">Logotipo da Igreja</label>
-                                {logoUrl && (
-                                    <div className="mb-3 flex items-center gap-3">
-                                        <img src={logoUrl} alt="Logo atual" className="h-14 w-auto object-contain rounded border border-border" />
+                <div className="relative min-h-[400px]">
+                    {/* ── Personal Data ── */}
+                    <div className={`transition-all duration-300 ${activeTab === 'dados' ? 'opacity-100 translate-y-0' : 'hidden opacity-0 translate-y-4'}`}>
+                        <SectionCard id="dados" icon={<User className="h-4 w-4" />} title="Dados Pessoais">
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs text-app-text-muted font-medium">Nome completo</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            value={name}
+                                            onChange={e => setName(e.target.value)}
+                                            placeholder="Seu nome"
+                                            className="flex-1 bg-app-raised border-border"
+                                        />
                                         <button
-                                            type="button"
-                                            onClick={() => setLogoUrl(null)}
-                                            className="text-xs text-red-400 hover:underline"
+                                            onClick={handleSaveName}
+                                            disabled={personalSaving}
+                                            className="px-4 py-2 text-xs font-medium bg-gold text-app-bg rounded-lg hover:bg-gold/90 disabled:opacity-50 flex items-center gap-1.5 transition-colors"
                                         >
-                                            Remover logo
+                                            {personalSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Salvar"}
                                         </button>
                                     </div>
-                                )}
-                                <input
-                                    ref={logoInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={async (e) => {
-                                        const file = e.target.files?.[0];
-                                        if (!file || !user) return;
-                                        setLogoUploading(true);
-                                        try {
-                                            const ext = file.name.split('.').pop();
-                                            const path = `${user.id}/logo.${ext}`;
-                                            const { error: upErr } = await supabase.storage
-                                                .from('church-logos')
-                                                .upload(path, file, { upsert: true });
-                                            if (upErr) throw upErr;
-                                            const { data: urlData } = supabase.storage
-                                                .from('church-logos')
-                                                .getPublicUrl(path);
-                                            setLogoUrl(urlData.publicUrl + '?t=' + Date.now());
-                                        } catch (err: any) {
-                                            setChurchMsg({ type: 'error', text: 'Erro ao enviar logo: ' + err.message });
-                                        } finally {
-                                            setLogoUploading(false);
-                                        }
-                                    }}
-                                />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs text-app-text-muted font-medium">E-mail</label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="email"
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            placeholder="seu@email.com"
+                                            className="flex-1 bg-app-raised border-border"
+                                        />
+                                        <button
+                                            onClick={handleSaveEmail}
+                                            disabled={personalSaving || email === user.email}
+                                            className="px-4 py-2 text-xs font-medium bg-gold text-app-bg rounded-lg hover:bg-gold/90 disabled:opacity-50 flex items-center gap-1.5 transition-colors"
+                                        >
+                                            {personalSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Salvar"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </SectionCard>
+                    </div>
+
+                    {/* ── Security ── */}
+                    <div className={`transition-all duration-300 ${activeTab === 'seguranca' ? 'opacity-100 translate-y-0' : 'hidden opacity-0 translate-y-4'}`}>
+                        <SectionCard id="seguranca" icon={<Lock className="h-4 w-4" />} title="Segurança">
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <label className="text-xs text-app-text-muted font-medium">Senha atual</label>
+                                    <Input
+                                        type="password"
+                                        value={currentPw}
+                                        onChange={e => setCurrentPw(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="bg-app-raised border-border"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs text-app-text-muted font-medium">Nova senha</label>
+                                    <Input
+                                        type="password"
+                                        value={newPw}
+                                        onChange={e => setNewPw(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="bg-app-raised border-border"
+                                    />
+                                    {newPw.length > 0 && (
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <div className="flex gap-1 flex-1">
+                                                {[1, 2, 3, 4].map(i => (
+                                                    <div
+                                                        key={i}
+                                                        className={`h-1 flex-1 rounded-full transition-colors ${i <= strength.score ? strength.color : "bg-app-raised"}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <span className="text-xs text-app-text-muted">{strength.label}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs text-app-text-muted font-medium">Confirmar nova senha</label>
+                                    <Input
+                                        type="password"
+                                        value={confirmPw}
+                                        onChange={e => setConfirmPw(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="bg-app-raised border-border"
+                                    />
+                                </div>
+
                                 <button
-                                    type="button"
-                                    onClick={() => logoInputRef.current?.click()}
-                                    disabled={logoUploading}
-                                    className="flex items-center gap-2 text-sm border border-dashed border-border rounded-xl px-4 py-3 w-full hover:bg-app-raised transition-colors text-app-text-muted"
+                                    onClick={handleChangePassword}
+                                    disabled={pwSaving || !currentPw || !newPw || !confirmPw}
+                                    className="w-full py-2.5 text-sm font-medium bg-app-raised hover:bg-app-surface border border-border rounded-lg disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                                 >
-                                    {logoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                    {logoUploading ? 'Enviando...' : logoUrl ? 'Trocar logo' : 'Enviar logo (PNG, SVG ou JPG)'}
+                                    {pwSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                                    Alterar Senha
                                 </button>
                             </div>
+                        </SectionCard>
+                    </div>
 
-                            {churchMsg && <Alert type={churchMsg.type} message={churchMsg.text} />}
+                    {/* ── Subscription ── */}
+                    <div className={`transition-all duration-300 ${activeTab === 'plano' ? 'opacity-100 translate-y-0' : 'hidden opacity-0 translate-y-4'}`}>
+                        <SectionCard id="plano" icon={<CreditCard className="h-4 w-4" />} title="Gestão de Plano">
+                            {subLoading ? (
+                                <div className="flex items-center gap-2 text-sm text-app-text-muted">
+                                    <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {/* Status display */}
+                                    {isActive && !isCancelingAtEnd && (
+                                        <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gold/10 to-gold/5 border border-gold/20">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <Crown className="h-4 w-4 text-gold" />
+                                                    <span className="font-semibold text-gold text-sm">
+                                                        {isLocalAdmin ? "Acesso Total (Admin)" : isTemploActive ? "Plano Templo" : "Plano PRO"}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-app-text-muted mt-1">
+                                                    {isLocalAdmin ? "Acesso Premium Vitalício" : `Renova em ${formatDate(subscription?.current_period_end ?? null)}`}
+                                                </p>
+                                            </div>
+                                            <span className="px-2.5 py-1 text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20 rounded-full">Ativo</span>
+                                        </div>
+                                    )}
 
-                            <button
-                                type="button"
-                                onClick={async () => {
-                                    if (!user) return;
-                                    setChurchSaving(true);
-                                    setChurchMsg(null);
-                                    try {
-                                        const { error } = await supabase
-                                            .from('church_settings')
-                                            .upsert({ user_id: user.id, church_name: churchName, logo_url: logoUrl }, { onConflict: 'user_id' });
-                                        if (error) throw error;
-                                        setChurchMsg({ type: 'success', text: 'Configurações salvas!' });
-                                    } catch (err: any) {
-                                        setChurchMsg({ type: 'error', text: err.message });
-                                    } finally {
-                                        setChurchSaving(false);
-                                    }
-                                }}
-                                disabled={churchSaving}
-                                className="w-full py-2.5 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-                            >
-                                {churchSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Salvar configurações'}
-                            </button>
+                                    {isCancelingAtEnd && (
+                                        <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                                                <span className="text-sm font-medium text-yellow-400">Cancelamento agendado</span>
+                                            </div>
+                                            <p className="text-xs text-app-text-muted">Você mantém acesso PRO até <strong>{formatDate(subscription?.current_period_end ?? null)}</strong>.</p>
+                                        </div>
+                                    )}
+
+                                    {(isCanceled || subscription?.status === "none" || (!isActive && !isCanceled)) && !isCancelingAtEnd && (
+                                        <div className="p-4 rounded-xl bg-app-raised border border-border">
+                                            <p className="text-sm text-app-text-muted">
+                                                {isCanceled ? "Sua assinatura PRO foi cancelada." : "Você ainda não tem uma assinatura PRO."}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Actions */}
+                                    {!isActive && (
+                                        <button
+                                            onClick={() => checkout("pro")}
+                                            disabled={subSaving}
+                                            className="w-full py-3 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                                        >
+                                            <Crown className="h-4 w-4" />
+                                            {isCanceled ? "Retomar Assinatura PRO" : "Assinar PRO"}
+                                        </button>
+                                    )}
+
+                                    {isActive && !isCancelingAtEnd && !isLocalAdmin && (
+                                        <button
+                                            onClick={() => setShowConfirmCancel(true)}
+                                            disabled={subSaving}
+                                            className="w-full py-2.5 text-sm text-app-text-muted border border-border rounded-xl hover:bg-red-500/5 hover:text-red-400 hover:border-red-500/20 disabled:opacity-50 transition-colors"
+                                        >
+                                            Cancelar assinatura
+                                        </button>
+                                    )}
+
+                                    {isCancelingAtEnd && (
+                                        <button
+                                            onClick={() => checkout("pro")}
+                                            className="w-full py-3 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 flex items-center justify-center gap-2 transition-colors"
+                                        >
+                                            <Crown className="h-4 w-4" />
+                                            Retomar Assinatura PRO
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </SectionCard>
+                    </div>
+
+                    {/* Church Mode Settings — Templo only */}
+                    {isTemplo && (
+                        <div className={`transition-all duration-300 ${activeTab === 'igreja' ? 'opacity-100 translate-y-0' : 'hidden opacity-0 translate-y-4'}`}>
+                            <SectionCard id="igreja" icon={<Monitor className="h-4 w-4" />} title="Modo Igreja — Configurações do Telão">
+                                <p className="text-xs text-app-text-muted -mt-2">Personalize a tela de espera que aparece no telão antes de projetar.</p>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1.5">Nome da Igreja</label>
+                                        <Input
+                                            value={churchName}
+                                            onChange={(e) => setChurchName(e.target.value)}
+                                            placeholder="Ex: Igreja Batista Central"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1.5">Logotipo da Igreja</label>
+                                        {logoUrl && (
+                                            <div className="mb-3 flex items-center gap-3">
+                                                <img src={logoUrl} alt="Logo atual" className="h-14 w-auto object-contain rounded border border-border" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setLogoUrl(null)}
+                                                    className="text-xs text-red-400 hover:underline"
+                                                >
+                                                    Remover logo
+                                                </button>
+                                            </div>
+                                        )}
+                                        <input
+                                            ref={logoInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file || !user) return;
+                                                setLogoUploading(true);
+                                                try {
+                                                    const ext = file.name.split('.').pop();
+                                                    const path = `${user.id}/logo.${ext}`;
+                                                    const { error: upErr } = await supabase.storage
+                                                        .from('church-logos')
+                                                        .upload(path, file, { upsert: true });
+                                                    if (upErr) throw upErr;
+                                                    const { data: urlData } = supabase.storage
+                                                        .from('church-logos')
+                                                        .getPublicUrl(path);
+                                                    setLogoUrl(urlData.publicUrl + '?t=' + Date.now());
+                                                } catch (err: any) {
+                                                    toast({ message: 'Erro ao enviar logo: ' + err.message, type: 'error' });
+                                                } finally {
+                                                    setLogoUploading(false);
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => logoInputRef.current?.click()}
+                                            disabled={logoUploading}
+                                            className="flex items-center gap-2 text-sm border border-dashed border-border rounded-xl px-4 py-3 w-full hover:bg-app-raised transition-colors text-app-text-muted"
+                                        >
+                                            {logoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                            {logoUploading ? 'Enviando...' : logoUrl ? 'Trocar logo' : 'Enviar logo (PNG, SVG ou JPG)'}
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (!user) return;
+                                            setChurchSaving(true);
+                                            try {
+                                                const { error } = await supabase
+                                                    .from('church_settings')
+                                                    .upsert({ user_id: user.id, church_name: churchName, logo_url: logoUrl }, { onConflict: 'user_id' });
+                                                if (error) throw error;
+                                                toast({ message: 'Configurações salvas!', type: 'success' });
+                                            } catch (err: any) {
+                                                toast({ message: err.message, type: 'error' });
+                                            } finally {
+                                                setChurchSaving(false);
+                                            }
+                                        }}
+                                        disabled={churchSaving}
+                                        className="w-full py-2.5 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                                    >
+                                        {churchSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Salvar configurações'}
+                                    </button>
+                                </div>
+                            </SectionCard>
                         </div>
-                    </SectionCard>
-                )}
+                    )}
+
+                    {/* ── My Study ── */}
+                    <div className={`transition-all duration-300 ${activeTab === 'estudo' ? 'opacity-100 translate-y-0' : 'hidden opacity-0 translate-y-4'}`}>
+                        <SectionCard id="estudo" icon={<BookOpen className="h-4 w-4" />} title="Meu Estudo">
+                            {studyLoading ? (
+                                <div className="flex items-center gap-2 text-sm text-app-text-muted">
+                                    <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
+                                </div>
+                            ) : stats.totalNotes === 0 && stats.totalHighlights === 0 ? (
+                                <div className="space-y-3">
+                                    <p className="text-sm text-app-text-muted">
+                                        Comece a anotar seus versículos favoritos.
+                                    </p>
+                                    <button
+                                        onClick={() => navigate('/meu-estudo')}
+                                        className="text-[0.78rem] text-gold hover:text-gold/80 transition-colors"
+                                    >
+                                        Ver painel de estudo →
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <p className="text-sm text-app-text-muted">
+                                        <span className="font-medium text-app-text">{stats.totalNotes}</span> anotações ·{' '}
+                                        <span className="font-medium text-app-text">{stats.totalHighlights}</span> destaques em{' '}
+                                        <span className="font-medium text-app-text">{stats.booksCount}</span>{' '}
+                                        {stats.booksCount === 1 ? 'livro bíblico' : 'livros bíblicos'}
+                                    </p>
+                                    <button
+                                        onClick={() => navigate('/meu-estudo')}
+                                        className="text-[0.78rem] text-gold hover:text-gold/80 transition-colors"
+                                    >
+                                        Ver painel de estudo →
+                                    </button>
+                                </div>
+                            )}
+                        </SectionCard>
+                    </div>
+                </div>
 
                 {/* Danger Zone */}
                 <div className="pt-2">

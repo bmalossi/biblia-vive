@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { findBookById } from "@/lib/books";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { memo, useMemo } from "react";
 
 interface SearchResultCardProps {
-  onNavigate: () => void;
+  route: string;
   query: string;
   verse: {
     bookId: string;
@@ -36,7 +37,8 @@ const highlightText = (text: string, query: string) => {
   );
 };
 
-function SearchResultCardComponent({ verse, query, onNavigate }: SearchResultCardProps) {
+
+function SearchResultCardComponent({ verse, query, route }: SearchResultCardProps) {
   const cleanedContent = useMemo(() => cleanText(verse.content), [verse.content]);
   const [bookId, chapterId] = (verse.chapterId || "").split(".");
   const verseNumber = verse.reference.match(/:(\d+)/)?.[1] ?? "1";
@@ -44,21 +46,20 @@ function SearchResultCardComponent({ verse, query, onNavigate }: SearchResultCar
   const matchedBook = findBookById(bookId || verse.bookId);
 
   return (
-    <button
-      className="group block w-full rounded-xl border border-border bg-app-surface p-4 text-left transition-colors hover:border-gold hover:bg-app-raised"
-      onClick={onNavigate}
-      type="button"
+    <Link
+      to={route}
+      className="group block w-full rounded-xl border border-border bg-app-surface p-4 text-left transition-colors hover:border-gold hover:bg-app-raised cursor-pointer"
     >
       <p className="font-mono text-[0.68rem] uppercase tracking-[0.08em] text-gold">
         {matchedBook?.name ?? verse.reference.split(" ")[0]} {chapterNumber} · versículo {verseNumber}
       </p>
       <p className="mt-2 font-serif text-base leading-relaxed text-app-text">{highlightText(cleanedContent, query)}</p>
       <div className="mt-3 flex justify-end">
-        <Button className="h-8 px-3" size="sm" type="button" variant="ghost">
-          Ler capítulo <ArrowRight className="h-3.5 w-3.5" />
-        </Button>
+        <div className="inline-flex h-8 items-center justify-center rounded-md px-3 text-sm font-medium text-app-text hover:bg-accent hover:text-accent-foreground">
+          Ler capítulo <ArrowRight className="ml-2 h-3.5 w-3.5" />
+        </div>
       </div>
-    </button>
+    </Link>
   );
 }
 

@@ -212,6 +212,14 @@ const ptBR: TranslationDict = {
    // Terms Page
    "terms.title": "Termos de Uso – Bibliavive",
    "terms.desc": "Termos de uso do Bibliavive - plataforma de estudo bíblico digital",
+
+   // My Study Panel (Sprint 14)
+   "myStudy.title": "Meu Estudo",
+   "myStudy.tabNotes": "Anotações",
+   "myStudy.tabHighlights": "Destaques",
+   "myStudy.emptyHighlights": "Nenhum destaque ainda.",
+   "myStudy.goToVerse": "Ir ao versículo",
+   "myStudy.removeHighlight": "Remover",
 };
 
 export default ptBR;

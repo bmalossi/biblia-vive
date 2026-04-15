@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/lib/supabase";
-import { useNavigate } from "react-router-dom";
-import { Play, Pause, Loader2, Crown } from "lucide-react";
+import { Play, Pause, Loader2 } from "lucide-react";
 
 interface AudioPlayerProps {
     text: string;
@@ -11,10 +8,6 @@ interface AudioPlayerProps {
 }
 
 export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
-    const { isPro, loading: proLoading } = useSubscription();
-    const { user } = useAuth();
-    const navigate = useNavigate();
-
     const [isPlaying, setIsPlaying] = useState(false);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const [isFetching, setIsFetching] = useState(false);
@@ -83,12 +76,6 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
     }, [text, slug]);
 
     const handlePlayPause = async () => {
-        // Require login to play
-        if (!user) {
-            navigate("/pro");
-            return;
-        }
-
         if (isPlaying) {
             if (audioRef.current) {
                 audioRef.current.pause();
@@ -111,48 +98,21 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
         await fetchAndPlay();
     };
 
-    if (proLoading) {
-        return <div className="animate-pulse h-12 bg-app-raised rounded-xl" />;
-    }
-
     return (
-        <div className="bg-app-raised/50 border border-border rounded-xl p-4 flex items-center gap-4">
-            <button
-                onClick={handlePlayPause}
-                disabled={isFetching}
-                className={`h-12 w-12 flex-shrink-0 flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 ${isPro ? "bg-gold text-app-bg shadow-lg shadow-gold/20" : "bg-app-surface border border-gold/30 text-gold"
-                    }`}
-            >
-                {isFetching ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                ) : isPlaying ? (
-                    <Pause className="h-5 w-5 fill-current" />
-                ) : (
-                    <Play className="h-5 w-5 fill-current ml-1" />
-                )}
-            </button>
-
-            <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-medium text-app-text">
-                        {isPro ? "Áudio Narrado" : "Áudio Narrado"}
-                    </h4>
-                    {!isPro && <Crown className="h-3.5 w-3.5 text-gold" />}
-                </div>
-                <p className="text-xs text-app-text-muted leading-relaxed">
-                    {isPro
-                        ? "Narração com qualidade."
-                        : "Ouça os versículos narrados assinando o plano PRO."}
-                </p>
-                {!isPro && (
-                    <button
-                        onClick={() => navigate("/pro")}
-                        className="text-[0.65rem] uppercase tracking-wider text-gold hover:underline mt-1 inline-block"
-                    >
-                        Desbloquear Acesso Pro
-                    </button>
-                )}
-            </div>
-        </div>
+        <button
+            onClick={handlePlayPause}
+            disabled={isFetching}
+            aria-label="Reproduzir Áudio Narrado"
+            title="Reproduzir Áudio Narrado"
+            className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-md border border-border bg-app-surface text-app-text transition-colors hover:bg-app-raised hover:text-gold"
+        >
+            {isFetching ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isPlaying ? (
+                <Pause className="h-4 w-4 fill-current" />
+            ) : (
+                <Play className="h-4 w-4 fill-current ml-0.5" />
+            )}
+        </button>
     );
 }

@@ -503,27 +503,15 @@ export async function searchLocalBible(
   };
 }
 
-export async function searchVerses(version: string, query: string, limit = 20, signal?: AbortSignal): Promise<Verse[]> {
-  // If we have an API key, try the remote search first as it's faster than scanning 66 JSONs sequentially
-  if (API_KEY) {
-    const bibleId = VERSION_IDS[version] ?? VERSION_IDS.acf;
-    try {
-      const payload = await requestApi<{ data?: { verses?: Verse[] } }>(
-        `/bibles/${bibleId}/search?query=${encodeURIComponent(query)}&limit=${limit}&sort=relevance`,
-        signal,
-      );
-      if (payload.data?.verses?.length) {
-        return payload.data.verses;
-      }
-    } catch (e) {
-      console.warn("Remote search failed, falling back to local:", e);
-    }
-  }
-
-  // Fallback to local search
+export async function searchVerses(version: string, query: string, limit = 100, signal?: AbortSignal): Promise<Verse[]> {
+  // NOTE: the external scripture.api.bible search is intentionally bypassed here.
+  // That API returns incomplete/biased results (e.g. only Matthew for "Jesus") and
+  // succeeds (HTTP 200), causing the local fallback to never run.
+  // The local scan covers all 66 books faithfully — it is the correct source.
   const localResult = await searchLocalBible(version, query, limit, signal);
   return localResult.verses;
 }
+
 
 export async function searchBible(version: string, query: string, limit = 20, signal?: AbortSignal): Promise<Verse[]> {
   return searchVerses(version, query, limit, signal);

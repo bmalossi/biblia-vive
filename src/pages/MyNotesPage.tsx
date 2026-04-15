@@ -12,6 +12,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import {
     getAllNotes,
     deleteNote,
+    saveNote,
     exportNotesToTXT,
     exportNotesToPDF,
     type VerseNote,
@@ -231,7 +232,9 @@ export default function MyNotesPage() {
                 existingNote={editNote}
                 onSave={(content) => {
                     if (!editNote) return;
-                    // Update in list optimistically
+                    // Persist to DB/localStorage
+                    void saveNote(user?.id ?? null, { ...editNote, content });
+                    // Optimistic UI update
                     setNotes(prev => prev.map(n => n.id === editNote.id ? { ...n, content, updatedAt: new Date().toISOString() } : n));
                 }}
                 onDelete={() => {

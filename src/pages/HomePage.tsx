@@ -86,8 +86,6 @@ export default function HomePage() {
 
 
 
-        <SearchBar />
-
         <div className="min-h-[104px]">
           {lastRead && !dismissed && lastReadBook && (
             <div className="animate-in fade-in-0 duration-500 delay-300 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
