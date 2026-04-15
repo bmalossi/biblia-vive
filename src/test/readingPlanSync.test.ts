@@ -36,6 +36,7 @@ const sampleProgress = {
     planId: 'bible-1-year',
     startDate: 1700000000000,
     completedDays: [1, 2, 3],
+    readRefs: ['pv/1', 'pv/2', 'pv/3'],
 };
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -57,6 +58,7 @@ describe('Reading Plan Cloud Sync', () => {
                     user_id: 'user-123',
                     plan_id: 'bible-1-year',
                     completed_days: [1, 2, 3],
+                    read_refs: ['pv/1', 'pv/2', 'pv/3'],
                 }),
                 { onConflict: 'user_id,plan_id' }
             );
@@ -82,6 +84,7 @@ describe('Reading Plan Cloud Sync', () => {
                     plan_id: 'bible-1-year',
                     start_date: 1700000000000,
                     completed_days: [1, 2, 3],
+                    read_refs: ['pv/1', 'pv/2'],
                 },
                 error: null,
             });
@@ -92,6 +95,7 @@ describe('Reading Plan Cloud Sync', () => {
                 planId: 'bible-1-year',
                 startDate: 1700000000000,
                 completedDays: [1, 2, 3],
+                readRefs: ['pv/1', 'pv/2'],
             });
         });
     });
@@ -99,7 +103,7 @@ describe('Reading Plan Cloud Sync', () => {
     // ── mergePlanProgress ─────────────────────────────────────────────────────
     describe('mergePlanProgress (Merge Automático - Opção A)', () => {
         it('should return cloud data when local is null', () => {
-            const cloud = { planId: 'nt-90', startDate: 1000, completedDays: [1, 2] };
+            const cloud = { planId: 'nt-90', startDate: 1000, completedDays: [1, 2], readRefs: [] };
             expect(mergePlanProgress(null, cloud)).toEqual(cloud);
         });
 
@@ -112,8 +116,8 @@ describe('Reading Plan Cloud Sync', () => {
         });
 
         it('should keep cloud planId and merge completed days from both', () => {
-            const local = { planId: 'bible-1-year', startDate: 1000, completedDays: [1, 2, 5] };
-            const cloud = { planId: 'bible-1-year', startDate: 2000, completedDays: [1, 3, 4] };
+            const local = { planId: 'bible-1-year', startDate: 1000, completedDays: [1, 2, 5], readRefs: [] };
+            const cloud = { planId: 'bible-1-year', startDate: 2000, completedDays: [1, 3, 4], readRefs: [] };
 
             const merged = mergePlanProgress(local, cloud);
 
@@ -124,10 +128,18 @@ describe('Reading Plan Cloud Sync', () => {
         });
 
         it('should use earliest startDate (to preserve streak)', () => {
-            const local = { planId: 'bible-1-year', startDate: 500, completedDays: [] };
-            const cloud = { planId: 'bible-1-year', startDate: 1000, completedDays: [] };
+            const local = { planId: 'bible-1-year', startDate: 500, completedDays: [], readRefs: [] };
+            const cloud = { planId: 'bible-1-year', startDate: 1000, completedDays: [], readRefs: [] };
             const merged = mergePlanProgress(local, cloud);
             expect(merged?.startDate).toBe(500);
+        });
+
+        it('should merge readRefs from local and cloud (union)', () => {
+            const local = { planId: 'bible-1-year', startDate: 1000, completedDays: [], readRefs: ['sl/1', 'sl/2'] };
+            const cloud = { planId: 'bible-1-year', startDate: 1000, completedDays: [], readRefs: ['sl/2', 'sl/3'] };
+            const merged = mergePlanProgress(local, cloud);
+            expect(merged?.readRefs).toEqual(expect.arrayContaining(['sl/1', 'sl/2', 'sl/3']));
+            expect(merged?.readRefs).toHaveLength(3);
         });
     });
 

@@ -1,15 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
-import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
 
-// Instala o Chrome automaticamente se não estiver disponível (ex.: Vercel CI)
-try {
-    execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
-} catch (e) {
-    console.log('[prerender] Aviso: não foi possível instalar o Chrome automaticamente:', e.message);
+if (process.env.VERCEL || process.env.VERCEL_ENV) {
+    console.log('[prerender] Ambiente Vercel detectado. Ignorando o script de prerender usando Puppeteer porque o Vercel não possui as bibliotecas do sistema (como libnspr4.so) necessárias para o Chrome durante o build.');
+    console.log('[prerender] O site continuará sendo gerado como um SPA normalmente (index.html).');
+    process.exit(0);
 }
 
 const __filename = fileURLToPath(import.meta.url);

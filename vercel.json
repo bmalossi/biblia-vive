@@ -1,5 +1,4 @@
 {
-    "installCommand": "npm install && npx puppeteer browsers install chrome",
     "functions": {
         "api/checkout.ts": {
             "maxDuration": 30

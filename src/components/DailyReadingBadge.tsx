@@ -1,12 +1,15 @@
 import { useTranslation } from "@/i18n";
 import { Link } from "react-router-dom";
-import { CheckCircle2, CalendarDays, ArrowRight, BookMarked } from "lucide-react";
+import { CheckCircle2, CalendarDays, ArrowRight, BookMarked, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DailyReadingBadgeProps {
     planName: string;
     todayDayIndex: number;
     isTodayCompleted: boolean;
+    isRefCompleted: boolean;
+    totalRefs: number;
+    completedRefs: number;
     onMarkComplete: () => void;
 }
 
@@ -14,10 +17,14 @@ export default function DailyReadingBadge({
     planName,
     todayDayIndex,
     isTodayCompleted,
+    isRefCompleted,
+    totalRefs,
+    completedRefs,
     onMarkComplete,
 }: DailyReadingBadgeProps) {
     const { t } = useTranslation();
 
+    // The whole day is completed
     if (isTodayCompleted) {
         return (
             <div className="mx-auto mt-16 mb-12 flex w-full max-w-lg flex-col items-center justify-center animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -32,7 +39,7 @@ export default function DailyReadingBadge({
                     </div>
 
                     <h4 className="font-serif text-2xl font-medium text-app-text mb-2">
-                        Leitura Concluída
+                        Leitura do dia concluída!
                     </h4>
 
                     <p className="font-sans text-sm text-app-text-muted mb-8 leading-relaxed max-w-[280px] mx-auto">
@@ -51,6 +58,34 @@ export default function DailyReadingBadge({
         );
     }
 
+    // This specific chapter is read, but there are more chapters today
+    if (isRefCompleted) {
+        return (
+            <div className="mx-auto mt-16 mb-12 flex w-full max-w-lg flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex flex-col sm:flex-row items-center gap-6 rounded-2xl border border-green-500/30 bg-green-500/5 px-6 py-6 text-center sm:text-left">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-500/10 text-green-600 ring-1 ring-green-500/20">
+                        <Check className="h-6 w-6" strokeWidth={2} />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                        <h4 className="font-serif text-lg font-medium text-app-text">
+                            Capítulo lido
+                        </h4>
+                        <p className="font-sans text-sm text-app-text-muted">
+                            {completedRefs} de {totalRefs} concluídos hoje no plano "{planName}".
+                        </p>
+                    </div>
+                    <Link
+                        to="/planos"
+                        className="shrink-0 rounded-full bg-app-text px-6 py-2.5 font-sans text-sm font-medium text-app-surface transition-transform hover:opacity-90 active:scale-95"
+                    >
+                        Continuar
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    // Not read yet
     return (
         <div className="mx-auto mt-16 mb-12 flex w-full max-w-lg flex-col animate-in fade-in duration-700">
             {/* Elegant Call to Action Card */}
@@ -63,7 +98,7 @@ export default function DailyReadingBadge({
 
                     <div className="flex-1 space-y-1">
                         <p className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.15em] text-gold/80">
-                            Plano • Dia {todayDayIndex}
+                            Plano • Dia {todayDayIndex} • {completedRefs} de {totalRefs}
                         </p>
                         <h4 className="font-serif text-lg font-medium text-app-text">
                             {planName}

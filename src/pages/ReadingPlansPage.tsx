@@ -1,28 +1,39 @@
+import { useState } from "react";
 import { useReadingPlan } from "@/hooks/useReadingPlan";
+import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n";
 import { getVersion } from "@/lib/themes";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
+import AuthModal from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
-import { Flame, Calendar, BookOpen, CheckCircle, ArrowRight, Play, Trophy } from "lucide-react";
+import {
+    Flame, Calendar, BookOpen, CheckCircle, ArrowRight,
+    Check, ChevronRight, Trophy, SkipForward,
+} from "lucide-react";
 
 export default function ReadingPlansPage() {
     const { t } = useTranslation();
-    const navigate = useNavigate();
+    const { user } = useAuth();
+
     const {
         plans,
         activePlan,
         isLoading,
         todayDayIndex,
         todayRefs,
+        todayReadRefs,
         isTodayCompleted,
         streak,
         progressPct,
         startPlan,
-        abandonPlan
-    } = useReadingPlan();
+        abandonPlan,
+        markRefRead,
+        advanceToNextDay,
+    } = useReadingPlan(user?.id ?? null);
 
     const currentVersion = getVersion();
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     if (isLoading) {
         return (
@@ -40,6 +51,7 @@ export default function ReadingPlansPage() {
         return { book, chap };
     };
 
+    // ─── Plan selection screen ─────────────────────────────────────────────
     if (!activePlan) {
         return (
             <Layout>
@@ -74,7 +86,13 @@ export default function ReadingPlansPage() {
                                 </div>
 
                                 <Button
-                                    onClick={() => startPlan(plan.id)}
+                                    onClick={() => {
+                                        if (!user) {
+                                            setShowAuthModal(true);
+                                        } else {
+                                            startPlan(plan.id);
+                                        }
+                                    }}
                                     className="w-full bg-gold hover:bg-gold-hover text-white shadow-md shadow-gold/20"
                                 >
                                     Iniciar Plano
@@ -83,11 +101,20 @@ export default function ReadingPlansPage() {
                         ))}
                     </div>
                 </div>
+
+                <AuthModal
+                    isOpen={showAuthModal}
+                    onClose={() => setShowAuthModal(false)}
+                    hint="Faça login ou crie uma conta para iniciar seu plano de leitura."
+                />
             </Layout>
         );
     }
 
-    // Dashboard for Active Plan
+    // ─── Active plan dashboard ─────────────────────────────────────────────
+    const completedCount = todayReadRefs.length;
+    const totalCount = todayRefs.length;
+
     return (
         <Layout>
             <div className="mx-auto max-w-3xl pt-4 pb-12">
@@ -142,6 +169,7 @@ export default function ReadingPlansPage() {
                 {todayDayIndex <= activePlan.totalDays ? (
                     <div className="mb-10 rounded-2xl border border-gold/30 bg-gold-bg/30 p-1">
                         <div className="rounded-xl bg-app-surface p-5 md:p-8">
+                            {/* Day header */}
                             <div className="mb-6 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold">
@@ -150,7 +178,9 @@ export default function ReadingPlansPage() {
                                     <div>
                                         <h4 className="font-bold text-app-text">Dia {todayDayIndex}</h4>
                                         <p className="text-sm text-app-text-muted">
-                                            {isTodayCompleted ? "Você já concluiu a leitura de hoje!" : "Capítulos programados para hoje:"}
+                                            {isTodayCompleted
+                                                ? "Você já concluiu a leitura de hoje!"
+                                                : `${completedCount} de ${totalCount} leitura${totalCount !== 1 ? "s" : ""} concluída${completedCount !== 1 ? "s" : ""}`}
                                         </p>
                                     </div>
                                 </div>
@@ -163,37 +193,99 @@ export default function ReadingPlansPage() {
                                 )}
                             </div>
 
+                            {/* Per-item reading list */}
                             <div className="space-y-3">
                                 {todayRefs.map((ref) => {
                                     const { book, chap } = parseRef(ref);
+                                    const isRead = todayReadRefs.includes(ref);
                                     return (
-                                        <Link
+                                        <div
                                             key={ref}
-                                            to={`/${currentVersion}/${book}/${chap}`}
-                                            className="group flex items-center justify-between rounded-xl border border-border bg-app-raised px-5 py-4 transition-colors hover:border-gold/50 hover:bg-gold-bg/20"
+                                            className={`flex items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isRead
+                                                    ? "border-green-500/30 bg-green-500/5"
+                                                    : "border-border bg-app-raised hover:border-gold/50 hover:bg-gold-bg/20"
+                                                }`}
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-app-surface shadow-sm text-gold">
-                                                    <Play className="h-3.5 w-3.5 ml-0.5" />
+                                            {/* Left: navigate to chapter */}
+                                            <Link
+                                                to={`/${currentVersion}/${book}/${chap}`}
+                                                className="group flex flex-1 items-center gap-3 min-w-0"
+                                            >
+                                                <div
+                                                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${isRead
+                                                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                                            : "bg-app-surface text-gold"
+                                                        }`}
+                                                >
+                                                    {isRead ? (
+                                                        <Check className="h-3.5 w-3.5" />
+                                                    ) : (
+                                                        <ChevronRight className="h-3.5 w-3.5" />
+                                                    )}
                                                 </div>
-                                                <span className="font-medium text-app-text uppercase font-mono tracking-wider text-sm">
+                                                <span
+                                                    className={`font-medium font-mono tracking-wider text-sm uppercase truncate ${isRead
+                                                            ? "text-app-text-muted line-through"
+                                                            : "text-app-text"
+                                                        }`}
+                                                >
                                                     {book} {chap}
                                                 </span>
-                                            </div>
-                                            <ArrowRight className="h-4 w-4 text-app-text-muted transition-transform group-hover:translate-x-1 group-hover:text-gold" />
-                                        </Link>
+                                                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-app-text-muted transition-transform group-hover:translate-x-1 group-hover:text-gold" />
+                                            </Link>
+
+                                            {/* Right: Mark as Read button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => markRefRead(ref)}
+                                                disabled={isRead}
+                                                aria-label={isRead ? `${book} ${chap} já lido` : `Marcar ${book} ${chap} como lido`}
+                                                title={isRead ? "Leitura já marcada" : "Marcar como lido"}
+                                                className={`ml-3 flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${isRead
+                                                        ? "cursor-default text-green-600 dark:text-green-400 bg-green-500/10"
+                                                        : "bg-gold/10 text-gold hover:bg-gold/20 active:scale-95"
+                                                    }`}
+                                            >
+                                                {isRead ? (
+                                                    <>
+                                                        <Check className="h-3.5 w-3.5" />
+                                                        <span className="hidden sm:inline">Lido</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Check className="h-3.5 w-3.5" />
+                                                        <span className="hidden sm:inline">Marcar como lido</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
                                     );
                                 })}
                             </div>
 
-                            <div className="mt-8 text-center pt-6 border-t border-border">
+                            {/* Bottom area */}
+                            <div className="mt-8 text-center pt-6 border-t border-border space-y-4">
                                 {isTodayCompleted ? (
-                                    <p className="text-sm text-app-text-muted font-medium">
-                                        Excelente trabalho! Volte amanhã para continuar sua jornada.
-                                    </p>
+                                    <>
+                                        <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                                            🎉 Excelente! Todas as leituras de hoje foram concluídas.
+                                        </p>
+                                        {todayDayIndex < activePlan.totalDays && (
+                                            <Button
+                                                onClick={advanceToNextDay}
+                                                variant="outline"
+                                                className="gap-2 border-gold/40 text-gold hover:bg-gold/10"
+                                            >
+                                                <SkipForward className="h-4 w-4" />
+                                                Avançar para o próximo dia
+                                            </Button>
+                                        )}
+                                    </>
                                 ) : (
                                     <p className="text-sm text-app-text-muted">
-                                        Comece a leitura por qualquer um dos capítulos acima. Quando você chegar ao final da página, poderá marcar a leitura de hoje como concluída.
+                                        Clique no capítulo para ler e depois em{" "}
+                                        <strong className="text-app-text">Marcar como lido</strong>{" "}
+                                        para registrar sua leitura. O dia será concluído após todas as leituras.
                                     </p>
                                 )}
                             </div>
@@ -210,13 +302,12 @@ export default function ReadingPlansPage() {
                 {/* Danger Zone */}
                 <div className="mt-16 flex justify-center">
                     <Button
-                        variant="ghost"
                         onClick={() => {
                             if (window.confirm("Tem certeza que deseja abandonar este plano? Todo o seu progresso será perdido.")) {
                                 abandonPlan();
                             }
                         }}
-                        className="text-red-500 hover:bg-red-500/10 hover:text-red-600"
+                        className="bg-red-000/10 border border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-100/20 hover:text-red-700 dark:hover:text-red-300 shadow-sm"
                     >
                         Abandonar Plano
                     </Button>

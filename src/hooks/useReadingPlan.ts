@@ -25,7 +25,10 @@ const STORAGE_KEY = "bv_plan_progress";
 function readLocal(): PlanProgress | null {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : null;
+        if (!stored) return null;
+        const raw = JSON.parse(stored);
+        // Backward-compat: legacy data may not have readRefs
+        return { readRefs: [], ...raw };
     } catch {
         return null;
     }
@@ -89,6 +92,11 @@ export function useReadingPlan(userId: string | null = null) {
 
     const todayDayIndex = getTodayDayIndex();
     const todayRefs = activePlan?.days.find((d) => d.day === todayDayIndex)?.refs ?? [];
+
+    // Which refs for today have been individually marked as read
+    const readRefs = progress?.readRefs ?? [];
+    const todayReadRefs = todayRefs.filter((r) => readRefs.includes(r));
+
     const isTodayCompleted = progress?.completedDays.includes(todayDayIndex) ?? false;
     const streak = progress?.completedDays.length ?? 0;
     const progressPct = activePlan
@@ -101,6 +109,7 @@ export function useReadingPlan(userId: string | null = null) {
             planId,
             startDate: Date.now(),
             completedDays: [],
+            readRefs: [],
         });
     }, []);
 
@@ -108,12 +117,51 @@ export function useReadingPlan(userId: string | null = null) {
         setProgress(null);
     }, []);
 
-    const markTodayComplete = useCallback(() => {
+    /**
+     * Marks a single ref (e.g. "sl/1") as read.
+     * Auto-completes the day only when ALL refs for today have been read.
+     */
+    const markRefRead = useCallback((ref: string) => {
         setProgress((prev) => {
-            if (!prev || prev.completedDays.includes(todayDayIndex)) return prev;
-            return { ...prev, completedDays: [...prev.completedDays, todayDayIndex] };
+            if (!prev) return prev;
+
+            // Prevent duplicate entries
+            if (prev.readRefs.includes(ref)) return prev;
+
+            const newReadRefs = [...prev.readRefs, ref];
+
+            // Check if every ref for today is now read
+            const plan = plans.find((p) => p.id === prev.planId);
+            const day = plan?.days.find((d) => d.day === todayDayIndex);
+            const allRead = day ? day.refs.every((r) => newReadRefs.includes(r)) : false;
+
+            const newCompletedDays =
+                allRead && !prev.completedDays.includes(todayDayIndex)
+                    ? [...prev.completedDays, todayDayIndex]
+                    : prev.completedDays;
+
+            return {
+                ...prev,
+                readRefs: newReadRefs,
+                completedDays: newCompletedDays,
+            };
         });
-    }, [todayDayIndex]);
+    }, [plans, todayDayIndex]);
+
+    /**
+     * Advances the plan to the next day manually by shifting startDate back 1 day.
+     * Only meaningful when the current day is already completed.
+     */
+    const advanceToNextDay = useCallback(() => {
+        setProgress((prev) => {
+            if (!prev) return prev;
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            return {
+                ...prev,
+                startDate: prev.startDate - ONE_DAY_MS,
+            };
+        });
+    }, []);
 
     return {
         plans,
@@ -122,11 +170,13 @@ export function useReadingPlan(userId: string | null = null) {
         isLoading,
         todayDayIndex,
         todayRefs,
+        todayReadRefs,
         isTodayCompleted,
         streak,
         progressPct,
         startPlan,
         abandonPlan,
-        markTodayComplete,
+        markRefRead,
+        advanceToNextDay,
     };
 }

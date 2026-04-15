@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// readingPlanSync.ts — Bíblia Viva · Sprint 12
-// Cloud Sync para Planos de Leitura com estratégia de Merge Automático
+// readingPlanSync.ts — Bíblia Viva · Sprint 14
+// Cloud Sync para Planos de Leitura com rastreamento individual por capítulo
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { supabase } from './supabase';
@@ -13,6 +13,7 @@ export interface PlanProgress {
     planId: string;
     startDate: number;        // Unix timestamp in ms
     completedDays: number[];
+    readRefs: string[];       // e.g. ["sl/1", "sl/2"] — refs read individually
 }
 
 // ── save ─────────────────────────────────────────────────────────────────────
@@ -36,6 +37,7 @@ export async function savePlanProgressToCloud(
                     plan_id: progress.planId,
                     start_date: progress.startDate,
                     completed_days: progress.completedDays,
+                    read_refs: progress.readRefs,
                     updated_at: new Date().toISOString(),
                 },
                 { onConflict: 'user_id,plan_id' }
@@ -59,7 +61,7 @@ export async function loadPlanProgressFromCloud(
     try {
         const { data, error } = await supabase
             .from('user_plan_progress')
-            .select('plan_id, start_date, completed_days')
+            .select('plan_id, start_date, completed_days, read_refs')
             .eq('user_id', userId)
             .single();
 
@@ -69,6 +71,7 @@ export async function loadPlanProgressFromCloud(
             planId: data.plan_id,
             startDate: data.start_date,
             completedDays: data.completed_days ?? [],
+            readRefs: data.read_refs ?? [],
         };
     } catch {
         return null;
@@ -81,7 +84,7 @@ export async function loadPlanProgressFromCloud(
  * Merge Automático (Opção A):
  * Combines local and cloud progress to produce the richest possible state.
  * - Uses earliest startDate to preserve streaks.
- * - Takes the union of all completedDays from both sources.
+ * - Takes the union of all completedDays and readRefs from both sources.
  * - If plans differ (e.g. user started a new plan on another device), cloud wins.
  */
 export function mergePlanProgress(
@@ -99,10 +102,15 @@ export function mergePlanProgress(
         new Set([...local.completedDays, ...cloud.completedDays])
     ).sort((a, b) => a - b);
 
+    const mergedRefs = Array.from(
+        new Set([...(local.readRefs ?? []), ...(cloud.readRefs ?? [])])
+    );
+
     return {
         planId: cloud.planId,
         startDate: Math.min(local.startDate, cloud.startDate),
         completedDays: mergedDays,
+        readRefs: mergedRefs,
     };
 }
 
@@ -118,7 +126,12 @@ export async function migrateLocalPlanToSupabase(userId: string): Promise<void> 
         const stored = localStorage.getItem(STORAGE_KEY);
         if (!stored) return;
 
-        const local: PlanProgress = JSON.parse(stored);
+        const raw = JSON.parse(stored);
+        // Ensure readRefs exists for legacy localStorage data
+        const local: PlanProgress = {
+            ...raw,
+            readRefs: raw.readRefs ?? [],
+        };
         await savePlanProgressToCloud(userId, local);
         localStorage.removeItem(STORAGE_KEY);
     } catch (err) {

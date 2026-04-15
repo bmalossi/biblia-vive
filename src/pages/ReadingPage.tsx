@@ -200,7 +200,7 @@ export default function ReadingPage() {
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
 
-  const { activePlan, todayDayIndex, todayRefs, isTodayCompleted, markTodayComplete } = useReadingPlan();
+  const { activePlan, todayDayIndex, todayRefs, todayReadRefs, isTodayCompleted, markRefRead } = useReadingPlan(user?.id ?? null);
 
   const currentRef = selectedBook ? `${selectedBook.slug}/${chapterNumber}` : "";
   const isPartOfTodayReading = activePlan && todayRefs.includes(currentRef);
@@ -1401,7 +1401,10 @@ export default function ReadingPage() {
                   planName={activePlan.name}
                   todayDayIndex={todayDayIndex}
                   isTodayCompleted={isTodayCompleted}
-                  onMarkComplete={markTodayComplete}
+                  isRefCompleted={todayReadRefs?.includes(currentRef) ?? false}
+                  totalRefs={todayRefs?.length ?? 0}
+                  completedRefs={todayReadRefs?.length ?? 0}
+                  onMarkComplete={() => markRefRead(currentRef)}
                 />
               )}
             </article>
