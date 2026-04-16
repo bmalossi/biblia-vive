@@ -55,7 +55,8 @@ function withSavedAt(response) {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
-  if (request.method !== "GET") return;
+  // Only handle HTTP/HTTPS — skip chrome-extension://, data:, etc.
+  if (request.method !== "GET" || (url.protocol !== "http:" && url.protocol !== "https:")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(

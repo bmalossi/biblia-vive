@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
+const TIMEOUT_MS = 5000;
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+            setTimeout(() => reject(new Error("timeout")), ms)
+        ),
+    ]);
+}
+
 export interface SubscriptionData {
     status:
     | "active"
@@ -32,11 +42,16 @@ export function useSubscription() {
         const fetchSubscription = async () => {
             try {
                 setLoading(true);
-                const { data, error } = await supabase
-                    .from("user_subscriptions")
-                    .select("status, current_period_end, plan_type")
-                    .eq("user_id", user.id)
-                    .maybeSingle();
+                const queryPromise = new Promise<{ data: SubscriptionData | null; error: unknown }>((resolve, reject) => {
+                    supabase
+                        .from("user_subscriptions")
+                        .select("status, current_period_end, plan_type")
+                        .eq("user_id", user.id)
+                        .maybeSingle()
+                        .then(resolve, reject);
+                });
+
+                const { data, error } = await withTimeout(queryPromise, TIMEOUT_MS);
 
                 if (error || !data) {
                     if (error) console.error("[useSubscription] Error fetching subscription:", error);
@@ -45,6 +60,7 @@ export function useSubscription() {
                     setSubscription(data as SubscriptionData);
                 }
             } catch (err) {
+                // Timeout or any other error — default to "none" so UI unblocks
                 setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
             } finally {
                 setLoading(false);

@@ -55,7 +55,7 @@ export default function ReadingPlansPage() {
     };
 
     // ─── Plan selection screen ─────────────────────────────────────────────
-    if (!activePlan) {
+    if (!activePlan || searchParams.get("view") === "all") {
         return (
             <Layout>
                 <div className="mx-auto max-w-4xl pt-4">
@@ -94,7 +94,7 @@ export default function ReadingPlansPage() {
                                             {plan.totalDays} dias
                                         </span>
                                         {hasStarted && (
-                                            <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 px-3 py-1 font-bold">
+                                            <span className="flex items-center gap-1.5 rounded-full bg-app-raised text-green-600 dark:text-green-400 px-3 py-1 font-light">
                                                 {planProgressPct}% lido
                                             </span>
                                         )}
@@ -140,7 +140,7 @@ export default function ReadingPlansPage() {
         <Layout>
             <div className="mx-auto max-w-3xl pt-4 pb-12">
                 <button
-                    onClick={() => setSearchParams({})}
+                    onClick={() => setSearchParams({ view: "all" })}
                     className="mb-6 group flex items-center gap-2 text-sm font-medium text-app-text-muted hover:text-gold transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -270,7 +270,7 @@ export default function ReadingPlansPage() {
                                                 aria-label={isRead ? `${book} ${chap} já lido` : `Marcar ${book} ${chap} como lido`}
                                                 title={isRead ? "Leitura já marcada" : "Marcar como lido"}
                                                 className={`ml-3 flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${isRead
-                                                    ? "cursor-default text-green-600 dark:text-green-400 bg-green-500/10"
+                                                    ? "cursor-default text-green-600 dark:text-green-400 bg-transparent"
                                                     : "bg-gold/10 text-gold hover:bg-gold/20 active:scale-95"
                                                     }`}
                                             >

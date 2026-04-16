@@ -5,8 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import InstallPrompt from "@/components/InstallPrompt";
 import { ToastViewport } from "@/components/Toast";
 import { Loader2 } from "lucide-react";
+import { AuthProvider } from "@/contexts/AuthContext";
 import HomePage from "./pages/HomePage";
 import TermsPage from "./pages/TermsPage";
+
 
 const BookPage = lazy(() => import("./pages/BookPage"));
 const ReadingPage = lazy(() => import("./pages/ReadingPage"));
@@ -34,32 +36,34 @@ const PageFallback = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <ToastViewport />
-      <InstallPrompt />
-      <BrowserRouter>
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/busca" element={<SearchPage />} />
-            <Route path="/:version/:book" element={<BookPage />} />
-            <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
-            <Route path="/minhas-notas" element={<MyNotesPage />} />
-            <Route path="/planos" element={<ReadingPlansPage />} />
-            <Route path="/compartilhar" element={<SharePage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/pro" element={<PricingPage />} />
-            <Route path="/widget/daily" element={<WidgetDailyVerse />} />
-            <Route path="/church-display" element={<ChurchDisplayPage />} />
-<Route path="/conta" element={<AccountPage />} />
-<Route path="/sobre" element={<AboutPage />} />
-<Route path="/termos-de-uso" element={<TermsPage />} />
-<Route path="/meu-estudo" element={<MyStudyPage />} />
-<Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <ToastViewport />
+        <InstallPrompt />
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/busca" element={<SearchPage />} />
+              <Route path="/:version/:book" element={<BookPage />} />
+              <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
+              <Route path="/minhas-notas" element={<MyNotesPage />} />
+              <Route path="/planos" element={<ReadingPlansPage />} />
+              <Route path="/compartilhar" element={<SharePage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/pro" element={<PricingPage />} />
+              <Route path="/widget/daily" element={<WidgetDailyVerse />} />
+              <Route path="/church-display" element={<ChurchDisplayPage />} />
+              <Route path="/conta" element={<AccountPage />} />
+              <Route path="/sobre" element={<AboutPage />} />
+              <Route path="/termos-de-uso" element={<TermsPage />} />
+              <Route path="/meu-estudo" element={<MyStudyPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

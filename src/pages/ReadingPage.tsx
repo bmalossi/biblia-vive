@@ -447,6 +447,8 @@ export default function ReadingPage() {
     if (!selectedBook) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // Guard: event.key can be undefined in synthetic/extension-dispatched events
+      if (!event.key) return;
       const target = event.target as HTMLElement | null;
       const typingInField = target && ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName);
 

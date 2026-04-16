@@ -7,6 +7,16 @@ import { useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
 import { getAllNotes, getAllHighlights, type VerseNote, type VerseHighlightFull } from '@/lib/notesHighlights';
 
+const TIMEOUT_MS = 5000;
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+            setTimeout(() => reject(new Error("timeout")), ms)
+        ),
+    ]);
+}
+
 export interface StudyStats {
     totalNotes: number;
     totalHighlights: number;
@@ -22,14 +32,29 @@ export function useAllStudyData() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         setLoading(true);
-        Promise.all([
-            getAllNotes(userId),
-            getAllHighlights(userId),
-        ]).then(([n, h]) => {
-            setNotes(n);
-            setHighlights(h);
-        }).finally(() => setLoading(false));
+
+        withTimeout(
+            Promise.all([getAllNotes(userId), getAllHighlights(userId)]),
+            TIMEOUT_MS
+        )
+            .then(([n, h]) => {
+                if (cancelled) return;
+                setNotes(n);
+                setHighlights(h);
+            })
+            .catch(() => {
+                // Timeout or network error — keep empty arrays so UI unblocks
+                if (cancelled) return;
+                setNotes([]);
+                setHighlights([]);
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => { cancelled = true; };
     }, [userId]);
 
     const stats: StudyStats = {

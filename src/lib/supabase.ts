@@ -8,5 +8,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Supabase URL or Anon Key is missing. Check your environment variables.');
 }
 
-// Create and export the Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Singleton Supabase client — one instance for the entire app.
+// Explicit auth options make session behaviour deterministic across environments.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        // Stable storage key — avoids collisions between Vite dev server and prod
+        storageKey: 'bv-auth-token',
+    },
+});
