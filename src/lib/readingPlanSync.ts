@@ -1,11 +1,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// readingPlanSync.ts — Bíblia Viva · Sprint 14
+// readingPlanSync.ts — Bíblia Viva · Sprint 15
 // Cloud Sync para Planos de Leitura com rastreamento individual por capítulo
+// (Suporte a múltiplos planos simultâneos + restore robusto após login)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { supabase } from './supabase';
 
-const STORAGE_KEY = 'bv_plan_progress';
+export const STORAGE_KEY = 'bv_plan_progress';
+export const LAST_PLAN_KEY = 'bv_last_active_plan_id';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -19,8 +21,9 @@ export interface PlanProgress {
 // ── save ─────────────────────────────────────────────────────────────────────
 
 /**
- * Persists the current plan progress to Supabase for authenticated users.
+ * Persists a specific plan progress to Supabase for authenticated users.
  * No-op for anonymous users (null userId).
+ * Retries once on network failure to improve resilience.
  */
 export async function savePlanProgressToCloud(
     userId: string | null,
@@ -28,76 +31,100 @@ export async function savePlanProgressToCloud(
 ): Promise<void> {
     if (!userId) return;
 
+    const payload = {
+        user_id: userId,
+        plan_id: progress.planId,
+        start_date: progress.startDate,
+        completed_days: progress.completedDays,
+        read_refs: progress.readRefs ?? [],
+        updated_at: new Date().toISOString(),
+    };
+
+    const upsertOnce = () =>
+        supabase
+            .from('user_plan_progress')
+            .upsert(payload, { onConflict: 'user_id,plan_id' });
+
+    try {
+        const { error } = await upsertOnce();
+        if (error) {
+            // Retry once after a short delay
+            await new Promise(r => setTimeout(r, 800));
+            const { error: retryError } = await upsertOnce();
+            if (retryError) {
+                console.warn('[readingPlanSync] Retry failed:', retryError.message);
+            }
+        }
+    } catch (err) {
+        console.warn('[readingPlanSync] Failed to save to cloud:', err);
+    }
+}
+
+/**
+ * Deletes a plan progress from the cloud.
+ */
+export async function deletePlanProgressFromCloud(
+    userId: string | null,
+    planId: string
+): Promise<void> {
+    if (!userId) return;
     try {
         await supabase
             .from('user_plan_progress')
-            .upsert(
-                {
-                    user_id: userId,
-                    plan_id: progress.planId,
-                    start_date: progress.startDate,
-                    completed_days: progress.completedDays,
-                    read_refs: progress.readRefs,
-                    updated_at: new Date().toISOString(),
-                },
-                { onConflict: 'user_id,plan_id' }
-            );
+            .delete()
+            .eq('user_id', userId)
+            .eq('plan_id', planId);
     } catch (err) {
-        console.warn('[readingPlanSync] Failed to save to cloud:', err);
+        console.warn('[readingPlanSync] Failed to delete from cloud:', err);
     }
 }
 
 // ── load ─────────────────────────────────────────────────────────────────────
 
 /**
- * Loads the user's active plan progress from Supabase.
- * Returns null if no record exists or on error.
+ * Loads ALL the user's active plan progresses from Supabase.
+ * Returns an empty Record if no records exist or on error.
+ * Now correctly reads read_refs from the database.
  */
-export async function loadPlanProgressFromCloud(
+export async function loadPlanProgressesFromCloud(
     userId: string | null
-): Promise<PlanProgress | null> {
-    if (!userId) return null;
+): Promise<Record<string, PlanProgress>> {
+    if (!userId) return {};
 
     try {
         const { data, error } = await supabase
             .from('user_plan_progress')
             .select('plan_id, start_date, completed_days, read_refs')
             .eq('user_id', userId)
-            .single();
+            .order('updated_at', { ascending: false });
 
-        if (error || !data) return null;
+        if (error) {
+            console.warn('[readingPlanSync] Failed to load from cloud:', error.message);
+            return {};
+        }
+        if (!data || data.length === 0) return {};
 
-        return {
-            planId: data.plan_id,
-            startDate: data.start_date,
-            completedDays: data.completed_days ?? [],
-            readRefs: data.read_refs ?? [],
-        };
+        const result: Record<string, PlanProgress> = {};
+        for (const row of data) {
+            result[row.plan_id] = {
+                planId: row.plan_id,
+                startDate: row.start_date,
+                completedDays: row.completed_days ?? [],
+                readRefs: row.read_refs ?? [],
+            };
+        }
+        return result;
     } catch {
-        return null;
+        return {};
     }
 }
 
 // ── merge ─────────────────────────────────────────────────────────────────────
 
 /**
- * Merge Automático (Opção A):
- * Combines local and cloud progress to produce the richest possible state.
- * - Uses earliest startDate to preserve streaks.
- * - Takes the union of all completedDays and readRefs from both sources.
- * - If plans differ (e.g. user started a new plan on another device), cloud wins.
+ * Merges two specific plan progresses, combining days and refs from both sources.
  */
-export function mergePlanProgress(
-    local: PlanProgress | null,
-    cloud: PlanProgress | null
-): PlanProgress | null {
-    if (!local && !cloud) return null;
-    if (!local) return cloud;
-    if (!cloud) return local;
-
-    // If plans differ, cloud is the source of truth (avoid overwriting intention)
-    if (local.planId !== cloud.planId) return cloud;
-
+function mergeSinglePlan(local: PlanProgress, cloud: PlanProgress): PlanProgress {
     const mergedDays = Array.from(
         new Set([...local.completedDays, ...cloud.completedDays])
     ).sort((a, b) => a - b);
@@ -108,17 +135,40 @@ export function mergePlanProgress(
 
     return {
         planId: cloud.planId,
+        // Take the earlier start date so longer streaks aren't lost
         startDate: Math.min(local.startDate, cloud.startDate),
         completedDays: mergedDays,
         readRefs: mergedRefs,
     };
 }
 
+/**
+ * Merges dictionaries of plan progresses from Local Storage and Cloud Storage.
+ * Cloud takes precedence for plans that exist in both, merged at the refs level.
+ */
+export function mergePlanProgresses(
+    localObj: Record<string, PlanProgress>,
+    cloudObj: Record<string, PlanProgress>
+): Record<string, PlanProgress> {
+    const result: Record<string, PlanProgress> = { ...cloudObj };
+
+    // Merge local-only or diverged entries over cloud
+    for (const [planId, localPlan] of Object.entries(localObj)) {
+        if (!result[planId]) {
+            result[planId] = localPlan;
+        } else {
+            result[planId] = mergeSinglePlan(localPlan, result[planId]);
+        }
+    }
+
+    return result;
+}
+
 // ── migrate ─────────────────────────────────────────────────────────────────
 
 /**
- * Called once on user login.
- * Uploads any existing localStorage plan to Supabase, then clears local storage.
+ * Called once on user SIGNED_IN event.
+ * Uploads any existing localStorage plan(s) to Supabase then clears local.
  * The hook (useReadingPlan) will then load the merged state from the cloud.
  */
 export async function migrateLocalPlanToSupabase(userId: string): Promise<void> {
@@ -127,12 +177,29 @@ export async function migrateLocalPlanToSupabase(userId: string): Promise<void> 
         if (!stored) return;
 
         const raw = JSON.parse(stored);
-        // Ensure readRefs exists for legacy localStorage data
-        const local: PlanProgress = {
-            ...raw,
-            readRefs: raw.readRefs ?? [],
-        };
-        await savePlanProgressToCloud(userId, local);
+
+        // Handle migration from legacy single-item progress vs new dictionary object
+        if (raw.planId) {
+            // It's the old single-plan format
+            const local: PlanProgress = {
+                planId: raw.planId,
+                startDate: raw.startDate ?? Date.now(),
+                completedDays: raw.completedDays ?? [],
+                readRefs: raw.readRefs ?? [],
+            };
+            await savePlanProgressToCloud(userId, local);
+        } else {
+            // It's the new dictionary format Record<string, PlanProgress>
+            const plans = Object.values(raw) as PlanProgress[];
+            for (const plan of plans) {
+                await savePlanProgressToCloud(userId, {
+                    ...plan,
+                    readRefs: plan.readRefs ?? [],
+                });
+            }
+        }
+
+        // Remove local copy — cloud is now the source of truth
         localStorage.removeItem(STORAGE_KEY);
     } catch (err) {
         console.warn('[readingPlanSync] Migration failed:', err);

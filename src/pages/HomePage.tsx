@@ -6,10 +6,12 @@ import { findBookBySlug, getBooksForLocale } from "@/lib/books";
 import { getVersion } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { Bookmark, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Bookmark, X, BookOpen, Calendar } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/hooks/useAuth";
+import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { Sparkles, ArrowRight } from "lucide-react";
 
 interface LastRead {
@@ -25,12 +27,17 @@ const DISMISS_KEY = "bv_last_read_dismissed";
 export default function HomePage() {
   const { locale, t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { isPro } = useSubscription();
   const [version, setVersion] = useState(getVersion());
   const [lastRead, setLastRead] = useState<LastRead | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
   const { oldTestament, newTestament } = getBooksForLocale(locale);
+
+  const { progresses, plans } = useReadingPlan(user?.id ?? null);
+  const firstProgress = useMemo(() => Object.values(progresses)[0] ?? null, [progresses]);
+  const activePlanInfo = useMemo(() => firstProgress ? plans.find(p => p.id === firstProgress.planId) : null, [firstProgress, plans]);
 
   useEffect(() => {
     const refreshVersion = () => setVersion(getVersion());
@@ -86,9 +93,9 @@ export default function HomePage() {
 
 
 
-        <div className="min-h-[104px]">
+        <div className="min-h-[104px] flex flex-col md:flex-row gap-4">
           {lastRead && !dismissed && lastReadBook && (
-            <div className="animate-in fade-in-0 duration-500 delay-300 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
+            <div className="flex-1 animate-in fade-in-0 duration-500 delay-300 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Bookmark className="mt-0.5 h-4 w-4 text-gold" />
@@ -115,10 +122,40 @@ export default function HomePage() {
 
               <div className="mt-3">
                 <Link
-                  className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm text-gold transition-colors hover:bg-gold-bg"
+                  className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm text-gold transition-colors hover:bg-gold-bg hover:text-gold"
                   to={`/${lastRead.versao}/${lastRead.livro}/${lastRead.capitulo}`}
                 >
                   {t("home.continue")}
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {firstProgress && activePlanInfo && (
+            <div className="flex-1 animate-in fade-in-0 duration-500 delay-400 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <BookOpen className="mt-0.5 h-4 w-4 text-gold" />
+                  <div>
+                    <p className="text-sm font-medium text-app-text">
+                      Plano: {activePlanInfo.name}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <Calendar className="h-3 w-3 text-app-text-muted" />
+                      <p className="text-xs text-app-text-muted">
+                        Dia {Math.floor((Date.now() - firstProgress.startDate) / (1000 * 60 * 60 * 24)) + 1} de {activePlanInfo.totalDays}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <Link
+                  className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm font-bold text-gold transition-colors hover:bg-gold-hover hover:text-white bg-gold"
+                  to={`/planos?id=${activePlanInfo.id}`}
+                >
+                  Retomar Leitura
                 </Link>
               </div>
             </div>

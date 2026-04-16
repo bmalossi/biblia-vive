@@ -10,6 +10,19 @@
             "maxDuration": 30
         }
     },
+    "redirects": [
+        {
+            "source": "/:path*",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "bibliavive.com.br"
+                }
+            ],
+            "destination": "https://www.bibliavive.com.br/:path*",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",

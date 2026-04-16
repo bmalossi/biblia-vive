@@ -3,21 +3,24 @@ import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/i18n";
 import { getVersion } from "@/lib/themes";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import {
     Flame, Calendar, BookOpen, CheckCircle, ArrowRight,
-    Check, ChevronRight, Trophy, SkipForward,
+    Check, ChevronRight, Trophy, SkipForward, ArrowLeft,
 } from "lucide-react";
 
 export default function ReadingPlansPage() {
     const { t } = useTranslation();
     const { user } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const selectedPlanId = searchParams.get("id");
 
     const {
         plans,
+        progresses,
         activePlan,
         isLoading,
         todayDayIndex,
@@ -30,7 +33,7 @@ export default function ReadingPlansPage() {
         abandonPlan,
         markRefRead,
         advanceToNextDay,
-    } = useReadingPlan(user?.id ?? null);
+    } = useReadingPlan(user?.id ?? null, selectedPlanId);
 
     const currentVersion = getVersion();
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -67,38 +70,56 @@ export default function ReadingPlansPage() {
                     </div>
 
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {plans.map((plan) => (
-                            <div
-                                key={plan.id}
-                                className="flex flex-col rounded-2xl border border-border bg-app-surface p-6 shadow-sm transition-all hover:shadow-md hover:border-gold/30"
-                            >
-                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold-bg text-gold">
-                                    <BookOpen className="h-6 w-6" />
-                                </div>
-                                <h3 className="mb-2 font-serif text-xl font-bold text-app-text">{plan.name}</h3>
-                                <p className="mb-6 flex-1 text-sm text-app-text-muted">{plan.description}</p>
+                        {plans.map((plan) => {
+                            const prog = progresses[plan.id];
+                            const hasStarted = !!prog;
+                            const planProgressPct = hasStarted
+                                ? Math.round(((prog.completedDays.length ?? 0) / plan.totalDays) * 100)
+                                : 0;
 
-                                <div className="mb-6 flex items-center gap-4 text-xs font-medium text-app-text-muted">
-                                    <span className="flex items-center gap-1.5 rounded-full bg-app-raised px-3 py-1">
-                                        <Calendar className="h-3.5 w-3.5" />
-                                        {plan.totalDays} dias
-                                    </span>
-                                </div>
-
-                                <Button
-                                    onClick={() => {
-                                        if (!user) {
-                                            setShowAuthModal(true);
-                                        } else {
-                                            startPlan(plan.id);
-                                        }
-                                    }}
-                                    className="w-full bg-gold hover:bg-gold-hover text-white shadow-md shadow-gold/20"
+                            return (
+                                <div
+                                    key={plan.id}
+                                    className="flex flex-col rounded-2xl border border-border bg-app-surface p-6 shadow-sm transition-all hover:shadow-md hover:border-gold/30"
                                 >
-                                    Iniciar Plano
-                                </Button>
-                            </div>
-                        ))}
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold-bg text-gold">
+                                        <BookOpen className="h-6 w-6" />
+                                    </div>
+                                    <h3 className="mb-2 font-serif text-xl font-bold text-app-text">{plan.name}</h3>
+                                    <p className="mb-6 flex-1 text-sm text-app-text-muted">{plan.description}</p>
+
+                                    <div className="mb-6 flex items-center gap-4 text-xs font-medium text-app-text-muted">
+                                        <span className="flex items-center gap-1.5 rounded-full bg-app-raised px-3 py-1">
+                                            <Calendar className="h-3.5 w-3.5" />
+                                            {plan.totalDays} dias
+                                        </span>
+                                        {hasStarted && (
+                                            <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 px-3 py-1 font-bold">
+                                                {planProgressPct}% lido
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <Button
+                                        onClick={() => {
+                                            if (!user) {
+                                                setShowAuthModal(true);
+                                            } else {
+                                                if (!hasStarted) {
+                                                    startPlan(plan.id);
+                                                }
+                                                setSearchParams({ id: plan.id });
+                                            }
+                                        }}
+                                        className={hasStarted
+                                            ? "w-full bg-app-raised hover:bg-gold/10 text-gold border border-gold/30 shadow-sm"
+                                            : "w-full bg-gold hover:bg-gold-hover text-white shadow-md shadow-gold/20"}
+                                    >
+                                        {hasStarted ? "Retomar Leitura" : "Iniciar Plano"}
+                                    </Button>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -118,6 +139,13 @@ export default function ReadingPlansPage() {
     return (
         <Layout>
             <div className="mx-auto max-w-3xl pt-4 pb-12">
+                <button
+                    onClick={() => setSearchParams({})}
+                    className="mb-6 group flex items-center gap-2 text-sm font-medium text-app-text-muted hover:text-gold transition-colors"
+                >
+                    <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                    Voltar à lista de planos
+                </button>
                 {/* Header Dashboard */}
                 <div className="mb-8 overflow-hidden rounded-3xl bg-app-surface border border-border shadow-sm">
                     <div className="bg-gradient-to-r from-gold/10 to-transparent px-6 py-8 md:px-10 md:py-10">
@@ -186,7 +214,7 @@ export default function ReadingPlansPage() {
                                 </div>
 
                                 {isTodayCompleted && (
-                                    <div className="flex items-center gap-2 text-green-600 dark:text-green-500 font-medium">
+                                    <div className="flex items-center gap-2 text-gold font-medium">
                                         <CheckCircle className="h-5 w-5" />
                                         <span className="hidden sm:inline">Concluído</span>
                                     </div>
@@ -202,8 +230,8 @@ export default function ReadingPlansPage() {
                                         <div
                                             key={ref}
                                             className={`flex items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isRead
-                                                    ? "border-green-500/30 bg-green-500/5"
-                                                    : "border-border bg-app-raised hover:border-gold/50 hover:bg-gold-bg/20"
+                                                ? "border-gold/30 bg-gold-bg/10 opacity-70"
+                                                : "border-border bg-app-raised hover:border-gold/50 hover:bg-gold-bg/20"
                                                 }`}
                                         >
                                             {/* Left: navigate to chapter */}
@@ -213,8 +241,8 @@ export default function ReadingPlansPage() {
                                             >
                                                 <div
                                                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${isRead
-                                                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                                                            : "bg-app-surface text-gold"
+                                                        ? "bg-gold/10 text-gold"
+                                                        : "bg-app-surface text-gold/40"
                                                         }`}
                                                 >
                                                     {isRead ? (
@@ -225,8 +253,8 @@ export default function ReadingPlansPage() {
                                                 </div>
                                                 <span
                                                     className={`font-medium font-mono tracking-wider text-sm uppercase truncate ${isRead
-                                                            ? "text-app-text-muted line-through"
-                                                            : "text-app-text"
+                                                        ? "text-app-text-muted line-through"
+                                                        : "text-app-text"
                                                         }`}
                                                 >
                                                     {book} {chap}
@@ -242,8 +270,8 @@ export default function ReadingPlansPage() {
                                                 aria-label={isRead ? `${book} ${chap} já lido` : `Marcar ${book} ${chap} como lido`}
                                                 title={isRead ? "Leitura já marcada" : "Marcar como lido"}
                                                 className={`ml-3 flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${isRead
-                                                        ? "cursor-default text-green-600 dark:text-green-400 bg-green-500/10"
-                                                        : "bg-gold/10 text-gold hover:bg-gold/20 active:scale-95"
+                                                    ? "cursor-default text-green-600 dark:text-green-400 bg-green-500/10"
+                                                    : "bg-gold/10 text-gold hover:bg-gold/20 active:scale-95"
                                                     }`}
                                             >
                                                 {isRead ? (
@@ -267,7 +295,7 @@ export default function ReadingPlansPage() {
                             <div className="mt-8 text-center pt-6 border-t border-border space-y-4">
                                 {isTodayCompleted ? (
                                     <>
-                                        <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                                        <p className="text-sm text-gold font-medium">
                                             🎉 Excelente! Todas as leituras de hoje foram concluídas.
                                         </p>
                                         {todayDayIndex < activePlan.totalDays && (
@@ -303,13 +331,15 @@ export default function ReadingPlansPage() {
                 <div className="mt-16 flex justify-center">
                     <Button
                         onClick={() => {
-                            if (window.confirm("Tem certeza que deseja abandonar este plano? Todo o seu progresso será perdido.")) {
-                                abandonPlan();
+                            if (window.confirm("Tem certeza que deseja recomeçar este plano do zero? Todo o seu progresso será perdido.")) {
+                                abandonPlan(activePlan.id);
+                                setSearchParams({});
                             }
                         }}
-                        className="bg-red-000/10 border border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-100/20 hover:text-red-700 dark:hover:text-red-300 shadow-sm"
+                        variant="ghost"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-500/10 transition-colors"
                     >
-                        Abandonar Plano
+                        Apagar Meu Progresso
                     </Button>
                 </div>
             </div>

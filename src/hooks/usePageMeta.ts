@@ -24,7 +24,7 @@ const upsertMeta = (name: string, content: string, property = false) => {
 
 export function usePageMeta({ title, description, canonical, image, type = "website", robots, jsonLd }: PageMeta) {
   useEffect(() => {
-    const origin = window.location.origin;
+    const CANONICAL_ORIGIN = "https://www.bibliavive.com.br";
     document.title = title;
 
     if (description) {
@@ -38,12 +38,12 @@ export function usePageMeta({ title, description, canonical, image, type = "webs
     upsertMeta("og:type", type, true);
     if (robots) upsertMeta("robots", robots);
     if (image) {
-      const absoluteImage = image.startsWith("http") ? image : `${origin}${image}`;
+      const absoluteImage = image.startsWith("http") ? image : `${CANONICAL_ORIGIN}${image}`;
       upsertMeta("og:image", absoluteImage, true);
       upsertMeta("twitter:image", absoluteImage);
     }
 
-    const canonicalHref = canonical ? (canonical.startsWith("http") ? canonical : `${origin}${canonical}`) : `${origin}${window.location.pathname}`;
+    const canonicalHref = canonical ? (canonical.startsWith("http") ? canonical : `${CANONICAL_ORIGIN}${canonical}`) : `${CANONICAL_ORIGIN}${window.location.pathname}`;
     let canonicalTag = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonicalTag) {
       canonicalTag = document.createElement("link");

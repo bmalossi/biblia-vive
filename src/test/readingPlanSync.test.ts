@@ -1,14 +1,15 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// readingPlanSync.test.ts — Bíblia Vive · Sprint 12 · TDD RED → GREEN
+// readingPlanSync.test.ts — Bíblia Vive · Sprint 14
 // Tests written BEFORE implementation (per TDD workflow)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
     savePlanProgressToCloud,
-    loadPlanProgressFromCloud,
+    loadPlanProgressesFromCloud,
     migrateLocalPlanToSupabase,
-    mergePlanProgress,
+    mergePlanProgresses,
+    deletePlanProgressFromCloud,
 } from '../lib/readingPlanSync';
 
 // ── Mock Supabase ─────────────────────────────────────────────────────────────
@@ -41,7 +42,7 @@ const sampleProgress = {
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-describe('Reading Plan Cloud Sync', () => {
+describe('Reading Plan Cloud Sync (Multi-Plan Support)', () => {
     beforeEach(() => {
         localStorage.clear();
         vi.clearAllMocks();
@@ -70,82 +71,96 @@ describe('Reading Plan Cloud Sync', () => {
         });
     });
 
-    // ── loadPlanProgressFromCloud ─────────────────────────────────────────────
-    describe('loadPlanProgressFromCloud', () => {
-        it('should return null when no cloud data found', async () => {
-            mockChain.single.mockResolvedValueOnce({ data: null, error: null });
-            const result = await loadPlanProgressFromCloud('user-123');
-            expect(result).toBeNull();
+    describe('deletePlanProgressFromCloud', () => {
+        it('should delete plan entry', async () => {
+            await deletePlanProgressFromCloud('user-123', 'test-plan');
+            expect(supabase.from).toHaveBeenCalledWith('user_plan_progress');
+            expect(mockChain.delete).toHaveBeenCalled();
+            expect(mockChain.eq).toHaveBeenCalledWith('plan_id', 'test-plan');
+        });
+    });
+
+    // ── loadPlanProgressesFromCloud ─────────────────────────────────────────────
+    describe('loadPlanProgressesFromCloud', () => {
+        it('should return empty record when no cloud data found', async () => {
+            mockChain.eq.mockResolvedValueOnce({ data: null, error: null });
+            const result = await loadPlanProgressesFromCloud('user-123');
+            expect(result).toEqual({});
         });
 
-        it('should map Supabase row to PlanProgress format', async () => {
-            mockChain.single.mockResolvedValueOnce({
-                data: {
-                    plan_id: 'bible-1-year',
-                    start_date: 1700000000000,
-                    completed_days: [1, 2, 3],
-                    read_refs: ['pv/1', 'pv/2'],
-                },
+        it('should map multiple Supabase rows to Record<string, PlanProgress> format', async () => {
+            mockChain.eq.mockResolvedValueOnce({
+                data: [
+                    {
+                        plan_id: 'bible-1-year',
+                        start_date: 1700000000000,
+                        completed_days: [1, 2, 3],
+                        read_refs: ['pv/1', 'pv/2'],
+                    },
+                    {
+                        plan_id: 'psalms-30',
+                        start_date: 1800000000000,
+                        completed_days: [1],
+                        read_refs: ['sl/1'],
+                    }
+                ],
                 error: null,
             });
 
-            const result = await loadPlanProgressFromCloud('user-123');
+            const result = await loadPlanProgressesFromCloud('user-123');
 
             expect(result).toEqual({
-                planId: 'bible-1-year',
-                startDate: 1700000000000,
-                completedDays: [1, 2, 3],
-                readRefs: ['pv/1', 'pv/2'],
+                'bible-1-year': {
+                    planId: 'bible-1-year',
+                    startDate: 1700000000000,
+                    completedDays: [1, 2, 3],
+                    readRefs: ['pv/1', 'pv/2'],
+                },
+                'psalms-30': {
+                    planId: 'psalms-30',
+                    startDate: 1800000000000,
+                    completedDays: [1],
+                    readRefs: ['sl/1'],
+                }
             });
         });
     });
 
-    // ── mergePlanProgress ─────────────────────────────────────────────────────
-    describe('mergePlanProgress (Merge Automático - Opção A)', () => {
-        it('should return cloud data when local is null', () => {
-            const cloud = { planId: 'nt-90', startDate: 1000, completedDays: [1, 2], readRefs: [] };
-            expect(mergePlanProgress(null, cloud)).toEqual(cloud);
+    // ── mergePlanProgresses ─────────────────────────────────────────────────────
+    describe('mergePlanProgresses', () => {
+        it('should return cloud data when local is empty', () => {
+            const cloud = { 'nt-90': { planId: 'nt-90', startDate: 1000, completedDays: [1, 2], readRefs: [] } };
+            expect(mergePlanProgresses({}, cloud)).toEqual(cloud);
         });
 
-        it('should return local data when cloud is null', () => {
-            expect(mergePlanProgress(sampleProgress, null)).toEqual(sampleProgress);
+        it('should merge disparate plans without conflict', () => {
+            const local = { 'psalms-30': { planId: 'psalms-30', startDate: 500, completedDays: [1], readRefs: [] } };
+            const cloud = { 'nt-90': { planId: 'nt-90', startDate: 1000, completedDays: [1, 2], readRefs: [] } };
+
+            const merged = mergePlanProgresses(local, cloud);
+
+            expect(merged['nt-90']).toBeDefined();
+            expect(merged['psalms-30']).toBeDefined();
         });
 
-        it('should return null when both are null', () => {
-            expect(mergePlanProgress(null, null)).toBeNull();
-        });
+        it('should merge same plan completed days and refs from both', () => {
+            const local = { 'bible-1-year': { planId: 'bible-1-year', startDate: 1000, completedDays: [1, 2, 5], readRefs: ['sl/1'] } };
+            const cloud = { 'bible-1-year': { planId: 'bible-1-year', startDate: 2000, completedDays: [1, 3, 4], readRefs: ['sl/2'] } };
 
-        it('should keep cloud planId and merge completed days from both', () => {
-            const local = { planId: 'bible-1-year', startDate: 1000, completedDays: [1, 2, 5], readRefs: [] };
-            const cloud = { planId: 'bible-1-year', startDate: 2000, completedDays: [1, 3, 4], readRefs: [] };
+            const merged = mergePlanProgresses(local, cloud);
+            const plan = merged['bible-1-year'];
 
-            const merged = mergePlanProgress(local, cloud);
-
-            expect(merged?.planId).toBe('bible-1-year');
-            // Merged must contain all unique days from both
-            expect(merged?.completedDays).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
-            expect(merged?.completedDays).toHaveLength(5);
-        });
-
-        it('should use earliest startDate (to preserve streak)', () => {
-            const local = { planId: 'bible-1-year', startDate: 500, completedDays: [], readRefs: [] };
-            const cloud = { planId: 'bible-1-year', startDate: 1000, completedDays: [], readRefs: [] };
-            const merged = mergePlanProgress(local, cloud);
-            expect(merged?.startDate).toBe(500);
-        });
-
-        it('should merge readRefs from local and cloud (union)', () => {
-            const local = { planId: 'bible-1-year', startDate: 1000, completedDays: [], readRefs: ['sl/1', 'sl/2'] };
-            const cloud = { planId: 'bible-1-year', startDate: 1000, completedDays: [], readRefs: ['sl/2', 'sl/3'] };
-            const merged = mergePlanProgress(local, cloud);
-            expect(merged?.readRefs).toEqual(expect.arrayContaining(['sl/1', 'sl/2', 'sl/3']));
-            expect(merged?.readRefs).toHaveLength(3);
+            expect(plan.completedDays).toEqual(expect.arrayContaining([1, 2, 3, 4, 5]));
+            expect(plan.completedDays).toHaveLength(5);
+            expect(plan.readRefs).toEqual(expect.arrayContaining(['sl/1', 'sl/2']));
+            expect(plan.startDate).toBe(1000); // Takes earliest start date
         });
     });
 
     // ── migrateLocalPlanToSupabase ────────────────────────────────────────────
     describe('migrateLocalPlanToSupabase', () => {
-        it('should upload localStorage plan progress to Supabase and clear local storage', async () => {
+        it('should upload legacy single plan progress to Supabase and clear local storage', async () => {
+            // Legacy format was just the object at the root
             localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleProgress));
 
             await migrateLocalPlanToSupabase('user-123');
@@ -155,9 +170,16 @@ describe('Reading Plan Cloud Sync', () => {
             expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
         });
 
-        it('should do nothing if localStorage has no plan progress', async () => {
+        it('should upload new dictionary plan progress to Supabase and clear local storage', async () => {
+            // New format is Record<string, PlanProgress>
+            const dict = { 'bible-1-year': sampleProgress };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(dict));
+
             await migrateLocalPlanToSupabase('user-123');
-            expect(supabase.from).not.toHaveBeenCalled();
+
+            expect(supabase.from).toHaveBeenCalledWith('user_plan_progress');
+            expect(mockChain.upsert).toHaveBeenCalled(); // Loop triggers this
+            expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
         });
     });
 });
