@@ -58,6 +58,11 @@ self.addEventListener("fetch", (event) => {
   // Only handle HTTP/HTTPS — skip chrome-extension://, data:, etc.
   if (request.method !== "GET" || (url.protocol !== "http:" && url.protocol !== "https:")) return;
 
+  // Do NOT intercept Google Fonts — let the browser handle them natively.
+  // Fonts are loaded via <link rel="preload"> and have their own browser cache.
+  // Intercepting them causes CSP connect-src violations.
+  if (url.hostname === "fonts.gstatic.com" || url.hostname === "fonts.googleapis.com") return;
+
   if (request.mode === "navigate") {
     event.respondWith(
       (async () => {
