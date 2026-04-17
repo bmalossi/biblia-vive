@@ -40,31 +40,50 @@ export function useSubscription() {
         }
 
         const fetchSubscription = async () => {
-            try {
-                setLoading(true);
-                const queryPromise = new Promise<{ data: SubscriptionData | null; error: unknown }>((resolve, reject) => {
-                    supabase
-                        .from("user_subscriptions")
-                        .select("status, current_period_end, plan_type")
-                        .eq("user_id", user.id)
-                        .maybeSingle()
-                        .then(resolve, reject);
-                });
+            let attempt = 0;
+            const maxRetries = 3;
+            setLoading(true);
 
-                const { data, error } = await withTimeout(queryPromise, TIMEOUT_MS);
+            while (attempt <= maxRetries) {
+                try {
+                    const queryPromise = Promise.resolve(
+                        supabase
+                            .from("user_subscriptions")
+                            .select("status, current_period_end, plan_type")
+                            .eq("user_id", user.id)
+                            .maybeSingle()
+                    );
 
-                if (error || !data) {
-                    if (error) console.error("[useSubscription] Error fetching subscription:", error);
+                    const { data, error } = await withTimeout<any>(queryPromise, TIMEOUT_MS);
+
+                    if (error) {
+                        if (attempt < maxRetries) {
+                            attempt++;
+                            await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
+                            continue;
+                        }
+                        console.error("[useSubscription] Error fetching subscription after retries:", error);
+                        setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
+                        break;
+                    } else if (!data) {
+                        setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
+                        break;
+                    } else {
+                        setSubscription(data as SubscriptionData);
+                        break;
+                    }
+                } catch (err) {
+                    // Timeout or network error
+                    if (attempt < maxRetries) {
+                        attempt++;
+                        await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
+                        continue;
+                    }
                     setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
-                } else {
-                    setSubscription(data as SubscriptionData);
+                    break;
                 }
-            } catch (err) {
-                // Timeout or any other error — default to "none" so UI unblocks
-                setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
-            } finally {
-                setLoading(false);
             }
+            setLoading(false);
         };
 
         fetchSubscription();

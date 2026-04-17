@@ -36,7 +36,16 @@ export default function HomePage() {
   const { oldTestament, newTestament } = getBooksForLocale(locale);
 
   const { progresses, plans } = useReadingPlan(user?.id ?? null);
-  const firstProgress = useMemo(() => Object.values(progresses)[0] ?? null, [progresses]);
+  const firstProgress = useMemo(() => {
+    const activeProgresses = Object.values(progresses).filter(prog => {
+      const planInfo = plans.find(p => p.id === prog.planId);
+      if (!planInfo) return false;
+      return prog.completedDays.length < planInfo.totalDays;
+    });
+    // Sort by startDate descending (most recently started active plan)
+    activeProgresses.sort((a, b) => b.startDate - a.startDate);
+    return activeProgresses[0] ?? null;
+  }, [progresses, plans]);
   const activePlanInfo = useMemo(() => firstProgress ? plans.find(p => p.id === firstProgress.planId) : null, [firstProgress, plans]);
 
   useEffect(() => {
