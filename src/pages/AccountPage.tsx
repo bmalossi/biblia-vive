@@ -57,7 +57,7 @@ function Alert({ type, message }: { type: "success" | "error"; message: string }
 export default function AccountPage() {
     const navigate = useNavigate();
     const { user, loading: authLoading, signOut } = useAuth();
-    const { subscription, isPro, isTemplo, isAdmin, loading: subLoading, checkout, cancelSubscription } = useSubscription();
+    const { subscription, isPro, isTemplo, isAdmin, loading: subLoading, checkout, manageSubscription } = useSubscription();
     const { stats, loading: studyLoading } = useAllStudyData();
 
     // ── Personal Data ──
@@ -69,12 +69,10 @@ export default function AccountPage() {
     const [currentPw, setCurrentPw] = useState("");
     const [newPw, setNewPw] = useState("");
     const [confirmPw, setConfirmPw] = useState("");
-    const [showCancelModal, setShowCancelModal] = useState(false);
     const [pwSaving, setPwSaving] = useState(false);
 
     // ── Subscription ──
     const [subSaving, setSubSaving] = useState(false);
-    const [showConfirmCancel, setShowConfirmCancel] = useState(false);
 
     // ── Church Settings ──
     const [churchName, setChurchName] = useState("");
@@ -200,15 +198,13 @@ export default function AccountPage() {
         }
     };
 
-    const handleCancelSubscription = async () => {
-        setShowConfirmCancel(false);
+    const handleManageSubscription = async () => {
         setSubSaving(true);
         try {
-            await cancelSubscription();
-            toast({ message: "Assinatura cancelada. Você mantém acesso até o fim do período pago.", type: "success" });
+            await manageSubscription();
+            // User will be redirected. The loading state can stay stuck on until redirect.
         } catch (err: any) {
-            toast({ message: err.message || "Erro ao cancelar assinatura.", type: "error" });
-        } finally {
+            toast({ message: err.message || "Erro ao carregar o portal da assinatura.", type: "error" });
             setSubSaving(false);
         }
     };
@@ -422,11 +418,11 @@ export default function AccountPage() {
 
                                     {isActive && !isCancelingAtEnd && !isLocalAdmin && (
                                         <button
-                                            onClick={() => setShowConfirmCancel(true)}
+                                            onClick={handleManageSubscription}
                                             disabled={subSaving}
-                                            className="w-full py-2.5 text-sm text-app-text-muted border border-border rounded-xl hover:bg-red-500/5 hover:text-red-400 hover:border-red-500/20 disabled:opacity-50 transition-colors"
+                                            className="w-full py-2.5 text-sm text-app-text-muted border border-border rounded-xl hover:bg-app-surface hover:text-app-text transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                                         >
-                                            Cancelar assinatura
+                                            {subSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Gerenciar assinatura"}
                                         </button>
                                     )}
 
@@ -588,38 +584,6 @@ export default function AccountPage() {
                     </button>
                 </div>
             </main>
-
-            {/* ── Cancel Confirmation Modal ── */}
-            {showConfirmCancel && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-app-surface border border-border rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                                <AlertTriangle className="h-5 w-5 text-red-400" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-app-text">Cancelar assinatura?</h3>
-                                <p className="text-xs text-app-text-muted mt-0.5">Você mantém o acesso PRO até o final do período já pago.</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-3 pt-2">
-                            <button
-                                onClick={() => setShowConfirmCancel(false)}
-                                className="flex-1 py-2.5 text-sm border border-border rounded-xl hover:bg-app-raised transition-colors"
-                            >
-                                Manter plano
-                            </button>
-                            <button
-                                onClick={handleCancelSubscription}
-                                disabled={subSaving}
-                                className="flex-1 py-2.5 text-sm font-medium bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl hover:bg-red-500/20 disabled:opacity-50 transition-colors"
-                            >
-                                {subSaving ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Sim, cancelar"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

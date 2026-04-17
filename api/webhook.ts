@@ -95,6 +95,7 @@ export default async function handler(req: Request) {
                     status: subscription.status,
                     current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
                     stripe_subscription_id: subscription.id,
+                    ...(subscription.status === "canceled" ? { plan_type: "none" } : {})
                 })
                 .eq("stripe_customer_id", customerId);
 

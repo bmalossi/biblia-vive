@@ -7,15 +7,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
 import { getAllNotes, getAllHighlights, type VerseNote, type VerseHighlightFull } from '@/lib/notesHighlights';
 
-const TIMEOUT_MS = 5000;
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-            setTimeout(() => reject(new Error("timeout")), ms)
-        ),
-    ]);
-}
+
 
 export interface StudyStats {
     totalNotes: number;
@@ -35,17 +27,14 @@ export function useAllStudyData() {
         let cancelled = false;
         setLoading(true);
 
-        withTimeout(
-            Promise.all([getAllNotes(userId), getAllHighlights(userId)]),
-            TIMEOUT_MS
-        )
+        Promise.all([getAllNotes(userId), getAllHighlights(userId)])
             .then(([n, h]) => {
                 if (cancelled) return;
                 setNotes(n);
                 setHighlights(h);
             })
-            .catch(() => {
-                // Timeout or network error — keep empty arrays so UI unblocks
+            .catch((err) => {
+                console.error("Error loading study data:", err);
                 if (cancelled) return;
                 setNotes([]);
                 setHighlights([]);

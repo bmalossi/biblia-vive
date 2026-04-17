@@ -10,15 +10,7 @@ import {
     type PlanProgress,
 } from "@/lib/readingPlanSync";
 
-const CLOUD_TIMEOUT_MS = 5000;
-async function loadWithTimeout(userId: string): Promise<Record<string, PlanProgress>> {
-    return Promise.race([
-        loadPlanProgressesFromCloud(userId),
-        new Promise<Record<string, PlanProgress>>(resolve =>
-            setTimeout(() => resolve({}), CLOUD_TIMEOUT_MS)
-        ),
-    ]);
-}
+
 
 export interface ReadingPlanDay {
     day: number;
@@ -87,9 +79,12 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
             const local = readLocal();
 
             // Always try to load from cloud when authenticated.
-            // Use loadWithTimeout so the UI is never blocked indefinitely.
+            // If the network stalls, fallback to {} after 8 seconds so the UI unblocks.
             const cloudObj = userId
-                ? await loadWithTimeout(userId)
+                ? await Promise.race([
+                    loadPlanProgressesFromCloud(userId),
+                    new Promise<Record<string, PlanProgress>>(resolve => setTimeout(() => resolve({}), 8000))
+                ])
                 : {};
 
             if (cancelled) return;

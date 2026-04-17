@@ -2,15 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
-const TIMEOUT_MS = 5000;
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-            setTimeout(() => reject(new Error("timeout")), ms)
-        ),
-    ]);
-}
+
 
 export interface SubscriptionData {
     status:
@@ -46,15 +38,14 @@ export function useSubscription() {
 
             while (attempt <= maxRetries) {
                 try {
-                    const queryPromise = Promise.resolve(
+                    const { data, error } = await Promise.race([
                         supabase
                             .from("user_subscriptions")
                             .select("status, current_period_end, plan_type")
                             .eq("user_id", user.id)
-                            .maybeSingle()
-                    );
-
-                    const { data, error } = await withTimeout<any>(queryPromise, TIMEOUT_MS);
+                            .maybeSingle(),
+                        new Promise<{ data: any, error: any }>((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
+                    ]);
 
                     if (error) {
                         if (attempt < maxRetries) {
@@ -72,15 +63,15 @@ export function useSubscription() {
                         setSubscription(data as SubscriptionData);
                         break;
                     }
-                } catch (err) {
+                } catch (err: any) {
                     // Timeout or network error
-                    if (attempt < maxRetries) {
-                        attempt++;
-                        await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
-                        continue;
+                    if (err.message === "timeout" || attempt >= maxRetries) {
+                        setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
+                        break;
                     }
-                    setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
-                    break;
+                    attempt++;
+                    await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
+                    continue;
                 }
             }
             setLoading(false);
@@ -146,28 +137,28 @@ export function useSubscription() {
         }
     };
 
-    // Helper to cancel subscription via Supabase Edge Function
-    const cancelSubscription = async () => {
+    // Helper to manage subscription via Stripe Customer Portal
+    const manageSubscription = async () => {
         if (!user) throw new Error("User must be logged in.");
 
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-        const { data: { session } } = await supabase.auth.getSession();
-
-        const response = await fetch(`${supabaseUrl}/functions/v1/stripe-cancel`, {
+        const response = await fetch(`/api/stripe/portal`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${session?.access_token}`,
             },
+            body: JSON.stringify({ userId: user.id }),
         });
 
         if (!response.ok) {
             const err = await response.json().catch(() => ({}));
-            throw new Error(err.error || "Failed to cancel subscription");
+            throw new Error(err.error || "Failed to open subscription portal");
         }
 
-        return response.json();
+        const data = await response.json();
+        if (data.url) {
+            window.location.href = data.url;
+        }
     };
 
-    return { subscription, isPro, isTemplo, isAdmin, loading, checkout, cancelSubscription };
+    return { subscription, isPro, isTemplo, isAdmin, loading, checkout, manageSubscription };
 }

@@ -85,12 +85,15 @@ async function getCachedStudyResponse(
   try {
     const supabase = await getSupabaseClient();
     if (!supabase) return null;
-    const { data } = await supabase
-      .from('ai_study_cache')
-      .select('response')
-      .eq('verse_id', verseId)
-      .eq('question_type', questionType)
-      .maybeSingle();
+    const { data } = await Promise.race([
+      supabase
+        .from('ai_study_cache')
+        .select('response')
+        .eq('verse_id', verseId)
+        .eq('question_type', questionType)
+        .maybeSingle(),
+      new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+    ]);
 
     if (!data?.response) return null;
 
@@ -143,10 +146,15 @@ export async function requestCommentary(
   const { supabase } = await import('./supabase');
   const { data: { session } } = await supabase.auth.getSession();
 
-  const { data: result, error } = await supabase.functions.invoke('commentary', {
+  const invokePromise = supabase.functions.invoke('commentary', {
     body: params,
     headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
   });
+
+  const { data: result, error } = await Promise.race([
+    invokePromise,
+    new Promise<any>((_, reject) => setTimeout(() => reject(new Error('A geração do comentário demorou mais que o esperado e expirou (Timeout). Tente novamente.')), 35000))
+  ]);
 
   if (error || result?.error) {
     throw new Error(error?.message || result?.error || 'Erro na chamada da API de IA');
