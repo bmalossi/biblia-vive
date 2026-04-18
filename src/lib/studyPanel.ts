@@ -6,6 +6,7 @@
 import { getCrossRefs, CrossReference } from './crossReferences';
 import { getVerseWords, VerseWord } from './strongs';
 import { supabase } from './supabase';
+import { getSession } from './auth';
 
 // ─── Tipos do book-contexts.json (Pacote A) ──────────────────────────────────
 
@@ -137,21 +138,31 @@ export async function requestCommentary(
 ): Promise<{ commentaries: Commentary[]; cached: boolean }> {
   const timeoutPromise = new Promise<any>((_, reject) => {
     setTimeout(() => {
-      reject(new Error('A geração do comentário demorou mais que o esperado (Timeout de 40s). Verifique sua conexão ou tente novamente.'));
-    }, 40000);
+      reject(new Error('A geração do comentário demorou mais que o esperado (Timeout de 1m30s). Verifique sua conexão ou tente novamente.'));
+    }, 90000);
   });
 
   return Promise.race([
     (async () => {
-      // NOTE: supabase.functions.invoke automatically attaches the Authorization header
-      // from the internal session state. We DO NOT call getSession() here because 
-      // Supabase-js v2 has a lock mechanism bug that can hang the promise eternally.
-      const { data: result, error } = await supabase.functions.invoke('commentary', {
-        body: params
+      // NOTE: We bypass supabase.functions.invoke entirely because Supabase-js v2
+      // has an internal queue/lock mechanism bug that hangs on edge function invocations.
+      // We manually construct the fetch request and use the hardened getSession.
+      const session = await getSession();
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/commentary`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+        },
+        body: JSON.stringify(params)
       });
 
-      if (error || result?.error) {
-        throw new Error(error?.message || result?.error || 'Erro na chamada da API de IA');
+      const result = await response.json();
+
+      if (!response.ok || result?.error) {
+        throw new Error(result?.error || result?.message || `Erro HTTP ${response.status} na chamada da API de IA`);
       }
 
       try {

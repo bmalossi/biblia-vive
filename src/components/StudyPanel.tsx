@@ -608,7 +608,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                                     Analisando teologia...
                                                                 </div>
                                                                 <span className="text-[0.65rem] opacity-80 mt-0.5 font-normal tracking-wide">
-                                                                    Isto pode levar entre 20 e 30 segundos
+                                                                    Isto pode levar entre 60 e 90 segundos
                                                                 </span>
                                                             </div>
                                                         ) : (
