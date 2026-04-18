@@ -23,8 +23,15 @@ export async function signOut() {
 }
 
 export async function getSession() {
-    const { data } = await supabase.auth.getSession();
-    return data.session;
+    try {
+        const { data } = await Promise.race([
+            supabase.auth.getSession(),
+            new Promise<any>(resolve => setTimeout(() => resolve({ data: { session: null } }), 5000))
+        ]);
+        return data.session;
+    } catch {
+        return null;
+    }
 }
 
 export async function resetPassword(email: string) {

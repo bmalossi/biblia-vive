@@ -5,6 +5,7 @@
 
 import { getCrossRefs, CrossReference } from './crossReferences';
 import { getVerseWords, VerseWord } from './strongs';
+import { supabase } from './supabase';
 
 // ─── Tipos do book-contexts.json (Pacote A) ──────────────────────────────────
 
@@ -70,12 +71,7 @@ async function loadBookContexts(): Promise<Record<string, BookContext>> {
 // ─── Supabase — cache de IA ───────────────────────────────────────────────────
 // Importa o cliente Supabase do projeto (ajuste o caminho se necessário)
 async function getSupabaseClient() {
-  try {
-    const { supabase } = await import('@/lib/supabase');
-    return supabase;
-  } catch {
-    return null;
-  }
+  return supabase;
 }
 
 async function getCachedStudyResponse(
@@ -129,10 +125,6 @@ export async function cacheStudyResponse(
   }
 }
 
-/**
- * Chama o backend (/api/commentary) para gerar um novo comentário teológico.
- * Requer assinatura PRO validada no server-side.
- */
 export async function requestCommentary(
   params: {
     bookId: string;
@@ -143,40 +135,42 @@ export async function requestCommentary(
     language?: string;
   }
 ): Promise<{ commentaries: Commentary[]; cached: boolean }> {
-  const { supabase } = await import('./supabase');
-  const { data: { session } } = await supabase.auth.getSession();
-
-  const invokePromise = supabase.functions.invoke('commentary', {
-    body: params,
-    headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
+  const timeoutPromise = new Promise<any>((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('A geração do comentário demorou mais que o esperado (Timeout de 40s). Verifique sua conexão ou tente novamente.'));
+    }, 40000);
   });
 
-  const { data: result, error } = await Promise.race([
-    invokePromise,
-    new Promise<any>((_, reject) => setTimeout(() => reject(new Error('A geração do comentário demorou mais que o esperado e expirou (Timeout). Tente novamente.')), 35000))
+  return Promise.race([
+    (async () => {
+      // NOTE: supabase.functions.invoke automatically attaches the Authorization header
+      // from the internal session state. We DO NOT call getSession() here because 
+      // Supabase-js v2 has a lock mechanism bug that can hang the promise eternally.
+      const { data: result, error } = await supabase.functions.invoke('commentary', {
+        body: params
+      });
+
+      if (error || result?.error) {
+        throw new Error(error?.message || result?.error || 'Erro na chamada da API de IA');
+      }
+
+      try {
+        const parsed = JSON.parse(result.response || "[]");
+        return {
+          commentaries: Array.isArray(parsed)
+            ? parsed.filter((c: any) => c && typeof c === 'object' && c.author)
+            : Array.isArray(parsed?.commentaries)
+              ? parsed.commentaries.filter((c: any) => c && typeof c === 'object' && c.author)
+              : [],
+          cached: result.cached || false
+        };
+      } catch (parseError) {
+        console.error("Erro ao fazer parse dos comentários", parseError);
+        return { commentaries: [], cached: false };
+      }
+    })(),
+    timeoutPromise
   ]);
-
-  if (error || result?.error) {
-    throw new Error(error?.message || result?.error || 'Erro na chamada da API de IA');
-  }
-
-  try {
-    const parsed = JSON.parse(result.response || "[]");
-    return {
-      commentaries: Array.isArray(parsed)
-        ? parsed.filter((c: any) => c && typeof c === 'object' && c.author)
-        : Array.isArray(parsed?.commentaries)
-          ? parsed.commentaries.filter((c: any) => c && typeof c === 'object' && c.author)
-          : [],
-      cached: result.cached || false
-    };
-  } catch (parseError) {
-    console.error("Erro ao fazer parse dos comentários", parseError);
-    return {
-      commentaries: [],
-      cached: false
-    };
-  }
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -602,10 +602,15 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                         disabled={isGenerating}
                                                     >
                                                         {isGenerating ? (
-                                                            <>
-                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                {t("study.commentaryLoading")}
-                                                            </>
+                                                            <div className="flex flex-col items-center py-1">
+                                                                <div className="flex items-center">
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                    Analisando teologia...
+                                                                </div>
+                                                                <span className="text-[0.65rem] opacity-80 mt-0.5 font-normal tracking-wide">
+                                                                    Isto pode levar entre 20 e 30 segundos
+                                                                </span>
+                                                            </div>
                                                         ) : (
                                                             t("study.getCommentary")
                                                         )}

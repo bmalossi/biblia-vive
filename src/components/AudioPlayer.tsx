@@ -28,7 +28,10 @@ export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
     const fetchAndPlay = useCallback(async () => {
         setIsFetching(true);
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await Promise.race([
+                supabase.auth.getSession(),
+                new Promise<any>(resolve => setTimeout(() => resolve({ data: { session: null } }), 5000))
+            ]);
             const headers: Record<string, string> = { "Content-Type": "application/json" };
             if (session?.access_token) {
                 headers["Authorization"] = `Bearer ${session.access_token}`;
