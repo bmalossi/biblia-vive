@@ -7,7 +7,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Input } from "@/components/ui/input";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
 import { getVersion } from "@/lib/themes";
-import { Clock3, LogIn, LogOut, Menu, Search, SearchX, User, X } from "lucide-react";
+import { Clock3, Loader2, LogIn, LogOut, Menu, Search, SearchX, User, X } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { Link, NavLink } from "react-router-dom";
 import { FormEvent, MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -40,7 +40,7 @@ const saveHistoryItem = (term: string) => {
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isPending } = useAuth();
   const { isPro, loading: proLoading } = useSubscription();
   const userRole = (user?.app_metadata as any)?.role;
   const [isScrolled, setIsScrolled] = useState(false);
@@ -326,10 +326,16 @@ export default function Header() {
                 <button
                   aria-label="Sair da conta"
                   title="Sair"
-                  onClick={() => signOut()}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-app-surface text-app-text transition-colors hover:bg-red-500/10 hover:text-red-400 hover:border-red-400"
+                  disabled={isPending}
+                  onClick={async () => {
+                    await signOut();
+                    if (location.pathname === "/conta" || location.pathname === "/admin") {
+                      navigate("/");
+                    }
+                  }}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-app-surface text-app-text transition-colors hover:bg-red-500/10 hover:text-red-400 hover:border-red-400 disabled:opacity-50"
                 >
-                  <LogOut className="h-3.5 w-3.5" />
+                  {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
                 </button>
               </div>
             ) : (
@@ -475,14 +481,18 @@ export default function Header() {
                   Minha Conta
                 </NavLink>
                 <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
-                  onClick={() => {
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                  disabled={isPending}
+                  onClick={async () => {
                     setIsMobileMenuOpen(false);
-                    signOut();
+                    await signOut();
+                    if (location.pathname === "/conta" || location.pathname === "/admin") {
+                      navigate("/");
+                    }
                   }}
                   type="button"
                 >
-                  <LogOut className="h-4 w-4" />
+                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
                   Sair da conta
                 </button>
               </>

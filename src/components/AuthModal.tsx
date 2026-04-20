@@ -18,17 +18,28 @@ type AuthMode = 'login' | 'register';
 
 export default function AuthModal({ isOpen, onClose, hint }: Props) {
     const { t } = useTranslation();
-    const { signIn, signUp, loading } = useAuth();
+    const { signIn, signUp, isPending: loading, user } = useAuth();
     const [mode, setMode] = useState<AuthMode>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const emailRef = useRef<HTMLInputElement>(null);
+    // Track whether this modal triggered a sign-in attempt
+    const attemptingLogin = useRef(false);
+
+    // Auto-close when a login attempt succeeds and the user state updates
+    useEffect(() => {
+        if (isOpen && user && attemptingLogin.current) {
+            attemptingLogin.current = false;
+            onClose();
+        }
+    }, [user, isOpen, onClose]);
 
     useEffect(() => {
         if (isOpen) {
             setEmail(''); setPassword(''); setError(''); setSuccess('');
+            attemptingLogin.current = false;
             setTimeout(() => emailRef.current?.focus(), 50);
         }
     }, [isOpen, mode]);
@@ -40,13 +51,16 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
         setError(''); setSuccess('');
         try {
             if (mode === 'login') {
+                attemptingLogin.current = true;
                 await signIn(email, password);
+                // If the promise resolves normally before the state change fires, close here too
                 onClose();
             } else {
                 await signUp(email, password);
                 setSuccess(t('auth.checkEmail'));
             }
         } catch (err: unknown) {
+            attemptingLogin.current = false;
             setError(err instanceof Error ? err.message : t('auth.genericError'));
         }
     }

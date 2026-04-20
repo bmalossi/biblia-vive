@@ -148,7 +148,7 @@ const AUTHOR_METADATA: Record<string, {
 // Tries multiple regex patterns used by Sacred Texts formatting.
 // Falls back to a truncated excerpt of the full chapter.
 function extractVerseSection(content: string, verse: number): string {
-    const MAX_CHARS = 3500;
+    const MAX_CHARS = 5000; // Increased to ensure long texts aren't cut off
 
     const patterns = [
         // Pattern: "Ver. 3.", "Ver 3.", "Verse 3." followed by next verse marker
@@ -176,7 +176,14 @@ function extractVerseSection(content: string, verse: number): string {
         }
     }
 
-    // Fallback: return a truncated slice of the full chapter
+    // Fallback: look for the verse number as a standalone token and slice around it
+    const fallbackIdx = content.search(new RegExp(`\\b${verse}\\b`));
+    if (fallbackIdx !== -1) {
+        const start = Math.max(0, fallbackIdx - 500); // include some context before
+        return content.slice(start, start + MAX_CHARS);
+    }
+
+    // Ultimate fallback: return the beginning of the chapter
     return content.slice(0, MAX_CHARS);
 }
 
@@ -347,17 +354,18 @@ Deno.serve(async (req) => {
         const systemPrompt = `Você é um editor especializado em teologia histórica cristã.
 
 Seu trabalho é:
-1. Ler os excertos brutos de comentaristas históricos fornecidos sobre ${verseLabel}.
-2. SELECIONAR NO MÁXIMO 3 autores — escolha obrigatoriamente aqueles que forneceram os comentários mais completos, profundos e ricos em informação sobre o versículo.
-3. Para cada um dos autores escolhidos, extraia e limpe o trecho relevante, traduzindo fielmente para ${langLabel}.
-4. Retorne SOMENTE JSON válido. O array "commentaries" nunca deve ter mais que 3 itens.
+1. Ler os excertos brutos de comentaristas históricos. Estes textos podem ser sobre o capítulo inteiro ou sobre um trecho maior, mas SEU FOCO ÚNICO E EXCLUSIVO é o versículo alvo: ${verseLabel}.
+2. Analisar o que CADA autor comentou ESPECIFICAMENTE E DIRETAMENTE sobre este versículo isolado.
+3. SELECIONAR NO MÁXIMO 3 autores que forneceram as explicações teológicas mais profundas e diretas sobre O VERSÍCULO ALVO. Descarte autores que fizeram apenas um resumo genérico do capítulo.
+4. Para cada autor selecionado, extraia a porção exata onde ele explica o versículo, traduza fielmente para ${langLabel} mantendo a erudição do autor, e exclua qualquer parte do comentário original que divague sobre versos anteriores ou posteriores.
+5. Retorne SOMENTE JSON válido.
 
 Regras:
-- Nunca invente ou parafraseie texto.
-- Máximo absoluto de 3 comentários. Se houver mais, descarte os mais fracos.
-- O campo "text" deve conter o texto limpo e traduzido.
+- NUNCA faça um resumo do capítulo inteiro. É estritamente proibido falar sobre o contexto do capítulo; foque 100% no versículo em tela.
+- Máximo absoluto de 3 comentários selecionados.
+- O campo "text" deve conter o comentário limpo, focado e traduzido.
 
-Schema de retorno:
+Schema de retorno JSON:
 {
   "status": "complete",
   "count": <número entre 1 e 3>,
@@ -369,14 +377,14 @@ Schema de retorno:
       "work": "<obra>",
       "year": "<ano>",
       "original_language": "<idioma>",
-      "text": "<texto traduzido e limpo do comentarista>",
+      "text": "<texto traduzido focado no versículo>",
       "source_url": "<url ou null>"
     }
   ]
 }`;
 
-        const userPrompt = `Dentre estes excertos históricos sobre ${verseLabel}, selecione OS 3 MAIS COMPLETOS E INFORMATIVOS, formate-os e traduza-os.
-Versículo: "${verseText ?? ""}"
+        const userPrompt = `Dentre estes excertos históricos, localize a porção que fala do versículo alvo (${verseLabel}), isole OS 3 MAIS COMPLETOS, formate-os e traduza-os focando APENAS neste versículo.
+Versículo alvo e seu texto bíblico: "${verseText ?? ""}"
 
 ${authorBlocks}
 

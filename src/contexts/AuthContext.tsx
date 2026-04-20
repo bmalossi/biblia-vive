@@ -26,6 +26,8 @@ interface AuthState {
     user: User | null;
     /** true only during the very first session restore on mount */
     loading: boolean;
+    /** true when an async auth action (login/logout/signup) is in progress */
+    isPending: boolean;
     isAuthenticated: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
@@ -42,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     // Starts true; becomes false exactly once after INITIAL_SESSION fires.
     const [loading, setLoading] = useState(true);
+    const [isPending, setIsPending] = useState(false);
     const migratedUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
@@ -55,11 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const nextUser = session?.user ?? null;
 
             setUser(nextUser);
-
             // Mark initial load as done on the very first event — ANY event, not
             // just INITIAL_SESSION, so edge cases (e.g. SIGNED_IN fires first)
             // never leave the app stuck in loading=true forever.
             setLoading(false);
+            setIsPending(false); // SAFETY: Reset pending on any auth event
 
             // Refresh user object after token refresh to pick up new metadata
             if (event === 'TOKEN_REFRESHED' && nextUser) {
@@ -101,17 +104,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // ── Auth actions ──────────────────────────────────────────────────────────
 
     const signIn = useCallback(async (email: string, password: string) => {
-        await signInWithEmail(email, password);
-        // onAuthStateChange will fire SIGNED_IN and update state automatically
+        setIsPending(true);
+        try {
+            await signInWithEmail(email, password);
+        } finally {
+            setIsPending(false);
+        }
     }, []);
 
     const signUp = useCallback(async (email: string, password: string) => {
-        await signUpWithEmail(email, password);
+        setIsPending(true);
+        try {
+            await signUpWithEmail(email, password);
+        } finally {
+            setIsPending(false);
+        }
     }, []);
 
     const signOut = useCallback(async () => {
-        await authSignOut();
-        // onAuthStateChange will fire SIGNED_OUT and set user = null
+        setIsPending(true);
+        try {
+            await authSignOut();
+        } finally {
+            setUser(null);
+            migratedUserIdRef.current = null;
+            setIsPending(false);
+        }
     }, []);
 
     // ── Value ─────────────────────────────────────────────────────────────────
@@ -121,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             value={{
                 user,
                 loading,
+                isPending,
                 isAuthenticated: !!user,
                 signIn,
                 signUp,

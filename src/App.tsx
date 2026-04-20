@@ -20,6 +20,7 @@ const SharePage = lazy(() => import("./pages/SharePage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const WidgetDailyVerse = lazy(() => import("./pages/WidgetDailyVerse"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
+const ProSuccessPage = lazy(() => import("./pages/ProSuccessPage"));
 const ChurchDisplayPage = lazy(() => import("./pages/ChurchDisplayPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/compartilhar" element={<SharePage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/pro" element={<PricingPage />} />
+              <Route path="/pro/success" element={<ProSuccessPage />} />
               <Route path="/widget/daily" element={<WidgetDailyVerse />} />
               <Route path="/church-display" element={<ChurchDisplayPage />} />
               <Route path="/conta" element={<AccountPage />} />

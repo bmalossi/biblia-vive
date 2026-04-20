@@ -7,7 +7,7 @@ import { toast } from "@/hooks/useToast";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen } from "lucide-react";
+import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle } from "lucide-react";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ function Alert({ type, message }: { type: "success" | "error"; message: string }
 
 export default function AccountPage() {
     const navigate = useNavigate();
-    const { user, loading: authLoading, signOut } = useAuth();
+    const { user, loading: authLoading, signOut, isPending } = useAuth();
     const { subscription, isPro, isTemplo, isAdmin, loading: subLoading, checkout, manageSubscription } = useSubscription();
     const { stats, loading: studyLoading } = useAllStudyData();
 
@@ -578,8 +578,10 @@ export default function AccountPage() {
                 <div className="pt-2">
                     <button
                         onClick={() => signOut().then(() => navigate("/"))}
-                        className="text-xs text-app-text-muted hover:text-red-400 transition-colors"
+                        disabled={isPending}
+                        className="text-xs text-app-text-muted hover:text-red-400 transition-colors disabled:opacity-50 flex items-center gap-2"
                     >
+                        {isPending && <Loader2 className="h-3 w-3 animate-spin" />}
                         Sair da conta
                     </button>
                 </div>

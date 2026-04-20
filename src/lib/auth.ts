@@ -18,8 +18,21 @@ export async function signUpWithEmail(email: string, password: string) {
 }
 
 export async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+        // RACE CONDITION SAFETY: Supabase v2 lock bugs can cause signOut() to hang.
+        // We use a 3s timeout to ensure we don't block the UI forever.
+        await Promise.race([
+            supabase.auth.signOut(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Sign out timeout')), 3000))
+        ]);
+    } catch (error) {
+        console.warn('Sign out had issues (possibly timeout or lock), clearing locally anyway.', error);
+    } finally {
+        // ALWAYS clear local storage to ensure the user is logged out visually/locally
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('bv-auth-token');
+        }
+    }
 }
 
 export async function getSession() {

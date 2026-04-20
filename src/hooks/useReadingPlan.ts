@@ -128,7 +128,10 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
         now.setHours(0, 0, 0, 0);
         start.setHours(0, 0, 0, 0);
         const diff = Math.abs(now.getTime() - start.getTime());
-        return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+        const calendarDayIndex = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+
+        // Prevent auto-advancing past days that haven't been completed yet
+        return Math.min(calendarDayIndex, progress.completedDays.length + 1);
     };
 
     const todayDayIndex = getTodayDayIndex();
@@ -230,6 +233,7 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
 
     /**
      * Advances the active plan to the next day manually by shifting startDate back 1 day.
+     * This is useful when the user completes reading early and wants to skip to tomorrow's reading.
      */
     const advanceToNextDay = useCallback(() => {
         const targetId = effectivePlanId;
