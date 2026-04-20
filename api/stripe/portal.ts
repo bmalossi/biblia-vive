@@ -1,5 +1,4 @@
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req: Request) {
     if (req.method !== "POST") {
@@ -14,7 +13,7 @@ export default async function handler(req: Request) {
         if (!stripeSecretKey || !supabaseUrl || !supabaseServiceRoleKey) {
             return new Response(
                 JSON.stringify({ error: "Missing Environment Variables" }),
-                { status: 500 }
+                { status: 500, headers: { "Content-Type": "application/json" } }
             );
         }
 
@@ -24,35 +23,55 @@ export default async function handler(req: Request) {
         if (!userId) {
             return new Response(
                 JSON.stringify({ error: "User ID is required" }),
-                { status: 400 }
+                { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
 
-        const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+        // ── Fetch stripe_customer_id via native fetch with timeout ──────────
+        // The Supabase SDK hangs indefinitely on this project — use raw REST instead.
+        const controller = new AbortController();
+        const dbTimeout = setTimeout(() => controller.abort(), 8000);
 
-        const { data: subscription } = await supabase
-            .from("user_subscriptions")
-            .select("stripe_customer_id")
-            .eq("user_id", userId)
-            .maybeSingle();
+        let stripeCustomerId: string | null = null;
+        try {
+            const dbRes = await fetch(
+                `${supabaseUrl}/rest/v1/user_subscriptions?select=stripe_customer_id&user_id=eq.${userId}&limit=1`,
+                {
+                    headers: {
+                        apikey: supabaseServiceRoleKey,
+                        Authorization: `Bearer ${supabaseServiceRoleKey}`,
+                        Accept: "application/json",
+                    },
+                    signal: controller.signal,
+                }
+            );
 
-        if (!subscription || !subscription.stripe_customer_id) {
+            if (!dbRes.ok) {
+                throw new Error(`Supabase query failed: ${dbRes.status}`);
+            }
+
+            const rows: { stripe_customer_id: string | null }[] = await dbRes.json();
+            stripeCustomerId = rows?.[0]?.stripe_customer_id ?? null;
+        } finally {
+            clearTimeout(dbTimeout);
+        }
+
+        if (!stripeCustomerId) {
             return new Response(
-                JSON.stringify({ error: "No active Stripe customer found" }),
-                { status: 404 }
+                JSON.stringify({ error: "No active Stripe customer found for this user." }),
+                { status: 404, headers: { "Content-Type": "application/json" } }
             );
         }
 
+        // ── Create Stripe Billing Portal session ────────────────────────────
         const stripe = new Stripe(stripeSecretKey, {
             apiVersion: "2023-10-16" as any,
             httpClient: Stripe.createFetchHttpClient(),
         });
 
-        const returnUrl = "https://www.bibliavive.com.br/plano";
-
         const portalSession = await stripe.billingPortal.sessions.create({
-            customer: subscription.stripe_customer_id,
-            return_url: returnUrl,
+            customer: stripeCustomerId,
+            return_url: "https://www.bibliavive.com.br/conta",
             locale: "pt-BR",
         });
 
@@ -62,10 +81,10 @@ export default async function handler(req: Request) {
         });
 
     } catch (err: any) {
-        console.error("Stripe Portal Error:", err);
+        console.error("[stripe/portal] Error:", err?.message ?? err);
         return new Response(
-            JSON.stringify({ error: err.message || "Internal Server Error" }),
-            { status: 500 }
+            JSON.stringify({ error: err?.message || "Internal Server Error" }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
         );
     }
 }
