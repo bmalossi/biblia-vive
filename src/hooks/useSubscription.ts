@@ -144,16 +144,13 @@ export function useSubscription() {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
         const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-        // Get current session token for auth
-        const { data: { session } } = await supabase.auth.getSession();
-        const accessToken = session?.access_token ?? anonKey;
-
         const response = await fetch(`${supabaseUrl}/functions/v1/stripe-portal`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken}`,
+                "Authorization": `Bearer ${anonKey}`,
             },
+            body: JSON.stringify({ userId: user.id }),
         });
 
         if (!response.ok) {

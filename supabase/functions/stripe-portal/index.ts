@@ -29,35 +29,27 @@ Deno.serve(async (req: Request) => {
             );
         }
 
-        // Authenticate the requesting user via the Bearer token
-        const authHeader = req.headers.get("Authorization");
-        if (!authHeader) {
+        const body = await req.json().catch(() => ({}));
+        const userId: string | undefined = body.userId;
+
+        if (!userId) {
             return new Response(
-                JSON.stringify({ error: "Unauthorized" }),
-                { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                JSON.stringify({ error: "User ID is required" }),
+                { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
         const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-        const token = authHeader.replace("Bearer ", "");
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-        if (authError || !user) {
-            return new Response(
-                JSON.stringify({ error: "Invalid or expired token" }),
-                { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
 
         // Fetch the stripe_customer_id for this user
         const { data: sub, error: subError } = await supabase
             .from("user_subscriptions")
             .select("stripe_customer_id")
-            .eq("user_id", user.id)
+            .eq("user_id", userId)
             .maybeSingle();
 
         if (subError || !sub?.stripe_customer_id) {
-            console.error("[stripe-portal] No customer found for user:", user.id, subError?.message);
+            console.error("[stripe-portal] No customer found for user:", userId, subError?.message);
             return new Response(
                 JSON.stringify({ error: "Nenhuma assinatura ativa encontrada para este usuário." }),
                 { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -76,7 +68,7 @@ Deno.serve(async (req: Request) => {
             locale: "pt-BR",
         });
 
-        console.log(`[stripe-portal] ✅ Portal session created for user ${user.id}`);
+        console.log(`[stripe-portal] ✅ Portal session created for user ${userId}`);
 
         return new Response(JSON.stringify({ url: portalSession.url }), {
             status: 200,
