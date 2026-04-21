@@ -6,6 +6,7 @@ import InstallPrompt from "@/components/InstallPrompt";
 import { ToastViewport } from "@/components/Toast";
 import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Analytics } from '@vercel/analytics/react';
 import HomePage from "./pages/HomePage";
 import TermsPage from "./pages/TermsPage";
 
@@ -68,6 +69,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
+    <Analytics />
   </QueryClientProvider>
 );
 
