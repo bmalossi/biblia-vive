@@ -17,5 +17,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         detectSessionInUrl: true,
         // Stable storage key — avoids collisions between Vite dev server and prod
         storageKey: 'bv-auth-token',
+        // @ts-expect-error Supabase types sometimes miss this parameter
+        lockAcquireTimeout: 10000,
     },
 });

@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Load test credentials — NEVER commit
+tests/load/.env.load-test
+# k6 results output
+tests/load/results/

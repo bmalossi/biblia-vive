@@ -30,14 +30,26 @@ export function useNotesHighlights(bookId: string, chapter: number) {
     // Load data whenever chapter or auth state changes
     useEffect(() => {
         if (!bookId || !chapter) return;
+
+        let cancelled = false;
         setLoading(true);
+        // Clear old notes and highlights immediately when chapter changes
+        // This prevents the stale UI offset bug (e.g. 30:6 -> 31:6+) while fetching
+        setHighlights([]);
+        setNotes([]);
+
         Promise.all([
             getChapterHighlights(userId, bookId, chapter),
             getChapterNotes(userId, bookId, chapter),
         ]).then(([hl, nt]) => {
+            if (cancelled) return;
             setHighlights(hl);
             setNotes(nt);
-        }).finally(() => setLoading(false));
+        }).finally(() => {
+            if (!cancelled) setLoading(false);
+        });
+
+        return () => { cancelled = true; };
     }, [userId, bookId, chapter]);
 
     const getHighlightForVerse = useCallback(
@@ -52,11 +64,19 @@ export function useNotesHighlights(bookId: string, chapter: number) {
 
     const addHighlight = useCallback(
         async (verse: number, color: HighlightColor, meta?: { bookName?: string; version?: string; verseText?: string }) => {
-            await svcSetHighlight(userId, bookId, chapter, verse, color, meta);
-            setHighlights(prev => {
-                const without = prev.filter(h => h.verse !== verse);
-                return [...without, { verse, color }];
-            });
+            const isCurrentChapter = bookId && chapter;
+            // Optimistic update BEFORE await
+            if (isCurrentChapter) {
+                setHighlights(prev => {
+                    const without = prev.filter(h => h.verse !== verse);
+                    return [...without, { verse, color } as any];
+                });
+            }
+            try {
+                await svcSetHighlight(userId, bookId, chapter, verse, color, meta);
+            } catch (err) {
+                console.warn("Error saving highlight", err);
+            }
         },
         [userId, bookId, chapter]
     );

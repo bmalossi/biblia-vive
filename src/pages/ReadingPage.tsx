@@ -1307,12 +1307,14 @@ export default function ReadingPage() {
                             key={verse.id}
                             note={verseNote}
                             onEditClick={() => {
-                              handleVerseClick({
+                              setSelectedVerse({
                                 anchorKey,
-                                text: verse.text,
+                                reference: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber}:${verseNumber}`,
+                                text: primaryText,
                                 verseNumber,
                                 version: selectedVersion,
                               });
+                              setHashHighlightedVerse(null);
                               setIsNoteModalOpen(true);
                             }}
                           >
