@@ -50,6 +50,7 @@ export default function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchWrapperRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -72,6 +73,10 @@ export default function Header() {
       setQuery(params.get("q") ?? "");
     }
   }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.id]);
 
   useEffect(() => {
     const onClickOutside = (event: MouseEvent) => {
@@ -322,12 +327,13 @@ export default function Header() {
                     }`
                   }
                 >
-                  {user.user_metadata?.avatar_url ? (
+                  {user.user_metadata?.avatar_url && !avatarError ? (
                     <img
                       src={user.user_metadata.avatar_url}
                       alt={user.user_metadata?.full_name || user.email || "Avatar"}
                       className="h-full w-full object-cover"
                       referrerPolicy="no-referrer"
+                      onError={() => setAvatarError(true)}
                     />
                   ) : (
                     <span className="text-[0.65rem] font-semibold text-app-text select-none">
