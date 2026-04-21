@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import readingPlansData from "../../public/bible/reading-plans.json";
+import readingPlansData from "@/data/bible/reading-plans.json";
 import {
     savePlanProgressToCloud,
     loadPlanProgressesFromCloud,

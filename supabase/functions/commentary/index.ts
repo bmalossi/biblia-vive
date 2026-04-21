@@ -2,10 +2,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from "npm:@supabase/supabase-js@2.39.3"
 import OpenAI from "npm:openai@4.28.0"
+import { Ratelimit } from "npm:@upstash/ratelimit@2"
+import { Redis } from "npm:@upstash/redis@1"
+
+const RATE_LIMIT = 10; // requests per hour
 
 // ─── Author metadata dictionary ───────────────────────────────────────────────
-// Maps the `author` slug in the `commentaries` table to structured metadata
-// for the frontend Commentary interface.
 const AUTHOR_METADATA: Record<string, {
     author: string;
     era: string;
@@ -145,23 +147,18 @@ const AUTHOR_METADATA: Record<string, {
 };
 
 // ─── Extracts the section relevant to a specific verse from chapter content ──
-// Tries multiple regex patterns used by Sacred Texts formatting.
-// Falls back to a truncated excerpt of the full chapter.
 function extractVerseSection(content: string, verse: number): string {
-    const MAX_CHARS = 5000; // Increased to ensure long texts aren't cut off
+    const MAX_CHARS = 5000;
 
     const patterns = [
-        // Pattern: "Ver. 3.", "Ver 3.", "Verse 3." followed by next verse marker
         new RegExp(
             `(?:Verse|Ver\\.)\\s*${verse}[:.)(]([\\s\\S]*?)(?=(?:Verse|Ver\\.)\\s*${verse + 1}[:.)(]|$)`,
             'i'
         ),
-        // Pattern: standalone verse number at start of line "3." or "3:"
         new RegExp(
             `(?:^|\\n)\\s*${verse}[.:]\\s+([\\s\\S]*?)(?=\\n\\s*${verse + 1}[.:]|$)`,
             'm'
         ),
-        // Pattern: bracketed or parenthetical verse "v. 3" or "(3)"
         new RegExp(
             `(?:v\\.\\s*|\\()${verse}[).:]([\\s\\S]*?)(?=(?:v\\.\\s*|\\()${verse + 1}[).:])`,
             'i'
@@ -176,32 +173,47 @@ function extractVerseSection(content: string, verse: number): string {
         }
     }
 
-    // Fallback: look for the verse number as a standalone token and slice around it
     const fallbackIdx = content.search(new RegExp(`\\b${verse}\\b`));
     if (fallbackIdx !== -1) {
-        const start = Math.max(0, fallbackIdx - 500); // include some context before
+        const start = Math.max(0, fallbackIdx - 500);
         return content.slice(start, start + MAX_CHARS);
     }
 
-    // Ultimate fallback: return the beginning of the chapter
     return content.slice(0, MAX_CHARS);
+}
+
+// ─── Build rate limit headers ─────────────────────────────────────────────────
+function buildRateLimitHeaders(
+    corsHeaders: Record<string, string>,
+    remaining: number,
+    resetAt: number
+): Record<string, string> {
+    return {
+        ...corsHeaders,
+        'X-RateLimit-Limit': String(RATE_LIMIT),
+        'X-RateLimit-Remaining': String(Math.max(0, remaining)),
+        'X-RateLimit-Reset': String(resetAt),
+    };
 }
 
 Deno.serve(async (req) => {
     console.log("[Commentary] Request received:", req.method, req.url);
+
     // CORS preflight
     if (req.method === 'OPTIONS') {
         return new Response('ok', {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+                'Access-Control-Expose-Headers': 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset'
             }
         });
     }
 
-    const corsHeaders = {
+    const corsHeaders: Record<string, string> = {
         'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Expose-Headers': 'X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset'
     };
 
     try {
@@ -233,7 +245,7 @@ Deno.serve(async (req) => {
         const verseId = lang !== 'en' ? `${baseId}:${lang}` : baseId;
         const questionType = isChapterLevel ? "chapter_commentary" : "commentary";
 
-        // ── 1. Check cache first ───────────────────────────────────────────────
+        // ── 1. Check cache first (cached responses bypass rate limit) ──────────
         const { data: cached } = await supabase
             .from("ai_study_cache")
             .select("response")
@@ -248,13 +260,15 @@ Deno.serve(async (req) => {
             );
         }
 
-        // ── 2. Verify PRO status ───────────────────────────────────────────────
+        // ── 2. Verify PRO status & get user_id ────────────────────────────────
         let isPro = false;
+        let userId: string | null = null;
         const authHeader = req.headers.get("Authorization");
         if (authHeader) {
             const token = authHeader.replace("Bearer ", "");
             const { data: { user } } = await supabase.auth.getUser(token);
             if (user) {
+                userId = user.id;
                 const isAdmin = user.app_metadata?.role === "admin";
                 const { data: sub, error: subError } = await supabase
                     .from("user_subscriptions")
@@ -275,9 +289,47 @@ Deno.serve(async (req) => {
             );
         }
 
-        // ── 3. Query Supabase `commentaries` table ────────────────────────────
-        // Map frontend bookId (e.g. "JHN") → book_code ("jhn")
-        // Map chapter integer (e.g. 3) → zero-padded string ("003")
+        // ── 3. Rate limiting with Upstash Redis ───────────────────────────────
+        const upstashUrl = Deno.env.get("UPSTASH_REDIS_REST_URL");
+        const upstashToken = Deno.env.get("UPSTASH_REDIS_REST_TOKEN");
+
+        if (upstashUrl && upstashToken && userId) {
+            const redis = new Redis({ url: upstashUrl, token: upstashToken });
+            const ratelimit = new Ratelimit({
+                redis,
+                limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
+                prefix: "bv:commentary",
+            });
+
+            const { success, limit, remaining, reset } = await ratelimit.limit(userId);
+
+            // Reset timestamp in milliseconds for frontend countdown
+            const resetAtMs = reset * 1000;
+
+            const rlHeaders = buildRateLimitHeaders(corsHeaders, remaining, resetAtMs);
+
+            if (!success) {
+                console.log(`[Commentary] Rate limit hit for user: ${userId}`);
+                return new Response(
+                    JSON.stringify({
+                        error: "limite_atingido",
+                        message: "Você atingiu o limite de comentários desta hora.",
+                        reset_at: resetAtMs,
+                        limit: RATE_LIMIT,
+                    }),
+                    { status: 429, headers: rlHeaders }
+                );
+            }
+
+            // Attach real-time quota to corsHeaders for the success response
+            Object.assign(corsHeaders, {
+                'X-RateLimit-Limit': String(limit),
+                'X-RateLimit-Remaining': String(remaining),
+                'X-RateLimit-Reset': String(resetAtMs),
+            });
+        }
+
+        // ── 4. Query Supabase `commentaries` table ────────────────────────────
         const bookCode = bookId.toLowerCase();
         const chapterPadded = String(chapter).padStart(3, '0');
 
@@ -293,7 +345,6 @@ Deno.serve(async (req) => {
         }
 
         if (!rows || rows.length === 0) {
-            // No source material found — return empty commentaries gracefully
             const emptyResponse = JSON.stringify({ status: "unavailable", count: 0, commentaries: [] });
             return new Response(
                 JSON.stringify({ response: emptyResponse, cached: false }),
@@ -301,7 +352,7 @@ Deno.serve(async (req) => {
             );
         }
 
-        // ── 4. Extract verse-relevant section from each author's chapter text ──
+        // ── 5. Extract verse-relevant section from each author's chapter text ──
         const authorSnippets: { slug: string; meta: (typeof AUTHOR_METADATA)[string]; excerpt: string; url: string }[] = [];
 
         for (const row of rows) {
@@ -331,7 +382,7 @@ Deno.serve(async (req) => {
             );
         }
 
-        // ── 5. Call OpenAI to format the extracted excerpts into Commentary[] ──
+        // ── 6. Call OpenAI ─────────────────────────────────────────────────────
         if (!openaiKey) {
             throw new Error("OpenAI API Key not configured");
         }
@@ -346,7 +397,6 @@ Deno.serve(async (req) => {
             ? `${bookId.toUpperCase()} capítulo ${chapter} (visão geral)`
             : `${bookId.toUpperCase()} ${chapter}:${verse}`;
 
-        // Build the input block for each author
         const authorBlocks = authorSnippets.map(s =>
             `[AUTOR: ${s.meta.author}]\n[SLUG: ${s.slug}]\nExcerto original:\n"""\n${s.excerpt}\n"""`
         ).join('\n\n---\n\n');
@@ -414,7 +464,7 @@ ${authorSnippets.map(s => `- ${s.slug}: author="${s.meta.author}", era="${s.meta
         const commentariesArray = result.commentaries || [];
         const commentaryJson = JSON.stringify(result);
 
-        // ── 6. Save to cache if there are results ──────────────────────────────
+        // ── 7. Save to cache if there are results ──────────────────────────────
         if (commentariesArray.length > 0 && result.status !== "unavailable") {
             supabase
                 .from("ai_study_cache")

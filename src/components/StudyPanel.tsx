@@ -13,6 +13,8 @@ import type { CrossReference } from "@/lib/crossReferences";
 import { useSubscription } from "@/hooks/useSubscription";
 import { BiblicalCommentary } from "./BiblicalCommentary";
 import { toast } from "@/hooks/useToast";
+import CommentaryQuota from "./CommentaryQuota";
+import { RateLimitDialog } from "./RateLimitDialog";
 
 // Helper to strip Greek and Hebrew diacritics/vowels for pure consonant matching
 function normalizeText(text: string) {
@@ -99,6 +101,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
 
     const [activeTab, setActiveTab] = useState<TabId>("context");
     const [isGenerating, setIsGenerating] = useState(false);
+    const [rateLimitStatus, setRateLimitStatus] = useState<{ open: boolean, resetAt: number | null, limit: number }>({ open: false, resetAt: null, limit: 10 });
     const [localCommentary, setLocalCommentary] = useState<string | null>(null);
     const [strongsCache, setStrongsCache] = useState<Record<string, StrongsEntry>>({});
     const [strongsLoading, setStrongsLoading] = useState(false);
@@ -208,7 +211,11 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
             toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
         } catch (err: any) {
             console.error(err);
-            toast({ message: "Erro ao gerar comentários: " + err.message, type: "error" });
+            if (err.code === 'RATE_LIMITED') {
+                setRateLimitStatus({ open: true, resetAt: err.reset_at, limit: err.limit });
+            } else {
+                toast({ message: "Erro ao gerar comentários: " + err.message, type: "error" });
+            }
         } finally {
             setIsGenerating(false);
         }
@@ -572,6 +579,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                         </div>
                                     ) : (
                                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+                                            <CommentaryQuota className="mb-2" />
                                             {(data?.commentaries || localCommentary) ? (
                                                 <BiblicalCommentary
                                                     commentaries={(function () {
@@ -673,6 +681,13 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                     </div>
                 </DialogContent>
             </Dialog>
+
+            <RateLimitDialog
+                open={rateLimitStatus.open}
+                onOpenChange={(open) => setRateLimitStatus(prev => ({ ...prev, open }))}
+                resetAt={rateLimitStatus.resetAt}
+                limit={rateLimitStatus.limit}
+            />
         </>
     );
 }

@@ -71,7 +71,7 @@ export default function PricingPage() {
                         <ul className="space-y-4 mb-8">
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Acesso aos Comentários Teológicos Históricos</span>
+                                <span>Acesso a até 10 Comentários de IA por hora</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
@@ -194,9 +194,9 @@ export default function PricingPage() {
                                 <Sparkles className="h-5 w-5 text-violet-400" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Comentários Teológicos Históricos</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Comentários Teológicos de IA</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Tenha acesso direto a extrações ricas e completas de grandes comentaristas e teólogos históricos (ex: Spurgeon, Matthew Henry, Calvino) para um aprofundamento muito maior da Palavra através do painel de estudo.
+                                    Tenha acesso a até 10 comentários explicativos por hora, gerados pela nossa inteligência artificial treinada em teologia histórica (Spurgeon, Calvino, etc) para se aprofundar na Palavra.
                                 </p>
                             </div>
                         </div>

@@ -126,6 +126,27 @@ export async function cacheStudyResponse(
   }
 }
 
+const QUOTA_STORAGE_KEY = 'bv_commentary_quota';
+
+function persistQuota(response: Response): void {
+  try {
+    const limitHeader = response.headers.get('X-RateLimit-Limit');
+    if (!limitHeader) return;
+
+    const limit = Number(limitHeader);
+    const remaining = Number(response.headers.get('X-RateLimit-Remaining') ?? limit);
+    const resetAt = Number(response.headers.get('X-RateLimit-Reset') ?? (Date.now() + 3600000));
+    localStorage.setItem(QUOTA_STORAGE_KEY, JSON.stringify({
+      limit,
+      remaining,
+      resetAt,
+      updatedAt: Date.now(),
+    }));
+  } catch {
+    // ignore storage errors
+  }
+}
+
 export async function requestCommentary(
   params: {
     bookId: string;
@@ -159,7 +180,19 @@ export async function requestCommentary(
         body: JSON.stringify(params)
       });
 
+      // Persist quota info from headers (available on all non-cached responses)
+      persistQuota(response);
+
       const result = await response.json();
+
+      // Handle rate limit
+      if (response.status === 429) {
+        const err = new Error(result?.message || 'Limite de comentários atingido') as any;
+        err.code = 'RATE_LIMITED';
+        err.reset_at = result?.reset_at ?? (Date.now() + 3600000);
+        err.limit = result?.limit ?? 10;
+        throw err;
+      }
 
       if (!response.ok || result?.error) {
         throw new Error(result?.error || result?.message || `Erro HTTP ${response.status} na chamada da API de IA`);

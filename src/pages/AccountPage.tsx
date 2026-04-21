@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle } from "lucide-react";
+import CommentaryQuota from "@/components/CommentaryQuota";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -383,6 +384,12 @@ export default function AccountPage() {
                                                 </p>
                                             </div>
                                             <span className="px-2.5 py-1 text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20 rounded-full">Ativo</span>
+                                        </div>
+                                    )}
+
+                                    {isActive && !isCancelingAtEnd && (
+                                        <div className="pt-2">
+                                            <CommentaryQuota />
                                         </div>
                                     )}
 

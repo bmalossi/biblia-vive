@@ -7,6 +7,8 @@ import VerseToolbar from "@/components/VerseToolbar";
 import NoteModal from "@/components/NoteModal";
 import AuthModal from "@/components/AuthModal";
 import NotePopover from "@/components/NotePopover";
+import { RateLimitDialog } from "@/components/RateLimitDialog";
+import CommentaryQuota from "@/components/CommentaryQuota";
 import DailyReadingBadge from "@/components/DailyReadingBadge";
 import VerseCardModal from "@/components/VerseCardModal";
 import type { CardData } from "@/components/VerseCardTemplates";
@@ -171,6 +173,7 @@ export default function ReadingPage() {
   const [toolbarPosition, setToolbarPosition] = useState<{ left: number; top: number } | null>(null);
   const [isToolbarMobile, setIsToolbarMobile] = useState(false);
   const [isStudyPanelOpen, setIsStudyPanelOpen] = useState(false);
+  const [rateLimitStatus, setRateLimitStatus] = useState<{ open: boolean, resetAt: number | null, limit: number }>({ open: false, resetAt: null, limit: 10 });
   const [studyVerse, setStudyVerse] = useState<number | null>(null);
   const [studyVerseText, setStudyVerseText] = useState<string>('');
   const [bookContext, setBookContext] = useState<BookContextData | null>(null);
@@ -764,7 +767,11 @@ export default function ReadingPage() {
         document.getElementById('chapter-commentary-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } catch (e: any) {
-      toast({ message: "Erro: " + e.message, type: "error" });
+      if (e.code === 'RATE_LIMITED') {
+        setRateLimitStatus({ open: true, resetAt: e.reset_at, limit: e.limit });
+      } else {
+        toast({ message: "Erro: " + e.message, type: "error" });
+      }
     } finally {
       setIsChapterCommentaryLoading(false);
     }
@@ -1447,6 +1454,7 @@ export default function ReadingPage() {
 
                   {/* Chapter Commentary Button in Sidebar */}
                   <div className="w-full mt-8 border-t border-border/50 pt-6 flex flex-col items-center justify-center">
+                    {isPro && <CommentaryQuota compact className="w-full mb-4 px-2" />}
                     <Button
                       onClick={handleChapterCommentary}
                       disabled={isChapterCommentaryLoading}
@@ -1642,6 +1650,13 @@ export default function ReadingPage() {
             onClose={() => setIsStudyPanelOpen(false)}
           />
         )}
+
+        <RateLimitDialog
+          open={rateLimitStatus.open}
+          onOpenChange={(open) => setRateLimitStatus(prev => ({ ...prev, open }))}
+          resetAt={rateLimitStatus.resetAt}
+          limit={rateLimitStatus.limit}
+        />
       </div>
     </Layout>
   );
