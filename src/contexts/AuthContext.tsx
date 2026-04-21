@@ -16,7 +16,7 @@ import {
 } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
-import { signInWithEmail, signUpWithEmail, signOut as authSignOut } from '@/lib/auth';
+import { signInWithEmail, signUpWithEmail, signOut as authSignOut, signInWithGoogle as authSignInWithGoogle } from '@/lib/auth';
 import { migrateLocalToSupabase } from '@/lib/notesHighlights';
 import { migrateLocalPlanToSupabase } from '@/lib/readingPlanSync';
 
@@ -32,6 +32,7 @@ interface AuthState {
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    signInWithGoogle: () => Promise<void>;
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -132,6 +133,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
+    const signInWithGoogle = useCallback(async () => {
+        setIsPending(true);
+        try {
+            await authSignInWithGoogle();
+            // Navigation is handled by the OAuth redirect; isPending stays true
+            // until the page unloads. Auth state update fires on return.
+        } catch (err) {
+            setIsPending(false);
+            throw err;
+        }
+    }, []);
+
     // ── Value ─────────────────────────────────────────────────────────────────
 
     return (
@@ -144,6 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 signIn,
                 signUp,
                 signOut,
+                signInWithGoogle,
             }}
         >
             {children}

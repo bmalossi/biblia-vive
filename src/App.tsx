@@ -25,6 +25,7 @@ const ChurchDisplayPage = lazy(() => import("./pages/ChurchDisplayPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const MyStudyPage = lazy(() => import("./pages/MyStudyPage"));
+const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage"));
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/sobre" element={<AboutPage />} />
               <Route path="/termos-de-uso" element={<TermsPage />} />
               <Route path="/meu-estudo" element={<MyStudyPage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>

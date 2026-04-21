@@ -313,6 +313,30 @@ export default function Header() {
                 </span>
                 <NavLink
                   to="/conta"
+                  title="Minha Conta"
+                  aria-label="Minha Conta"
+                  className={({ isActive }) =>
+                    `hidden md:inline-flex h-8 w-8 items-center justify-center rounded-full border overflow-hidden transition-colors ${isActive
+                      ? "border-gold/50"
+                      : "border-border hover:border-gold/40"
+                    }`
+                  }
+                >
+                  {user.user_metadata?.avatar_url ? (
+                    <img
+                      src={user.user_metadata.avatar_url}
+                      alt={user.user_metadata?.full_name || user.email || "Avatar"}
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <span className="text-[0.65rem] font-semibold text-app-text select-none">
+                      {(user.user_metadata?.full_name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink
+                  to="/conta"
                   className={({ isActive }) =>
                     `hidden md:inline-flex h-8 items-center justify-center rounded-full border px-3 text-xs font-medium transition-colors ${isActive
                       ? "border-gold/50 bg-gold/10 text-gold"

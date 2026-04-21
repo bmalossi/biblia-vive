@@ -67,6 +67,17 @@ export async function getSession() {
     }
 }
 
+export async function signInWithGoogle() {
+    const redirectTo = import.meta.env.VITE_APP_URL || window.location.origin;
+    const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo,
+        },
+    });
+    if (error) throw error;
+}
+
 export async function resetPassword(email: string) {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) throw error;

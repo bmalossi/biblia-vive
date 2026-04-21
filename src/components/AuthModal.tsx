@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // AuthModal.tsx — Bíblia Viva · Sprint 7
-// Modal login/cadastro com email/senha
+// Modal login/cadastro com email/senha + Google OAuth
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useRef, useEffect } from 'react';
@@ -16,14 +16,25 @@ interface Props {
 
 type AuthMode = 'login' | 'register';
 
+// Google G logo — inline SVG as specified
+const GoogleIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
+        <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z" />
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 16.1 4 9.4 8.4 6.3 14.7z" />
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.8 13.5-4.7l-6.2-5.2C29.4 35.6 26.8 36 24 36c-5.2 0-9.6-2.9-11.3-7l-6.6 5C9.5 39.6 16.2 44 24 44z" />
+        <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.5-2.6 4.6-4.9 6l6.2 5.2C40.5 35.6 44 30.2 44 24c0-1.3-.1-2.7-.4-4z" />
+    </svg>
+);
+
 export default function AuthModal({ isOpen, onClose, hint }: Props) {
     const { t } = useTranslation();
-    const { signIn, signUp, isPending: loading, user } = useAuth();
+    const { signIn, signUp, signInWithGoogle, isPending: loading, user } = useAuth();
     const [mode, setMode] = useState<AuthMode>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [googleLoading, setGoogleLoading] = useState(false);
     const emailRef = useRef<HTMLInputElement>(null);
     // Track whether this modal triggered a sign-in attempt
     const attemptingLogin = useRef(false);
@@ -39,6 +50,7 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
     useEffect(() => {
         if (isOpen) {
             setEmail(''); setPassword(''); setError(''); setSuccess('');
+            setGoogleLoading(false);
             attemptingLogin.current = false;
             setTimeout(() => emailRef.current?.focus(), 50);
         }
@@ -64,6 +76,20 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
             setError(err instanceof Error ? err.message : t('auth.genericError'));
         }
     }
+
+    async function handleGoogleSignIn() {
+        setError('');
+        setGoogleLoading(true);
+        try {
+            await signInWithGoogle();
+            // Page will redirect — no need to reset state
+        } catch (err: unknown) {
+            setGoogleLoading(false);
+            setError(err instanceof Error ? err.message : t('auth.genericError'));
+        }
+    }
+
+    const anyLoading = loading || googleLoading;
 
     return (
         <div
@@ -94,7 +120,29 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
                     {hint && <p className="text-[0.78rem] text-app-text-muted">{hint}</p>}
                 </div>
 
-                {/* Form */}
+                {/* Google OAuth Button */}
+                <button
+                    id="auth-google-btn"
+                    type="button"
+                    disabled={anyLoading}
+                    onClick={handleGoogleSignIn}
+                    className="w-full flex items-center justify-center gap-2.5 rounded-xl border border-border bg-white py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                >
+                    {googleLoading
+                        ? <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                        : <GoogleIcon />
+                    }
+                    Continuar com Google
+                </button>
+
+                {/* Separator */}
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[0.72rem] text-app-text-muted select-none">ou</span>
+                    <div className="flex-1 h-px bg-border" />
+                </div>
+
+                {/* Email/Password Form */}
                 <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
                         <label className="text-[0.75rem] font-medium text-app-text/80 mb-1.5 block" htmlFor="auth-email">
@@ -133,7 +181,7 @@ export default function AuthModal({ isOpen, onClose, hint }: Props) {
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={anyLoading}
                         className="w-full flex items-center justify-center gap-2 rounded-xl bg-gold py-2.5 text-sm font-medium text-black hover:bg-gold/90 disabled:opacity-50 transition-colors"
                     >
                         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
