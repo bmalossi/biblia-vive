@@ -63,14 +63,14 @@ export default function CommentaryQuota({ compact = false, className = '' }: Pro
         return () => clearInterval(id);
     }, [quota]);
 
-    if (!quota) return null;
+    const effectiveQuota = quota || { limit: 10, remaining: 10, resetAt: Date.now() + 3600000, updatedAt: Date.now() };
 
-    const used = (quota.limit ?? LIMIT) - quota.remaining;
-    const limit = quota.limit ?? LIMIT;
+    const used = (effectiveQuota.limit ?? LIMIT) - effectiveQuota.remaining;
+    const limit = effectiveQuota.limit ?? LIMIT;
     const pct = Math.min(100, Math.round((used / limit) * 100));
 
-    const isExhausted = quota.remaining === 0;
-    const isWarning = !isExhausted && quota.remaining <= 2;
+    const isExhausted = effectiveQuota.remaining === 0;
+    const isWarning = !isExhausted && effectiveQuota.remaining <= 2;
 
     const barColor = isExhausted
         ? 'bg-red-500'
@@ -89,7 +89,7 @@ export default function CommentaryQuota({ compact = false, className = '' }: Pro
             <div className={`space-y-1.5 ${className}`}>
                 <div className="flex items-center justify-between">
                     <span className={`text-[0.7rem] font-medium ${textColor}`}>
-                        Comentários: {used} / {limit} esta hora
+                        Consultas: {used} / {limit} por hora
                     </span>
                     {isExhausted && countdown && (
                         <span className="flex items-center gap-1 text-[0.65rem] text-red-400">
@@ -116,7 +116,7 @@ export default function CommentaryQuota({ compact = false, className = '' }: Pro
     return (
         <div className={`rounded-xl border border-border bg-app-surface p-4 space-y-3 ${className}`}>
             <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-app-text">Comentários de IA</p>
+                <p className="text-sm font-medium text-app-text">Comentários Teológicos</p>
                 <span className={`text-xs font-semibold tabular-nums ${textColor}`}>
                     {used} / {limit}
                 </span>
@@ -139,8 +139,8 @@ export default function CommentaryQuota({ compact = false, className = '' }: Pro
             ) : (
                 <p className={`text-[0.75rem] ${textColor}`}>
                     {isWarning
-                        ? `Atenção: restam apenas ${quota.remaining} comentário${quota.remaining !== 1 ? 's' : ''} esta hora.`
-                        : `${quota.remaining} comentário${quota.remaining !== 1 ? 's' : ''} disponível${quota.remaining !== 1 ? 'is' : ''} esta hora.`}
+                        ? `Atenção: restam apenas ${effectiveQuota.remaining} consulta${effectiveQuota.remaining !== 1 ? 's' : ''} nesta hora.`
+                        : `${effectiveQuota.remaining} consulta${effectiveQuota.remaining !== 1 ? 's' : ''} disponíve${effectiveQuota.remaining !== 1 ? 'is' : 'l'} nesta hora.`}
                 </p>
             )}
         </div>

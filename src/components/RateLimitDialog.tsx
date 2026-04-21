@@ -44,7 +44,7 @@ export function RateLimitDialog({ open, onOpenChange, resetAt, limit }: RateLimi
                         Limite Atingido
                     </DialogTitle>
                     <DialogDescription className="text-[0.95rem] text-app-text-muted leading-relaxed max-w-sm mx-auto">
-                        Você utilizou todos os <strong className="text-app-text">{limit} comentários</strong> de IA disponíveis para esta hora.
+                        Você utilizou todos os <strong className="text-app-text">{limit} comentários</strong> disponíveis para esta hora.
                     </DialogDescription>
                 </DialogHeader>
 
