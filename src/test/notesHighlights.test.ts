@@ -34,24 +34,24 @@ describe('Notes & Highlights Service (Dual-Mode)', () => {
 
     describe('Anonymous Mode (localStorage)', () => {
         it('should save and retrieve highlights in localStorage', async () => {
-            await setHighlight(null, 'JHN', 3, 16, 'yellow');
-            const hls = await getChapterHighlights(null, 'JHN', 3);
+            await setHighlight(null, 'JOH', 3, 16, 'yellow');
+            const hls = await getChapterHighlights(null, 'JOH', 3);
             expect(hls).toHaveLength(1);
             expect(hls[0]).toEqual({ verse: 16, color: 'yellow' });
         });
 
         it('should update existing highlight color in localStorage', async () => {
-            await setHighlight(null, 'JHN', 3, 16, 'yellow');
-            await setHighlight(null, 'JHN', 3, 16, 'blue');
-            const hls = await getChapterHighlights(null, 'JHN', 3);
+            await setHighlight(null, 'JOH', 3, 16, 'yellow');
+            await setHighlight(null, 'JOH', 3, 16, 'blue');
+            const hls = await getChapterHighlights(null, 'JOH', 3);
             expect(hls).toHaveLength(1);
             expect(hls[0].color).toBe('blue');
         });
 
         it('should remove highlight from localStorage', async () => {
-            await setHighlight(null, 'JHN', 3, 16, 'yellow');
-            await removeHighlight(null, 'JHN', 3, 16);
-            const hls = await getChapterHighlights(null, 'JHN', 3);
+            await setHighlight(null, 'JOH', 3, 16, 'yellow');
+            await removeHighlight(null, 'JOH', 3, 16);
+            const hls = await getChapterHighlights(null, 'JOH', 3);
             expect(hls).toHaveLength(0);
         });
 
@@ -142,11 +142,11 @@ describe('Notes & Highlights Service (Dual-Mode)', () => {
         const userId = '123-abc';
 
         it('should call supabase upsert when saving highlight', async () => {
-            await setHighlight(userId, 'JHN', 3, 16, 'yellow');
+            await setHighlight(userId, 'JOH', 3, 16, 'yellow');
             expect(supabase.from).toHaveBeenCalledWith('user_highlights');
             // Verify upsert was called with the right data via the mock chain
             expect(mockChain.upsert).toHaveBeenCalledWith(
-                { user_id: userId, book_id: 'JHN', chapter: 3, verse: 16, color: 'yellow' },
+                { user_id: userId, book_id: 'JOH', chapter: 3, verse: 16, color: 'yellow' },
                 { onConflict: 'user_id,book_id,chapter,verse' }
             );
         });
@@ -168,7 +168,7 @@ describe('Notes & Highlights Service (Dual-Mode)', () => {
     describe('Migration', () => {
         it('should migrate highlights and notes from local to Supabase upon login', async () => {
             // 1. Create anonymous data
-            await setHighlight(null, 'JHN', 3, 16, 'yellow');
+            await setHighlight(null, 'JOH', 3, 16, 'yellow');
             await saveNote(null, {
                 bookId: 'GEN',
                 bookName: 'Gênesis',

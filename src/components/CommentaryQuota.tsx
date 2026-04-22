@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CommentaryQuota.tsx — Bíblia Vive
-// Reutilizável: exibe a cota de comentários de IA do usuário PRO.
+// Reutilizável: exibe a cota de comentários teológicos do usuário PRO.
 // Lê de localStorage (chave bv_commentary_quota) — atualizada após cada request.
 // ─────────────────────────────────────────────────────────────────────────────
 

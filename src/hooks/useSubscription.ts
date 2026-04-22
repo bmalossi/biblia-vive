@@ -21,8 +21,32 @@ export interface SubscriptionData {
 
 export function useSubscription() {
     const { user } = useAuth();
-    const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-    const [loading, setLoading] = useState(true);
+
+    // Cache key specific to user
+    const getCacheKey = (uid: string) => `sub_cache_${uid}`;
+
+    // Initialize from localStorage if available to prevent UI flicker on F5
+    const [subscription, setSubscription] = useState<SubscriptionData | null>(() => {
+        if (user?.id) {
+            const cached = localStorage.getItem(`sub_cache_${user.id}`);
+            if (cached) {
+                try {
+                    return JSON.parse(cached);
+                } catch (e) {
+                    return null;
+                }
+            }
+        }
+        return null;
+    });
+    // Initialize loading: false if we have cached data (background refresh), true if no cache (fresh load)
+    const [loading, setLoading] = useState(() => {
+        if (user?.id) {
+            const cached = localStorage.getItem(`sub_cache_${user.id}`);
+            if (cached) return false; // Cache exists: no blocking spinner needed
+        }
+        return true;
+    });
 
     useEffect(() => {
         if (!user) {
@@ -31,50 +55,59 @@ export function useSubscription() {
             return;
         }
 
-        const fetchSubscription = async () => {
-            let attempt = 0;
-            const maxRetries = 3;
-            setLoading(true);
-
-            while (attempt <= maxRetries) {
-                try {
-                    const { data, error } = await Promise.race([
-                        supabase
-                            .from("user_subscriptions")
-                            .select("status, current_period_end, plan_type")
-                            .eq("user_id", user.id)
-                            .maybeSingle(),
-                        new Promise<{ data: any, error: any }>((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
-                    ]);
-
-                    if (error) {
-                        if (attempt < maxRetries) {
-                            attempt++;
-                            await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
-                            continue;
-                        }
-                        console.error("[useSubscription] Error fetching subscription after retries:", error);
-                        setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
-                        break;
-                    } else if (!data) {
-                        setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
-                        break;
-                    } else {
-                        setSubscription(data as SubscriptionData);
-                        break;
-                    }
-                } catch (err: any) {
-                    // Timeout or network error
-                    if (err.message === "timeout" || attempt >= maxRetries) {
-                        setSubscription({ status: "none", current_period_end: null, plan_type: "none" });
-                        break;
-                    }
-                    attempt++;
-                    await new Promise(res => setTimeout(res, 1000 * Math.pow(2, attempt)));
-                    continue;
-                }
+        // Try to load from cache immediately when user is found (prevents PRO flickering on F5)
+        const cacheKey = getCacheKey(user.id);
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                setSubscription(JSON.parse(cached));
+                console.log("[useSubscription] Loaded from cache:", JSON.parse(cached));
+            } catch (e) {
+                console.error("[useSubscription] Failed to parse cache", e);
             }
-            setLoading(false);
+        }
+
+        const fetchSubscription = async () => {
+            const hasCache = !!localStorage.getItem(cacheKey);
+            if (!hasCache) setLoading(true);
+
+            try {
+                // Single attempt with a long timeout.
+                // Without lockAcquireTimeout in the Supabase client, queries queue behind
+                // any ongoing token refresh and complete naturally (typically in 5-20s).
+                // Multiple short retries compound failures during the lock window, so one
+                // long attempt is more reliable. The cache keeps the UI correct while waiting.
+                const { data, error } = await Promise.race([
+                    supabase
+                        .from("user_subscriptions")
+                        .select("status, current_period_end, plan_type")
+                        .eq("user_id", user.id)
+                        .maybeSingle(),
+                    new Promise<{ data: any, error: any }>((_, reject) =>
+                        setTimeout(() => reject(new Error("timeout")), 60000)
+                    )
+                ]);
+
+                if (error) {
+                    console.error("[useSubscription] DB error fetching subscription:", error);
+                    // Keep cache intact on error
+                } else if (!data) {
+                    console.log("[useSubscription] No subscription row found.");
+                    const noneState: SubscriptionData = { status: "none", current_period_end: null, plan_type: "none" };
+                    setSubscription(noneState);
+                    localStorage.setItem(cacheKey, JSON.stringify(noneState));
+                } else {
+                    console.log("[useSubscription] Fetched successfully:", data);
+                    const subData = data as SubscriptionData;
+                    setSubscription(subData);
+                    localStorage.setItem(cacheKey, JSON.stringify(subData));
+                }
+            } catch (err: any) {
+                // Timeout or network error — keep cache intact, don't overwrite PRO state
+                console.warn("[useSubscription] Fetch failed, keeping cached state:", err.message);
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchSubscription();
@@ -91,7 +124,10 @@ export function useSubscription() {
                     filter: `user_id=eq.${user.id}`,
                 },
                 (payload) => {
-                    setSubscription(payload.new as SubscriptionData);
+                    const newData = payload.new as SubscriptionData;
+                    console.log("[useSubscription] Realtime update:", newData);
+                    setSubscription(newData);
+                    localStorage.setItem(getCacheKey(user.id), JSON.stringify(newData));
                 }
             )
             .subscribe();

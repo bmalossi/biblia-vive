@@ -40,12 +40,12 @@ export function getBooksForLocale(locale: Locale) {
 
 export function findBookBySlug(slug?: string, locale?: Locale) {
   const books = locale ? getBooksForLocale(locale).allBooks : ALL_BOOKS;
-  return books.find((book) => book.slug === slug);
+  return books.find((book) => book.slug.toLowerCase() === slug?.toLowerCase());
 }
 
 export function findBookById(id?: string, locale?: Locale) {
   const books = locale ? getBooksForLocale(locale).allBooks : ALL_BOOKS;
-  return books.find((book) => book.id === id);
+  return books.find((book) => book.id.toLowerCase() === id?.toLowerCase());
 }
 
 export function getTestament(book?: Book) {

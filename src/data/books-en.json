@@ -1,273 +1,273 @@
 {
     "old_testament": [
         {
-            "id": "GEN",
+            "id": "gen",
             "slug": "gn",
             "name": "Genesis",
             "chapters": 50,
             "abbrev": "Gen"
         },
         {
-            "id": "EXO",
+            "id": "exo",
             "slug": "ex",
             "name": "Exodus",
             "chapters": 40,
             "abbrev": "Exo"
         },
         {
-            "id": "LEV",
+            "id": "lev",
             "slug": "lv",
             "name": "Leviticus",
             "chapters": 27,
             "abbrev": "Lev"
         },
         {
-            "id": "NUM",
+            "id": "num",
             "slug": "nm",
             "name": "Numbers",
             "chapters": 36,
             "abbrev": "Num"
         },
         {
-            "id": "DEU",
+            "id": "deu",
             "slug": "dt",
             "name": "Deuteronomy",
             "chapters": 34,
             "abbrev": "Deu"
         },
         {
-            "id": "JOS",
+            "id": "jos",
             "slug": "js",
             "name": "Joshua",
             "chapters": 24,
             "abbrev": "Jos"
         },
         {
-            "id": "JDG",
+            "id": "jdg",
             "slug": "jz",
             "name": "Judges",
             "chapters": 21,
             "abbrev": "Jdg"
         },
         {
-            "id": "RUT",
+            "id": "rut",
             "slug": "rt",
             "name": "Ruth",
             "chapters": 4,
             "abbrev": "Rut"
         },
         {
-            "id": "1SA",
+            "id": "sa1",
             "slug": "1sm",
             "name": "1 Samuel",
             "chapters": 31,
             "abbrev": "1Sa"
         },
         {
-            "id": "2SA",
+            "id": "sa2",
             "slug": "2sm",
             "name": "2 Samuel",
             "chapters": 24,
             "abbrev": "2Sa"
         },
         {
-            "id": "1KI",
+            "id": "kg1",
             "slug": "1rs",
             "name": "1 Kings",
             "chapters": 22,
             "abbrev": "1Ki"
         },
         {
-            "id": "2KI",
+            "id": "kg2",
             "slug": "2rs",
             "name": "2 Kings",
             "chapters": 25,
             "abbrev": "2Ki"
         },
         {
-            "id": "1CH",
+            "id": "ch1",
             "slug": "1cr",
             "name": "1 Chronicles",
             "chapters": 29,
             "abbrev": "1Ch"
         },
         {
-            "id": "2CH",
+            "id": "ch2",
             "slug": "2cr",
             "name": "2 Chronicles",
             "chapters": 36,
             "abbrev": "2Ch"
         },
         {
-            "id": "EZR",
+            "id": "ezr",
             "slug": "ed",
             "name": "Ezra",
             "chapters": 10,
             "abbrev": "Ezr"
         },
         {
-            "id": "NEH",
+            "id": "neh",
             "slug": "ne",
             "name": "Nehemiah",
             "chapters": 13,
             "abbrev": "Neh"
         },
         {
-            "id": "EST",
+            "id": "est",
             "slug": "et",
             "name": "Esther",
             "chapters": 10,
             "abbrev": "Est"
         },
         {
-            "id": "JOB",
+            "id": "job",
             "slug": "jo",
             "name": "Job",
             "chapters": 42,
             "abbrev": "Job"
         },
         {
-            "id": "PSA",
+            "id": "psa",
             "slug": "sl",
             "name": "Psalms",
             "chapters": 150,
             "abbrev": "Psa"
         },
         {
-            "id": "PRO",
+            "id": "pro",
             "slug": "pv",
             "name": "Proverbs",
             "chapters": 31,
             "abbrev": "Pro"
         },
         {
-            "id": "ECC",
+            "id": "ecc",
             "slug": "ec",
             "name": "Ecclesiastes",
             "chapters": 12,
             "abbrev": "Ecc"
         },
         {
-            "id": "SNG",
+            "id": "sol",
             "slug": "ct",
             "name": "Song of Solomon",
             "chapters": 8,
             "abbrev": "Son"
         },
         {
-            "id": "ISA",
+            "id": "isa",
             "slug": "is",
             "name": "Isaiah",
             "chapters": 66,
             "abbrev": "Isa"
         },
         {
-            "id": "JER",
+            "id": "jer",
             "slug": "jr",
             "name": "Jeremiah",
             "chapters": 52,
             "abbrev": "Jer"
         },
         {
-            "id": "LAM",
+            "id": "lam",
             "slug": "lm",
             "name": "Lamentations",
             "chapters": 5,
             "abbrev": "Lam"
         },
         {
-            "id": "EZK",
+            "id": "eze",
             "slug": "ez",
             "name": "Ezekiel",
             "chapters": 48,
             "abbrev": "Ezk"
         },
         {
-            "id": "DAN",
+            "id": "dan",
             "slug": "dn",
             "name": "Daniel",
             "chapters": 12,
             "abbrev": "Dan"
         },
         {
-            "id": "HOS",
+            "id": "hos",
             "slug": "os",
             "name": "Hosea",
             "chapters": 14,
             "abbrev": "Hos"
         },
         {
-            "id": "JOL",
+            "id": "joe",
             "slug": "jl",
             "name": "Joel",
             "chapters": 3,
             "abbrev": "Joe"
         },
         {
-            "id": "AMO",
+            "id": "amo",
             "slug": "am",
             "name": "Amos",
             "chapters": 9,
             "abbrev": "Amo"
         },
         {
-            "id": "OBA",
+            "id": "oba",
             "slug": "ob",
             "name": "Obadiah",
             "chapters": 1,
             "abbrev": "Oba"
         },
         {
-            "id": "JON",
+            "id": "jon",
             "slug": "jn",
             "name": "Jonah",
             "chapters": 4,
             "abbrev": "Jon"
         },
         {
-            "id": "MIC",
+            "id": "mic",
             "slug": "mq",
             "name": "Micah",
             "chapters": 7,
             "abbrev": "Mic"
         },
         {
-            "id": "NAM",
+            "id": "nah",
             "slug": "na",
             "name": "Nahum",
             "chapters": 3,
             "abbrev": "Nah"
         },
         {
-            "id": "HAB",
+            "id": "hab",
             "slug": "hc",
             "name": "Habakkuk",
             "chapters": 3,
             "abbrev": "Hab"
         },
         {
-            "id": "ZEP",
+            "id": "zep",
             "slug": "sf",
             "name": "Zephaniah",
             "chapters": 3,
             "abbrev": "Zep"
         },
         {
-            "id": "HAG",
+            "id": "hag",
             "slug": "ag",
             "name": "Haggai",
             "chapters": 2,
             "abbrev": "Hag"
         },
         {
-            "id": "ZEC",
+            "id": "zac",
             "slug": "zc",
             "name": "Zechariah",
             "chapters": 14,
             "abbrev": "Zec"
         },
         {
-            "id": "MAL",
+            "id": "mal",
             "slug": "ml",
             "name": "Malachi",
             "chapters": 4,
@@ -276,189 +276,189 @@
     ],
     "new_testament": [
         {
-            "id": "MAT",
+            "id": "mat",
             "slug": "mt",
             "name": "Matthew",
             "chapters": 28,
             "abbrev": "Mat"
         },
         {
-            "id": "MRK",
+            "id": "mar",
             "slug": "mc",
             "name": "Mark",
             "chapters": 16,
             "abbrev": "Mrk"
         },
         {
-            "id": "LUK",
+            "id": "luk",
             "slug": "lc",
             "name": "Luke",
             "chapters": 24,
             "abbrev": "Luk"
         },
         {
-            "id": "JHN",
+            "id": "joh",
             "slug": "joa",
             "name": "John",
             "chapters": 21,
             "abbrev": "Jhn"
         },
         {
-            "id": "ACT",
+            "id": "act",
             "slug": "atos",
             "name": "Acts",
             "chapters": 28,
             "abbrev": "Act"
         },
         {
-            "id": "ROM",
+            "id": "rom",
             "slug": "rm",
             "name": "Romans",
             "chapters": 16,
             "abbrev": "Rom"
         },
         {
-            "id": "1CO",
+            "id": "co1",
             "slug": "1co",
             "name": "1 Corinthians",
             "chapters": 16,
             "abbrev": "1Co"
         },
         {
-            "id": "2CO",
+            "id": "co2",
             "slug": "2co",
             "name": "2 Corinthians",
             "chapters": 13,
             "abbrev": "2Co"
         },
         {
-            "id": "GAL",
+            "id": "gal",
             "slug": "gl",
             "name": "Galatians",
             "chapters": 6,
             "abbrev": "Gal"
         },
         {
-            "id": "EPH",
+            "id": "eph",
             "slug": "ef",
             "name": "Ephesians",
             "chapters": 6,
             "abbrev": "Eph"
         },
         {
-            "id": "PHP",
+            "id": "phi",
             "slug": "fp",
             "name": "Philippians",
             "chapters": 4,
             "abbrev": "Php"
         },
         {
-            "id": "COL",
+            "id": "col",
             "slug": "cl",
             "name": "Colossians",
             "chapters": 4,
             "abbrev": "Col"
         },
         {
-            "id": "1TH",
+            "id": "th1",
             "slug": "1ts",
             "name": "1 Thessalonians",
             "chapters": 5,
             "abbrev": "1Th"
         },
         {
-            "id": "2TH",
+            "id": "th2",
             "slug": "2ts",
             "name": "2 Thessalonians",
             "chapters": 3,
             "abbrev": "2Th"
         },
         {
-            "id": "1TI",
+            "id": "ti1",
             "slug": "1tm",
             "name": "1 Timothy",
             "chapters": 6,
             "abbrev": "1Ti"
         },
         {
-            "id": "2TI",
+            "id": "ti2",
             "slug": "2tm",
             "name": "2 Timothy",
             "chapters": 4,
             "abbrev": "2Ti"
         },
         {
-            "id": "TIT",
+            "id": "tit",
             "slug": "tt",
             "name": "Titus",
             "chapters": 3,
             "abbrev": "Tit"
         },
         {
-            "id": "PHM",
+            "id": "plm",
             "slug": "fm",
             "name": "Philemon",
             "chapters": 1,
             "abbrev": "Phm"
         },
         {
-            "id": "HEB",
+            "id": "heb",
             "slug": "hb",
             "name": "Hebrews",
             "chapters": 13,
             "abbrev": "Heb"
         },
         {
-            "id": "JAS",
+            "id": "jam",
             "slug": "tg",
             "name": "James",
             "chapters": 5,
             "abbrev": "Jas"
         },
         {
-            "id": "1PE",
+            "id": "pe1",
             "slug": "1pe",
             "name": "1 Peter",
             "chapters": 5,
             "abbrev": "1Pe"
         },
         {
-            "id": "2PE",
+            "id": "pe2",
             "slug": "2pe",
             "name": "2 Peter",
             "chapters": 3,
             "abbrev": "2Pe"
         },
         {
-            "id": "1JN",
+            "id": "jo1",
             "slug": "1jo",
             "name": "1 John",
             "chapters": 5,
             "abbrev": "1Jn"
         },
         {
-            "id": "2JN",
+            "id": "jo2",
             "slug": "2jo",
             "name": "2 John",
             "chapters": 1,
             "abbrev": "2Jn"
         },
         {
-            "id": "3JN",
+            "id": "jo3",
             "slug": "3jo",
             "name": "3 John",
             "chapters": 1,
             "abbrev": "3Jn"
         },
         {
-            "id": "JUD",
+            "id": "jde",
             "slug": "jd",
             "name": "Jude",
             "chapters": 1,
             "abbrev": "Jud"
         },
         {
-            "id": "REV",
+            "id": "rev",
             "slug": "ap",
             "name": "Revelation",
             "chapters": 22,

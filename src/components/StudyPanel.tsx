@@ -103,6 +103,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const [isGenerating, setIsGenerating] = useState(false);
     const [rateLimitStatus, setRateLimitStatus] = useState<{ open: boolean, resetAt: number | null, limit: number }>({ open: false, resetAt: null, limit: 10 });
     const [localCommentary, setLocalCommentary] = useState<string | null>(null);
+    const [hasFreeCommentary, setHasFreeCommentary] = useState(() => !localStorage.getItem('bv_free_commentary_used'));
     const [strongsCache, setStrongsCache] = useState<Record<string, StrongsEntry>>({});
     const [strongsLoading, setStrongsLoading] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -191,7 +192,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     ];
 
     const handleGenerateCommentary = async () => {
-        if (!isPro) {
+        if (!isPro && !hasFreeCommentary) {
             navigate('/pro');
             return;
         }
@@ -208,6 +209,12 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
             });
 
             setLocalCommentary(JSON.stringify(commentaries));
+
+            if (!isPro) {
+                localStorage.setItem('bv_free_commentary_used', 'true');
+                setHasFreeCommentary(false);
+            }
+
             toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
         } catch (err: any) {
             console.error(err);
@@ -559,15 +566,15 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                             {/* Commentary Tab */}
                             {activeTab === "commentary" && (
                                 <div className="space-y-4">
-                                    {!isPro ? (
-                                        <div className="rounded-xl border border-gold/20 bg-gold-bg/10 p-6 text-center space-y-4">
+                                    {(!isPro && !hasFreeCommentary) && !(data?.commentaries || localCommentary) ? (
+                                        <div className="rounded-xl border border-gold/20 bg-gold-bg/10 p-6 text-center space-y-4 animate-in fade-in">
                                             <div className="mx-auto w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center">
                                                 <Lock className="h-6 w-6 text-gold" />
                                             </div>
                                             <div className="space-y-1.5">
                                                 <h3 className="text-sm font-semibold text-app-text">Recurso Exclusivo PRO</h3>
                                                 <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                    Tenha acesso a comentários teológicos profundos gerados por nossa análise teológica orientada por grandes comentaristas.
+                                                    Você já utilizou sua análise teológica gratuita. Assine para ter acesso a 10 comentários por hora de teólogos históricos e renomados.
                                                 </p>
                                             </div>
                                             <Button
@@ -579,7 +586,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                         </div>
                                     ) : (
                                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                                            <CommentaryQuota className="mb-2" />
+                                            {isPro && <CommentaryQuota className="mb-2" />}
                                             {(data?.commentaries || localCommentary) ? (
                                                 <BiblicalCommentary
                                                     commentaries={(function () {
@@ -601,7 +608,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                             {t("study.commentaryIntro")}
                                                         </p>
                                                         <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                            Acesse perspectivas bíblicas de teólogos renomados sobre este versículo específico.
+                                                            Acesse perspectivas bíblicas de teólogos renomados sobre este versículo específico. {(!isPro && hasFreeCommentary) && <strong className="text-gold block mt-2">Você tem 1 comentário gratuito disponível.</strong>}
                                                         </p>
                                                     </div>
                                                     <Button

@@ -6,8 +6,8 @@
 
 import { supabase } from './supabase';
 
-export const STORAGE_KEY = 'bv_plan_progress';
-export const LAST_PLAN_KEY = 'bv_last_active_plan_id';
+export const getStorageKey = (userId: string | null) => userId ? `bv_plan_progress_${userId}` : 'bv_plan_progress_anon';
+export const getLastPlanKey = (userId: string | null) => userId ? `bv_last_active_plan_id_${userId}` : 'bv_last_active_plan_id_anon';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -173,7 +173,15 @@ export function mergePlanProgresses(
  */
 export async function migrateLocalPlanToSupabase(userId: string): Promise<void> {
     try {
-        const stored = localStorage.getItem(STORAGE_KEY);
+        // Try legacy key first, then anon key
+        let sourceKey = 'bv_plan_progress';
+        let stored = localStorage.getItem(sourceKey);
+
+        if (!stored) {
+            sourceKey = 'bv_plan_progress_anon';
+            stored = localStorage.getItem(sourceKey);
+        }
+
         if (!stored) return;
 
         const raw = JSON.parse(stored);
@@ -200,7 +208,10 @@ export async function migrateLocalPlanToSupabase(userId: string): Promise<void> 
         }
 
         // Remove local copy — cloud is now the source of truth
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(sourceKey);
+        // Also remove legacy last plan key if it exists
+        localStorage.removeItem('bv_last_active_plan_id');
+        localStorage.removeItem('bv_last_active_plan_id_anon');
     } catch (err) {
         console.warn('[readingPlanSync] Migration failed:', err);
     }

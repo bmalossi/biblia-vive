@@ -25,6 +25,13 @@ export function useAllStudyData() {
 
     useEffect(() => {
         let cancelled = false;
+
+        // Safety net: stop the spinner after 12s even if queries are still pending.
+        // Queries may still resolve later (when auth lock releases) and update the UI.
+        const safetyTimer = setTimeout(() => {
+            if (!cancelled) setLoading(false);
+        }, 12000);
+
         setLoading(true);
 
         Promise.all([getAllNotes(userId), getAllHighlights(userId)])
@@ -34,16 +41,19 @@ export function useAllStudyData() {
                 setHighlights(h);
             })
             .catch((err) => {
-                console.error("Error loading study data:", err);
+                console.error("[useAllStudyData] Error loading study data:", err?.message ?? err);
                 if (cancelled) return;
-                setNotes([]);
-                setHighlights([]);
+                // Keep existing data on error — don't wipe if we had something before
             })
             .finally(() => {
+                clearTimeout(safetyTimer);
                 if (!cancelled) setLoading(false);
             });
 
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            clearTimeout(safetyTimer);
+        };
     }, [userId]);
 
     const stats: StudyStats = {

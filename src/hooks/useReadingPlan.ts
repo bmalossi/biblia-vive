@@ -5,8 +5,8 @@ import {
     loadPlanProgressesFromCloud,
     mergePlanProgresses,
     deletePlanProgressFromCloud,
-    STORAGE_KEY,
-    LAST_PLAN_KEY,
+    getStorageKey,
+    getLastPlanKey,
     type PlanProgress,
 } from "@/lib/readingPlanSync";
 
@@ -25,9 +25,9 @@ export interface ReadingPlan {
     days: ReadingPlanDay[];
 }
 
-function readLocal(): Record<string, PlanProgress> {
+function readLocal(userId: string | null): Record<string, PlanProgress> {
     try {
-        const stored = localStorage.getItem(STORAGE_KEY);
+        const stored = localStorage.getItem(getStorageKey(userId));
         if (!stored) return {};
         const raw = JSON.parse(stored);
 
@@ -47,8 +47,8 @@ function readLocal(): Record<string, PlanProgress> {
     }
 }
 
-function writeLocal(progresses: Record<string, PlanProgress>) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progresses));
+function writeLocal(userId: string | null, progresses: Record<string, PlanProgress>) {
+    localStorage.setItem(getStorageKey(userId), JSON.stringify(progresses));
 }
 
 export function useReadingPlan(userId: string | null = null, activePlanId: string | null = null) {
@@ -76,7 +76,7 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
                 return;
             }
 
-            const local = readLocal();
+            const local = readLocal(userId);
 
             // Always try to load from cloud when authenticated.
             // If the network stalls, fallback to {} after 8 seconds so the UI unblocks.
@@ -91,7 +91,7 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
 
             const merged = mergePlanProgresses(local, cloudObj);
             setProgresses(merged);
-            writeLocal(merged);
+            writeLocal(userId, merged);
 
             // Re-sync any local-only progress up to cloud (e.g. anonymous → logged-in)
             if (userId) {
@@ -112,12 +112,12 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
     // ── Persist lastActivePlanId when a specific plan is selected ─────────────
     useEffect(() => {
         if (activePlanId) {
-            localStorage.setItem(LAST_PLAN_KEY, activePlanId);
+            localStorage.setItem(getLastPlanKey(userId), activePlanId);
         }
-    }, [activePlanId]);
+    }, [activePlanId, userId]);
 
     // ── Derived active state ───────────────────────────────────────────────────
-    const effectivePlanId = activePlanId ?? localStorage.getItem(LAST_PLAN_KEY) ?? null;
+    const effectivePlanId = activePlanId ?? localStorage.getItem(getLastPlanKey(userId)) ?? null;
     const progress = effectivePlanId ? (progresses[effectivePlanId] ?? null) : null;
     const activePlan = effectivePlanId ? (plans.find((p) => p.id === effectivePlanId) ?? null) : null;
 
@@ -158,11 +158,11 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
             };
             setProgresses((prev) => {
                 const next = { ...prev, [planId]: newPlan };
-                writeLocal(next);
+                writeLocal(userId, next);
                 if (userId) savePlanProgressToCloud(userId, newPlan).catch(console.warn);
                 return next;
             });
-            localStorage.setItem(LAST_PLAN_KEY, planId);
+            localStorage.setItem(getLastPlanKey(userId), planId);
         },
         [userId]
     );
@@ -172,13 +172,13 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
             setProgresses((prev) => {
                 const next = { ...prev };
                 delete next[planId];
-                writeLocal(next);
+                writeLocal(userId, next);
                 if (userId) deletePlanProgressFromCloud(userId, planId).catch(console.warn);
                 return next;
             });
             // Clear the last active plan if it was this one
-            if (localStorage.getItem(LAST_PLAN_KEY) === planId) {
-                localStorage.removeItem(LAST_PLAN_KEY);
+            if (localStorage.getItem(getLastPlanKey(userId)) === planId) {
+                localStorage.removeItem(getLastPlanKey(userId));
             }
         },
         [userId]
@@ -222,7 +222,7 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
                     [targetId]: updatedPlan,
                 };
 
-                writeLocal(nextDict);
+                writeLocal(userId, nextDict);
                 if (userId) savePlanProgressToCloud(userId, updatedPlan).catch(console.warn);
 
                 return nextDict;
@@ -254,7 +254,7 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
                 [targetId]: updatedPlan,
             };
 
-            writeLocal(nextDict);
+            writeLocal(userId, nextDict);
             if (userId) savePlanProgressToCloud(userId, updatedPlan).catch(console.warn);
 
             return nextDict;

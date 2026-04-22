@@ -195,7 +195,7 @@ export async function requestCommentary(
       }
 
       if (!response.ok || result?.error) {
-        throw new Error(result?.error || result?.message || `Erro HTTP ${response.status} na chamada da API de IA`);
+        throw new Error(result?.error || result?.message || `Erro HTTP ${response.status} na chamada da API`);
       }
 
       try {

@@ -282,29 +282,29 @@ Deno.serve(async (req) => {
             }
         }
 
-        if (!isPro) {
-            return new Response(
-                JSON.stringify({ error: "Pro subscription required" }),
-                { status: 403, headers: corsHeaders }
-            );
-        }
-
         // ── 3. Rate limiting with Upstash Redis ───────────────────────────────
         const upstashUrl = Deno.env.get("UPSTASH_REDIS_REST_URL");
         const upstashToken = Deno.env.get("UPSTASH_REDIS_REST_TOKEN");
 
-        if (upstashUrl && upstashToken && userId) {
+        if (upstashUrl && upstashToken) {
+            const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
             const redis = new Redis({ url: upstashUrl, token: upstashToken });
+
+            const ratelimitId = isPro && userId ? `user:${userId}` : `ip:${clientIp}`;
+            const limitConfig = isPro
+                ? Ratelimit.slidingWindow(RATE_LIMIT, "1 h")
+                : Ratelimit.slidingWindow(1, "1 d");
+
             const ratelimit = new Ratelimit({
                 redis,
-                limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
+                limiter: limitConfig,
                 prefix: "bv:commentary",
             });
 
-            const { success, limit, remaining, reset } = await ratelimit.limit(userId);
+            const { success, limit, remaining, reset } = await ratelimit.limit(ratelimitId);
 
-            // Reset timestamp in milliseconds for frontend countdown
-            const resetAtMs = reset * 1000;
+            // Reset timestamp is already in milliseconds from Upstash v2
+            const resetAtMs = reset;
 
             const rlHeaders = buildRateLimitHeaders(corsHeaders, remaining, resetAtMs);
 
@@ -466,16 +466,18 @@ ${authorSnippets.map(s => `- ${s.slug}: author="${s.meta.author}", era="${s.meta
 
         // ── 7. Save to cache if there are results ──────────────────────────────
         if (commentariesArray.length > 0 && result.status !== "unavailable") {
-            supabase
-                .from("ai_study_cache")
-                .upsert({
-                    verse_id: verseId,
-                    question_type: questionType,
-                    response: commentaryJson,
-                    created_at: new Date().toISOString()
-                }, { onConflict: "verse_id,question_type" })
-                .then(() => { })
-                .catch(() => { });
+            try {
+                await supabase
+                    .from("ai_study_cache")
+                    .upsert({
+                        verse_id: verseId,
+                        question_type: questionType,
+                        response: commentaryJson,
+                        created_at: new Date().toISOString()
+                    }, { onConflict: "verse_id,question_type" });
+            } catch (e) {
+                console.error("Cache insert failed", e);
+            }
         }
 
         return new Response(

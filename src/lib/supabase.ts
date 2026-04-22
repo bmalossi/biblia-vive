@@ -9,15 +9,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Singleton Supabase client — one instance for the entire app.
-// Explicit auth options make session behaviour deterministic across environments.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        // Stable storage key — avoids collisions between Vite dev server and prod
         storageKey: 'bv-auth-token',
-        // @ts-expect-error Supabase types sometimes miss this parameter
-        lockAcquireTimeout: 10000,
+        // lockAcquireTimeout intentionally omitted:
+        // With a hard limit, queries fail if the token is being refreshed (lock held).
+        // Without it, queries queue and complete naturally once the lock releases (~5-15s).
     },
 });

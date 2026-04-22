@@ -58,7 +58,7 @@ export function RateLimitDialog({ open, onOpenChange, resetAt, limit }: RateLimi
                 </div>
 
                 <p className="text-[0.8rem] text-app-text-muted/80 leading-relaxed px-2">
-                    Para garantir a qualidade e estabilidade da IA para todos os usuários, aplicamos este limite por hora.
+                    Para garantir a qualidade e estabilidade da extração dos comentários teológicos para todos os usuários, aplicamos este limite por hora.
                 </p>
 
                 <div className="pt-2 flex flex-col gap-3">
