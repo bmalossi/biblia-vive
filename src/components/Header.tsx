@@ -5,37 +5,86 @@ import AuthModal from "@/components/AuthModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
 import { getVersion } from "@/lib/themes";
-import { Clock3, Loader2, LogIn, LogOut, Menu, Search, SearchX, User, X } from "lucide-react";
+import {
+  BookOpen,
+  Clock3,
+  Loader2,
+  LogIn,
+  LogOut,
+  Menu,
+  Search,
+  SearchX,
+  Settings,
+  User,
+} from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { Link, NavLink } from "react-router-dom";
-import { FormEvent, MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 const navItems = [
-  { label: "Início", href: "/" },
+  { label: "Leitura", href: "/" },
   { label: "Planos", href: "/planos" },
 ];
 
 const HISTORY_KEY = "bv_search_history";
 
-const readHistory = () => {
+// ─── Search history helpers ───────────────────────────────────────────────────
+
+const readHistory = (): string[] => {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
-    if (!raw) return [] as string[];
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
   } catch {
-    return [] as string[];
+    return [];
   }
 };
 
 const saveHistoryItem = (term: string) => {
   if (!term.trim()) return;
-  const unique = [term.trim(), ...readHistory().filter((item) => item.toLowerCase() !== term.trim().toLowerCase())].slice(0, 5);
+  const unique = [
+    term.trim(),
+    ...readHistory().filter((item) => item.toLowerCase() !== term.trim().toLowerCase()),
+  ].slice(0, 5);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(unique));
 };
+
+// ─── Star icon (reused for PRO) ───────────────────────────────────────────────
+
+const StarIcon = ({ className }: { className?: string }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
+  </svg>
+);
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Header() {
   const navigate = useNavigate();
@@ -43,6 +92,7 @@ export default function Header() {
   const { user, signOut, isPending } = useAuth();
   const { isPro, loading: proLoading } = useSubscription();
   const userRole = (user?.app_metadata as any)?.role;
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [query, setQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -51,6 +101,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const searchWrapperRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -60,6 +111,12 @@ export default function Header() {
     () => (parsedReference ? formatParsedReferenceLabel(parsedReference) : ""),
     [parsedReference],
   );
+
+  // Display name / initial for avatar
+  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "U";
+  const avatarInitial = displayName[0].toUpperCase();
+
+  // ── Effects ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 4);
@@ -111,6 +168,8 @@ export default function Header() {
     };
   }, []);
 
+  // ── Handlers ─────────────────────────────────────────────────────────────────
+
   const runSearch = (value: string) => {
     const term = value.trim();
     if (!term) return;
@@ -141,48 +200,165 @@ export default function Header() {
     setHistory(readHistory());
   };
 
-  const showDesktopDropdown = isDropdownOpen;
-  const showMobilePanel = isMobileSearchOpen;
+  const handleSignOut = async () => {
+    setIsMobileMenuOpen(false);
+    await signOut();
+    if (location.pathname === "/conta" || location.pathname === "/admin") {
+      navigate("/");
+    }
+  };
 
-  const onLogoClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+  const onLogoClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (location.pathname !== "/") return;
     event.preventDefault();
-    window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
   };
+
+  // ── Sub-components ───────────────────────────────────────────────────────────
+
+  /** Shared avatar circle — used in desktop dropdown trigger and mobile drawer */
+  const AvatarCircle = ({ size = "sm" }: { size?: "sm" | "md" }) => {
+    const cls =
+      size === "md"
+        ? "h-10 w-10 text-sm"
+        : "h-8 w-8 text-[0.65rem]";
+    return (
+      <span
+        className={`relative inline-flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-app-surface overflow-hidden ${cls}`}
+      >
+        {user?.user_metadata?.avatar_url && !avatarError ? (
+          <img
+            alt={displayName}
+            className="h-full w-full object-cover"
+            onError={() => setAvatarError(true)}
+            referrerPolicy="no-referrer"
+            src={user.user_metadata.avatar_url}
+          />
+        ) : (
+          <span className="font-semibold text-app-text select-none">{avatarInitial}</span>
+        )}
+        {/* PRO dot badge */}
+        {isPro && !proLoading && (
+          <span
+            aria-label="Plano PRO ativo"
+            className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-gold border-2 border-app-bg"
+          />
+        )}
+      </span>
+    );
+  };
+
+  /** PRO badge pill (desktop inline) */
+  const ProBadge = () => (
+    <div
+      aria-label="Plano PRO ativo"
+      className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-full select-none cursor-default"
+    >
+      <StarIcon className="w-3 h-3 text-gold" />
+      <span className="text-[0.7rem] font-semibold text-gold tracking-widest">PRO</span>
+    </div>
+  );
+
+  /** "Assine PRO" CTA button */
+  const ProCtaButton = ({ className = "" }: { className?: string }) => (
+    <button
+      className={`flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-gold/80 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${className}`}
+      onClick={() => navigate("/pro")}
+      type="button"
+    >
+      <StarIcon className="w-3.5 h-3.5" />
+      Assine PRO
+    </button>
+  );
+
+  /** Search dropdown suggestions (shared for desktop and mobile panel) */
+  const SearchSuggestions = () => (
+    <div
+      className="mt-2 space-y-1"
+      id="header-search-suggestions"
+      role="listbox"
+    >
+      {parsedReference && (
+        <button
+          className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-app-text hover:bg-app-raised"
+          onClick={goToReference}
+          role="option"
+          type="button"
+        >
+          {t("search.goTo", { reference: parsedReferenceLabel })}
+        </button>
+      )}
+      {history.length > 0 ? (
+        history.map((item) => (
+          <button
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-app-text-muted hover:bg-app-raised hover:text-app-text"
+            key={item}
+            onClick={() => {
+              setQuery(item);
+              runSearch(item);
+            }}
+            role="option"
+            type="button"
+          >
+            <Clock3 className="h-3.5 w-3.5 flex-shrink-0" />
+            {item}
+          </button>
+        ))
+      ) : (
+        <p className="px-3 py-2 text-xs text-app-text-muted">
+          {t("search.noRecentHistory")}
+        </p>
+      )}
+    </div>
+  );
+
+  // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b border-border transition-colors duration-200 ${isScrolled ? "bg-app-bg/85 backdrop-blur-md" : "bg-app-bg"
         }`}
     >
-      <div className="mx-auto flex h-[60px] w-full max-w-7xl items-center justify-between px-4 md:px-6">
-        {/* Left Section: Logo & Nav (Weight 1) */}
-        <div className="flex-shrink-0 flex items-center gap-3 sm:gap-6 min-w-0">
-          <Link to="/" className="flex-shrink-0 flex items-center gap-2 group" onClick={onLogoClick}>
+      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-4 md:h-[60px] md:px-6">
+
+        {/* ── LEFT: Logo + Nav ────────────────────────────────────────────── */}
+        <div className="flex flex-shrink-0 items-center gap-4 md:gap-6">
+          <Link
+            className="flex-shrink-0 flex items-center gap-2 group"
+            onClick={onLogoClick}
+            to="/"
+          >
             <img
-              src="/logo-transparente-lateral.png"
               alt="Bíblia Vive"
               className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
+              src="/logo-transparente-lateral.png"
             />
           </Link>
 
-          <nav aria-label="Navegação principal" className="hidden h-full items-center gap-4 lg:flex overflow-hidden">
+          <nav aria-label="Navegação principal" className="hidden lg:flex h-full items-center gap-5">
             {navItems.map((item) => (
               <NavLink
                 className={({ isActive }) =>
-                  `flex h-full items-center font-sans text-[0.8rem] font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive ? "text-app-text border-b-2 border-gold" : "text-app-text-muted"
+                  `flex h-full items-center text-sm font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive
+                    ? "text-app-text border-b-2 border-gold"
+                    : "text-app-text-muted"
                   }`
                 }
                 key={item.label}
                 to={item.href}
               >
-                {t(`nav.${item.href === "/" ? "home" : item.href.slice(1)}` as any, { defaultValue: item.label })}
+                {item.label}
               </NavLink>
             ))}
             {userRole === "admin" && (
               <NavLink
                 className={({ isActive }) =>
-                  `flex h-full items-center font-sans text-[0.8rem] font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive ? "text-app-text border-b-2 border-gold" : "text-app-text-muted"
+                  `flex h-full items-center text-sm font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive
+                    ? "text-app-text border-b-2 border-gold"
+                    : "text-app-text-muted"
                   }`
                 }
                 to="/admin"
@@ -193,21 +369,21 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Center Section: Search Bar (Weight Auto) */}
+        {/* ── CENTER: Search Bar (desktop) ────────────────────────────────── */}
         <div className="hidden md:flex flex-1 justify-start items-center px-4 lg:px-8" ref={searchWrapperRef}>
-          <div className="w-full min-w-[200px] max-w-[360px] relative">
+          <div className="w-full min-w-[180px] max-w-[400px] relative">
             <form onSubmit={handleSubmit}>
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
               <Input
                 aria-autocomplete="list"
                 aria-controls="header-search-suggestions"
                 aria-describedby="header-search-help"
-                aria-expanded={showDesktopDropdown}
+                aria-expanded={isDropdownOpen}
                 aria-label="Buscar na Bíblia"
                 className="h-9 rounded-full border-border bg-app-surface pl-9 w-full"
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 onFocus={openSearch}
-                placeholder="Buscar capitulo, versículo ou tema..."
+                placeholder="Jo 3:16, Sl 23, amor, fé…"
                 ref={inputRef}
                 role="combobox"
                 value={query}
@@ -217,54 +393,104 @@ export default function Header() {
               </span>
             </form>
 
-            {showDesktopDropdown && (
-              <div className="absolute left-0 right-0 top-11 z-50 rounded-xl border border-border bg-app-surface p-2 shadow-md" id="header-search-suggestions" role="listbox">
-                {parsedReference && (
-                  <button
-                    className="mb-1 flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-app-text hover:bg-app-raised"
-                    onClick={goToReference}
-                    role="option"
-                    type="button"
-                  >
-                    {t("search.goTo", { reference: parsedReferenceLabel })}
-                  </button>
-                )}
-
-                {history.length > 0 ? (
-                  <div className="space-y-1">
-                    {history.map((item) => (
-                      <button
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-app-text-muted hover:bg-app-raised hover:text-app-text"
-                        key={item}
-                        onClick={() => {
-                          setQuery(item);
-                          runSearch(item);
-                        }}
-                        role="option"
-                        type="button"
-                      >
-                        <Clock3 className="h-3.5 w-3.5" />
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="px-3 py-2 text-xs text-app-text-muted">{t("search.noRecentHistory")}</p>
-                )}
+            {isDropdownOpen && (
+              <div className="absolute left-0 right-0 top-11 z-50 rounded-xl border border-border bg-app-surface p-2 shadow-md">
+                <SearchSuggestions />
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Section: Controls (Weight 1) */}
-        <div className="flex-shrink-0 flex items-center justify-end gap-1.5 min-w-0">
-          {/* Mobile: Search icon (only when menu closed) */}
+        {/* ── RIGHT: Controls ─────────────────────────────────────────────── */}
+        <div className="flex flex-shrink-0 items-center gap-2">
+
+          {/* PRO badge or CTA — visible from md: */}
+          {!proLoading && (
+            <>
+              {isPro ? (
+                <ProBadge />
+              ) : (
+                <ProCtaButton className="hidden md:flex" />
+              )}
+            </>
+          )}
+
+          {/* Account dropdown (desktop, logged in) */}
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  aria-label="Menu da conta"
+                  className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border hover:border-gold/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                >
+                  <AvatarCircle size="sm" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[200px]">
+                <DropdownMenuLabel className="font-normal">
+                  <p className="text-xs font-semibold text-app-text truncate">{displayName}</p>
+                  <p className="text-xs text-app-text-muted truncate">{user.email}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2"
+                  onSelect={() => navigate("/conta")}
+                >
+                  <User className="h-4 w-4" />
+                  Minha Conta
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {/* Selectors inside dropdown */}
+                <div className="px-2 py-1 flex items-center gap-2">
+                  <LanguageSelector />
+                  <VersionSelector />
+                  <ThemeToggle />
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 text-red-400 focus:text-red-400"
+                  disabled={isPending}
+                  onSelect={handleSignOut}
+                >
+                  {isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogOut className="h-4 w-4" />
+                  )}
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {/* Login button (desktop, not logged in) */}
+          {!user && (
+            <button
+              aria-label="Entrar na conta"
+              className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-full border border-gold/50 bg-transparent px-3 text-sm font-medium text-gold transition-colors hover:bg-gold-bg flex-shrink-0"
+              onClick={() => setAuthModalOpen(true)}
+              type="button"
+            >
+              <LogIn className="h-4 w-4" />
+              Entrar
+            </button>
+          )}
+
+          {/* Theme toggle always visible on desktop (outside dropdown for quick access) */}
+          {!user && (
+            <div className="hidden md:flex items-center gap-1.5">
+              <VersionSelector />
+              <ThemeToggle />
+            </div>
+          )}
+
+          {/* Mobile: search icon */}
           {!isMobileMenuOpen && (
             <button
               aria-label="Abrir busca"
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-app-surface text-app-text md:hidden transition-colors hover:bg-app-raised"
               onClick={() => {
-                setIsMobileSearchOpen((value) => !value);
+                setIsMobileSearchOpen((v) => !v);
                 setHistory(readHistory());
               }}
               type="button"
@@ -273,296 +499,213 @@ export default function Header() {
             </button>
           )}
 
-          {/* Mobile: Hamburger button */}
-          <button
-            aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={isMobileMenuOpen}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-app-surface text-app-text md:hidden transition-colors hover:bg-app-raised"
-            onClick={() => {
-              setIsMobileMenuOpen((v) => !v);
-              setIsMobileSearchOpen(false);
-            }}
-            type="button"
-          >
-            {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
-
-          <div className="flex items-center gap-1.5">
-            {/* Pro Badge or Upgrade Button */}
-            {!proLoading && (
-              isPro ? (
-                <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-full select-none cursor-default">
-                  <svg className="w-3.5 h-3.5 text-gold" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-                  </svg>
-                  <span className="text-xs font-serif font-medium text-gold tracking-wide">PRO</span>
-                </div>
-              ) : (
-                <button
-                  onClick={() => navigate("/pro")}
-                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-app-raised hover:bg-gold/10 border border-border hover:border-gold/30 rounded-full transition-colors group flex-shrink-0"
-                >
-                  <svg className="w-3.5 h-3.5 text-app-text-muted group-hover:text-gold transition-colors" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-                  </svg>
-                  <span className="text-xs font-medium text-app-text-muted group-hover:text-gold transition-colors tracking-wide">Premium</span>
-                </button>
-              )
-            )}
-
-            {/* Auth Button */}
-            {user ? (
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <span className="hidden xl:block text-xs text-app-text-muted max-w-[100px] truncate mr-1">
-                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
-                </span>
-                <NavLink
-                  to="/conta"
-                  title="Minha Conta"
-                  aria-label="Minha Conta"
-                  className={({ isActive }) =>
-                    `hidden md:inline-flex h-8 w-8 items-center justify-center rounded-full border overflow-hidden transition-colors ${isActive
-                      ? "border-gold/50"
-                      : "border-border hover:border-gold/40"
-                    }`
-                  }
-                >
-                  {user.user_metadata?.avatar_url && !avatarError ? (
-                    <img
-                      src={user.user_metadata.avatar_url}
-                      alt={user.user_metadata?.full_name || user.email || "Avatar"}
-                      className="h-full w-full object-cover"
-                      referrerPolicy="no-referrer"
-                      onError={() => setAvatarError(true)}
-                    />
-                  ) : (
-                    <span className="text-[0.65rem] font-semibold text-app-text select-none">
-                      {(user.user_metadata?.full_name?.[0] || user.email?.[0] || "U").toUpperCase()}
-                    </span>
-                  )}
-                </NavLink>
-                <NavLink
-                  to="/conta"
-                  className={({ isActive }) =>
-                    `hidden md:inline-flex h-8 items-center justify-center rounded-full border px-3 text-xs font-medium transition-colors ${isActive
-                      ? "border-gold/50 bg-gold/10 text-gold"
-                      : "border-border bg-app-surface text-app-text hover:bg-app-raised"
-                    }`
-                  }
-                >
-                  <User className="h-3.5 w-3.5 mr-1.5" />
-                  Minha Conta
-                </NavLink>
-                <button
-                  aria-label="Sair da conta"
-                  title="Sair"
-                  disabled={isPending}
-                  onClick={async () => {
-                    await signOut();
-                    if (location.pathname === "/conta" || location.pathname === "/admin") {
-                      navigate("/");
-                    }
-                  }}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-app-surface text-app-text transition-colors hover:bg-red-500/10 hover:text-red-400 hover:border-red-400 disabled:opacity-50"
-                >
-                  {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
-                </button>
-              </div>
-            ) : (
+          {/* Mobile: Hamburger — uses Sheet (right drawer) */}
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
               <button
-                aria-label="Entrar na conta"
-                onClick={() => setAuthModalOpen(true)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-gold/50 bg-transparent px-3 text-xs font-medium text-gold transition-colors hover:bg-gold-bg flex-shrink-0"
+                aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+                aria-expanded={isMobileMenuOpen}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-app-surface text-app-text md:hidden transition-colors hover:bg-app-raised"
+                type="button"
               >
-                <LogIn className="h-3.5 w-3.5" />
-                <span className="hidden sm:block">Entrar</span>
+                <Menu className="h-4 w-4" />
               </button>
-            )}
-            <div className="hidden md:block">
-              <LanguageSelector />
-            </div>
-            <VersionSelector />
-            <ThemeToggle />
-          </div>
+            </SheetTrigger>
+
+            <SheetContent
+              side="right"
+              className="flex flex-col gap-0 p-0 bg-app-bg border-l border-border w-[280px]"
+            >
+              <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
+              {/* ── Drawer header ── */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <Link
+                  to="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2"
+                >
+                  <img alt="Bíblia Vive" className="h-7 w-auto" src="/logo-transparente-lateral.png" />
+                </Link>
+              </div>
+
+              {/* ── PRO CTA or status (top of drawer) ── */}
+              {!proLoading && (
+                <div className="px-4 pt-4 pb-2">
+                  {isPro ? (
+                    <div className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-gold/15 to-gold/5 border border-gold/25 px-3 py-2.5">
+                      <StarIcon className="h-4 w-4 text-gold flex-shrink-0" />
+                      <div>
+                        <p className="text-xs font-semibold text-gold">Você é PRO ✦</p>
+                        <p className="text-xs text-app-text-muted">Obrigado por apoiar!</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <SheetClose asChild>
+                      <button
+                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-gold to-gold/80 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+                        onClick={() => navigate("/pro")}
+                        type="button"
+                      >
+                        <StarIcon className="h-4 w-4" />
+                        Assine PRO
+                      </button>
+                    </SheetClose>
+                  )}
+                </div>
+              )}
+
+              {/* ── Nav links ── */}
+              <div className="px-3 py-2 border-t border-border">
+                <p className="px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                  Navegar
+                </p>
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.label}
+                    to={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                        ? "bg-app-raised text-app-text"
+                        : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                      }`
+                    }
+                  >
+                    <BookOpen className="h-4 w-4 flex-shrink-0" />
+                    {item.label}
+                  </NavLink>
+                ))}
+                {userRole === "admin" && (
+                  <NavLink
+                    to="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                        ? "bg-app-raised text-app-text"
+                        : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                      }`
+                    }
+                  >
+                    Admin
+                  </NavLink>
+                )}
+              </div>
+
+              {/* ── Account section ── */}
+              <div className="px-3 py-2 border-t border-border">
+                <p className="px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                  Conta
+                </p>
+                {user ? (
+                  <>
+                    {/* User identity row */}
+                    <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
+                      <AvatarCircle size="md" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-app-text truncate">{displayName}</p>
+                        <p className="text-xs text-app-text-muted truncate">{user.email}</p>
+                      </div>
+                      {isPro && !proLoading && (
+                        <span className="ml-auto flex-shrink-0 flex items-center gap-0.5 rounded-full bg-gold/15 border border-gold/25 px-2 py-0.5 text-[0.6rem] font-bold text-gold tracking-widest">
+                          <StarIcon className="h-2.5 w-2.5" /> PRO
+                        </span>
+                      )}
+                    </div>
+
+                    <NavLink
+                      to="/conta"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                          ? "bg-app-raised text-app-text"
+                          : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                        }`
+                      }
+                    >
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      Minha Conta
+                    </NavLink>
+
+                    <button
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                      disabled={isPending}
+                      onClick={handleSignOut}
+                      type="button"
+                    >
+                      {isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogOut className="h-4 w-4 flex-shrink-0" />
+                      )}
+                      Sair da conta
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gold hover:bg-gold/10 transition-colors"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setAuthModalOpen(true);
+                    }}
+                    type="button"
+                  >
+                    <LogIn className="h-4 w-4 flex-shrink-0" />
+                    Entrar ou criar conta
+                  </button>
+                )}
+              </div>
+
+              {/* ── Settings ── */}
+              <div className="px-3 py-2 border-t border-border mt-auto">
+                <p className="px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                  <Settings className="inline h-3 w-3 mr-1 -mt-0.5" />
+                  Configurações
+                </p>
+                <div className="flex flex-wrap items-center gap-3 px-3 py-3 pb-6">
+                  <LanguageSelector />
+                  <VersionSelector />
+                  <ThemeToggle />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
-      {/* Auth Modal */}
+      {/* ── Auth Modal ─────────────────────────────────────────────────────── */}
       <AuthModal
+        hint="Salve seu progresso de leitura na nuvem."
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
-        hint="Salve seu progresso de leitura na nuvem."
       />
 
-      {/* Mobile Search Panel */}
-      {showMobilePanel && !isMobileMenuOpen && (
+      {/* ── Mobile Search Panel ────────────────────────────────────────────── */}
+      {isMobileSearchOpen && !isMobileMenuOpen && (
         <div className="border-t border-border bg-app-surface p-3 md:hidden" ref={searchWrapperRef}>
           <form className="relative" onSubmit={handleSubmit}>
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
             <Input
               aria-label="Buscar na Bíblia"
               className="h-10 rounded-full border-border bg-app-raised pl-9"
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               onFocus={openSearch}
-              placeholder="Buscar"
+              placeholder="Buscar versículo ou tema"
               ref={inputRef}
               value={query}
             />
           </form>
 
-          <div className="mt-2 space-y-1">
-            {parsedReference && (
-              <button
-                className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-app-text hover:bg-app-raised"
-                onClick={goToReference}
-                type="button"
-              >
-                {t("search.goTo", { reference: parsedReferenceLabel })}
-              </button>
-            )}
+          <SearchSuggestions />
 
-            {history.length > 0 ? (
-              history.map((item) => (
-                <button
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-app-text-muted hover:bg-app-raised"
-                  key={item}
-                  onClick={() => {
-                    setQuery(item);
-                    runSearch(item);
-                  }}
-                  type="button"
-                >
-                  <Clock3 className="h-3.5 w-3.5" />
-                  {item}
-                </button>
-              ))
-            ) : (
-              <p className="px-3 py-2 text-xs text-app-text-muted">{t("search.noRecentHistory")}</p>
-            )}
-            <button
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-app-text-muted hover:bg-app-raised"
-              onClick={() => setIsMobileSearchOpen(false)}
-              type="button"
-            >
-              <SearchX className="h-3.5 w-3.5" />
-              {t("search.closeSearch")}
-            </button>
-          </div>
+          <button
+            className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-app-text-muted hover:bg-app-raised"
+            onClick={() => setIsMobileSearchOpen(false)}
+            type="button"
+          >
+            <SearchX className="h-3.5 w-3.5" />
+            {t("search.closeSearch")}
+          </button>
         </div>
-      )}
-
-      {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <nav
-          aria-label="Menu mobile"
-          className="border-t border-border bg-app-surface divide-y divide-border md:hidden"
-        >
-          {/* Nav links */}
-          <div className="py-2 px-4 space-y-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.label}
-                to={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
-                    ? "bg-app-raised text-app-text"
-                    : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-            {userRole === "admin" && (
-              <NavLink
-                to="/admin"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
-                    ? "bg-app-raised text-app-text"
-                    : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
-                  }`
-                }
-              >
-                Admin
-              </NavLink>
-            )}
-          </div>
-
-          {/* User actions */}
-          <div className="py-2 px-4 space-y-1">
-            {user ? (
-              <>
-                <div className="px-3 py-2 text-xs text-app-text-muted truncate">
-                  {user.email}
-                </div>
-                <NavLink
-                  to="/conta"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
-                      ? "bg-app-raised text-app-text"
-                      : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
-                    }`
-                  }
-                >
-                  <User className="h-4 w-4" />
-                  Minha Conta
-                </NavLink>
-                <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-                  disabled={isPending}
-                  onClick={async () => {
-                    setIsMobileMenuOpen(false);
-                    await signOut();
-                    if (location.pathname === "/conta" || location.pathname === "/admin") {
-                      navigate("/");
-                    }
-                  }}
-                  type="button"
-                >
-                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
-                  Sair da conta
-                </button>
-              </>
-            ) : (
-              <button
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gold hover:bg-gold/10 transition-colors"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setAuthModalOpen(true);
-                }}
-                type="button"
-              >
-                <LogIn className="h-4 w-4" />
-                Entrar / Criar conta
-              </button>
-            )}
-            {!isPro && (
-              <button
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-app-text-muted hover:bg-app-raised hover:text-gold transition-colors"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  navigate("/pro");
-                }}
-                type="button"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5L12 2Z" />
-                </svg>
-                Assinar Premium
-              </button>
-            )}
-          </div>
-
-          {/* Selectors */}
-          <div className="py-3 px-7 flex items-center gap-3">
-            <LanguageSelector />
-            <VersionSelector />
-            <ThemeToggle />
-          </div>
-        </nav>
       )}
     </header>
   );

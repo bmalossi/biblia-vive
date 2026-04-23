@@ -30,7 +30,7 @@ import {
     type VerseHighlightFull,
     type HighlightColor,
 } from '@/lib/notesHighlights';
-import { findBookById } from '@/lib/books';
+import { findBookGlobally } from '@/lib/books';
 import NoteModal from '@/components/NoteModal';
 import AuthModal from '@/components/AuthModal';
 
@@ -129,10 +129,10 @@ export default function MyStudyPage() {
         setHighlights(prev => prev.filter(h => h.id !== highlight.id));
     }
 
-    function navigateToVerse(version: string, bookId: string, chapter: number) {
-        const bookObj = findBookById(bookId);
+    function navigateToVerse(version: string, bookId: string, chapter: number, verse: number) {
+        const bookObj = findBookGlobally(bookId);
         const slug = bookObj?.slug || bookId.toLowerCase();
-        navigate(`/${version || 'acf'}/${slug}/${chapter}`);
+        navigate(`/${version || 'acf'}/${slug}/${chapter}#v${verse}`);
     }
 
     // ── Tab change resets book filter ──
@@ -364,7 +364,7 @@ export default function MyStudyPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => navigateToVerse(note.version, note.bookId, note.chapter)}
+                                        onClick={() => navigateToVerse(note.version, note.bookId, note.chapter, note.verse)}
                                         className="flex items-center gap-1 text-[0.7rem] text-app-text-muted hover:text-gold transition-colors ml-auto"
                                     >
                                         {t('myStudy.goToVerse')} →
@@ -424,7 +424,7 @@ export default function MyStudyPage() {
                                 <div className="flex gap-2 pt-1">
                                     <button
                                         type="button"
-                                        onClick={() => navigateToVerse(highlight.version, highlight.bookId, highlight.chapter)}
+                                        onClick={() => navigateToVerse(highlight.version, highlight.bookId, highlight.chapter, highlight.verse)}
                                         className="flex items-center gap-1 text-[0.7rem] text-app-text-muted hover:text-gold transition-colors"
                                     >
                                         {t('myStudy.goToVerse')} →

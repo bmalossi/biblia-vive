@@ -52,3 +52,20 @@ export function getTestament(book?: Book) {
   if (!book) return "";
   return OLD_TESTAMENT.some((item) => item.id === book.id) ? "old" : "new";
 }
+
+export function findBookGlobally(value?: string, locale?: Locale) {
+  if (!value) return undefined;
+  const books = locale ? getBooksForLocale(locale).allBooks : ALL_BOOKS;
+  const normalized = value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  return books.find((book) =>
+    book.id.toLowerCase() === normalized ||
+    book.slug.toLowerCase() === normalized ||
+    book.abbrev.toLowerCase() === normalized ||
+    book.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === normalized ||
+    // common aliases from edge cases
+    (normalized === "jm" && book.id === "jam") ||
+    (normalized === "jud" && book.id === "jdg") ||
+    (normalized === "joa" && book.id === "joh")
+  );
+}
