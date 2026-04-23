@@ -1,115 +1,82 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
-import { Play, Pause, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Play, Pause, Loader2, AlertCircle } from "lucide-react";
+import { useAudioBible } from "@/hooks/useAudioBible";
 
 interface AudioPlayerProps {
-    text: string;
-    slug: string; // e.g. "JHN-3-ACF"
+    bookId: string | undefined;
+    chapter: number;
+    version: string;
 }
 
-export default function AudioPlayer({ text, slug }: AudioPlayerProps) {
+export default function AudioPlayer({ bookId, chapter, version }: AudioPlayerProps) {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
-    const [isFetching, setIsFetching] = useState(false);
+    const [runtimeError, setRuntimeError] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Cleanup when slug changes (chapter navigation)
+    const { audioUrl, isAvailable, isLoading, checking } = useAudioBible(bookId, chapter, version);
+
+    // Reset state when chapter/book changes
     useEffect(() => {
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-            setAudioUrl(null);
-            setIsPlaying(false);
-        };
-    }, [slug]);
-
-    const fetchAndPlay = useCallback(async () => {
-        setIsFetching(true);
-        try {
-            const { data: { session } } = await Promise.race([
-                supabase.auth.getSession(),
-                new Promise<any>(resolve => setTimeout(() => resolve({ data: { session: null } }), 5000))
-            ]);
-            const headers: Record<string, string> = { "Content-Type": "application/json" };
-            if (session?.access_token) {
-                headers["Authorization"] = `Bearer ${session.access_token}`;
-            }
-
-            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-            const res = await fetch(`${supabaseUrl}/functions/v1/tts`, {
-                method: "POST",
-                headers,
-                body: JSON.stringify({ text, slug }),
-            });
-
-            const data = await res.json();
-
-            if (data.fallback) {
-                // Google key not configured yet — use browser synthesis as last resort
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "pt-BR";
-                utterance.rate = 0.9;
-                utterance.onend = () => setIsPlaying(false);
-                utterance.onerror = () => { setIsPlaying(false); setIsFetching(false); };
-                utterance.onstart = () => { setIsPlaying(true); setIsFetching(false); };
-                const voices = window.speechSynthesis?.getVoices() ?? [];
-                const ptVoice = voices.find(v => v.lang.startsWith("pt"));
-                if (ptVoice) utterance.voice = ptVoice;
-                window.speechSynthesis?.speak(utterance);
-                return;
-            }
-
-            if (data.url) {
-                setAudioUrl(data.url);
-                const audio = new Audio(data.url);
-                audioRef.current = audio;
-                audio.onended = () => setIsPlaying(false);
-                audio.onerror = () => { setIsPlaying(false); setIsFetching(false); };
-                await audio.play();
-                setIsPlaying(true);
-            }
-        } catch (err) {
-            console.error("[AudioPlayer] Error:", err);
-            alert("Erro ao carregar áudio. Tente novamente.");
-        } finally {
-            setIsFetching(false);
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
         }
-    }, [text, slug]);
+        setIsPlaying(false);
+        setRuntimeError(false);
+    }, [bookId, chapter, version]);
 
     const handlePlayPause = async () => {
         if (isPlaying) {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-            } else if (window.speechSynthesis?.speaking) {
-                window.speechSynthesis.cancel();
-            }
+            audioRef.current?.pause();
             setIsPlaying(false);
             return;
         }
 
-        // Resume cached audio element if available
-        if (audioRef.current && audioUrl) {
-            audioRef.current.currentTime = 0;
+        if (!audioUrl) return;
+
+        try {
+            if (!audioRef.current) {
+                const audio = new Audio(audioUrl);
+                audioRef.current = audio;
+
+                audio.onended = () => setIsPlaying(false);
+
+                audio.onerror = () => {
+                    console.error("[AudioPlayer] Runtime error playing audio");
+                    setRuntimeError(true);
+                    setIsPlaying(false);
+                };
+
+                // Handle loading state in case of slow connection
+                audio.onplaying = () => setRuntimeError(false);
+            }
+
             await audioRef.current.play();
             setIsPlaying(true);
-            return;
+        } catch (err) {
+            console.error("[AudioPlayer] Playback failed:", err);
+            setRuntimeError(true);
         }
-
-        await fetchAndPlay();
     };
+
+    if (runtimeError || (!checking && !isAvailable)) {
+        return (
+            <div className="flex items-center gap-2 px-3 py-2 text-xs text-app-text-muted bg-app-raised/30 rounded-md border border-border/50">
+                <AlertCircle className="h-3.5 w-3.5 text-orange-500" />
+                <span>Áudio indisponível para este capítulo</span>
+            </div>
+        );
+    }
 
     return (
         <button
             onClick={handlePlayPause}
-            disabled={isFetching}
-            aria-label="Reproduzir Áudio Narrado"
-            title="Reproduzir Áudio Narrado"
-            className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-md border border-border bg-app-surface text-app-text transition-colors hover:bg-app-raised hover:text-gold"
+            disabled={isLoading || checking}
+            aria-label={isPlaying ? "Pausar Áudio Narrado" : "Reproduzir Áudio Narrado"}
+            title={isPlaying ? "Pausar Áudio Narrado" : "Reproduzir Áudio Narrado"}
+            className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-md border border-border bg-app-surface text-app-text transition-colors hover:bg-app-raised hover:text-gold disabled:opacity-50"
         >
-            {isFetching ? (
+            {isLoading || checking ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
             ) : isPlaying ? (
                 <Pause className="h-4 w-4 fill-current" />

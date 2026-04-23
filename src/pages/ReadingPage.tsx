@@ -1068,8 +1068,9 @@ export default function ReadingPage() {
                   </div>
 
                   <AudioPlayer
-                    text={chapterVerses.map(v => v.text).join(" ")}
-                    slug={`${selectedVersion}-${selectedBook?.slug}-${chapterNumber}`}
+                    bookId={selectedBook?.id}
+                    chapter={chapterNumber}
+                    version={selectedVersion}
                   />
 
                   <Button
