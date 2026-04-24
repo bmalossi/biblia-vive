@@ -57,7 +57,7 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "@/hooks/useToast";
 import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
-import { findBookBySlug, findBookById } from "@/lib/books";
+import { findBookBySlug, findBookGlobally } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
 import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2 } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
@@ -156,7 +156,7 @@ export default function ReadingPage() {
   const { version, book, chapter } = useParams();
 
   const selectedVersion = isBibleVersion(version) ? version : getVersion();
-  const selectedBook = findBookBySlug(book) || findBookById(book);
+  const selectedBook = findBookGlobally(book);
   const chapterNumber = Number(chapter || "1");
 
   const [chapterData, setChapterData] = useState<Chapter | null>(null);

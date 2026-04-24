@@ -65,6 +65,7 @@ export function findBookGlobally(value?: string, locale?: Locale) {
     book.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === normalized ||
     // common aliases from edge cases
     (normalized === "jm" && book.id === "jam") ||
+    (normalized === "jas" && book.id === "jam") ||
     (normalized === "jud" && book.id === "jdg") ||
     (normalized === "joa" && book.id === "joh")
   );

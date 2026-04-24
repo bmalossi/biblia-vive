@@ -1,4 +1,4 @@
-import { findBookById, OLD_TESTAMENT } from "@/lib/books";
+import { findBookGlobally, OLD_TESTAMENT } from "@/lib/books";
 import { getVersionLangPath } from "@/lib/themes";
 
 const API_BASE = "https://api.scripture.api.bible/v1";
@@ -132,7 +132,7 @@ async function fetchChapterFromLocal(version: string, bookSlug: string, chapter:
   }
 
   const versesText = localBook.chapters[chapterIndex] ?? [];
-  const bookInfo = findBookById(undefined) ?? { name: localBook.name };
+  const bookInfo = findBookGlobally(undefined) ?? { name: localBook.name };
   const bookName = localBook.name;
 
   return normalizeChapter({
@@ -243,7 +243,7 @@ const ORIG_LANG_NAME_MAP: Record<string, string> = {
 };
 
 async function fetchChapterFromOriginalLanguage(bookId: string, chapter: string): Promise<Chapter> {
-  const book = findBookById(bookId);
+  const book = findBookGlobally(bookId);
   const slug = book?.slug ?? bookId.toLowerCase();
   const bookName = book?.name ?? slug;
   const isOT = OLD_TESTAMENT.some((b) => b.id === bookId);
@@ -315,7 +315,7 @@ async function getGithubBook(version: string, bookSlug: string): Promise<LocalBo
 
   if (!githubBookCache.has(cacheKey)) {
     const loader = (async () => {
-      const localBook = findBookById(undefined);
+      const localBook = findBookGlobally(undefined);
       const indexBooks = await getGithubVersionIndex(version);
 
       const fallbackIds = [bookSlug, localId].map((v) => normalize(String(v)));
@@ -376,7 +376,7 @@ export async function fetchChapter(version: string, bookId: string, chapter: str
     return fetchChapterFromOriginalLanguage(bookId, chapter);
   }
 
-  const book = findBookById(bookId);
+  const book = findBookGlobally(bookId);
   const bookSlug = book ? book.slug : bookId.toLowerCase();
 
   try {
@@ -452,7 +452,7 @@ export async function searchLocalBible(
     searchTerm = scopeMatch[1].trim();
     const rawScope = scopeMatch[2].trim();
     // Try to find book by slug/abbrev
-    const book = findBookById(undefined) || { slug: rawScope }; // Minimal fallback
+    const book = findBookGlobally(undefined) || { slug: rawScope }; // Minimal fallback
     // We actually need the books list to resolve aliases accurately, but for now we'll use the raw scope
     scopeBookSlug = rawScope;
   }
@@ -462,7 +462,7 @@ export async function searchLocalBible(
 
   // 2. Identify books to search
   const booksToSearch = scopeBookSlug
-    ? [findBookById(getLocalBookId(scopeBookSlug))?.slug || scopeBookSlug]
+    ? [findBookGlobally(getLocalBookId(scopeBookSlug))?.slug || scopeBookSlug]
     : (await import("@/data/books.json")).default.old_testament.concat((await import("@/data/books.json")).default.new_testament).map((b: any) => b.slug);
 
   for (const bookSlug of booksToSearch) {
