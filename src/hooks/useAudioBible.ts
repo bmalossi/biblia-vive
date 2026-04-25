@@ -9,13 +9,11 @@ export function useAudioBible(bookId: string | undefined, chapter: number, versi
   const [isLoading, setIsLoading] = useState(false);
   const baseUrl = import.meta.env.VITE_R2_AUDIO_URL;
 
-  // Currently, only ACF version is available in R2
-  const isCorrectVersion = version.toLowerCase() === 'acf';
-  
-  const audioUrl = (isCorrectVersion && bookId && baseUrl) 
-    ? `${baseUrl}/free-acf-${bookId}-${chapter}.mp3` 
+  // The audio in R2 is currently only available for the ACF version.
+  // To allow users to listen while reading other versions, we always use the 'acf' audio file.
+  const audioUrl = (bookId && baseUrl)
+    ? `${baseUrl}/free-acf-${bookId}-${chapter}.mp3`
     : null;
-
   useEffect(() => {
     if (!audioUrl) {
       setIsAvailable(false);
@@ -38,10 +36,10 @@ export function useAudioBible(bookId: string | undefined, chapter: number, versi
     checkAvailability();
   }, [audioUrl]);
 
-  return { 
-    audioUrl, 
-    isAvailable: isAvailable ?? false, 
+  return {
+    audioUrl,
+    isAvailable: isAvailable ?? false,
     isLoading,
-    checking: isAvailable === null 
+    checking: isAvailable === null
   };
 }
