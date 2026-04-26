@@ -64,7 +64,9 @@ const parsePreferenceState = (): ReadingPreferences => {
     columnWidth: columnRaw === "narrow" || columnRaw === "normal" || columnRaw === "wide" ? columnRaw : DEFAULT_PREFERENCES.columnWidth,
     focusMode: localStorage.getItem(STORAGE_KEYS.focusMode) === "true",
     ttsRate: ttsRaw === 0.75 || ttsRaw === 1 || ttsRaw === 1.25 || ttsRaw === 1.5 ? ttsRaw : DEFAULT_PREFERENCES.ttsRate,
-    wordsOfGod: localStorage.getItem(STORAGE_KEYS.wordsOfGod) === "true",
+    wordsOfGod: localStorage.getItem(STORAGE_KEYS.wordsOfGod) !== null
+      ? localStorage.getItem(STORAGE_KEYS.wordsOfGod) === "true"
+      : DEFAULT_PREFERENCES.wordsOfGod,
   };
 };
 
