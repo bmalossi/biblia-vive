@@ -33,6 +33,7 @@ import {
   SearchX,
   Settings,
   User,
+  Heart,
 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { Link, NavLink } from "react-router-dom";
@@ -265,11 +266,11 @@ export default function Header() {
   /** "Assine PRO" CTA button */
   const ProCtaButton = ({ className = "" }: { className?: string }) => (
     <button
-      className={`flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-gold/80 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${className}`}
+      className={`flex items-center gap-1.5 rounded-full border border-gold/30 bg-transparent px-2.5 py-1 text-xs font-medium text-gold opacity-80 transition-all hover:bg-gold/10 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${className}`}
       onClick={() => navigate("/pro")}
       type="button"
     >
-      <StarIcon className="w-3.5 h-3.5" />
+      <StarIcon className="w-3 h-3" />
       Assine PRO
     </button>
   );
@@ -417,6 +418,14 @@ export default function Header() {
             </>
           )}
 
+          <Link
+            to="/apoiar"
+            className="hidden md:inline-flex h-7 items-center gap-1 rounded-full border border-gold/30 bg-transparent px-2.5 text-xs font-medium text-gold opacity-80 transition-all hover:bg-gold/10 hover:opacity-100 flex-shrink-0"
+          >
+            <Heart className="h-3 w-3" />
+            Apoiar
+          </Link>
+
           {/* Account dropdown (desktop, logged in) */}
           {user && (
             <DropdownMenu>
@@ -469,7 +478,7 @@ export default function Header() {
           {!user && (
             <button
               aria-label="Entrar na conta"
-              className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-full border border-gold/50 bg-transparent px-3 text-sm font-medium text-gold transition-colors hover:bg-gold-bg flex-shrink-0"
+              className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-transparent px-3 text-sm font-medium text-app-text-muted transition-colors hover:bg-app-raised hover:text-app-text flex-shrink-0"
               onClick={() => setAuthModalOpen(true)}
               type="button"
             >
@@ -484,6 +493,17 @@ export default function Header() {
               <VersionSelector />
               <ThemeToggle />
             </div>
+          )}
+
+          {/* Mobile: Apoiar icon */}
+          {!isMobileMenuOpen && (
+            <Link
+              to="/apoiar"
+              aria-label="Apoiar o projeto"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 bg-gold/5 text-gold md:hidden transition-colors hover:bg-gold/10"
+            >
+              <Heart className="h-4 w-4" />
+            </Link>
           )}
 
           {/* Mobile: search icon */}
@@ -544,7 +564,7 @@ export default function Header() {
                   ) : (
                     <SheetClose asChild>
                       <button
-                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-gold to-gold/80 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+                        className="w-full flex items-center justify-center gap-2 rounded-lg border border-gold/30 bg-transparent px-4 py-2 text-sm font-medium text-gold opacity-80 shadow-sm transition-all hover:bg-gold/10 hover:opacity-100"
                         onClick={() => navigate("/pro")}
                         type="button"
                       >

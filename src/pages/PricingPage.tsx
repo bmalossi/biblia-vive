@@ -65,7 +65,7 @@ export default function PricingPage() {
                         </div>
 
                         <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
-                            Ajude a manter o projeto no ar, impulsione missões futuras e, em retorno, acesse ferramentas cristãs para o seu aprofundamento pessoal e devoção.
+                            Acesse ferramentas cristãs para o seu aprofundamento pessoal e devoção. Este valor ajudará nos custos envolvidos na busca e filtragem de comentários teológicos de 99% dos versículos da bíblia.
                         </p>
 
                         <ul className="space-y-4 mb-8">
