@@ -5,14 +5,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="yuU8I7SMnCeej1SYkF3ybKvZBxgCN8qqeBJFoY7WZyM" />
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNJ3P0061E"></script>
+  <!-- Google Analytics (carregado após 'load' para não bloquear LCP/TBT) -->
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-RNJ3P0061E');
+    window.addEventListener('load', function () {
+      var s = document.createElement('script');
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RNJ3P0061E';
+      s.async = true;
+      document.head.appendChild(s);
+      s.onload = function () {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RNJ3P0061E', { send_page_view: true });
+      };
+    });
   </script>
   <meta name="theme-color" content="#9a6e1e" />
   <meta name="mobile-web-app-capable" content="yes" />

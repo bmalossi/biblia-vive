@@ -7,10 +7,10 @@ import { ToastViewport } from "@/components/Toast";
 import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Analytics } from '@vercel/analytics/react';
-import HomePage from "./pages/HomePage";
-import TermsPage from "./pages/TermsPage";
 
 
+const HomePage = lazy(() => import('./pages/HomePage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
 const BookPage = lazy(() => import("./pages/BookPage"));
 const ReadingPage = lazy(() => import("./pages/ReadingPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));

@@ -333,6 +333,8 @@ export default function Header() {
           >
             <img
               alt="Bíblia Vive"
+              width="160"
+              height="32"
               className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
               src="/logo-transparente-lateral.png"
             />
@@ -524,7 +526,7 @@ export default function Header() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-2"
                 >
-                  <img alt="Bíblia Vive" className="h-7 w-auto" src="/logo-transparente-lateral.png" />
+                  <img alt="Bíblia Vive" width="140" height="28" className="h-7 w-auto" src="/logo-transparente-lateral.png" />
                 </Link>
               </div>
 

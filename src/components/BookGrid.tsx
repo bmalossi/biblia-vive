@@ -21,7 +21,7 @@ export default function BookGrid({ books, version, currentReading }: BookGridPro
               to={`/${version}/${book.slug}`}
             >
               {currentReading?.slug === book.slug && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold" />}
-              <p className="line-clamp-1 font-sans text-[0.72rem] font-medium text-app-text">{book.name}</p>
+              <p className="truncate font-sans text-[0.72rem] font-medium text-app-text">{book.name}</p>
               <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted">{t("reading.chaptersCount", { count: book.chapters })}</p>
             </Link>
           </TooltipTrigger>

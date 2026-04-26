@@ -74,7 +74,7 @@ export default function MyStudyPage() {
     const navigate = useNavigate();
     const { user, isAuthenticated, signOut } = useAuth();
     const { isPro } = useSubscription();
-    const { notes, highlights, loading, setNotes, setHighlights } = useAllStudyData();
+    const { notes, highlights, loading, sessionExpired, setNotes, setHighlights } = useAllStudyData();
 
     // ── UI State ──
     const [activeTab, setActiveTab] = useState<TabType>('notes');
@@ -305,7 +305,25 @@ export default function MyStudyPage() {
             )}
 
             {/* ── Content ── */}
-            {loading ? (
+            {sessionExpired ? (
+                /* ── Sessão expirada ── */
+                <div className="text-center py-16 space-y-4">
+                    <p className="text-[0.95rem] font-medium text-app-text">
+                        Sua sessão expirou.
+                    </p>
+                    <p className="text-[0.82rem] text-app-text-muted">
+                        Faça login novamente para ver suas anotações e destaques.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => setAuthOpen(true)}
+                        className="mt-2 flex items-center gap-1.5 mx-auto text-[0.82rem] text-gold hover:text-gold/80 px-4 py-2 rounded-lg border border-gold/40 hover:bg-gold/10 transition-colors"
+                    >
+                        <LogIn className="h-3.5 w-3.5" />
+                        Entrar novamente
+                    </button>
+                </div>
+            ) : loading ? (
                 <div className="text-center py-12 text-app-text-muted text-sm">Carregando...</div>
             ) : activeTab === 'notes' ? (
                 /* ── Notes list ── */

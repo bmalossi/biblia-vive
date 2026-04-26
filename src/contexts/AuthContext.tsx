@@ -91,6 +91,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         });
 
+        // ── Renovação proativa de sessão ao retornar ao app ──────────────────
+        // Quando o JWT expira durante inatividade (aba em background ou janela
+        // fechada), o Supabase JS armazena o refresh_token mas não renova o
+        // access_token até que uma requisição autenticada falhe.  Este listener
+        // antecipa esse fluxo: assim que o usuário volta à aba, tentamos
+        // renovar a sessão ANTES que qualquer query autenticada seja disparada.
+        const handleVisibilityChange = async () => {
+            if (document.visibilityState !== 'visible') return;
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                if (error || !data.session) {
+                    // Tenta renovar via refresh_token; se também falhar o
+                    // onAuthStateChange disparará SIGNED_OUT e o user será
+                    // atualizado para null — exibindo a tela de sessão expirada.
+                    await supabase.auth.refreshSession();
+                }
+            } catch { /* non-fatal — erros de rede não devem travar o app */ }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
         // Safety net: if INITIAL_SESSION never fires (e.g. Supabase client
         // bug or network error), unblock the UI after 3 s so the app is
         // not stuck in a permanent loading state.
@@ -98,6 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return () => {
             subscription.unsubscribe();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
             clearTimeout(safetyTimer);
         };
     }, []);
