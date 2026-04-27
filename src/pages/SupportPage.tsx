@@ -123,7 +123,7 @@ export default function SupportPage() {
                         </div>
                         <div className="bg-app-surface p-5 rounded-2xl border border-border">
                             <h4 className="font-medium text-app-text mb-2">É seguro doar usando a chave PIX?</h4>
-                            <p className="text-sm text-app-text-muted">Sim, a chave PIX informada é recebida por um intermediador de pagamentos oficial vinculado à conta da instituição/desenvolvedor responsável pela plataforma.</p>
+                            <p className="text-sm text-app-text-muted">Sim, a chave PIX informada é vinculada à conta do desenvolvedor responsável pela plataforma.</p>
                         </div>
                         <div className="bg-app-surface p-5 rounded-2xl border border-border">
                             <h4 className="font-medium text-app-text mb-2">Posso ajudar de outra forma?</h4>
@@ -133,7 +133,7 @@ export default function SupportPage() {
                 </section>
 
                 <div className="text-center mt-12 bg-app-surface/50 py-6 rounded-2xl">
-                    <p className="text-gold italic font-serif text-lg">"Deus os abençoe rica e abundantemente."</p>
+                    <p className="text-gold italic font-serif text-lg">Deus os abençoe rica e abundantemente.</p>
                 </div>
             </div>
         </Layout>

@@ -1,14 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // useDailyVerse.ts — Bíblia Vive
-// Prioritises the curated verse from Supabase daily_verses table.
-// Falls back to the i18n static verse if:
-//   • No record is scheduled for today
-//   • The Supabase query takes longer than 5 s (timeout safety net)
-//   • Any network/RLS error occurs
+//
+// Fetches today's curated verse from /api/verse-today (Vercel serverless).
+// The endpoint uses the service-role key server-side — no Supabase credentials
+// are exposed in the browser bundle.
+//
+// Falls back to the i18n static verse when:
+//   • /api/verse-today returns null (no verse scheduled)
+//   • The request takes longer than 5 s (timeout safety net)
+//   • Any network or HTTP error occurs
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export interface DailyVerse {
     text: string;
@@ -17,19 +20,13 @@ export interface DailyVerse {
     isCurated: boolean; // true = from Supabase, false = static fallback
 }
 
-const today = () => new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-
-/** Maximum ms to wait for the Supabase query before showing the fallback. */
+/** Maximum ms to wait for the API before showing the fallback. */
 const FETCH_TIMEOUT_MS = 5000;
 
-/** Returns a promise that rejects after the given delay. */
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return Promise.race([
-        promise,
-        new Promise<T>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), ms)
-        ),
-    ]);
+interface ApiVerseResponse {
+    text: string;
+    reference: string;
+    reflection?: string;
 }
 
 export function useDailyVerse(
@@ -41,38 +38,41 @@ export function useDailyVerse(
 
     useEffect(() => {
         let cancelled = false;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-        async function fetchCurated() {
+        async function fetchVerse() {
             try {
-                // Wrap in a proper Promise so Promise.race() can use it.
-                // The Supabase query builder is thenable but not a native Promise
-                // in all versions, so we resolve it explicitly.
-                const queryPromise = new Promise<{ data: { verse_text: string; verse_reference: string; reflection_text: string | null } | null }>((resolve, reject) => {
-                    supabase
-                        .from('daily_verses')
-                        .select('verse_text, verse_reference, reflection_text')
-                        .eq('verse_date', today())
-                        .maybeSingle()
-                        .then(resolve, reject);
+                const res = await fetch('/api/verse-today', {
+                    signal: controller.signal,
                 });
 
-                const { data } = await withTimeout(queryPromise, FETCH_TIMEOUT_MS);
+                clearTimeout(timeoutId);
 
                 if (cancelled) return;
 
-                if (data?.verse_text) {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const data: ApiVerseResponse | null = await res.json();
+
+                if (cancelled) return;
+
+                if (data?.text) {
                     setVerse({
-                        text: data.verse_text,
-                        reference: data.verse_reference,
-                        reflection: data.reflection_text ?? undefined,
+                        text: data.text,
+                        reference: data.reference,
+                        reflection: data.reflection,
                         isCurated: true,
                     });
                 } else {
-                    // No record today — use static fallback
+                    // No verse scheduled — show static fallback
                     setVerse({ text: fallbackText, reference: fallbackRef, isCurated: false });
                 }
             } catch {
-                // Timeout, network error, or RLS block — show fallback
+                // Timeout, network error, or non-OK response — show fallback silently
+                clearTimeout(timeoutId);
                 if (!cancelled) {
                     setVerse({ text: fallbackText, reference: fallbackRef, isCurated: false });
                 }
@@ -81,9 +81,13 @@ export function useDailyVerse(
             }
         }
 
-        fetchCurated();
+        fetchVerse();
 
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            controller.abort();
+            clearTimeout(timeoutId);
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Fetch once per mount; fallbackText/Ref are stable i18n strings
 

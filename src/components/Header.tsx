@@ -21,7 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
-import { getVersion } from "@/lib/themes";
+import { getVersion, getTheme, type Theme } from "@/lib/themes";
 import {
   BookOpen,
   Clock3,
@@ -102,6 +102,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => getTheme());
 
   const inputRef = useRef<HTMLInputElement>(null);
   const searchWrapperRef = useRef<HTMLDivElement>(null);
@@ -122,7 +123,14 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 4);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    const handleThemeChange = () => setTheme(getTheme());
+    window.addEventListener("bv-theme-change", handleThemeChange);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("bv-theme-change", handleThemeChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -337,7 +345,7 @@ export default function Header() {
               width="160"
               height="32"
               className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
-              src="/logo-transparente-lateral.png"
+              src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
             />
           </Link>
 
@@ -546,7 +554,13 @@ export default function Header() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-2"
                 >
-                  <img alt="Bíblia Vive" width="140" height="28" className="h-7 w-auto" src="/logo-transparente-lateral.png" />
+                  <img
+                    alt="Bíblia Vive"
+                    width="140"
+                    height="28"
+                    className="h-7 w-auto"
+                    src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
+                  />
                 </Link>
               </div>
 

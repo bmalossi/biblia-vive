@@ -11,6 +11,9 @@
         },
         "api/stripe/portal.ts": {
             "maxDuration": 30
+        },
+        "api/verse-today.ts": {
+            "maxDuration": 10
         }
     },
     "headers": [
@@ -54,6 +57,10 @@
         }
     ],
     "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/api/$1"
+        },
         {
             "source": "/(.*)",
             "destination": "/index.html"
