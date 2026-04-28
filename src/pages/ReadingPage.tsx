@@ -3,6 +3,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import StudyPanel from "@/components/StudyPanel";
 import { prefetchLexicons } from "@/lib/strongs";
 import AudioPlayer from "@/components/AudioPlayer";
+import WorshipCard from "@/components/WorshipCard";
 import VerseToolbar from "@/components/VerseToolbar";
 import NoteModal from "@/components/NoteModal";
 import AuthModal from "@/components/AuthModal";
@@ -1198,6 +1199,7 @@ export default function ReadingPage() {
               style={{ maxWidth: compareEnabled ? "1120px" : "var(--column-width)" }}
             >
               <h1 className="mb-4 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
+              <WorshipCard bookId={selectedBook?.id} chapter={chapterNumber} />
               <div className={compareEnabled ? "grid gap-6 lg:grid-cols-2" : "block"}>
                 <section>
                   {!preferences.focusMode && (
