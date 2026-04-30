@@ -182,9 +182,9 @@ export default function PricingPage() {
                                 <AudioLines className="h-5 w-5 text-gold" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Áudio com Voz Humana Real</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Áudio com Voz - Narração de Versículos</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Ouça os capítulos narrados com precisão e emoção cristalina pela tecnologia da ElevenLabs. Sem vozes robóticas, apenas uma narração profunda e natural.
+                                    Ouça os capítulos narrados com precisão e emoção cristalina. Sem vozes robóticas, apenas uma narração profunda e natural.
                                 </p>
                             </div>
                         </div>

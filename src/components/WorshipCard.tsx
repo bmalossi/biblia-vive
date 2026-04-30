@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Music2, Play, Pause, Loader2 } from "lucide-react";
+import { Music2, Play, Pause, Volume2, Volume1, VolumeX } from "lucide-react";
 import { useWorshipAudio } from "@/hooks/useWorshipAudio";
 import { cn } from "@/lib/utils";
 
@@ -11,10 +11,12 @@ interface WorshipCardProps {
 export default function WorshipCard({ bookId, chapter }: WorshipCardProps) {
     const { audioUrl, isAvailable, checking } = useWorshipAudio(bookId, chapter);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);       // 0-100
+    const [progress, setProgress] = useState(0);   // 0-100
     const [duration, setDuration] = useState(0);
+    const [volume, setVolume] = useState(0.8);     // 0-1
     const [error, setError] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const prevVolumeRef = useRef(0.8); // for mute/restore toggle
 
     // Reset everything on chapter change
     useEffect(() => {
@@ -40,6 +42,7 @@ export default function WorshipCard({ bookId, chapter }: WorshipCardProps) {
         try {
             if (!audioRef.current) {
                 const audio = new Audio(audioUrl);
+                audio.volume = volume;
                 audioRef.current = audio;
 
                 audio.onloadedmetadata = () => setDuration(audio.duration);
@@ -77,6 +80,27 @@ export default function WorshipCard({ bookId, chapter }: WorshipCardProps) {
         setProgress(ratio * 100);
     };
 
+    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseFloat(e.target.value);
+        setVolume(val);
+        if (audioRef.current) audioRef.current.volume = val;
+        if (val > 0) prevVolumeRef.current = val;
+    };
+
+    const handleVolumeMuteToggle = () => {
+        if (volume > 0) {
+            prevVolumeRef.current = volume;
+            setVolume(0);
+            if (audioRef.current) audioRef.current.volume = 0;
+        } else {
+            const restored = prevVolumeRef.current || 0.8;
+            setVolume(restored);
+            if (audioRef.current) audioRef.current.volume = restored;
+        }
+    };
+
+    const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
+
     // Don't render while checking or when audio is unavailable/errored
     if (checking || !isAvailable || error) return null;
 
@@ -110,6 +134,29 @@ export default function WorshipCard({ bookId, chapter }: WorshipCardProps) {
                     <p className="text-xs text-app-text-muted leading-tight mt-0.5">
                         Salmo {chapter}
                     </p>
+                </div>
+
+                {/* Volume control */}
+                <div className="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+                    <button
+                        type="button"
+                        onClick={handleVolumeMuteToggle}
+                        aria-label={volume === 0 ? "Ativar som" : "Silenciar"}
+                        title={volume === 0 ? "Ativar som" : "Silenciar"}
+                        className="text-gold/60 hover:text-gold transition-colors duration-150"
+                    >
+                        <VolumeIcon className="h-3.5 w-3.5" />
+                    </button>
+                    <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={volume}
+                        onChange={handleVolumeChange}
+                        aria-label="Volume do louvor"
+                        className="worship-volume-slider w-16 h-0.5 cursor-pointer appearance-none rounded-full bg-gold/20 accent-gold focus:outline-none"
+                    />
                 </div>
 
                 {/* Play / Pause button */}
