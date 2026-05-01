@@ -2,10 +2,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import InstallPrompt from "@/components/InstallPrompt";
 import { ToastViewport } from "@/components/Toast";
 import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PWAProvider } from "@/contexts/PWAContext";
 import { Analytics } from '@vercel/analytics/react';
 
 
@@ -40,37 +40,38 @@ const PageFallback = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <ToastViewport />
-        <InstallPrompt />
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <Suspense fallback={<PageFallback />}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/busca" element={<SearchPage />} />
-              <Route path="/:version/:book" element={<BookPage />} />
-              <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
-              <Route path="/minhas-notas" element={<MyNotesPage />} />
-              <Route path="/planos" element={<ReadingPlansPage />} />
-              <Route path="/compartilhar" element={<SharePage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/pro" element={<PricingPage />} />
-              <Route path="/pro/success" element={<ProSuccessPage />} />
-              <Route path="/widget/daily" element={<WidgetDailyVerse />} />
-              <Route path="/church-display" element={<ChurchDisplayPage />} />
-              <Route path="/conta" element={<AccountPage />} />
-              <Route path="/sobre" element={<AboutPage />} />
-              <Route path="/termos-de-uso" element={<TermsPage />} />
-              <Route path="/apoiar" element={<SupportPage />} />
-              <Route path="/meu-estudo" element={<MyStudyPage />} />
-              <Route path="/auth/callback" element={<AuthCallbackPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <PWAProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <ToastViewport />
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Suspense fallback={<PageFallback />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/busca" element={<SearchPage />} />
+                <Route path="/:version/:book" element={<BookPage />} />
+                <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
+                <Route path="/minhas-notas" element={<MyNotesPage />} />
+                <Route path="/planos" element={<ReadingPlansPage />} />
+                <Route path="/compartilhar" element={<SharePage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/pro" element={<PricingPage />} />
+                <Route path="/pro/success" element={<ProSuccessPage />} />
+                <Route path="/widget/daily" element={<WidgetDailyVerse />} />
+                <Route path="/church-display" element={<ChurchDisplayPage />} />
+                <Route path="/conta" element={<AccountPage />} />
+                <Route path="/sobre" element={<AboutPage />} />
+                <Route path="/termos-de-uso" element={<TermsPage />} />
+                <Route path="/apoiar" element={<SupportPage />} />
+                <Route path="/meu-estudo" element={<MyStudyPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </PWAProvider>
     <Analytics />
   </QueryClientProvider>
 );

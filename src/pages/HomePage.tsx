@@ -13,6 +13,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { Sparkles, ArrowRight } from "lucide-react";
+import PwaInstallCard from "@/components/PwaInstallCard";
 
 interface LastRead {
   capitulo: number;
@@ -97,90 +98,100 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <section className="space-y-10 pb-4">
+      <div className="flex flex-col">
         <VerseOfDay />
 
-
-
-        <div className="min-h-[104px] flex flex-col md:flex-row gap-4">
-          {lastRead && !dismissed && lastReadBook && (
-            <div className="flex-1 animate-in fade-in-0 duration-500 delay-300 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <Bookmark className="mt-0.5 h-4 w-4 text-gold" />
-                  <div>
-                    <p className="text-sm text-app-text">
-                      {t("home.continueReading")}: {lastReadBook.name} · {t("home.chapter")} {lastRead.capitulo}
-                    </p>
-                    <p className="text-xs text-app-text-muted">({lastRead.versao.toUpperCase()})</p>
+        {/* Renderiza a seção de "Continuar Leitura" e "Plano" apenas se eles existirem. A mt-6 os empurra um pouco do versículo. */}
+        {((lastRead && !dismissed && lastReadBook) || (firstProgress && activePlanInfo)) && (
+          <div className="mt-6 min-h-[104px] flex flex-col md:flex-row gap-4">
+            {lastRead && !dismissed && lastReadBook && (
+              <div className="flex-1 animate-in fade-in-0 duration-500 delay-300 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <Bookmark className="mt-0.5 h-4 w-4 text-gold" />
+                    <div>
+                      <p className="text-sm text-app-text">
+                        {t("home.continueReading")}: {lastReadBook.name} · {t("home.chapter")} {lastRead.capitulo}
+                      </p>
+                      <p className="text-xs text-app-text-muted">({lastRead.versao.toUpperCase()})</p>
+                    </div>
                   </div>
+
+                  <button
+                    aria-label={t("home.dismiss")}
+                    className="rounded-md p-1 text-app-text-muted hover:bg-app-raised"
+                    onClick={() => {
+                      sessionStorage.setItem(DISMISS_KEY, "true");
+                      setDismissed(true);
+                    }}
+                    type="button"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
 
-                <button
-                  aria-label={t("home.dismiss")}
-                  className="rounded-md p-1 text-app-text-muted hover:bg-app-raised"
-                  onClick={() => {
-                    sessionStorage.setItem(DISMISS_KEY, "true");
-                    setDismissed(true);
-                  }}
-                  type="button"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="mt-3">
+                  <Link
+                    className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm text-gold transition-colors hover:bg-gold-bg hover:text-gold"
+                    to={`/${lastRead.versao}/${lastRead.livro}/${lastRead.capitulo}`}
+                  >
+                    {t("home.continue")}
+                  </Link>
+                </div>
               </div>
+            )}
 
-              <div className="mt-3">
-                <Link
-                  className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm text-gold transition-colors hover:bg-gold-bg hover:text-gold"
-                  to={`/${lastRead.versao}/${lastRead.livro}/${lastRead.capitulo}`}
-                >
-                  {t("home.continue")}
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {firstProgress && activePlanInfo && (
-            <div className="flex-1 animate-in fade-in-0 duration-500 delay-400 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="mt-0.5 h-4 w-4 text-gold" />
-                  <div>
-                    <p className="text-sm font-medium text-app-text">
-                      Plano: {activePlanInfo.name}
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <Calendar className="h-3 w-3 text-app-text-muted" />
-                      <p className="text-xs text-app-text-muted">
-                        Dia {Math.floor((Date.now() - firstProgress.startDate) / (1000 * 60 * 60 * 24)) + 1} de {activePlanInfo.totalDays}
+            {firstProgress && activePlanInfo && (
+              <div className="flex-1 animate-in fade-in-0 duration-500 delay-400 rounded-xl border border-gold/40 bg-accent/40 px-4 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="mt-0.5 h-4 w-4 text-gold" />
+                    <div>
+                      <p className="text-sm font-medium text-app-text">
+                        Plano: {activePlanInfo.name}
                       </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <Calendar className="h-3 w-3 text-app-text-muted" />
+                        <p className="text-xs text-app-text-muted">
+                          Dia {Math.floor((Date.now() - firstProgress.startDate) / (1000 * 60 * 60 * 24)) + 1} de {activePlanInfo.totalDays}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <div className="mt-3">
+                  <Link
+                    className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm font-extralight text-white transition-colors hover:bg-gold-hover hover:text-white bg-gold"
+                    to={`/planos?id=${activePlanInfo.id}`}
+                  >
+                    Retomar Leitura
+                  </Link>
+                </div>
               </div>
+            )}
+          </div>
+        )}
 
-              <div className="mt-3">
-                <Link
-                  className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm font-extralight text-white transition-colors hover:bg-gold-hover hover:text-white bg-gold"
-                  to={`/planos?id=${activePlanInfo.id}`}
-                >
-                  Retomar Leitura
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+        {/* 
+          Os livros ficam com mt-2 se não houver cards secundários acima (colando praticamente no versículo).
+          Se houver cards secundários (eles adicionam conteúdo acima com mt-6), os livros vão usar mt-8. 
+        */}
+        <section className={((lastRead && !dismissed && lastReadBook) || (firstProgress && activePlanInfo)) ? "mt-8" : "mt-2"}>
+          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.oldTestament")}</h2>
+          <BookGrid books={oldTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
 
-      <section className="mt-12">
-        <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.oldTestament")}</h2>
-        <BookGrid books={oldTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
+          <div className="my-8 border-t border-border" />
 
-        <div className="my-8 border-t border-border" />
+          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.newTestament")}</h2>
+          <BookGrid books={newTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
+        </section>
 
-        <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.newTestament")}</h2>
-        <BookGrid books={newTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
-      </section>
+        {/* Card PWA no final da página */}
+        <section className="mt-12 overflow-hidden">
+          <PwaInstallCard variant="home" />
+        </section>
+      </div>
     </Layout>
   );
 }

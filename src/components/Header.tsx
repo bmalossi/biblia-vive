@@ -38,7 +38,8 @@ import {
 import { useTranslation } from "@/i18n";
 import { Link, NavLink } from "react-router-dom";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Location, useLocation, useNavigate } from "react-router-dom";
+import PwaInstallCard from "@/components/PwaInstallCard";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -626,6 +627,9 @@ export default function Header() {
                   </NavLink>
                 )}
               </div>
+
+              {/* ── Install PWA Card ── */}
+              <PwaInstallCard variant="drawer" />
 
               {/* ── Account section ── */}
               <div className="px-3 py-2 border-t border-border">
