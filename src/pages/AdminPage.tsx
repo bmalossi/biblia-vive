@@ -82,7 +82,7 @@ export default function AdminPage() {
         setError(null);
         setSuccessMsg(null);
 
-        const { error: sbError } = await supabase.from("daily_verses").upsert(
+        let { error: sbError } = await supabase.from("daily_verses").upsert(
             {
                 verse_date: form.verse_date,
                 verse_text: form.verse_text,
@@ -92,6 +92,23 @@ export default function AdminPage() {
             },
             { onConflict: "verse_date" }
         );
+
+        // Transient lock error retry (common in multi-tab Supabase v2 environments)
+        if (sbError && sbError.message.includes("lock:") && sbError.message.includes("stole it")) {
+            console.warn("Auth lock stolen, retrying upsert once...");
+            await new Promise((resolve) => setTimeout(resolve, 800));
+            const retry = await supabase.from("daily_verses").upsert(
+                {
+                    verse_date: form.verse_date,
+                    verse_text: form.verse_text,
+                    verse_reference: form.verse_reference,
+                    reflection_text: form.reflection_text || null,
+                    created_by: user!.id,
+                },
+                { onConflict: "verse_date" }
+            );
+            sbError = retry.error;
+        }
 
         if (sbError) {
             setError(sbError.message);
