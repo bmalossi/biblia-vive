@@ -41,7 +41,7 @@ export default function PwaInstallCard({ variant = "home" }: Props) {
 
     // variant === "home"
     return (
-        <div className="relative overflow-hidden rounded-2xl border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-5 my-6 animate-in fade-in zoom-in duration-500">
+        <div className="relative overflow-hidden rounded-2xl border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-5 my-6 animate-in fade-in zoom-in duration-500 md:hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 className="font-serif text-lg text-gold flex items-center gap-2">

@@ -188,7 +188,7 @@ export default function HomePage() {
         </section>
 
         {/* Card PWA no final da página */}
-        <section className="mt-12 overflow-hidden">
+        <section className="mt-12 overflow-hidden md:hidden">
           <PwaInstallCard variant="home" />
         </section>
       </div>
