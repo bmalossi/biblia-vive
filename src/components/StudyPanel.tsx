@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
 import { useNavigate } from "react-router-dom";
-import { useStudyData, requestCommentary } from "@/lib/studyPanel";
+import { useStudyData } from "@/hooks/useStudyData";
+import { requestCommentary } from "@/lib/studyPanel";
+
 import { getStrongsEntry, getLanguageLabel, getOriginalVerseText, type StrongsEntry } from "@/lib/strongs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";

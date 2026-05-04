@@ -17,7 +17,23 @@ const mockData = { data: null, error: null };
 const mockChain = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
-    order: vi.fn().mockReturnThis(),
+    order: vi.fn().mockResolvedValue({
+        data: [
+            {
+                plan_id: 'bible-1-year',
+                start_date: 1700000000000,
+                completed_days: [1, 2, 3],
+                read_refs: ['pv/1', 'pv/2'],
+            },
+            {
+                plan_id: 'psalms-30',
+                start_date: 1800000000000,
+                completed_days: [1],
+                read_refs: ['sl/1'],
+            }
+        ],
+        error: null,
+    }),
     single: vi.fn().mockResolvedValue({ data: null, error: null }),
     upsert: vi.fn().mockResolvedValue(mockData),
     delete: vi.fn().mockReturnThis(),
@@ -89,24 +105,6 @@ describe('Reading Plan Cloud Sync (Multi-Plan Support)', () => {
         });
 
         it('should map multiple Supabase rows to Record<string, PlanProgress> format', async () => {
-            mockChain.eq.mockResolvedValueOnce({
-                data: [
-                    {
-                        plan_id: 'bible-1-year',
-                        start_date: 1700000000000,
-                        completed_days: [1, 2, 3],
-                        read_refs: ['pv/1', 'pv/2'],
-                    },
-                    {
-                        plan_id: 'psalms-30',
-                        start_date: 1800000000000,
-                        completed_days: [1],
-                        read_refs: ['sl/1'],
-                    }
-                ],
-                error: null,
-            });
-
             const result = await loadPlanProgressesFromCloud('user-123');
 
             expect(result).toEqual({

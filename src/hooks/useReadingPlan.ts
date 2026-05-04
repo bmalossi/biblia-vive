@@ -9,21 +9,19 @@ import {
     getLastPlanKey,
     type PlanProgress,
 } from "@/lib/readingPlanSync";
+import type { ReadingPlan, ReadingPlanDay } from "@/lib/readingPlanTypes";
+import {
+    calcCurrentDayIndex,
+    getDayRefs,
+    isDayCompleted,
+    calcProgressPct,
+    calcDiasConcluidos,
+} from "@/lib/progressCalculator";
 
 
 
-export interface ReadingPlanDay {
-    day: number;
-    refs: string[]; // e.g. ["sl/1", "sl/2", "sl/3"]
-}
-
-export interface ReadingPlan {
-    id: string;
-    name: string;
-    description: string;
-    totalDays: number;
-    days: ReadingPlanDay[];
-}
+// Re-export types for callers that imported them from here previously
+export type { ReadingPlan, ReadingPlanDay } from "@/lib/readingPlanTypes";
 
 function readLocal(userId: string | null): Record<string, PlanProgress> {
     try {
@@ -121,31 +119,17 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
     const progress = effectivePlanId ? (progresses[effectivePlanId] ?? null) : null;
     const activePlan = effectivePlanId ? (plans.find((p) => p.id === effectivePlanId) ?? null) : null;
 
-    const getTodayDayIndex = () => {
-        if (!progress) return 1;
-        const now = new Date();
-        const start = new Date(progress.startDate);
-        now.setHours(0, 0, 0, 0);
-        start.setHours(0, 0, 0, 0);
-        const diff = Math.abs(now.getTime() - start.getTime());
-        const calendarDayIndex = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
-
-        // Prevent auto-advancing past days that haven't been completed yet
-        return Math.min(calendarDayIndex, progress.completedDays.length + 1);
-    };
-
-    const todayDayIndex = getTodayDayIndex();
-    const todayRefs = activePlan?.days.find((d) => d.day === todayDayIndex)?.refs ?? [];
+    const todayDayIndex = progress ? calcCurrentDayIndex(progress, new Date()) : 1;
+    const todayRefs = activePlan ? getDayRefs(activePlan, todayDayIndex) : [];
 
     // Which refs for today have been individually marked as read
     const readRefs = progress?.readRefs ?? [];
     const todayReadRefs = todayRefs.filter((r) => readRefs.includes(r));
 
-    const isTodayCompleted = progress?.completedDays.includes(todayDayIndex) ?? false;
-    const streak = progress?.completedDays.length ?? 0;
-    const progressPct = activePlan
-        ? Math.round(((progress?.completedDays.length ?? 0) / activePlan.totalDays) * 100)
-        : 0;
+    const isTodayCompleted = progress ? isDayCompleted(progress, todayDayIndex) : false;
+    // "Dias Concluídos" — see CONTEXT.md: contagem acumulada, nunca consecutiva
+    const diasConcluidos = progress ? calcDiasConcluidos(progress) : 0;
+    const progressPct = activePlan && progress ? calcProgressPct(activePlan, progress) : 0;
 
     // ── Actions ────────────────────────────────────────────────────────────────
     const startPlan = useCallback(
@@ -263,7 +247,7 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
 
     return {
         plans,
-        progresses,        // the raw map of all active plan progressions
+        progresses,
         isLoading,
 
         // Active Plan scoped fields
@@ -273,7 +257,9 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
         todayRefs,
         todayReadRefs,
         isTodayCompleted,
-        streak,
+        diasConcluidos,
+        /** @deprecated use diasConcluidos — aligns with CONTEXT.md domain term */
+        streak: diasConcluidos,
         progressPct,
 
         startPlan,

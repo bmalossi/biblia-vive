@@ -6,17 +6,12 @@
 
 import { supabase } from './supabase';
 
+// PlanProgress type is canonical in readingPlanTypes.ts (ADR-0006)
+export type { PlanProgress } from './readingPlanTypes';
+import type { PlanProgress } from './readingPlanTypes';
+
 export const getStorageKey = (userId: string | null) => userId ? `bv_plan_progress_${userId}` : 'bv_plan_progress_anon';
 export const getLastPlanKey = (userId: string | null) => userId ? `bv_last_active_plan_id_${userId}` : 'bv_last_active_plan_id_anon';
-
-// ── Tipos ─────────────────────────────────────────────────────────────────────
-
-export interface PlanProgress {
-    planId: string;
-    startDate: number;        // Unix timestamp in ms
-    completedDays: number[];
-    readRefs: string[];       // e.g. ["sl/1", "sl/2"] — refs read individually
-}
 
 // ── save ─────────────────────────────────────────────────────────────────────
 
