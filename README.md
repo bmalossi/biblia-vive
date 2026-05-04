@@ -82,27 +82,27 @@ Os textos bíblicos disponibilizados pela plataforma pertencem aos seus respecti
 
 - **Almeida Corrigida Fiel (ACF)**  
   Bíblia Sagrada – Almeida Corrigida Fiel (ACF).  
-  © Sociedade Bíblica Trinitariana do Brasil.[web:122]
+  © Sociedade Bíblica Trinitariana do Brasil.
 
 - **Nova Versão Internacional (NVI)**  
   Bíblia Sagrada – Nova Versão Internacional (NVI).  
-  Copyright © International Bible Society / Biblica.[web:124]
+  Copyright © International Bible Society / Biblica.
 
 - **Almeida Revista e Corrigida (ARC)**  
-  Texto bíblico © Sociedade Bíblica do Brasil.[web:129]
+  Texto bíblico © Sociedade Bíblica do Brasil.
 
 - **King James Atualizada (KJA)**  
   Bíblia King James Atualizada (KJA).  
-  © Sociedade Bíblica Ibero-Americana & Abba Press.[web:128]
+  © Sociedade Bíblica Ibero-Americana & Abba Press.
 
 - **Reina-Valera 1960 (RVR1960)**  
-  Reina-Valera 1960 ® © Sociedades Bíblicas en América Latina, 1960; renovado © Sociedades Bíblicas Unidas, 1988.[web:127]
+  Reina-Valera 1960 ® © Sociedades Bíblicas en América Latina, 1960; renovado © Sociedades Bíblicas Unidas, 1988.
 
 - **Bible in Basic English (BBE)**  
-  Tradução em domínio público, conforme documentação pública disponível.[web:126][web:134]
+  Tradução em domínio público, conforme documentação pública disponível.
 
 - **King James Version (KJV)**  
-  Utilizada considerando seu status de domínio público em diversas jurisdições, observadas as condições aplicáveis em localidades específicas.[web:125]
+  Utilizada considerando seu status de domínio público em diversas jurisdições, observadas as condições aplicáveis em localidades específicas.
 
 - **AA (identificador interno da aplicação)**  
   A origem textual e os termos aplicáveis devem seguir a edição correspondente utilizada pela plataforma.
