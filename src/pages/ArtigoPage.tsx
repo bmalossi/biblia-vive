@@ -9,6 +9,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 import { Loader2, ArrowLeft, Calendar } from "lucide-react";
 
 interface Article {
@@ -135,7 +136,7 @@ export default function ArtigoPage() {
                 </header>
 
                 <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-gold prose-img:rounded-xl">
-                    <ReactMarkdown>{article.body}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkBreaks]}>{article.body}</ReactMarkdown>
                 </div>
             </article>
         </Layout>

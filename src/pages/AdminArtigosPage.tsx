@@ -12,6 +12,7 @@ import AuthModal from "@/components/AuthModal";
 import { Loader2, Plus, Trash2, FileText, Sparkles, LogIn, XCircle, Edit, Eye, Star, StarOff, Save, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 interface Article {
     id: string;
@@ -382,7 +383,7 @@ export default function AdminArtigosPage() {
                             <div className="space-y-4">
                                 <h3 className="font-sans text-xs uppercase tracking-widest text-gold">Preview</h3>
                                 <div className="rounded-xl border border-border bg-app-surface p-4 min-h-[400px] prose prose-sm max-w-none prose-headings:font-serif prose-a:text-gold">
-                                    {form.body ? <ReactMarkdown>{form.body}</ReactMarkdown> : <p className="text-app-text-muted italic">O preview aparecerá aqui...</p>}
+                                    {form.body ? <ReactMarkdown remarkPlugins={[remarkBreaks]}>{form.body}</ReactMarkdown> : <p className="text-app-text-muted italic">O preview aparecerá aqui...</p>}
                                 </div>
                             </div>
                         </div>

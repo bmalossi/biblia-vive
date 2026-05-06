@@ -166,6 +166,18 @@ All colors MUST be HSL.
   }
 }
 
+@layer components {
+  .prose {
+    white-space: break-spaces;
+  }
+  .prose br,
+  .prose p br {
+    display: block;
+    margin-top: 0.5em;
+    content: "";
+  }
+}
+
 /* prefers-reduced-motion removed to allow spinners */
 
 @layer utilities {
