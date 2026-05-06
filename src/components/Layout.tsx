@@ -43,6 +43,7 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
             <div>
               <h4 className="text-app-text font-medium mb-4 uppercase tracking-wider text-xs">Acesso</h4>
               <ul className="space-y-3">
+                <li><Link to="/artigos" className="text-sm text-app-text-muted hover:text-gold transition-colors">Artigos</Link></li>
                 <li><Link to="/sobre" className="text-sm text-app-text-muted hover:text-gold transition-colors">Sobre Nós & Missão</Link></li>
                 <li><Link to="/apoiar" className="text-sm text-app-text-muted hover:text-gold transition-colors">Apoiar o Projeto 💙</Link></li>
                 <li><Link to="/pro" className="text-sm text-app-text-muted hover:text-gold transition-colors">Assinatura PRO</Link></li>

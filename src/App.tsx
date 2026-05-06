@@ -19,6 +19,7 @@ const MyNotesPage = lazy(() => import("./pages/MyNotesPage"));
 const ReadingPlansPage = lazy(() => import("./pages/ReadingPlansPage"));
 const SharePage = lazy(() => import("./pages/SharePage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AdminArtigosPage = lazy(() => import("./pages/AdminArtigosPage"));
 const WidgetDailyVerse = lazy(() => import("./pages/WidgetDailyVerse"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ProSuccessPage = lazy(() => import("./pages/ProSuccessPage"));
@@ -28,6 +29,8 @@ const AboutPage = lazy(() => import("./pages/AboutPage"));
 const MyStudyPage = lazy(() => import("./pages/MyStudyPage"));
 const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
+const ArtigoPage = lazy(() => import("./pages/ArtigoPage"));
+const ArtigosIndexPage = lazy(() => import("./pages/ArtigosIndexPage"));
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,7 @@ const App = () => (
                 <Route path="/planos" element={<ReadingPlansPage />} />
                 <Route path="/compartilhar" element={<SharePage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/artigos" element={<AdminArtigosPage />} />
                 <Route path="/pro" element={<PricingPage />} />
                 <Route path="/pro/success" element={<ProSuccessPage />} />
                 <Route path="/widget/daily" element={<WidgetDailyVerse />} />
@@ -63,6 +67,8 @@ const App = () => (
                 <Route path="/sobre" element={<AboutPage />} />
                 <Route path="/termos-de-uso" element={<TermsPage />} />
                 <Route path="/apoiar" element={<SupportPage />} />
+                <Route path="/artigos" element={<ArtigosIndexPage />} />
+                <Route path="/artigos/:slug" element={<ArtigoPage />} />
                 <Route path="/meu-estudo" element={<MyStudyPage />} />
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="*" element={<NotFoundPage />} />

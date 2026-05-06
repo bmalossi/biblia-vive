@@ -2,6 +2,7 @@ import BookGrid from "@/components/BookGrid";
 import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
 import VerseOfDay from "@/components/VerseOfDay";
+import CarrosselArtigos from "@/components/CarrosselArtigos";
 import { findBookBySlug, getBooksForLocale } from "@/lib/books";
 import { getVersion } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
@@ -186,6 +187,9 @@ export default function HomePage() {
           <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.newTestament")}</h2>
           <BookGrid books={newTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
         </section>
+
+        {/* Artigos em destaque */}
+        <CarrosselArtigos />
 
         {/* Card PWA no final da página */}
         <section className="mt-12 overflow-hidden md:hidden">

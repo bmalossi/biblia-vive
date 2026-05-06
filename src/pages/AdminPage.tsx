@@ -1,18 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// AdminPage.tsx — Bíblia Viva · Sprint 12
-// Protected admin panel for scheduling curated daily verses.
+// AdminPage.tsx — Admin Hub
+// Protected admin panel hub with navigation to sub-sections.
 // Access controlled via Supabase auth + role check (app_metadata.role = 'admin').
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, NavLink } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
-import { Loader2, Plus, Trash2, CalendarDays, Sparkles, LogIn, XCircle } from "lucide-react";
+import { Loader2, Plus, Trash2, CalendarDays, Sparkles, LogIn, XCircle, FileText, Home, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 
 interface DailyVerseRow {
     id: string;
@@ -58,13 +57,20 @@ export default function AdminPage() {
     }, [user, authLoading]);
 
     // ── Fetch upcoming verses ────────────────────────────────────────────────
-    async function fetchVerses() {
-        const { data } = await supabase
+    async function fetchVerses(retries = 2) {
+        const { data, error } = await supabase
             .from("daily_verses")
             .select("id, verse_date, verse_text, verse_reference, reflection_text")
             .gte("verse_date", new Date().toISOString().slice(0, 10))
             .order("verse_date", { ascending: true })
             .limit(35);
+
+        if (error && error.message.includes("lock:") && error.message.includes("stole it") && retries > 0) {
+            console.warn("Auth lock stolen, retrying fetch...");
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            return fetchVerses(retries - 1);
+        }
+
         setVerses(data ?? []);
     }
 
@@ -115,14 +121,21 @@ export default function AdminPage() {
         } else {
             setSuccessMsg(`Versículo de ${form.verse_date} salvo com sucesso!`);
             setForm(EMPTY_VERSE);
+            setSaving(false);
+            await new Promise((resolve) => setTimeout(resolve, 300));
             fetchVerses();
+            return;
         }
         setSaving(false);
     }
 
     // ── Delete ───────────────────────────────────────────────────────────────
     async function handleDelete(id: string) {
-        await supabase.from("daily_verses").delete().eq("id", id);
+        const { error } = await supabase.from("daily_verses").delete().eq("id", id);
+        if (error && error.message.includes("lock:") && error.message.includes("stole it")) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            await supabase.from("daily_verses").delete().eq("id", id);
+        }
         fetchVerses();
     }
 
@@ -196,9 +209,40 @@ export default function AdminPage() {
                     <Sparkles className="h-6 w-6 text-gold" />
                     <div>
                         <h1 className="font-serif text-2xl text-app-text">Painel Admin</h1>
-                        <p className="mt-0.5 text-sm text-app-text-muted">Agendar Versículo do Dia</p>
+                        <p className="mt-0.5 text-sm text-app-text-muted">Gerenciamento do site</p>
                     </div>
                 </div>
+
+                {/* Navigation */}
+                <nav className="flex gap-2 border-b border-border pb-4">
+                    <NavLink
+                        to="/admin"
+                        end
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                                isActive
+                                    ? "bg-gold/10 text-gold"
+                                    : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
+                            }`
+                        }
+                    >
+                        <Home className="h-4 w-4" />
+                        Versículos do Dia
+                    </NavLink>
+                    <NavLink
+                        to="/admin/artigos"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                                isActive
+                                    ? "bg-gold/10 text-gold"
+                                    : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
+                            }`
+                        }
+                    >
+                        <FileText className="h-4 w-4" />
+                        Artigos
+                    </NavLink>
+                </nav>
 
                 {/* Form */}
                 <div className="rounded-2xl border border-border bg-app-surface p-6 space-y-4">

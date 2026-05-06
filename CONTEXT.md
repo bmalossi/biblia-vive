@@ -109,6 +109,68 @@ _Evitar_: página de versículo (muito granular), página de livro (pouco granul
 **Placeholder SEO**:
 Comentário HTML inserido no `index.html` e substituído pelo script de prerendering com os valores reais de cada rota. Exemplo: `<!--META_TITLE-->` → `<title>Gênesis 1 — ACF | Bíblia Vive</title>`.
 
+**Prerendering de Artigos**:
+Etapa adicionada ao script `scripts/prerender.mjs` existente que itera sobre os Artigos Publicados no Supabase e gera HTML estático para cada rota `/artigos/[slug]`. Executa após o prerendering de capítulos bíblicos. Falhas na query de artigos geram apenas um warning no log sem abortar o prerendering de capítulos.
+_Evitar_: script separado de artigos, prerender paralelo
+
+**Deploy Hook de Artigos**:
+Mecanismo que dispara rebuild automático na Vercel ao publicar um Artigo. Ao clicar em "Publicar" no Admin de Artigos, o frontend chama a serverless function `/api/publish-article`, que persiste o Artigo no Supabase e faz POST no Deploy Hook da Vercel. A URL do hook é armazenada em `VERCEL_DEPLOY_HOOK_URL` (variável de ambiente server-side). Rebuild leva aproximadamente 2 minutos.
+_Evitar_: webhook de publicação, trigger manual
+
+### Conteúdo Editorial
+
+**Artigo**:
+Conteúdo editorial publicado pelo administrador na plataforma, com título, slug, conteúdo textual e metadados SEO. Independente de Versículo, Referência ou Plano de Leitura — pode ou não referenciar conteúdo bíblico. Acessível a Visitantes e Leitores via rota pública `/artigos/[slug]`. Autoria exclusiva do Administrador (sem hierarquia de papéis editoriais por ora).
+_Evitar_: post, blog post, publicação, newsroom
+
+**Slug**:
+Identificador único de URL de um Artigo, gerado automaticamente a partir do título no momento da criação (ex: "Como orar todos os dias" → `como-orar-todos-os-dias`). Pode ser ajustado pelo Administrador antes da publicação. Após publicação, o Slug é imutável para preservar indexação e links externos.
+_Evitar_: URL amigável, permalink, handle
+
+**Rascunho**:
+Estado inicial de um Artigo recém-criado. Visível apenas no painel admin. Não gera rota pública nem HTML no prerendering.
+_Evitar_: rascunho não publicado, artigo oculto, draft
+
+**Publicado**:
+Estado final de um Artigo aprovado para exibição pública. Acessível via `/artigos/[slug]`, indexado por crawlers e processado no prerendering. Transição irreversível em relação ao Slug (que se torna imutável). Não há estados de agendamento ou arquivamento.
+_Evitar_: ativo, visível, ao vivo
+
+**Tabela de Artigos**:
+Persistência dos Artigos na tabela `articles` do Supabase (PostgreSQL). Campos canônicos: `id`, `title`, `slug`, `body`, `status` (rascunho | publicado), `meta_title`, `meta_description`, `created_at`, `published_at`. O script de prerendering faz fetch nessa tabela no build para gerar HTML estático por Artigo Publicado.
+_Evitar_: banco de artigos, repositório de conteúdo
+
+**Corpo do Artigo**:
+Conteúdo principal de um Artigo, armazenado no campo `body` como texto em **Markdown**. O painel admin exibe um editor com preview ao vivo. O frontend renderiza via `react-markdown`. Não é armazenado como HTML nem texto simples.
+_Evitar_: html do artigo, conteúdo rico, body HTML
+
+**Carrossel de Artigos**:
+Seção da página inicial que exibe Artigos em movimento automático (scroll horizontal). Prioriza Artigos com `featured = true`, ordenados por `published_at` desc, limitado a 6 itens. Se não houver nenhum artigo em destaque, exibe os 6 mais recentes como fallback. Cada card é um link para `/artigos/[slug]`.
+_Evitar_: banner de artigos, slider, lista de posts
+
+**Artigo em Destaque**:
+Artigo marcado pelo Administrador com `featured = true` para aparecer no Carrossel de Artigos. A ordenação é por data de publicação (mais recente primeiro), sem drag-and-drop manual.
+_Evitar_: artigo fixado, pinado, featured post
+
+**Admin Hub**:
+Página `/admin` refatorada como ponto de entrada do painel administrativo, com links para sub-seções. Não contém formulários diretamente. Reutiliza o guard de autenticação (`app_metadata.role === 'admin'`) e delega a lógica de cada domínio para páginas específicas.
+_Evitar_: dashboard, painel único, admin monolítico
+
+**Admin de Artigos**:
+Página `/admin/artigos` (`AdminArtigosPage.tsx`) responsável pelo CRUD completo de Artigos: listagem, criação, edição com preview Markdown, publicação e exclusão. Reutiliza o mesmo guard de autenticação do Admin Hub.
+_Evitar_: editor de posts, CMS de artigos
+
+**Página de Artigos**:
+Página pública `/artigos` que lista todos os Artigos Publicados em formato de grade de cards, ordenados por `published_at` desc. Recebe prerendering estático. Linkada no footer e/ou menu de navegação. Serve como destino para leitores que chegam via Carrossel ou links externos e querem explorar mais conteúdo.
+_Evitar_: blog, índice de posts, newsroom
+
+**Interlinking Editorial**:
+Prática de incluir hiperlinks dentro do Corpo do Artigo para outras páginas do site (capítulos bíblicos, outros Artigos, planos). Implementado manualmente pelo Administrador via sintaxe Markdown padrão. Não há detecção automática de padrões (smartlinks) no MVP.
+_Evitar_: smartlinks, link automático, link interno inteligente
+
+**Imagem de Capa**:
+Campo opcional `cover_image_url` (string) na tabela `articles`. URL de imagem externa gerenciada pelo Administrador no Cloudflare R2. Exibida no card do Carrossel de Artigos e no topo da página do Artigo. Artigos sem imagem de capa exibem um placeholder ou ficam sem imagem. Sem upload de arquivo no MVP — o admin cola a URL diretamente no painel.
+_Evitar_: thumbnail, banner do artigo, featured image
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.

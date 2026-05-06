@@ -11,6 +11,60 @@ const BIBLE_BASE_PATH = path.resolve(PROJECT_ROOT, 'public/bible/pt-br/acf');
 
 const CANONICAL_ORIGIN = 'https://www.bibliavive.com.br';
 
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+async function fetchPublishedArticles() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    console.warn('[prerender] Warning: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set. Skipping article prerendering.');
+    return [];
+  }
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/articles?status=eq.publicado&select=*`, {
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Supabase query failed: ${response.status}`);
+    }
+
+    const articles = await response.json();
+    return articles;
+  } catch (err) {
+    console.warn('[prerender] Warning: Could not fetch articles from Supabase. Continuing with chapter prerendering.');
+    console.warn(err.message);
+    return [];
+  }
+}
+
+function generateArticleMetaTags(article) {
+  const title = article.meta_title || `${article.title} — Bíblia Vive`;
+  const description = article.meta_description || article.body?.substring(0, 160).replace(/[#*_`~\[\]]/g, '') || '';
+  const url = `${CANONICAL_ORIGIN}/artigos/${article.slug}`;
+
+  const metaTags = {
+    'META_TITLE': `<title>${title}</title>`,
+    'META_DESCRIPTION': `<meta name="description" content="${description.substring(0, 160)}" />`,
+    'OG_URL': `<meta property="og:url" content="${url}" />`,
+    'OG_TITLE': `<meta property="og:title" content="${title}" />`,
+    'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
+    'OG_TYPE': `<meta property="og:type" content="article" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og/article.png`}" />`,
+    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${title}" />
+  <meta name="twitter:description" content="${description.substring(0, 160)}" />
+  <meta name="twitter:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og/article.png`}" />`,
+    'CANONICAL_URL': `<link rel="canonical" href="${url}" />`,
+    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"${article.title}","description":"${description.substring(0, 160)}","url":"${url}"}</script>`
+  };
+
+  return metaTags;
+}
+
 async function readJson(filePath) {
   const content = await fs.readFile(filePath, 'utf-8');
   return JSON.parse(content);
@@ -160,9 +214,61 @@ async function prerender() {
   await fs.writeFile(planosPath, planosHtml, 'utf-8');
   console.log('[prerender] ✓ Generated planos/index.html');
 
+  // Prerender Artigos
+  const articles = await fetchPublishedArticles();
+  let totalArticlesGenerated = 0;
+
+  for (const article of articles) {
+    try {
+      const metaTags = generateArticleMetaTags(article);
+      const prerenderedHtml = replacePlaceholders(template, metaTags);
+
+      const outputDir = path.join(DIST_DIR, 'artigos', article.slug);
+      await fs.mkdir(outputDir, { recursive: true });
+
+      const outputPath = path.join(outputDir, 'index.html');
+      await fs.writeFile(outputPath, prerenderedHtml, 'utf-8');
+
+      totalArticlesGenerated++;
+    } catch (err) {
+      console.warn(`[prerender] Warning: Could not prerender article ${article.slug}: ${err.message}`);
+    }
+  }
+
+  console.log(`[prerender] ✓ Generated ${totalArticlesGenerated} article HTML files`);
+
+  // Prerender Artigos Index
+  const artigosIndexTitle = 'Artigos — Bíblia Vive';
+  const artigosIndexDescription = 'Explore artigos e conteúdos sobre a Palavra de Deus.';
+  const artigosIndexUrl = `${CANONICAL_ORIGIN}/artigos`;
+
+  const artigosIndexMetaTags = {
+    'META_TITLE': `<title>${artigosIndexTitle}</title>`,
+    'META_DESCRIPTION': `<meta name="description" content="${artigosIndexDescription}" />`,
+    'OG_URL': `<meta property="og:url" content="${artigosIndexUrl}" />`,
+    'OG_TITLE': `<meta property="og:title" content="${artigosIndexTitle}" />`,
+    'OG_DESCRIPTION': `<meta property="og:description" content="${artigosIndexDescription}" />`,
+    'OG_TYPE': `<meta property="og:type" content="website" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og/artigos.png" />`,
+    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${artigosIndexTitle}" />
+  <meta name="twitter:description" content="${artigosIndexDescription}" />
+  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og/artigos.png" />`,
+    'CANONICAL_URL': `<link rel="canonical" href="${artigosIndexUrl}" />`,
+    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Artigos","description":"${artigosIndexDescription}","url":"${artigosIndexUrl}"}</script>`
+  };
+
+  const artigosIndexHtml = replacePlaceholders(template, artigosIndexMetaTags);
+  const artigosIndexDir = path.join(DIST_DIR, 'artigos');
+  await fs.mkdir(artigosIndexDir, { recursive: true });
+  const artigosIndexPath = path.join(artigosIndexDir, 'index.html');
+  await fs.writeFile(artigosIndexPath, artigosIndexHtml, 'utf-8');
+  console.log('[prerender] ✓ Generated artigos/index.html');
+
   const staticUrls = [
     { loc: `${CANONICAL_ORIGIN}/`, priority: '1.0', changefreq: 'daily' },
-    { loc: `${CANONICAL_ORIGIN}/planos`, priority: '0.8', changefreq: 'weekly' }
+    { loc: `${CANONICAL_ORIGIN}/planos`, priority: '0.8', changefreq: 'weekly' },
+    { loc: `${CANONICAL_ORIGIN}/artigos`, priority: '0.8', changefreq: 'weekly' }
   ];
 
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -194,6 +300,16 @@ async function prerender() {
     <loc>${staticUrl.loc}</loc>
     <changefreq>${staticUrl.changefreq}</changefreq>
     <priority>${staticUrl.priority}</priority>
+  </url>
+`;
+  }
+
+  for (const article of articles) {
+    const articleUrl = `${CANONICAL_ORIGIN}/artigos/${article.slug}`;
+    sitemap += `  <url>
+    <loc>${articleUrl}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 `;
   }
