@@ -1,13 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Loader2, Upload, Copy, Check, Search, X, ImageIcon, AlertCircle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-interface R2Image {
+const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
+const MANIFEST_URL = `${R2_PUBLIC_URL}/r2-media-index.json`;
+
+console.log("[ImageLibrary] R2_PUBLIC_URL:", R2_PUBLIC_URL);
+console.log("[ImageLibrary] MANIFEST_URL:", MANIFEST_URL);
+
+interface ManifestImage {
     key: string;
     url: string;
-    lastModified: string;
-    size: number;
+    filename: string;
+    uploadedAt: string;
 }
 
 interface ImageLibraryModalProps {
@@ -16,52 +21,56 @@ interface ImageLibraryModalProps {
 }
 
 export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModalProps) {
-    const [images, setImages] = useState<R2Image[]>([]);
+    const [images, setImages] = useState<ManifestImage[]>([]);
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [fetchError, setFetchError] = useState<string | null>(null);
+    const [uploadError, setUploadError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (isOpen) {
-            fetchImages();
-        }
+        if (isOpen) fetchImages();
     }, [isOpen]);
 
     async function fetchImages() {
         setLoading(true);
         setFetchError(null);
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 10000);
-
-            const response = await fetch("/api/r2-list-images", {
-                signal: controller.signal,
-                headers: {
-                    "Authorization": `Bearer ${session?.access_token}`
-                }
-            });
-            clearTimeout(timeout);
-
-            if (!response.ok) {
-                const err = await response.json().catch(() => ({ error: `Erro ${response.status}` }));
-                throw new Error(err.error || `Erro ${response.status}`);
+            const res = await fetch(`${MANIFEST_URL}?t=${Date.now()}`);
+            if (res.status === 404) {
+                setImages([]);
+                return;
             }
-
-            const data = await response.json();
-            setImages(data.images || []);
+            if (!res.ok) throw new Error(`Erro ao carregar manifest: ${res.status}`);
+            const data = await res.json();
+            const sorted = (data.images || []).sort(
+                (a: ManifestImage, b: ManifestImage) =>
+                    new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+            );
+            setImages(sorted);
         } catch (err: any) {
-            const msg = err.name === "AbortError"
-                ? "Tempo esgotado. Verifique as credenciais R2 na Vercel."
-                : (err.message || "Erro ao carregar imagens.");
-            setFetchError(msg);
-            console.error("Error fetching images:", err);
+            setFetchError(err.message || "Erro ao carregar biblioteca.");
+            console.error("[ImageLibrary] Fetch error details:", {
+                message: err.message,
+                name: err.name,
+                stack: err.stack,
+                url: MANIFEST_URL
+            });
         } finally {
             setLoading(false);
         }
+    }
+
+    async function updateManifest(manifestUploadUrl: string, newImage: ManifestImage) {
+        const currentImages = images;
+        const updated = { images: [newImage, ...currentImages] };
+        await fetch(manifestUploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updated),
+        });
+        setImages(updated.images);
     }
 
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -69,6 +78,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
         if (!file) return;
 
         setUploading(true);
+        setUploadError(null);
         try {
             const { data: { session } } = await supabase.auth.getSession();
             const response = await fetch("/api/r2-presigned-url", {
@@ -80,19 +90,31 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                 body: JSON.stringify({ filename: file.name, contentType: file.type })
             });
 
-            if (!response.ok) throw new Error("API failed");
-            const { uploadUrl } = await response.json();
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({ error: "Falha na API" }));
+                throw new Error(err.error || "Falha ao obter URL de upload");
+            }
 
+            const { uploadUrl, finalUrl, manifestUploadUrl, key } = await response.json();
+
+            // Upload the image to R2
             const uploadRes = await fetch(uploadUrl, {
                 method: "PUT",
                 headers: { "Content-Type": file.type },
                 body: file
             });
+            if (!uploadRes.ok) throw new Error("Erro ao enviar imagem para o Cloudflare");
 
-            if (uploadRes.ok) {
-                fetchImages();
-            }
-        } catch (err) {
+            // Update manifest.json in R2
+            const newEntry: ManifestImage = {
+                key,
+                url: finalUrl,
+                filename: file.name,
+                uploadedAt: new Date().toISOString(),
+            };
+            await updateManifest(manifestUploadUrl, newEntry);
+        } catch (err: any) {
+            setUploadError(err.message);
             console.error("Upload failed:", err);
         } finally {
             setUploading(false);
@@ -107,7 +129,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
     }
 
     const filteredImages = images.filter(img =>
-        img.key.toLowerCase().includes(search.toLowerCase())
+        img.filename.toLowerCase().includes(search.toLowerCase())
     );
 
     if (!isOpen) return null;
@@ -152,13 +174,18 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                             className={`inline-flex items-center gap-2 bg-gold text-app-bg px-4 py-2 rounded-xl text-sm font-medium hover:bg-gold/90 transition-colors cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
                         >
                             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                            Novo Upload
+                            {uploading ? "Enviando..." : "Novo Upload"}
                         </label>
                     </div>
                 </div>
+                {uploadError && (
+                    <p className="px-4 py-2 text-xs text-red-400 flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" /> {uploadError}
+                    </p>
+                )}
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4">
                     {loading ? (
                         <div className="h-full flex flex-col items-center justify-center text-app-text-muted gap-2">
                             <Loader2 className="h-8 w-8 animate-spin text-gold" />
@@ -171,17 +198,16 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                                 <p className="text-sm font-medium text-red-400">Falha ao carregar biblioteca</p>
                                 <p className="mt-1 text-xs max-w-sm">{fetchError}</p>
                             </div>
-                            <button
-                                onClick={fetchImages}
-                                className="flex items-center gap-2 text-xs text-gold hover:underline"
-                            >
+                            <button onClick={fetchImages} className="flex items-center gap-2 text-xs text-gold hover:underline">
                                 <RefreshCw className="h-3 w-3" /> Tentar novamente
                             </button>
                         </div>
                     ) : filteredImages.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-app-text-muted gap-3">
                             <ImageIcon className="h-12 w-12 opacity-20" />
-                            <p className="text-sm">Nenhuma imagem encontrada</p>
+                            <p className="text-sm">
+                                {images.length === 0 ? "Nenhuma imagem enviada ainda." : "Nenhuma imagem encontrada para essa busca."}
+                            </p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -189,7 +215,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                                 <div key={img.key} className="group relative aspect-square rounded-xl overflow-hidden border border-border bg-black/20">
                                     <img
                                         src={img.url}
-                                        alt={img.key}
+                                        alt={img.filename}
                                         className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                         loading="lazy"
                                     />
@@ -203,7 +229,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                                         </button>
                                     </div>
                                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                                        <p className="text-[10px] text-white truncate opacity-70">{img.key.replace('articles/', '')}</p>
+                                        <p className="text-[10px] text-white truncate opacity-70">{img.filename}</p>
                                     </div>
                                 </div>
                             ))}

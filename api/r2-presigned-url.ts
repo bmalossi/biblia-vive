@@ -51,18 +51,25 @@ export default async function handler(req: Request) {
             },
         });
 
-        // 3. Generate Presigned URL
+        // 3. Generate Presigned URL for the image
         const key = `articles/${Date.now()}-${filename}`;
-        const command = new PutObjectCommand({
+        const imgCommand = new PutObjectCommand({
             Bucket: r2BucketName,
             Key: key,
             ContentType: contentType,
         });
-
-        const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+        const uploadUrl = await getSignedUrl(s3, imgCommand, { expiresIn: 3600 });
         const finalUrl = `${r2PublicUrl}/${key}`;
 
-        return new Response(JSON.stringify({ uploadUrl, finalUrl }), {
+        // 4. Generate Presigned URL for r2-media-index.json (so client can update it)
+        const manifestCommand = new PutObjectCommand({
+            Bucket: r2BucketName,
+            Key: "r2-media-index.json",
+            ContentType: "application/json",
+        });
+        const manifestUploadUrl = await getSignedUrl(s3, manifestCommand, { expiresIn: 3600 });
+
+        return new Response(JSON.stringify({ uploadUrl, finalUrl, manifestUploadUrl, key, filename }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

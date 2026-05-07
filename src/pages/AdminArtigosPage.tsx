@@ -174,7 +174,7 @@ export default function AdminArtigosPage() {
         setUploadError(null);
 
         try {
-            // 1. Get Presigned URL
+            // 1. Get Presigned URLs
             const { data: { session } } = await supabase.auth.getSession();
             const response = await fetch("/api/r2-presigned-url", {
                 method: "POST",
@@ -182,10 +182,7 @@ export default function AdminArtigosPage() {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${session?.access_token}`
                 },
-                body: JSON.stringify({
-                    filename: file.name,
-                    contentType: file.type
-                })
+                body: JSON.stringify({ filename: file.name, contentType: file.type })
             });
 
             if (!response.ok) {
@@ -193,18 +190,32 @@ export default function AdminArtigosPage() {
                 throw new Error(err.error || "Erro ao gerar URL de upload");
             }
 
-            const { uploadUrl, finalUrl } = await response.json();
+            const { uploadUrl, finalUrl, manifestUploadUrl, key } = await response.json();
 
-            // 2. Upload to R2
+            // 2. Upload image to R2
             const uploadRes = await fetch(uploadUrl, {
                 method: "PUT",
                 headers: { "Content-Type": file.type },
                 body: file
             });
-
             if (!uploadRes.ok) throw new Error("Erro ao enviar arquivo para o Cloudflare");
 
-            // 3. Update form
+            // 3. Update manifest.json in R2 (fire and forget — don't block UI)
+            const r2PublicUrl = import.meta.env.VITE_R2_PUBLIC_URL || "";
+            fetch(`${r2PublicUrl}/r2-media-index.json?t=${Date.now()}`)
+                .then(r => r.ok ? r.json() : { images: [] })
+                .catch(() => ({ images: [] }))
+                .then(existing => {
+                    const newEntry = { key, url: finalUrl, filename: file.name, uploadedAt: new Date().toISOString() };
+                    const updated = { images: [newEntry, ...(existing.images || [])] };
+                    return fetch(manifestUploadUrl, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(updated),
+                    });
+                }).catch(() => { });
+
+            // 4. Update form
             setForm(f => ({ ...f, cover_image_url: finalUrl }));
             setSuccessMsg("Imagem enviada com sucesso!");
         } catch (err: any) {
@@ -212,7 +223,6 @@ export default function AdminArtigosPage() {
             setUploadError(err.message);
         } finally {
             setUploading(false);
-            // Reset input
             e.target.value = "";
         }
     }
