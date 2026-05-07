@@ -90,23 +90,24 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
         setUploadError(null);
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            const response = await fetch("/api/r2-presigned-url", {
+            const headers = {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session?.access_token}`
+            };
+
+            // Step 1: Get presigned URL for the image
+            const imgRes = await fetch("/api/r2-presigned-url", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session?.access_token}`
-                },
+                headers,
                 body: JSON.stringify({ filename: file.name, contentType: file.type })
             });
-
-            if (!response.ok) {
-                const err = await response.json().catch(() => ({ error: "Falha na API" }));
-                throw new Error(err.error || "Falha ao obter URL de upload");
+            if (!imgRes.ok) {
+                const err = await imgRes.json().catch(() => ({ error: "Falha na API" }));
+                throw new Error(err.error || "Falha ao gerar URL de upload");
             }
+            const { uploadUrl, finalUrl, key } = await imgRes.json();
 
-            const { uploadUrl, finalUrl, manifestUploadUrl, key } = await response.json();
-
-            // Upload the image to R2
+            // Step 2: Upload the image to R2
             const uploadRes = await fetch(uploadUrl, {
                 method: "PUT",
                 headers: { "Content-Type": file.type },
@@ -114,14 +115,24 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
             });
             if (!uploadRes.ok) throw new Error("Erro ao enviar imagem para o Cloudflare");
 
-            // Update manifest.json in R2
-            const newEntry: ManifestImage = {
-                key,
-                url: finalUrl,
-                filename: file.name,
-                uploadedAt: new Date().toISOString(),
-            };
-            await updateManifest(manifestUploadUrl, newEntry);
+            // Step 3: Get presigned URL for the manifest index
+            const manifestRes = await fetch("/api/r2-presigned-url", {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ filename: "r2-media-index.json", contentType: "application/json", manifestOnly: true })
+            });
+
+            if (manifestRes.ok) {
+                const { uploadUrl: manifestUploadUrl } = await manifestRes.json();
+                // Step 4: Update the manifest
+                const newEntry: ManifestImage = {
+                    key,
+                    url: finalUrl,
+                    filename: file.name,
+                    uploadedAt: new Date().toISOString(),
+                };
+                await updateManifest(manifestUploadUrl, newEntry);
+            }
         } catch (err: any) {
             setUploadError(err.message);
             console.error("Upload failed:", err);

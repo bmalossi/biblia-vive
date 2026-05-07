@@ -21,7 +21,7 @@ export default async function handler(req: Request) {
         }
 
         const body = await req.json().catch(() => ({}));
-        const { filename, contentType } = body;
+        const { filename, contentType, manifestOnly } = body;
 
         if (!filename || !contentType) {
             return new Response("Missing filename or contentType", { status: 400 });
@@ -43,32 +43,27 @@ export default async function handler(req: Request) {
 
         // 2. Initialize S3 Client for R2
         const s3 = new S3Client({
-            region: "us-east-1", // Fixed region for signing; Cloudflare ignores this
+            region: "auto",
             endpoint: r2Endpoint,
-            forcePathStyle: true, // Required: prevents virtual-hosted-style URL resolution
             credentials: {
                 accessKeyId: r2AccessKeyId,
                 secretAccessKey: r2SecretAccessKey,
             },
         });
 
-        // 3. Generate Presigned URLs in parallel (getSignedUrl makes a network call to R2)
-        const key = `articles/${Date.now()}-${filename}`;
-        const [uploadUrl, manifestUploadUrl] = await Promise.all([
-            getSignedUrl(s3, new PutObjectCommand({
-                Bucket: r2BucketName,
-                Key: key,
-                ContentType: contentType,
-            }), { expiresIn: 3600 }),
-            getSignedUrl(s3, new PutObjectCommand({
-                Bucket: r2BucketName,
-                Key: "r2-media-index.json",
-                ContentType: "application/json",
-            }), { expiresIn: 3600 }),
-        ]);
-        const finalUrl = `${r2PublicUrl}/${key}`;
+        // 3. Generate ONE Presigned URL (image or manifest)
+        // One call per request keeps the function within timeout limits.
+        const key = manifestOnly ? "r2-media-index.json" : `articles/${Date.now()}-${filename}`;
+        const command = new PutObjectCommand({
+            Bucket: r2BucketName,
+            Key: key,
+            ContentType: contentType,
+        });
 
-        return new Response(JSON.stringify({ uploadUrl, finalUrl, manifestUploadUrl, key, filename }), {
+        const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+        const finalUrl = manifestOnly ? `${r2PublicUrl}/${key}` : `${r2PublicUrl}/${key}`;
+
+        return new Response(JSON.stringify({ uploadUrl, finalUrl, key }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

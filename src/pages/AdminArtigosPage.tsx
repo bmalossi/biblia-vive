@@ -174,14 +174,16 @@ export default function AdminArtigosPage() {
         setUploadError(null);
 
         try {
-            // 1. Get Presigned URLs
             const { data: { session } } = await supabase.auth.getSession();
+            const headers = {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session?.access_token}`
+            };
+
+            // 1. Get Presigned URL for image
             const response = await fetch("/api/r2-presigned-url", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session?.access_token}`
-                },
+                headers,
                 body: JSON.stringify({ filename: file.name, contentType: file.type })
             });
 
@@ -190,7 +192,7 @@ export default function AdminArtigosPage() {
                 throw new Error(err.error || "Erro ao gerar URL de upload");
             }
 
-            const { uploadUrl, finalUrl, manifestUploadUrl, key } = await response.json();
+            const { uploadUrl, finalUrl, key } = await response.json();
 
             // 2. Upload image to R2
             const uploadRes = await fetch(uploadUrl, {
@@ -200,24 +202,30 @@ export default function AdminArtigosPage() {
             });
             if (!uploadRes.ok) throw new Error("Erro ao enviar arquivo para o Cloudflare");
 
-            // 3. Update manifest.json in R2 (fire and forget — don't block UI)
-            const r2PublicUrl = import.meta.env.VITE_R2_PUBLIC_URL || "";
-            fetch(`${r2PublicUrl}/r2-media-index.json?t=${Date.now()}`)
-                .then(r => r.ok ? r.json() : { images: [] })
-                .catch(() => ({ images: [] }))
-                .then(existing => {
-                    const newEntry = { key, url: finalUrl, filename: file.name, uploadedAt: new Date().toISOString() };
-                    const updated = { images: [newEntry, ...(existing.images || [])] };
-                    return fetch(manifestUploadUrl, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(updated),
-                    });
-                }).catch(() => { });
-
-            // 4. Update form
+            // 3. Update form immediately (don't wait for manifest)
             setForm(f => ({ ...f, cover_image_url: finalUrl }));
             setSuccessMsg("Imagem enviada com sucesso!");
+
+            // 4. Update manifest index (fire-and-forget, after UI is updated)
+            fetch("/api/r2-presigned-url", {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ filename: "r2-media-index.json", contentType: "application/json", manifestOnly: true })
+            }).then(async r => {
+                if (!r.ok) return;
+                const { uploadUrl: manifestUploadUrl } = await r.json();
+                const r2PublicUrl = import.meta.env.VITE_R2_PUBLIC_URL || "";
+                const existing = await fetch(`${r2PublicUrl}/r2-media-index.json?t=${Date.now()}`)
+                    .then(res => res.ok ? res.json() : { images: [] })
+                    .catch(() => ({ images: [] }));
+                const updated = { images: [{ key, url: finalUrl, filename: file.name, uploadedAt: new Date().toISOString() }, ...(existing.images || [])] };
+                await fetch(manifestUploadUrl, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updated),
+                });
+            }).catch(() => { });
+
         } catch (err: any) {
             console.error("Upload error:", err);
             setUploadError(err.message);
