@@ -16,7 +16,7 @@
             "maxDuration": 10
         },
         "api/r2-presigned-url.ts": {
-            "maxDuration": 10
+            "maxDuration": 30
         },
         "api/r2-list-images.ts": {
             "maxDuration": 10
