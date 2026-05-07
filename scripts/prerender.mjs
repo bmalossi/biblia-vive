@@ -125,7 +125,8 @@ function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
   <meta name="twitter:description" content="${description.substring(0, 160)}" />
   <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og/bible-chapter.png" />`,
     'CANONICAL_URL': `<link rel="canonical" href="${url}" />`,
-    'JSON_LD': `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`
+    'JSON_LD': `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    'SEO_CONTENT': `<h1>${bookName} ${chapterNum}</h1>` + verses.map((v, i) => `<p><sup>${i + 1}</sup> ${v}</p>`).join('')
   };
 
   return metaTags;

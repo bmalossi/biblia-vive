@@ -43,8 +43,9 @@ export default async function handler(req: Request) {
 
         // 2. Initialize S3 Client for R2
         const s3 = new S3Client({
-            region: "auto",
+            region: "us-east-1", // Fixed region for signing; Cloudflare ignores this
             endpoint: r2Endpoint,
+            forcePathStyle: true, // Required: prevents virtual-hosted-style URL resolution
             credentials: {
                 accessKeyId: r2AccessKeyId,
                 secretAccessKey: r2SecretAccessKey,
