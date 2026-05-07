@@ -1,6 +1,76 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
+
+/**
+ * Generates an AWS Signature V4 presigned PUT URL using pure Node.js crypto.
+ * No S3 SDK → no network calls → no timeouts.
+ */
+function createPresignedPutUrl({
+    endpoint,
+    bucket,
+    key,
+    accessKeyId,
+    secretAccessKey,
+    expiresIn = 3600,
+}: {
+    endpoint: string;
+    bucket: string;
+    key: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+    expiresIn?: number;
+}): string {
+    const now = new Date();
+    const ymd = now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+    const amzDate = now.toISOString().replace(/[:-]/g, "").replace(/\.\d+/, ""); // YYYYMMDDTHHMMSSZ
+
+    const region = "auto";
+    const service = "s3";
+    const host = new URL(endpoint).host;
+    const scope = `${ymd}/${region}/${service}/aws4_request`;
+    const credential = `${accessKeyId}/${scope}`;
+
+    // Encode path: keep slashes between segments, encode each segment
+    const encodedPath = "/" + [bucket, ...key.split("/")]
+        .map(s => encodeURIComponent(s))
+        .join("/");
+
+    // Canonical query string (params must be sorted)
+    const params: [string, string][] = [
+        ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
+        ["X-Amz-Credential", credential],
+        ["X-Amz-Date", amzDate],
+        ["X-Amz-Expires", String(expiresIn)],
+        ["X-Amz-SignedHeaders", "host"],
+    ].sort((a, b) => a[0].localeCompare(b[0]));
+
+    const qs = params
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
+
+    // Canonical request
+    const canonicalRequest = [
+        "PUT",
+        encodedPath,
+        qs,
+        `host:${host}\n`,
+        "host",
+        "UNSIGNED-PAYLOAD",
+    ].join("\n");
+
+    // String to sign
+    const reqHash = crypto.createHash("sha256").update(canonicalRequest).digest("hex");
+    const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${scope}\n${reqHash}`;
+
+    // Signing key
+    const kDate = crypto.createHmac("sha256", `AWS4${secretAccessKey}`).update(ymd).digest();
+    const kRegion = crypto.createHmac("sha256", kDate).update(region).digest();
+    const kService = crypto.createHmac("sha256", kRegion).update(service).digest();
+    const kReq = crypto.createHmac("sha256", kService).update("aws4_request").digest();
+    const signature = crypto.createHmac("sha256", kReq).update(stringToSign).digest("hex");
+
+    return `${endpoint}/${bucket}/${key}?${qs}&X-Amz-Signature=${signature}`;
+}
 
 export default async function handler(req: Request) {
     if (req.method !== "POST") {
@@ -27,41 +97,29 @@ export default async function handler(req: Request) {
             return new Response("Missing filename or contentType", { status: 400 });
         }
 
-        // 1. Verify Admin via Supabase
-        const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!);
+        // Verify admin via Supabase
         const authHeader = req.headers.get("Authorization");
         if (!authHeader) {
             return new Response("Unauthorized", { status: 401 });
         }
-
         const token = authHeader.replace("Bearer ", "");
+        const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!);
         const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
         if (authError || !user || (user.app_metadata as any).role !== "admin") {
             return new Response("Forbidden", { status: 403 });
         }
 
-        // 2. Initialize S3 Client for R2
-        const s3 = new S3Client({
-            region: "auto",
-            endpoint: r2Endpoint,
-            credentials: {
-                accessKeyId: r2AccessKeyId,
-                secretAccessKey: r2SecretAccessKey,
-            },
-        });
-
-        // 3. Generate ONE Presigned URL (image or manifest)
-        // One call per request keeps the function within timeout limits.
+        // Generate presigned URL — pure crypto, no network calls
         const key = manifestOnly ? "r2-media-index.json" : `articles/${Date.now()}-${filename}`;
-        const command = new PutObjectCommand({
-            Bucket: r2BucketName,
-            Key: key,
-            ContentType: contentType,
+        const uploadUrl = createPresignedPutUrl({
+            endpoint: r2Endpoint,
+            bucket: r2BucketName,
+            key,
+            accessKeyId: r2AccessKeyId,
+            secretAccessKey: r2SecretAccessKey,
         });
-
-        const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-        const finalUrl = manifestOnly ? `${r2PublicUrl}/${key}` : `${r2PublicUrl}/${key}`;
+        const finalUrl = `${r2PublicUrl}/${key}`;
 
         return new Response(JSON.stringify({ uploadUrl, finalUrl, key }), {
             status: 200,
