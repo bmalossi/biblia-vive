@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Loader2, Upload, Copy, Check, Search, X, ImageIcon, Trash2 } from "lucide-react";
+import { Loader2, Upload, Copy, Check, Search, X, ImageIcon, AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface R2Image {
@@ -21,6 +21,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
     const [uploading, setUploading] = useState(false);
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
     const [search, setSearch] = useState("");
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -30,18 +31,33 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
 
     async function fetchImages() {
         setLoading(true);
+        setFetchError(null);
         try {
             const { data: { session } } = await supabase.auth.getSession();
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000);
+
             const response = await fetch("/api/r2-list-images", {
+                signal: controller.signal,
                 headers: {
                     "Authorization": `Bearer ${session?.access_token}`
                 }
             });
-            if (response.ok) {
-                const data = await response.json();
-                setImages(data.images || []);
+            clearTimeout(timeout);
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({ error: `Erro ${response.status}` }));
+                throw new Error(err.error || `Erro ${response.status}`);
             }
-        } catch (err) {
+
+            const data = await response.json();
+            setImages(data.images || []);
+        } catch (err: any) {
+            const msg = err.name === "AbortError"
+                ? "Tempo esgotado. Verifique as credenciais R2 na Vercel."
+                : (err.message || "Erro ao carregar imagens.");
+            setFetchError(msg);
             console.error("Error fetching images:", err);
         } finally {
             setLoading(false);
@@ -147,6 +163,20 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                         <div className="h-full flex flex-col items-center justify-center text-app-text-muted gap-2">
                             <Loader2 className="h-8 w-8 animate-spin text-gold" />
                             <p className="text-sm">Carregando sua biblioteca...</p>
+                        </div>
+                    ) : fetchError ? (
+                        <div className="h-full flex flex-col items-center justify-center text-app-text-muted gap-4">
+                            <AlertCircle className="h-10 w-10 text-red-400/70" />
+                            <div className="text-center">
+                                <p className="text-sm font-medium text-red-400">Falha ao carregar biblioteca</p>
+                                <p className="mt-1 text-xs max-w-sm">{fetchError}</p>
+                            </div>
+                            <button
+                                onClick={fetchImages}
+                                className="flex items-center gap-2 text-xs text-gold hover:underline"
+                            >
+                                <RefreshCw className="h-3 w-3" /> Tentar novamente
+                            </button>
                         </div>
                     ) : filteredImages.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-app-text-muted gap-3">

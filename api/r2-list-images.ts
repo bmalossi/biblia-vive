@@ -38,6 +38,7 @@ export default async function handler(req: Request) {
         const s3 = new S3Client({
             region: "auto",
             endpoint: r2Endpoint,
+            forcePathStyle: true, // Required for Cloudflare R2 list operations
             credentials: {
                 accessKeyId: r2AccessKeyId,
                 secretAccessKey: r2SecretAccessKey,
