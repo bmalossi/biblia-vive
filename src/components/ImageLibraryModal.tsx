@@ -36,13 +36,22 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
     async function fetchImages() {
         setLoading(true);
         setFetchError(null);
+
+        if (!R2_PUBLIC_URL) {
+            setFetchError("Variável VITE_R2_PUBLIC_URL não configurada na Vercel. Adicione https://midia.bibliavive.com.br nas env vars.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const res = await fetch(`${MANIFEST_URL}?t=${Date.now()}`);
+            const res = await fetch(`${MANIFEST_URL}?t=${Date.now()}`, {
+                cache: "no-store",
+            });
             if (res.status === 404) {
                 setImages([]);
                 return;
             }
-            if (!res.ok) throw new Error(`Erro ao carregar manifest: ${res.status}`);
+            if (!res.ok) throw new Error(`Erro ao carregar índice de imagens: HTTP ${res.status}`);
             const data = await res.json();
             const sorted = (data.images || []).sort(
                 (a: ManifestImage, b: ManifestImage) =>
@@ -50,12 +59,12 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
             );
             setImages(sorted);
         } catch (err: any) {
-            setFetchError(err.message || "Erro ao carregar biblioteca.");
-            console.error("[ImageLibrary] Fetch error details:", {
-                message: err.message,
+            const msg = err.message || "Erro ao carregar biblioteca.";
+            setFetchError(msg);
+            console.error("[ImageLibrary] Fetch error:", {
                 name: err.name,
-                stack: err.stack,
-                url: MANIFEST_URL
+                message: err.message,
+                url: MANIFEST_URL,
             });
         } finally {
             setLoading(false);
