@@ -168,13 +168,17 @@ All colors MUST be HSL.
 
 @layer components {
   .prose {
-    white-space: break-spaces;
+    --tw-prose-line-height: 1.6;
   }
-  .prose br,
-  .prose p br {
-    display: block;
+  .prose p,
+  .prose li,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    line-height: 1.6 !important;
+  }
+  .prose p + p {
     margin-top: 0.5em;
-    content: "";
   }
 }
 

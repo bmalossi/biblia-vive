@@ -9,10 +9,11 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
-import { Loader2, Plus, Trash2, FileText, Sparkles, LogIn, XCircle, Edit, Eye, Star, StarOff, Save, Send } from "lucide-react";
+import { Loader2, Plus, Trash2, FileText, Sparkles, LogIn, XCircle, Edit, Eye, Star, StarOff, Save, Send, Upload, Check, AlertCircle, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import ImageLibraryModal from "@/components/ImageLibraryModal";
 
 interface Article {
     id: string;
@@ -36,6 +37,8 @@ interface ArticleFormData {
     meta_description: string;
     cover_image_url: string;
     featured: boolean;
+    line_height: string;
+    letter_spacing: string;
 }
 
 const EMPTY_FORM: ArticleFormData = {
@@ -46,6 +49,8 @@ const EMPTY_FORM: ArticleFormData = {
     meta_description: "",
     cover_image_url: "",
     featured: false,
+    line_height: "1.75",
+    letter_spacing: "0em",
 };
 
 function generateSlug(title: string): string {
@@ -76,6 +81,9 @@ export default function AdminArtigosPage() {
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const [libraryOpen, setLibraryOpen] = useState(false);
 
     useEffect(() => {
         if (authLoading) return;
@@ -158,6 +166,57 @@ export default function AdminArtigosPage() {
         fetchArticles();
     }
 
+    async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        setUploadError(null);
+
+        try {
+            // 1. Get Presigned URL
+            const { data: { session } } = await supabase.auth.getSession();
+            const response = await fetch("/api/r2-presigned-url", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session?.access_token}`
+                },
+                body: JSON.stringify({
+                    filename: file.name,
+                    contentType: file.type
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || "Erro ao gerar URL de upload");
+            }
+
+            const { uploadUrl, finalUrl } = await response.json();
+
+            // 2. Upload to R2
+            const uploadRes = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: { "Content-Type": file.type },
+                body: file
+            });
+
+            if (!uploadRes.ok) throw new Error("Erro ao enviar arquivo para o Cloudflare");
+
+            // 3. Update form
+            setForm(f => ({ ...f, cover_image_url: finalUrl }));
+            setSuccessMsg("Imagem enviada com sucesso!");
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            setUploadError(err.message);
+        } finally {
+            setUploading(false);
+            // Reset input
+            e.target.value = "";
+        }
+    }
+
     function startEdit(article: Article) {
         setEditingId(article.id);
         setForm({
@@ -168,6 +227,8 @@ export default function AdminArtigosPage() {
             meta_description: article.meta_description ?? "",
             cover_image_url: article.cover_image_url ?? "",
             featured: article.featured,
+            line_height: (article as Article & { line_height?: string }).line_height ?? "1.75",
+            letter_spacing: (article as Article & { letter_spacing?: string }).letter_spacing ?? "0em",
         });
         setView("form");
     }
@@ -243,9 +304,14 @@ export default function AdminArtigosPage() {
                         </div>
                     </div>
                     {view === "list" && (
-                        <Button onClick={startCreate} className="rounded-full bg-gold text-app-bg hover:bg-gold/90">
-                            <Plus className="mr-2 h-4 w-4" /> Novo Artigo
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button onClick={() => setLibraryOpen(true)} variant="outline" className="rounded-full border-gold/40 text-gold hover:bg-gold-bg">
+                                <ImageIcon className="mr-2 h-4 w-4" /> Biblioteca
+                            </Button>
+                            <Button onClick={startCreate} className="rounded-full bg-gold text-app-bg hover:bg-gold/90">
+                                <Plus className="mr-2 h-4 w-4" /> Novo Artigo
+                            </Button>
+                        </div>
                     )}
                 </div>
 
@@ -330,14 +396,38 @@ export default function AdminArtigosPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-app-text-muted mb-1">URL da Imagem de Capa</label>
-                                    <input
-                                        type="text"
-                                        value={form.cover_image_url}
-                                        onChange={e => setForm(f => ({ ...f, cover_image_url: e.target.value }))}
-                                        className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
-                                        placeholder="https://..."
-                                    />
+                                    <label className="block text-xs text-app-text-muted mb-1">Imagem de Capa</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={form.cover_image_url}
+                                            onChange={e => setForm(f => ({ ...f, cover_image_url: e.target.value }))}
+                                            className="flex-1 rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
+                                            placeholder="https://..."
+                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                id="article-image-upload"
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={handleFileUpload}
+                                                disabled={uploading}
+                                            />
+                                            <label
+                                                htmlFor="article-image-upload"
+                                                className={`flex items-center justify-center p-2.5 rounded-xl border border-dashed border-gold/40 text-gold hover:bg-gold-bg cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                                            >
+                                                {uploading ? (
+                                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                                ) : (
+                                                    <Upload className="h-5 w-5" />
+                                                )}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {uploadError && <p className="mt-1 text-xs text-red-400 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {uploadError}</p>}
+                                    {form.cover_image_url && !uploading && !uploadError && <p className="mt-1 text-xs text-green-400 flex items-center gap-1"><Check className="h-3 w-3" /> Imagem selecionada</p>}
                                 </div>
                                 <div>
                                     <label className="block text-xs text-app-text-muted mb-1">Meta Title (SEO)</label>
@@ -370,7 +460,16 @@ export default function AdminArtigosPage() {
                                     <label htmlFor="featured" className="text-sm text-app-text">Artigo em destaque</label>
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-app-text-muted mb-1">Conteúdo (Markdown)</label>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="block text-xs text-app-text-muted">Conteúdo (Markdown)</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setLibraryOpen(true)}
+                                            className="text-[10px] uppercase tracking-wider text-gold hover:underline flex items-center gap-1"
+                                        >
+                                            <ImageIcon className="h-3 w-3" /> Abrir Biblioteca
+                                        </button>
+                                    </div>
                                     <textarea
                                         value={form.body}
                                         onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
@@ -379,10 +478,40 @@ export default function AdminArtigosPage() {
                                         placeholder="# Título\n\nEscreva seu artigo aqui..."
                                     />
                                 </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1">Espaçamento entre linhas</label>
+                                        <select
+                                            value={form.line_height}
+                                            onChange={e => setForm(f => ({ ...f, line_height: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
+                                        >
+                                            <option value="1.0">Simples (1.0)</option>
+                                            <option value="1.25">1.25</option>
+                                            <option value="1.5">1.5 (1.5)</option>
+                                            <option value="1.75">1.75</option>
+                                            <option value="2.0">Duplo (2.0)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1">Espaçamento entre letras</label>
+                                        <select
+                                            value={form.letter_spacing}
+                                            onChange={e => setForm(f => ({ ...f, letter_spacing: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
+                                        >
+                                            <option value="-0.05em">Compactado (-0.05em)</option>
+                                            <option value="0em">Normal (0em)</option>
+                                            <option value="0.05em">0.05em</option>
+                                            <option value="0.1em">0.1em</option>
+                                            <option value="0.15em">0.15em (wide)</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div className="space-y-4">
                                 <h3 className="font-sans text-xs uppercase tracking-widest text-gold">Preview</h3>
-                                <div className="rounded-xl border border-border bg-app-surface p-4 min-h-[400px] prose prose-sm max-w-none prose-headings:font-serif prose-a:text-gold">
+                                <div className="rounded-xl border border-border bg-app-surface p-4 min-h-[400px] prose prose-sm max-w-none prose-headings:font-serif prose-a:text-gold" style={{ letterSpacing: form.letter_spacing, lineHeight: form.line_height }}>
                                     {form.body ? <ReactMarkdown remarkPlugins={[remarkBreaks]}>{form.body}</ReactMarkdown> : <p className="text-app-text-muted italic">O preview aparecerá aqui...</p>}
                                 </div>
                             </div>
@@ -404,6 +533,8 @@ export default function AdminArtigosPage() {
                         </div>
                     </div>
                 )}
+
+                <ImageLibraryModal isOpen={libraryOpen} onClose={() => setLibraryOpen(false)} />
             </div>
         </Layout>
     );

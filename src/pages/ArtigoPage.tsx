@@ -23,6 +23,8 @@ interface Article {
     cover_image_url: string | null;
     created_at: string;
     published_at: string | null;
+    line_height?: string;
+    letter_spacing?: string;
 }
 
 export default function ArtigoPage() {
@@ -135,7 +137,7 @@ export default function ArtigoPage() {
                     )}
                 </header>
 
-                <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-gold prose-img:rounded-xl">
+                <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-gold prose-img:rounded-xl" style={{ letterSpacing: article.letter_spacing || "0em", lineHeight: article.line_height || "1.75" }}>
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>{article.body}</ReactMarkdown>
                 </div>
             </article>
