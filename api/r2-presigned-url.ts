@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import { createHash, createHmac } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
 /**
@@ -30,23 +30,20 @@ function createPresignedPutUrl({
     const scope = `${ymd}/${region}/${service}/aws4_request`;
     const credential = `${accessKeyId}/${scope}`;
 
-    // Encode path: keep slashes between segments, encode each segment
-    const encodedPath = "/" + [bucket, ...key.split("/")]
-        .map(s => encodeURIComponent(s))
-        .join("/");
+    // Path: /{bucket}/{key}  (path-style, each segment encoded separately)
+    const pathParts = [bucket, ...key.split("/")].map(s => encodeURIComponent(s));
+    const encodedPath = "/" + pathParts.join("/");
 
-    // Canonical query string (params must be sorted)
-    const params: [string, string][] = ([
+    // Canonical query string (params sorted by key)
+    const rawParams: [string, string][] = [
         ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
         ["X-Amz-Credential", credential],
         ["X-Amz-Date", amzDate],
         ["X-Amz-Expires", String(expiresIn)],
         ["X-Amz-SignedHeaders", "host"],
-    ] as [string, string][]).sort((a, b) => a[0].localeCompare(b[0]));
-
-    const qs = params
-        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-        .join("&");
+    ];
+    rawParams.sort((a, b) => a[0].localeCompare(b[0]));
+    const qs = rawParams.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("&");
 
     // Canonical request
     const canonicalRequest = [
@@ -59,104 +56,68 @@ function createPresignedPutUrl({
     ].join("\n");
 
     // String to sign
-    const reqHash = crypto.createHash("sha256").update(canonicalRequest).digest("hex");
+    const reqHash = createHash("sha256").update(canonicalRequest).digest("hex");
     const stringToSign = `AWS4-HMAC-SHA256\n${amzDate}\n${scope}\n${reqHash}`;
 
-    // Signing key
-    const kDate = crypto.createHmac("sha256", `AWS4${secretAccessKey}`).update(ymd).digest();
-    const kRegion = crypto.createHmac("sha256", kDate).update(region).digest();
-    const kService = crypto.createHmac("sha256", kRegion).update(service).digest();
-    const kReq = crypto.createHmac("sha256", kService).update("aws4_request").digest();
-    const signature = crypto.createHmac("sha256", kReq).update(stringToSign).digest("hex");
+    // Signing key (HMAC chain)
+    const kDate = createHmac("sha256", `AWS4${secretAccessKey}`).update(ymd).digest();
+    const kRegion = createHmac("sha256", kDate).update(region).digest();
+    const kService = createHmac("sha256", kRegion).update(service).digest();
+    const kReq = createHmac("sha256", kService).update("aws4_request").digest();
+    const signature = createHmac("sha256", kReq).update(stringToSign).digest("hex");
 
     return `${endpoint}/${bucket}/${key}?${qs}&X-Amz-Signature=${signature}`;
 }
 
-export default async function handler(req: Request) {
-    const timeoutMs = 25000;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+/**
+ * VERCEL NODE.JS HANDLER — uses the two-argument (req, res) pattern to ensure
+ * the HTTP response is properly closed. The one-argument (req: Request) pattern
+ * causes 60s timeouts on Vercel Node.js runtime because res.end() is never called.
+ */
+export default async function handler(req: any, res: any) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method Not Allowed" });
+    }
 
     try {
-        if (req.method !== "POST") {
-            return new Response("Method Not Allowed", { status: 405 });
-        }
-
-        const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+        const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
         const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
         const r2AccessKeyId = process.env.R2_ACCESS_KEY_ID;
         const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
         const r2Endpoint = process.env.R2_ENDPOINT;
         const r2BucketName = process.env.R2_BUCKET_NAME;
-        const r2PublicUrl = process.env.R2_PUBLIC_URL || process.env.VITE_R2_PUBLIC_URL;
-
-        console.log("[R2-API] ENV check:", {
-            hasSupabaseUrl: !!supabaseUrl,
-            hasServiceRoleKey: !!supabaseServiceRoleKey,
-            hasR2AccessKey: !!r2AccessKeyId,
-            hasR2Secret: !!r2SecretAccessKey,
-            hasR2Endpoint: !!r2Endpoint,
-            hasR2Bucket: !!r2BucketName,
-            hasR2PublicUrl: !!r2PublicUrl,
-        });
-
-        if (!supabaseUrl || !supabaseServiceRoleKey) {
-            return new Response(JSON.stringify({ error: "Supabase configuration missing" }), { status: 500 });
-        }
+        const r2PublicUrl = process.env.VITE_R2_PUBLIC_URL || process.env.R2_PUBLIC_URL;
 
         if (!r2AccessKeyId || !r2SecretAccessKey || !r2Endpoint || !r2BucketName) {
-            return new Response(JSON.stringify({ error: "R2 configuration missing" }), { status: 500 });
+            return res.status(500).json({ error: "R2 configuration missing" });
         }
 
-        const body = await req.json().catch(() => ({}));
+        // req.body is auto-parsed by Vercel when Content-Type: application/json
+        const body = req.body || {};
         const { filename, contentType, manifestOnly } = body;
 
         if (!filename || !contentType) {
-            return new Response("Missing filename or contentType", { status: 400 });
+            return res.status(400).json({ error: "Missing filename or contentType" });
         }
 
-        const authHeader = req.headers.get("Authorization");
+        // Verify admin via Supabase (with persistSession: false to prevent background connections)
+        const authHeader = req.headers["authorization"] || req.headers["Authorization"];
         if (!authHeader) {
-            console.error("[R2-API] Missing Authorization header");
-            return new Response("Unauthorized", { status: 401 });
+            return res.status(401).json({ error: "Unauthorized" });
         }
-        const token = authHeader.replace("Bearer ", "");
+        const token = String(authHeader).replace("Bearer ", "");
 
-        console.log("[R2-API] Creating Supabase client...");
-        const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
-            auth: { lockAcquireTimeout: 0 },
-            global: { fetch: (url, init) => fetch(url, { ...init, signal: controller.signal }) },
+        const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!, {
+            auth: { persistSession: false },
         });
 
-        console.log("[R2-API] Calling supabase.auth.getUser()...");
-        let user = null;
-        let authError = null;
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
-        try {
-            const result = await Promise.race([
-                supabase.auth.getUser(token),
-                new Promise<{ data: any, error: any }>((_, reject) =>
-                    setTimeout(() => reject(new Error("Auth Timeout (8s)")), 8000)
-                )
-            ]);
-            user = result?.data?.user ?? null;
-            authError = result?.error ?? null;
-        } catch (raceErr: any) {
-            console.error("[R2-API] Race error:", raceErr.message);
-            authError = { message: raceErr.message || "Auth timeout" };
+        if (authError || !user || (user.app_metadata as any).role !== "admin") {
+            return res.status(403).json({ error: "Forbidden" });
         }
 
-        if (authError) {
-            console.error("[R2-API] Auth error:", authError.message);
-            return new Response(JSON.stringify({ error: authError.message }), { status: 403 });
-        }
-
-        if (!user || (user.app_metadata as any)?.role !== "admin") {
-            console.error("[R2-API] Forbidden: User is not admin");
-            return new Response("Forbidden", { status: 403 });
-        }
-        console.log("[R2-API] Auth success, generating URL...");
-
+        // Generate presigned URL — pure crypto, zero network calls
         const key = manifestOnly ? "r2-media-index.json" : `articles/${Date.now()}-${filename}`;
         const uploadUrl = createPresignedPutUrl({
             endpoint: r2Endpoint,
@@ -167,16 +128,10 @@ export default async function handler(req: Request) {
         });
         const finalUrl = `${r2PublicUrl}/${key}`;
 
-        console.log("[R2-API] Success!");
-        return new Response(JSON.stringify({ uploadUrl, finalUrl, key }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
+        return res.status(200).json({ uploadUrl, finalUrl, key });
 
     } catch (err: any) {
-        console.error("[R2 Upload Error]:", err?.message || err);
-        return new Response(JSON.stringify({ error: err?.message || "Unknown error" }), { status: 500 });
-    } finally {
-        clearTimeout(timer);
+        console.error("[R2 Upload Error]:", err.message);
+        return res.status(500).json({ error: err.message || "Internal Server Error" });
     }
 }
