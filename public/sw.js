@@ -6,6 +6,7 @@ const BIBLE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 const FONT_MAX_AGE = 365 * 24 * 60 * 60 * 1000;
 
 const isGoogleFont = (url) => url.origin.includes("fonts.googleapis.com") || url.origin.includes("fonts.gstatic.com");
+const isR2Media = (url) => url.hostname === "midia.bibliavive.com.br" || url.hostname.endsWith(".bibliavive.com.br");
 const isBibleApi = (url) => url.hostname.includes("api.scripture.api.bible") || url.hostname.includes("raw.githubusercontent.com");
 const isStaticAsset = (request) => ["style", "script", "font", "image"].includes(request.destination);
 
@@ -62,6 +63,9 @@ self.addEventListener("fetch", (event) => {
   // Fonts are loaded via <link rel="preload"> and have their own browser cache.
   // Intercepting them causes CSP connect-src violations.
   if (url.hostname === "fonts.gstatic.com" || url.hostname === "fonts.googleapis.com") return;
+  // Do NOT intercept R2 media — they are loaded directly via img tags.
+  // Intercepting them causes CSP connect-src violations.
+  if (isR2Media(url)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(

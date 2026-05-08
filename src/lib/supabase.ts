@@ -15,8 +15,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storageKey: 'bv-auth-token',
-        // lockAcquireTimeout intentionally omitted:
-        // With a hard limit, queries fail if the token is being refreshed (lock held).
-        // Without it, queries queue and complete naturally once the lock releases (~5-15s).
+        lockAcquireTimeout: 0,
     },
 });

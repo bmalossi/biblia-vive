@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PWAProvider } from "@/contexts/PWAContext";
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -79,6 +80,7 @@ const App = () => (
       </AuthProvider>
     </PWAProvider>
     <Analytics />
+    <SpeedInsights />
   </QueryClientProvider>
 );
 
