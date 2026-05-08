@@ -101,9 +101,19 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                 headers,
                 body: JSON.stringify({ filename: file.name, contentType: file.type })
             });
+
             if (!imgRes.ok) {
-                const err = await imgRes.json().catch(() => ({ error: "Falha na API" }));
-                throw new Error(err.error || "Falha ao gerar URL de upload");
+                const text = await imgRes.text();
+                // If it's the Vercel 504 page or a plain error, it might start with "An error" or reach the timeout
+                if (text.includes("An error") || imgRes.status === 504) {
+                    throw new Error("Erro de rede (504): A conexão com o servidor expirou. Tente novamente.");
+                }
+                try {
+                    const err = JSON.parse(text);
+                    throw new Error(err.error || "Falha ao gerar URL de upload");
+                } catch {
+                    throw new Error(`Falha na API (${imgRes.status}): ${text.slice(0, 50)}`);
+                }
             }
             const { uploadUrl, finalUrl, key } = await imgRes.json();
 

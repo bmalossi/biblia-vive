@@ -36,13 +36,13 @@ function createPresignedPutUrl({
         .join("/");
 
     // Canonical query string (params must be sorted)
-    const params: [string, string][] = [
+    const params: [string, string][] = ([
         ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
         ["X-Amz-Credential", credential],
         ["X-Amz-Date", amzDate],
         ["X-Amz-Expires", String(expiresIn)],
         ["X-Amz-SignedHeaders", "host"],
-    ].sort((a, b) => a[0].localeCompare(b[0]));
+    ] as [string, string][]).sort((a, b) => a[0].localeCompare(b[0]));
 
     const qs = params
         .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
@@ -98,17 +98,32 @@ export default async function handler(req: Request) {
         }
 
         // Verify admin via Supabase
+        console.log("[R2-API] Verifying auth...");
         const authHeader = req.headers.get("Authorization");
         if (!authHeader) {
+            console.error("[R2-API] Missing Authorization header");
             return new Response("Unauthorized", { status: 401 });
         }
         const token = authHeader.replace("Bearer ", "");
         const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!);
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
-        if (authError || !user || (user.app_metadata as any).role !== "admin") {
+        console.log("[R2-API] Calling supabase.auth.getUser()...");
+        // Add a race to avoid infinite wait
+        const { data: { user }, error: authError } = await Promise.race([
+            supabase.auth.getUser(token),
+            new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Auth Timeout (8s)")), 8000))
+        ]);
+
+        if (authError) {
+            console.error("[R2-API] Auth error:", authError);
+            return new Response(JSON.stringify({ error: authError.message }), { status: 403 });
+        }
+
+        if (!user || (user.app_metadata as any).role !== "admin") {
+            console.error("[R2-API] Forbidden: User is not admin");
             return new Response("Forbidden", { status: 403 });
         }
+        console.log("[R2-API] Auth success, generating URL...");
 
         // Generate presigned URL — pure crypto, no network calls
         const key = manifestOnly ? "r2-media-index.json" : `articles/${Date.now()}-${filename}`;

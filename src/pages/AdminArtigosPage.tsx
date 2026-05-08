@@ -188,8 +188,16 @@ export default function AdminArtigosPage() {
             });
 
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || "Erro ao gerar URL de upload");
+                const text = await response.text();
+                if (text.includes("An error") || response.status === 504) {
+                    throw new Error("Erro de rede (504): A conexão com o servidor expirou. Tente novamente.");
+                }
+                try {
+                    const err = JSON.parse(text);
+                    throw new Error(err.error || "Erro ao gerar URL de upload");
+                } catch {
+                    throw new Error(`Erro na API (${response.status}): ${text.slice(0, 50)}...`);
+                }
             }
 
             const { uploadUrl, finalUrl, key } = await response.json();
