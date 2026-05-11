@@ -180,6 +180,44 @@ All colors MUST be HSL.
   .prose p + p {
     margin-top: 0.5em;
   }
+
+  /* Article prose: maps Tailwind Typography tokens to the project's design-system
+     CSS variables so text/headings/links adapt automatically in light & dark mode. */
+  .article-prose {
+    --tw-prose-body:        hsl(var(--text));
+    --tw-prose-headings:    hsl(var(--text));
+    --tw-prose-lead:        hsl(var(--text-muted));
+    --tw-prose-links:       hsl(var(--gold));
+    --tw-prose-bold:        hsl(var(--text));
+    --tw-prose-counters:    hsl(var(--text-muted));
+    --tw-prose-bullets:     hsl(var(--text-muted));
+    --tw-prose-hr:          hsl(var(--border));
+    --tw-prose-quotes:      hsl(var(--text));
+    --tw-prose-quote-borders: hsl(var(--gold) / 0.5);
+    --tw-prose-captions:    hsl(var(--text-muted));
+    --tw-prose-code:        hsl(var(--text));
+    --tw-prose-pre-code:    hsl(var(--text));
+    --tw-prose-pre-bg:      hsl(var(--bg-raised));
+    --tw-prose-th-borders:  hsl(var(--border));
+    --tw-prose-td-borders:  hsl(var(--border));
+
+    /* invert tokens point to same vars — not needed since we always use design-system */
+    --tw-prose-invert-body:        hsl(var(--text));
+    --tw-prose-invert-headings:    hsl(var(--text));
+    --tw-prose-invert-links:       hsl(var(--gold));
+    --tw-prose-invert-bold:        hsl(var(--text));
+    --tw-prose-invert-counters:    hsl(var(--text-muted));
+    --tw-prose-invert-bullets:     hsl(var(--text-muted));
+    --tw-prose-invert-hr:          hsl(var(--border));
+    --tw-prose-invert-quotes:      hsl(var(--text));
+    --tw-prose-invert-quote-borders: hsl(var(--gold) / 0.5);
+    --tw-prose-invert-captions:    hsl(var(--text-muted));
+    --tw-prose-invert-code:        hsl(var(--text));
+    --tw-prose-invert-pre-code:    hsl(var(--text));
+    --tw-prose-invert-pre-bg:      hsl(var(--bg-raised));
+    --tw-prose-invert-th-borders:  hsl(var(--border));
+    --tw-prose-invert-td-borders:  hsl(var(--border));
+  }
 }
 
 /* prefers-reduced-motion removed to allow spinners */

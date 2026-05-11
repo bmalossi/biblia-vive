@@ -102,10 +102,10 @@ export default function ArtigoPage() {
 
     const formattedDate = article.published_at
         ? new Date(article.published_at).toLocaleDateString("pt-BR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-          })
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        })
         : "";
 
     return (
@@ -113,7 +113,7 @@ export default function ArtigoPage() {
             <article className="mx-auto max-w-3xl px-4 py-12">
                 <Link
                     to="/artigos"
-                    className="mb-8 inline-flex items-center gap-2 text-sm text-app-text-muted hover:text-gold"
+                    className="mb-8 inline-flex items-center gap-2 text-sm text-app-text-muted hover:text-gold transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" />
                     Voltar aos artigos
@@ -127,17 +127,29 @@ export default function ArtigoPage() {
                     />
                 )}
 
-                <header className="mb-8">
-                    <h1 className="font-serif text-4xl leading-tight text-app-text">{article.title}</h1>
+                {/* Header — same card style as Bible chapter article */}
+                <div className="mb-8 rounded-2xl border border-border bg-app-surface px-6 py-6 md:px-8">
+                    <h1 className="font-serif text-3xl leading-tight text-app-text md:text-4xl">
+                        {article.title}
+                    </h1>
                     {formattedDate && (
                         <div className="mt-4 flex items-center gap-2 text-sm text-app-text-muted">
                             <Calendar className="h-4 w-4" />
                             {formattedDate}
                         </div>
                     )}
-                </header>
+                </div>
 
-                <div className="prose prose-lg max-w-none prose-headings:font-serif prose-a:text-gold prose-img:rounded-xl" style={{ letterSpacing: article.letter_spacing || "0em", lineHeight: article.line_height || "1.75" }}>
+                {/* Body — article-prose overrides Tailwind Typography with design-system vars */}
+                <div
+                    className="rounded-2xl border border-border bg-app-surface px-6 py-8 md:px-8 prose prose-lg max-w-none article-prose dark:prose-invert prose-headings:font-serif prose-a:text-gold prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-blockquote:border-gold/50 prose-blockquote:text-app-text-muted"
+                    style={{
+                        letterSpacing: article.letter_spacing || "0em",
+                        lineHeight: article.line_height || "1.85",
+                        fontFamily: "var(--font-reading)",
+                        fontSize: "var(--font-size-reading)",
+                    }}
+                >
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>{article.body}</ReactMarkdown>
                 </div>
             </article>

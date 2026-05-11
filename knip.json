@@ -1,0 +1,16 @@
+{
+    "entry": [
+        "src/main.tsx",
+        "api/**/*.{ts,tsx}",
+        "supabase/functions/**/index.ts",
+        "scripts/prerender.{js,mjs}"
+    ],
+    "project": [
+        "src/**/*.{ts,tsx}",
+        "api/**/*.{ts,tsx}"
+    ],
+    "ignore": [
+        "public/sw.js",
+        "**/*.config.ts"
+    ]
+}

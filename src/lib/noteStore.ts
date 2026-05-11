@@ -8,8 +8,6 @@
 
 import { supabase } from "./supabase";
 
-export type { VerseNote } from "./notesHighlights";
-
 export interface VerseNote {
     id: string;
     bookId: string;

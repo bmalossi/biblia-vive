@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { PWAProvider } from "@/contexts/PWAContext";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import ScrollToTop from "@/components/ScrollToTop";
 
 
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -49,6 +50,7 @@ const App = () => (
         <TooltipProvider>
           <ToastViewport />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <ScrollToTop />
             <Suspense fallback={<PageFallback />}>
               <Routes>
                 <Route path="/" element={<HomePage />} />

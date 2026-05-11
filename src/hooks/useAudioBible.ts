@@ -23,7 +23,10 @@ export function useAudioBible(bookId: string | undefined, chapter: number, versi
     const checkAvailability = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(audioUrl, { method: 'HEAD' });
+        const response = await fetch(audioUrl, {
+          method: 'HEAD',
+          cache: 'no-cache' // Previne problema do browser cachear um 404 antigo e sumir com o player
+        });
         setIsAvailable(response.ok);
       } catch (error) {
         console.error("[useAudioBible] Availability check failed:", error);
