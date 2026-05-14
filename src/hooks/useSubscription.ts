@@ -72,6 +72,19 @@ export function useSubscription() {
             if (!hasCache) setLoading(true);
 
             try {
+                // ── Garantir sessão válida antes da query (H2 fix) ───────────
+                // Se o token JWT expirou (usuário voltou após horas), a query
+                // retorna silenciosamente sem dados. Verificamos e renovamos antes.
+                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError || !sessionData.session) {
+                    const { error: refreshError } = await supabase.auth.refreshSession();
+                    if (refreshError) {
+                        console.warn("[useSubscription] Session expired and refresh failed — keeping cache.");
+                        setLoading(false);
+                        return;
+                    }
+                }
+
                 // Single attempt with a long timeout.
                 // Without lockAcquireTimeout in the Supabase client, queries queue behind
                 // any ongoing token refresh and complete naturally (typically in 5-20s).

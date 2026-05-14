@@ -90,6 +90,39 @@ function extractVerseSection(content: string, verse: number, maxChars = 5000, ch
     return "";
 }
 
+// ─── [NOVO] Define tamanho máximo do chunk pelo score de similaridade ─────────
+function chunkSizeByScore(score: number): number {
+    if (score >= 0.85) return 4000;
+    if (score >= 0.70) return 2500;
+    return 1500;
+}
+
+function stripSacredTextsHeader(text: string): string {
+    return text
+        .split('\n')
+        .filter(line => {
+            const t = line.trim();
+            if (t === '') return true;
+            if (/^Índice de /i.test(t)) return false;
+            if (/^Index of /i.test(t)) return false;
+            if (/^\w+ Index$/i.test(t)) return false;
+            if (/^Anterior\s+Próximo/i.test(t)) return false;
+            if (/^Previous\s+Next/i.test(t)) return false;
+            if (/^Capítulo\s+\d+\s+de\s+/i.test(t)) return false;
+            if (/^Chapter\s+\d+\s+of\s+/i.test(t)) return false;
+            if (/^\w+\s+Chapter\s+\d+$/i.test(t)) return false;
+            if (/sacred-texts\.com/i.test(t)) return false;
+            if (/^[a-z]{2,5}\s+\d+:\d+$/i.test(t)) return false;
+            if (/^[A-ZÀ-Ú][a-zà-ú]+$/.test(t) && t.length < 20) return false;
+            // [NOVO] Remove linhas de índice: "(Jos 21:1-8) Título..." ou "(v. 9-42) Título..."
+            if (/^\([A-Za-z\.]+\s+\d+:\d+[\d\-]*\)\s+\S/.test(t)) return false;
+            if (/^\(v\.\s*\d+[\d\-]*\)\s+\S/.test(t)) return false;
+            return true;
+        })
+        .join('\n')
+        .replace(/^\n+/, '')
+        .trim();
+}
 
 // ─── Build rate limit headers ─────────────────────────────────────────────────
 function buildRateLimitHeaders(
@@ -257,21 +290,100 @@ Deno.serve(async (req) => {
             return new Response(JSON.stringify({ response: emptyResponse, cached: false }), { status: 200, headers: corsHeaders });
         }
 
+        // DEBUG TEMPORÁRIO — remover após confirmar
+        console.log("[Commentary] chunks RAW:", JSON.stringify(
+            chunks?.map((c: any) => ({ author: c.author, verse: c.verse, content_len: c.content?.length }))
+        ));
+
+        // ← ADICIONA AQUI
+        console.log("[Commentary] chunks VERSE field:", JSON.stringify(
+            chunks?.map((c: any) => ({ author: c.author, verse: c.verse, verse_type: typeof c.verse }))
+        ));
+
         // ── 5. Montar snippets a partir dos chunks ────────────────────────────
+        // IMPORTANTE: filtro usa conteúdo BRUTO (antes da limpeza) para detectar ":0"
+        const filteredChunks = isChapterLevel
+            ? chunks.filter((c: any) =>
+                new RegExp(`${bookCode}\\s+${chapterNum}:0\\b`, 'i').test(c.content ?? '')
+            )
+            : chunks;
+
+
         const authorSnippets: { slug: string; meta: (typeof AUTHOR_METADATA)[string]; excerpt: string; url: string }[] =
-            chunks
-                .filter((row: any) => row.content && row.content.length > 30)
-                .map((row: any) => ({
-                    slug: row.author,
-                    meta: AUTHOR_METADATA[row.author] ?? { author: row.author, era: "Desconhecido", tradition: "Desconhecida", work: "Sacred Texts Commentary", year: "N/A", original_language: "Inglês" },
-                    excerpt: row.content,
-                    url: row.url ?? "",
-                }));
+            filteredChunks
+                .filter((row: any) => {
+                    if (!row.content || row.content.length <= 30) return false;
+                    // Descarta chunk que, após limpeza, começa direto em versículo individual
+                    const preCleaned = stripSacredTextsHeader(row.content as string);
+                    const verseAtStartRe = new RegExp(
+                        `^[ \\t]*(?:\\w+\\.?\\s+${chapterNum}:[1-9]|\\(\\w+\\.?\\s+${chapterNum}:[1-9])`,
+                        'im'
+                    );
+                    if (verseAtStartRe.test(preCleaned.trimStart().slice(0, 50))) {
+                        console.log(`[Commentary] Chunk descartado (sem intro): ${row.author}`);
+                        return false;
+                    }
+                    return true;
+                })
+                .map((row: any) => {
+                    // Limpeza do cabeçalho APÓS o filtro — não interfere na detecção do ":0"
+                    const full = stripSacredTextsHeader(row.content as string);
+                    let cleaned = full;
+
+                    // Para capítulo: corta antes do primeiro BLOCO de versículo individual
+                    if (isChapterLevel) {
+                        const verseBlockRe = new RegExp(
+                            `(?:^|\\n)[ \\t]*(?:` +
+                            `Verse\\s+[1-9]|` +                              // "Verse 1"
+                            `Ver\\.\\s+[1-9]|` +                             // "Ver. 1"
+                            `\\w+\\.?\\s+${chapterNum}:[1-9]\\d*[ \\t]*$|` + // "Joshua 21:1" ou "Jos. 21:1" sozinho na linha
+                            `\\(\\w+\\.?\\s+${chapterNum}:[1-9]|` + // "(Jos 21:1" ou "(Joshua 21:1"
+                            `^[1-9]\\d*\\.\\s+[A-Z]` +                        // "1. The Lord..."
+                            `)`,
+                            'im'
+                        );
+                        const firstBlock = cleaned.search(verseBlockRe);
+                        if (firstBlock > 50) {
+                            cleaned = cleaned.slice(0, firstBlock).trim();
+                        }
+                    }
+
+                    // Trunca por score de similaridade no último parágrafo completo
+                    const maxLen = chunkSizeByScore(row.similarity ?? 1);
+                    let excerpt = cleaned;
+
+                    if (cleaned.length > maxLen) {
+                        const cutPoint = cleaned.lastIndexOf('\n\n', maxLen);
+                        excerpt = cutPoint > maxLen * 0.5
+                            ? cleaned.slice(0, cutPoint).trim()
+                            : cleaned.slice(0, maxLen).trim();
+                    }
+                    // DEBUG TEMPORÁRIO — remover após confirmar
+                    console.log(`[Commentary] excerpt[${row.author}] (300):`, cleaned.slice(0, 300));
+
+                    return {
+                        slug: row.author,
+                        meta: AUTHOR_METADATA[row.author] ?? { author: row.author, era: "Desconhecido", tradition: "Desconhecida", work: "Sacred Texts Commentary", year: "N/A", original_language: "Inglês" },
+                        excerpt,
+                        url: row.url ?? "",
+                    };
+                });
+
 
         if (authorSnippets.length === 0) {
             const emptyResponse = JSON.stringify({ status: "unavailable", count: 0, commentaries: [] });
             return new Response(JSON.stringify({ response: emptyResponse, cached: false }), { status: 200, headers: corsHeaders });
         }
+
+        // DEBUG TEMPORÁRIO
+        console.log("[Commentary] filteredChunks authors:", filteredChunks.map((c: any) => c.author));
+        console.log("[Commentary] authorSnippets authors:", authorSnippets.map((s: any) => s.slug));
+        // ── [NOVO] 5b. Pré-selecionar top 3 por tamanho do excerpt ───────────
+        const authorSnippetsForGPT = isChapterLevel
+            ? [...authorSnippets]
+                .sort((a, b) => b.excerpt.length - a.excerpt.length)
+                .slice(0, 3)
+            : authorSnippets;
 
         // ── 6. Helpers de prompt ──────────────────────────────────────────────
         const buildAuthorBlocks = (snippets: typeof authorSnippets) =>
@@ -286,19 +398,17 @@ Sua função é SELECIONAR e ESTRUTURAR trechos de comentaristas históricos —
 O campo "text" deve conter o trecho original copiado palavra por palavra, sem nenhuma alteração.
 
 TAREFA:
-1. Identificar os trechos onde o autor fala DIRETAMENTE sobre o versículo alvo: ${verseLabel}.
-   Ignore trechos que tratam de outros versículos ou do capítulo em geral.
-2. Selecionar NO MÁXIMO 3 autores com as explicações mais diretas sobre O VERSÍCULO ALVO.
-3. Para cada autor selecionado:
+1. Identificar os trechos onde o autor fala DIRETAMENTE sobre: ${verseLabel}.
+2. Selecionar NO MÁXIMO 3 autores com as explicações mais diretas.
+3. Para cada autor:
    - COPIE o trecho original palavra por palavra, sem omitir nada.
-   - Preserve toda a pontuação, estrutura de frases, travessões e formatação do autor.
-   - MANTENHA referências bíblicas como "Isa 37:28-29" — fazem parte do texto original.
+   - Preserve pontuação, travessões e referências bíblicas (ex: "Isa 37:28-29").
    - NÃO remova, reorganize ou adicione nada.
 4. Retorne SOMENTE JSON válido.
 
 PROIBIÇÕES:
 - É PROIBIDO resumir, parafrasear ou reescrever.
-- É PROIBIDO tratar do contexto do capítulo — apenas o versículo ${verseLabel}.
+- É PROIBIDO inventar trechos que não estejam na fonte original.
 
 Schema de retorno JSON:
 {
@@ -332,7 +442,7 @@ Schema de retorno JSON:
                 model: "gpt-5-mini",
                 messages: [
                     { role: "system", content: systemPrompt },
-                    { role: "user", content: buildUserPrompt(buildAuthorBlocks(authorSnippets), buildMetaLine(authorSnippets)) }
+                    { role: "user", content: buildUserPrompt(buildAuthorBlocks(authorSnippetsForGPT), buildMetaLine(authorSnippetsForGPT)) }
                 ],
                 max_completion_tokens: 5000,
                 temperature: 1,
@@ -369,7 +479,7 @@ Schema de retorno JSON:
 
                 const fallbackSnippets = fallbackRows
                     .map((row: any) => {
-                        const excerpt = extractVerseSection(row.content ?? "", verseNum, 2000, chapterNum);
+                        const excerpt = extractVerseSection(row.content ?? "", verseNum, 6000, chapterNum);
                         return {
                             slug: row.author,
                             meta: AUTHOR_METADATA[row.author] ?? { author: row.author, era: "Desconhecido", tradition: "Desconhecida", work: "Sacred Texts Commentary", year: "N/A", original_language: "Inglês" },
@@ -409,49 +519,39 @@ Schema de retorno JSON:
         }
 
         // ── 6c. TRADUÇÃO: gpt-4.1-nano — só executa se lang !== 'en' ──────────
-        // Chamada separada, prompt mínimo, modelo mais barato disponível.
-        // Traduz APENAS os campos "text" — metadados não são alterados.
         if (result.commentaries?.length > 0 && lang !== 'en') {
             const langLabel = lang === 'pt' ? 'Português Brasileiro (pt-BR)' : lang === 'es' ? 'Espanhol (es)' : lang;
 
-            const textsToTranslate = result.commentaries.map((c: any, i: number) => ({
-                i,
-                text: c.text,
-            }));
+            for (let i = 0; i < result.commentaries.length; i++) {
+                const original = result.commentaries[i].text;
+                if (!original || original.length < 10) continue;
 
-            const translatePrompt = `Traduza fielmente cada "text" abaixo para ${langLabel}.
-Regras:
-- Preserve referências bíblicas (ex: "Isa 37:28"), travessões (—) e pontuação do autor.
-- Não parafraseie, não resuma, não adicione palavras.
-- Retorne SOMENTE JSON: { "translations": [ { "i": <índice>, "text": "<tradução>" } ] }
+                try {
+                    const translateCompletion = await openai.chat.completions.create({
+                        model: "gpt-4.1-nano",
+                        messages: [{
+                            role: "user", content:
+                                `Traduza fielmente e em sua completude o texto abaixo para ${langLabel}.\n` +
+                                `Regras:\n` +
+                                `- Preserve referências bíblicas (ex: "Isa 37:28"), travessões (—) e pontuação do autor.\n` +
+                                `- Não parafraseie, não resuma, não adicione palavras.\n` +
+                                `- Retorne APENAS a tradução, sem explicações, sem JSON, sem marcadores.\n\n` +
+                                `Texto:\n${original}`
+                        }],
+                        max_completion_tokens: 6000,
+                        temperature: 0.1,
+                    });
 
-Textos:
-${JSON.stringify(textsToTranslate)}`;
-
-            try {
-                const translateCompletion = await openai.chat.completions.create({
-                    model: "gpt-4.1-nano",   // modelo mais barato — suficiente para tradução
-                    messages: [{ role: "user", content: translatePrompt }],
-                    max_completion_tokens: 4000,
-                    temperature: 1,
-                    response_format: { type: "json_object" },
-                });
-
-                const translateRaw = translateCompletion.choices[0]?.message?.content || "{}";
-                console.log("[Commentary] Translation rawContent (200):", translateRaw.slice(0, 200));
-
-                const translateResult = JSON.parse(translateRaw);
-                if (Array.isArray(translateResult?.translations)) {
-                    for (const t of translateResult.translations) {
-                        if (typeof t.i === 'number' && typeof t.text === 'string' && t.text.length > 10) {
-                            result.commentaries[t.i].text = t.text;
-                        }
+                    const translated = translateCompletion.choices[0]?.message?.content?.trim() || "";
+                    if (translated.length > 10) {
+                        result.commentaries[i].text = translated;
+                        console.log(`[Commentary] Tradução aplicada: comentário ${i} (${result.commentaries[i].author})`);
+                    } else {
+                        console.warn(`[Commentary] Tradução vazia para comentário ${i} — mantendo inglês`);
                     }
-                    console.log("[Commentary] Tradução aplicada para", lang);
+                } catch (translateErr: any) {
+                    console.error(`[Commentary] Translation error comentário ${i} (mantendo inglês):`, translateErr?.message);
                 }
-            } catch (translateErr: any) {
-                // Tradução falhou — mantém texto em inglês, não bloqueia a resposta
-                console.error("[Commentary] Translation error (mantendo inglês):", translateErr?.message);
             }
         }
 

@@ -171,6 +171,18 @@ _Evitar_: smartlinks, link automático, link interno inteligente
 Campo opcional `cover_image_url` (string) na tabela `articles`. URL de imagem externa gerenciada pelo Administrador no Cloudflare R2. Exibida no card do Carrossel de Artigos e no topo da página do Artigo. Artigos sem imagem de capa exibem um placeholder ou ficam sem imagem. Sem upload de arquivo no MVP — o admin cola a URL diretamente no painel.
 _Evitar_: thumbnail, banner do artigo, featured image
 
+## Inteligência Artificial e Estudo
+
+**Função de Comentário (Edge Function)**:
+Serviço Supabase Edge Function (`/functions/v1/commentary`) que utiliza RAG (Retrieval-Augmented Generation) para fornecer comentários teológicos históricos (Albert Barnes, Matthew Henry, John Gill, etc.) sobre versículos ou capítulos. Utiliza embeddings da OpenAI (`text-embedding-3-small`) para busca semântica em `commentary_chunks` e GPT-5-mini para selecionar e formatar os trechos originais. Suporta tradução automática para português e espanhol preservando a literalidade.
+_Evitar_: comentários da IA (são comentários históricos recuperados pela IA), bot de teologia.
+
+**Busca Semântica (match_commentary_chunks)**:
+Função RPC no Supabase que realiza busca por similaridade de cosseno entre o embedding da consulta e os fragmentos de comentários armazenados. Filtra por livro, capítulo e opcionalmente versículo.
+
+**Cache de Estudo (ai_study_cache)**:
+Tabela Supabase que armazena as respostas estruturadas das funções de IA para evitar chamadas redundantes à OpenAI e reduzir a latência para o Leitor. Chave primária: `verse_id` + `question_type` (ex: `JHN.3.16` + `commentary`).
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.

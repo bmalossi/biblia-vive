@@ -9,12 +9,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Singleton Supabase client — one instance for the entire app.
+// lockAcquireTimeout omitted intentionally: the SDK default (10 000 ms) lets the
+// auth lock resolve during token refresh. Setting it to 0 caused instant lock
+// failures when another tab held the mutex, blocking all queries for 60 s.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storageKey: 'bv-auth-token',
-        lockAcquireTimeout: 0,
     },
 });
