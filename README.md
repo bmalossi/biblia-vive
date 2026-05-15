@@ -31,7 +31,7 @@ O projeto foi construído com uma stack moderna, orientada a performance, escala
 - **Backend e dados**: Supabase (PostgreSQL, autenticação, storage e edge/serverless functions).
 - **Pagamentos e assinatura**: Stripe.
 - **IA aplicada à curadoria**: OpenAI para seleção, filtragem e apoio à organização de conteúdos históricos.
-- **Áudio**: ElevenLabs, Web Speech API e camadas de cache para otimização de entrega.
+- **Áudio**: Cache para otimização de entrega em R2 Cloudflare.
 - **SEO e indexação**: prerendering, metadados estruturados, sitemap e páginas otimizadas para descoberta orgânica.
 
 ## 🛠 Desenvolvimento local

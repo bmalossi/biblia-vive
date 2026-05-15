@@ -46,6 +46,7 @@ import PwaInstallCard from "@/components/PwaInstallCard";
 const navItems = [
   { label: "Leitura", href: "/" },
   { label: "Planos", href: "/planos" },
+  { label: "Artigos", href: "/artigos" },
 ];
 
 const HISTORY_KEY = "bv_search_history";

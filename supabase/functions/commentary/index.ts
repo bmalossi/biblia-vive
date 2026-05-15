@@ -32,7 +32,7 @@ const AUTHOR_METADATA: Record<string, {
     spurgeon: { author: "Charles Haddon Spurgeon", era: "Século XIX, Era Vitoriana", tradition: "Batista Reformada, Calvinista", work: "The Treasury of David", year: "1869-1885", original_language: "Inglês" },
     scofield: { author: "Cyrus Ingerson Scofield", era: "Século XX, Era Moderna", tradition: "Presbiteriana, Dispensacionalista", work: "Scofield Reference Notes", year: "1909", original_language: "Inglês" },
     torrey: { author: "R. A. Torrey", era: "Século XIX-XX, Despertamento", tradition: "Evangélica, Fundamentalista", work: "Treasury of Scriptural Knowledge", year: "ca. 1880", original_language: "Inglês" },
-    vincent: { author: "Marvin R. Vincent", era: "Século XIX, Era Pós-Guerra Civil", tradition: "Episcopal, Evangélica", work: "Vincent's Word Studies", year: "1887", original_language: "Inglês" },
+    vws: { author: "Marvin R. Vincent", era: "Século XIX, Era Pós-Guerra Civil", tradition: "Episcopal, Evangélica", work: "Vincent's Word Studies", year: "1887", original_language: "Inglês" },
     wesley: { author: "John Wesley", era: "Século XVIII, Despertamento Metodista", tradition: "Metodista, Arminiana", work: "Explanatory Notes on the Whole Bible", year: "1754-1765", original_language: "Inglês" },
 };
 
@@ -52,42 +52,96 @@ function extractVerseSection(content: string, verse: number, maxChars = 5000, ch
         if (extracted && extracted.length > 40) return extracted.slice(0, maxChars);
     }
 
-    // P5: encontra a última ocorrência de chapter:verse (ex: "32:32")
-    const p5Re = chapter
-        ? new RegExp(`${chapter}:${verse}(?!\\d)`, 'g')
-        : new RegExp(`\\d+:${verse}(?!\\d)`, 'g');
-
+    // P5: encontra chapter:verse em linha curta (≤120 chars) = marcador de bloco
+    // Linhas longas com chapter:verse no meio são referências cruzadas — ignorar
+    const lines = content.split('\n');
     let lastIdx = -1;
-    let m: RegExpExecArray | null;
-    while ((m = p5Re.exec(content)) !== null) { lastIdx = m.index; }
+    let charPos = 0;
+
+    const markerRe = chapter
+        ? new RegExp(`(?<![\\d])${chapter}:${verse}(?!\\d)`)
+        : new RegExp(`(?<![\\d])\\d+:${verse}(?!\\d)`);
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        // Linha curta (≤120 chars) com o marcador = início de bloco de versículo
+        if (trimmed.length <= 120 && markerRe.test(trimmed)) {
+            lastIdx = charPos;
+        }
+        charPos += line.length + 1; // +1 pelo \n
+    }
 
     if (lastIdx !== -1) {
-        const afterLast = content.slice(lastIdx + 1);
+        const blockStart = lastIdx;
+        const afterLast = content.slice(blockStart);
 
-        // ✅ FIX: busca o PRÓXIMO versículo do mesmo capítulo com número > verse
-        // Antes buscava apenas verse+1 — autores como JFB pulam versículos (32:32 → 32:44)
-        // e o fallback de 2000 chars engolia versículos seguintes desnecessariamente
         const nextAnyVerseRe = new RegExp(
-            chapter ? `${chapter}:(\\d+)(?!\\d)` : `\\d+:(\\d+)(?!\\d)`,
+            chapter ? `(?<![\\d])${chapter}:(\\d+)(?!\\d)` : `(?<![\\d])\\d+:(\\d+)(?!\\d)`,
             'g'
         );
 
+        // Busca próximo marcador de versículo em linha curta
         let nextBoundaryIdx = -1;
-        let nm: RegExpExecArray | null;
-        while ((nm = nextAnyVerseRe.exec(afterLast)) !== null) {
-            const foundVerse = parseInt(nm[1], 10);
-            if (foundVerse > verse) {
-                nextBoundaryIdx = nm.index;
-                break;
+        let linePos2 = 0;
+        for (const line of afterLast.split('\n')) {
+            if (linePos2 === 0) { linePos2 += line.length + 1; continue; } // pula a própria linha do versículo alvo
+            const trimmed2 = line.trim();
+            if (trimmed2.length <= 120) {
+                const nm = nextAnyVerseRe.exec(trimmed2);
+                nextAnyVerseRe.lastIndex = 0;
+                if (nm) {
+                    const foundVerse = parseInt(nm[1], 10);
+                    if (foundVerse > verse) {
+                        nextBoundaryIdx = linePos2;
+                        break;
+                    }
+                }
             }
+            linePos2 += line.length + 1;
         }
 
-        const end = nextBoundaryIdx > 0 ? lastIdx + 1 + nextBoundaryIdx : lastIdx + maxChars;
-        const excerpt = content.slice(lastIdx, Math.min(end, lastIdx + maxChars)).trim();
+        const end = nextBoundaryIdx > 0 ? blockStart + nextBoundaryIdx : blockStart + maxChars;
+        const excerpt = content.slice(blockStart, Math.min(end, blockStart + maxChars)).trim();
         if (excerpt.length > 40) return excerpt;
     }
 
     return "";
+}
+
+function extractChapterSection(content: string, maxChars = 5000, chapter?: number): string {
+    if (!chapter) return "";
+
+    const chapterStartRe = new RegExp(
+        String.raw`(?:\[(?:[^\]\n]*?\s)?${chapter}:0\]\([^\)]*\)|(?:^|\n)[^\n]*?(?<!\d)${chapter}:0(?!\d))`,
+        'i'
+    );
+
+    const match = content.match(chapterStartRe);
+    if (!match || typeof match.index !== 'number') return "";
+
+    const source = content.slice(match.index).trimStart();
+
+    const nextVerseRe = new RegExp(
+        String.raw`(?:^|\n)[^\n]*?(?<!\d)${chapter}:(\d+)(?!\d)`,
+        'g'
+    );
+
+    let nextBoundaryIdx = -1;
+    let m: RegExpExecArray | null;
+    while ((m = nextVerseRe.exec(source)) !== null) {
+        const foundVerse = parseInt(m[1], 10);
+        if (foundVerse > 0) {
+            nextBoundaryIdx = m.index;
+            break;
+        }
+    }
+
+    const excerpt = (nextBoundaryIdx > 0
+        ? source.slice(0, nextBoundaryIdx)
+        : source.slice(0, maxChars)
+    ).trim();
+
+    return excerpt.length > 30 ? excerpt.slice(0, maxChars) : "";
 }
 
 // ─── [NOVO] Define tamanho máximo do chunk pelo score de similaridade ─────────
@@ -105,17 +159,17 @@ function stripSacredTextsHeader(text: string): string {
             if (t === '') return true;
             if (/^Índice de /i.test(t)) return false;
             if (/^Index of /i.test(t)) return false;
-            if (/^\w+ Index$/i.test(t)) return false;
+            if (/\bIndex$/i.test(t)) return false; // "Joshua Index", "1 Timothy Index"
             if (/^Anterior\s+Próximo/i.test(t)) return false;
             if (/^Previous\s+Next/i.test(t)) return false;
             if (/^Capítulo\s+\d+\s+de\s+/i.test(t)) return false;
             if (/^Chapter\s+\d+\s+of\s+/i.test(t)) return false;
-            if (/^\w+\s+Chapter\s+\d+$/i.test(t)) return false;
+            if (/\bChapter\s+\d+$/i.test(t)) return false; // "1 Timothy Chapter 3", "Joshua Chapter 21"
             if (/sacred-texts\.com/i.test(t)) return false;
-            if (/^[a-z]{2,5}\s+\d+:\d+$/i.test(t)) return false;
-            if (/^[A-ZÀ-Ú][a-zà-ú]+$/.test(t) && t.length < 20) return false;
-            // [NOVO] Remove linhas de índice: "(Jos 21:1-8) Título..." ou "(v. 9-42) Título..."
-            if (/^\([A-Za-z\.]+\s+\d+:\d+[\d\-]*\)\s+\S/.test(t)) return false;
+            if (/^[a-z0-9]{2,5}\s+\d+:\d+$/i.test(t)) return false; // "jos 21:0", "ti1 3:0"
+            if (/^[A-ZÀ-Ú1-9][a-zà-ú ]+$/.test(t) && t.length < 25) return false; // "Josué", "1 Timothy" sozinhos
+            // Remove linhas de índice: "(Ti1 3:1-7) Título..." ou "(Jos 21:1-8) Título..."
+            if (/^\([A-Za-z0-9\.]+\s+\d+:\d+[\d\-]*\)\s+\S/.test(t)) return false;
             if (/^\(v\.\s*\d+[\d\-]*\)\s+\S/.test(t)) return false;
             return true;
         })
@@ -302,43 +356,67 @@ Deno.serve(async (req) => {
 
         // ── 5. Montar snippets a partir dos chunks ────────────────────────────
         // IMPORTANTE: filtro usa conteúdo BRUTO (antes da limpeza) para detectar ":0"
+        const chapterZeroRe = new RegExp(
+            String.raw`(?:\[(?:[^\]\n]*?\s)?${chapterNum}:0\]\([^\)]*\)|(?:^|\n)[^\n]*?\b${chapterNum}:0\b)`,
+            'i'
+        );
+
         const filteredChunks = isChapterLevel
-            ? chunks.filter((c: any) =>
-                new RegExp(`${bookCode}\\s+${chapterNum}:0\\b`, 'i').test(c.content ?? '')
-            )
+            ? chunks.filter((c: any) => chapterZeroRe.test(c.content ?? ''))
             : chunks;
 
+        console.log("[Commentary] filteredChunks preview:", JSON.stringify(
+            filteredChunks?.map((c: any) => ({
+                author: c.author,
+                first50: stripSacredTextsHeader(c.content ?? '').trimStart().slice(0, 80)
+            }))
+        ));
 
         const authorSnippets: { slug: string; meta: (typeof AUTHOR_METADATA)[string]; excerpt: string; url: string }[] =
             filteredChunks
                 .filter((row: any) => {
                     if (!row.content || row.content.length <= 30) return false;
-                    // Descarta chunk que, após limpeza, começa direto em versículo individual
-                    const preCleaned = stripSacredTextsHeader(row.content as string);
-                    const verseAtStartRe = new RegExp(
-                        `^[ \\t]*(?:\\w+\\.?\\s+${chapterNum}:[1-9]|\\(\\w+\\.?\\s+${chapterNum}:[1-9])`,
-                        'im'
-                    );
-                    if (verseAtStartRe.test(preCleaned.trimStart().slice(0, 50))) {
-                        console.log(`[Commentary] Chunk descartado (sem intro): ${row.author}`);
-                        return false;
-                    }
                     return true;
                 })
                 .map((row: any) => {
-                    // Limpeza do cabeçalho APÓS o filtro — não interfere na detecção do ":0"
-                    const full = stripSacredTextsHeader(row.content as string);
-                    let cleaned = full;
+                    let source = row.content as string;
+
+
+                    // Para capítulo: começa exatamente no marcador chapter:0
+                    if (isChapterLevel) {
+                        const chapterStartRe = new RegExp(
+                            String.raw`(?:\[(?:[^\]\n]*?\s)?${chapterNum}:0\]\([^\)]*\)|(?:^|\n)[^\n]*?\b${chapterNum}:0\b)`,
+                            'i'
+                        );
+                        const match = source.match(chapterStartRe);
+
+                        console.log("[Commentary] chapterStart match:", {
+                            author: row.author,
+                            idx: match?.index,
+                            match: match?.[0]
+                        });
+
+                        if (match && typeof match.index === 'number') {
+                            source = source.slice(match.index).trimStart();
+                        }
+                    }
+
+
+                    // Limpeza do cabeçalho APÓS localizar o início correto
+                    let cleaned = isChapterLevel
+                        ? source.replace(/^\s+/, '')
+                        : stripSacredTextsHeader(source);
+
 
                     // Para capítulo: corta antes do primeiro BLOCO de versículo individual
                     if (isChapterLevel) {
                         const verseBlockRe = new RegExp(
                             `(?:^|\\n)[ \\t]*(?:` +
-                            `Verse\\s+[1-9]|` +                              // "Verse 1"
-                            `Ver\\.\\s+[1-9]|` +                             // "Ver. 1"
-                            `\\w+\\.?\\s+${chapterNum}:[1-9]\\d*[ \\t]*$|` + // "Joshua 21:1" ou "Jos. 21:1" sozinho na linha
-                            `\\(\\w+\\.?\\s+${chapterNum}:[1-9]|` + // "(Jos 21:1" ou "(Joshua 21:1"
-                            `^[1-9]\\d*\\.\\s+[A-Z]` +                        // "1. The Lord..."
+                            `Verse\\s+[1-9]|` +
+                            `Ver\\.\\s+[1-9]|` +
+                            `[\\w ]+?\\s+${chapterNum}:[1-9]\\d*[ \\t]*$|` +
+                            `\\([\\w ]+?\\s+${chapterNum}:[1-9]|` +
+                            `^[1-9]\\d*\\.\\s+[A-Z]` +
                             `)`,
                             'im'
                         );
@@ -348,9 +426,11 @@ Deno.serve(async (req) => {
                         }
                     }
 
+
                     // Trunca por score de similaridade no último parágrafo completo
                     const maxLen = chunkSizeByScore(row.similarity ?? 1);
                     let excerpt = cleaned;
+
 
                     if (cleaned.length > maxLen) {
                         const cutPoint = cleaned.lastIndexOf('\n\n', maxLen);
@@ -431,40 +511,118 @@ Schema de retorno JSON:
         const buildUserPrompt = (blocks: string, meta: string) =>
             `Localize a porção que fala do versículo alvo (${verseLabel}), isole OS 3 MAIS COMPLETOS e estruture-os.\nVersículo alvo: "${verseText ?? ""}"\n\n${blocks}\n\nMetadados (use exatamente estes valores):\n${meta}`;
 
-        // ── 6a. Chamada RAG — skip se todos os chunks são nível de capítulo ────
-        const hasVerseSpecificChunks = !isChapterLevel &&
-            chunks.some((c: any) => c.verse !== null && c.verse === verseNum);
-
+        // ── 6a. CAPÍTULO e VERSÍCULO usam fallback determinístico na tabela commentaries ─
         let result: any = { status: "unavailable", count: 0, commentaries: [] };
 
-        if (isChapterLevel || hasVerseSpecificChunks) {
-            const completion = await openai.chat.completions.create({
-                model: "gpt-5-mini",
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: buildUserPrompt(buildAuthorBlocks(authorSnippetsForGPT), buildMetaLine(authorSnippetsForGPT)) }
-                ],
-                max_completion_tokens: 5000,
-                temperature: 1,
-                response_format: { type: "json_object" },
-            });
 
-            const rawContent = completion.choices[0]?.message?.content || "{}";
-            console.log("[Commentary] RAG rawContent (200):", rawContent.slice(0, 200));
+        if (isChapterLevel) {
+            console.log("[Commentary] Capítulo: pulando RAG, indo direto ao fallback");
 
-            try { result = JSON.parse(rawContent); }
-            catch { result = null; }
-            if (!result?.status || !Array.isArray(result?.commentaries)) {
-                result = { status: "unavailable", count: 0, commentaries: [] };
+            const { data: chapterRows } = await supabase
+                .from("commentaries")
+                .select("author, content, url")
+                .eq("book_code", bookCode)
+                .eq("chapter", chapterPadded)
+                .order("author");
+
+            if (chapterRows && chapterRows.length > 0) {
+                const chapterSnippetsRaw = chapterRows
+                    .map((row: any) => {
+                        const content = row.content ?? "";
+                        const lines = content.split('\n');
+
+                        let startLine = -1;
+                        let endLine = lines.length;
+
+                        const chapterZeroLineRe = new RegExp(`(?<!\\d)${chapterNum}:0(?!\\d)`, 'i');
+                        const verseOneLineRe = new RegExp(`(?<!\\d)${chapterNum}:1(?!\\d)`, 'i');
+
+                        for (let i = 0; i < lines.length; i++) {
+                            const trimmed = lines[i].trim();
+                            if (trimmed.length <= 120 && chapterZeroLineRe.test(trimmed)) {
+                                startLine = i;
+                                break;
+                            }
+                        }
+
+                        if (startLine !== -1) {
+                            for (let i = startLine + 1; i < lines.length; i++) {
+                                const trimmed = lines[i].trim();
+                                if (trimmed.length <= 120 && verseOneLineRe.test(trimmed)) {
+                                    endLine = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        let excerpt = startLine !== -1
+                            ? lines.slice(startLine, endLine).join('\n').trim()
+                            : "";
+
+                        excerpt = excerpt.slice(0, 6000).trim();
+
+                        return {
+                            slug: row.author,
+                            meta: AUTHOR_METADATA[row.author] ?? {
+                                author: row.author,
+                                era: "Desconhecido",
+                                tradition: "Desconhecida",
+                                work: "Sacred Texts Commentary",
+                                year: "N/A",
+                                original_language: "Inglês"
+                            },
+                            excerpt,
+                            url: row.url ?? "",
+                            hasChapterOverview: excerpt.length > 30,
+                        };
+                    })
+                    .filter((s: any) => s.hasChapterOverview);
+
+                const bestByAuthor = new Map<string, any>();
+                for (const s of chapterSnippetsRaw) {
+                    const authorKey = (s.meta.author || s.slug || "").trim().toLowerCase();
+                    if (!authorKey) continue;
+
+                    const existing = bestByAuthor.get(authorKey);
+                    if (!existing || s.excerpt.length > existing.excerpt.length) {
+                        bestByAuthor.set(authorKey, s);
+                    }
+                }
+
+                const chapterSnippets = Array.from(bestByAuthor.values())
+                    .sort((a: any, b: any) => b.excerpt.length - a.excerpt.length)
+                    .slice(0, 3);
+
+                console.log("[Commentary] Fallback chapter autores:", chapterSnippets.map((s: any) => s.slug).join(", "));
+                console.log("[Commentary] Fallback chapter excerpt[0] (200):", chapterSnippets[0]?.excerpt?.slice(0, 200));
+
+                if (chapterSnippets.length > 0) {
+                    result = {
+                        status: "complete",
+                        count: chapterSnippets.length,
+                        commentaries: chapterSnippets.map((s: any) => ({
+                            author: s.meta.author,
+                            era: s.meta.era,
+                            tradition: s.meta.tradition,
+                            work: s.meta.work,
+                            year: s.meta.year,
+                            original_language: s.meta.original_language,
+                            text: s.excerpt,
+                            source_url: s.url || null,
+                        })),
+                    };
+                } else {
+                    console.log("[Commentary] Fallback: nenhum autor com nota chapter-specific para", verseLabel);
+                }
             }
         } else {
-            console.log("[Commentary] RAG GPT skip — chunks nível de capítulo, indo direto ao fallback");
+            console.log("[Commentary] Versículo: pulando RAG, indo direto ao fallback");
         }
 
         // ── 6b. FALLBACK: monta JSON direto em código, sem GPT ────────────────
         // GPT não é necessário aqui — extração já foi feita por extractVerseSection.
         // A tradução será feita pelo step 6c (gpt-4.1-nano) separadamente.
-        if (result.commentaries.length === 0 && !isChapterLevel) {
+        if (!isChapterLevel) {
             console.log("[Commentary] Fallback acionado para", verseLabel);
 
             const { data: fallbackRows } = await supabase
