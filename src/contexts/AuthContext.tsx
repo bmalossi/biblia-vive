@@ -19,6 +19,7 @@ import { supabase } from '@/lib/supabase';
 import { signInWithEmail, signUpWithEmail, signOut as authSignOut, signInWithGoogle as authSignInWithGoogle } from '@/lib/auth';
 import { migrateLocalToSupabase } from '@/lib/notesHighlights';
 import { migrateLocalPlanToSupabase } from '@/lib/readingPlanSync';
+import * as Sentry from '@sentry/react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -75,6 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             // Migrate local data exactly once per user login
             if (event === 'SIGNED_IN' && nextUser) {
+                // Associa o usuário ao Sentry para contextualizar erros
+                Sentry.setUser({ id: nextUser.id });
+
                 if (migratedUserIdRef.current !== nextUser.id) {
                     migratedUserIdRef.current = nextUser.id;
                     try {
@@ -88,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (event === 'SIGNED_OUT') {
                 migratedUserIdRef.current = null;
+                // Limpa o contexto de usuário no Sentry ao fazer logout
+                Sentry.setUser(null);
             }
         });
 

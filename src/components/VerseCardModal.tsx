@@ -155,17 +155,57 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
         }
     };
 
-    const shareOnSocial = (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin' | 'telegram') => {
-        const text = `"${data.verseText}" - ${data.bookName} ${data.chapter}:${data.verseNumber} | Bíblia Vive`;
-        const url = window.location.origin;
-        const urls = {
-            whatsapp: `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`,
-            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-            twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-            telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-        };
-        window.open(urls[platform], '_blank', 'width=600,height=400');
+    const shareImageOnSocial = async (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin' | 'telegram' | 'instagram') => {
+        setSharing(true);
+        try {
+            const blob = await generateImageBlob();
+            if (!blob) throw new Error("Falha ao gerar imagem");
+
+            // No Instagram Mobile, tentamos navigator.share se disponível
+            if (platform === 'instagram') {
+                const fileName = `biblia-vive-${data.bookName.toLowerCase()}-${data.chapter}-${data.verseNumber}.png`;
+                const file = new File([blob], fileName, { type: 'image/png' });
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Bíblia Vive',
+                        text: `"${data.verseText}" - ${data.bookName} ${data.chapter}:${data.verseNumber}`
+                    });
+                    return;
+                }
+            }
+
+            // Para os outros ou Fallback do Instagram: Copia e abre link
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                toast({ message: "Imagem copiada! Agora use Ctrl+V para colar.", type: "success" });
+            } catch (copyErr) {
+                console.error("Erro ao copiar imagem:", copyErr);
+                toast({ message: "Não foi possível copiar a imagem automaticamente. O link será aberto.", type: "error" });
+            }
+
+            const text = `"${data.verseText}" - ${data.bookName} ${data.chapter}:${data.verseNumber} | Bíblia Vive`;
+            const url = window.location.origin;
+            const urls = {
+                whatsapp: `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`,
+                facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+                twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+                linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+                telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+                instagram: `https://www.instagram.com/`,
+            };
+
+            window.open(urls[platform], '_blank', 'width=600,height=400');
+        } catch (err) {
+            console.error("Erro ao compartilhar:", err);
+            toast({ message: "Erro ao preparar compartilhamento.", type: "error" });
+        } finally {
+            setSharing(false);
+        }
     };
 
     return (
@@ -251,21 +291,25 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
                                     </AlertDialogHeader>
 
                                     <div className="flex flex-wrap gap-2 py-4 justify-center">
-                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('whatsapp'); }}
+                                        <button onClick={() => shareImageOnSocial('whatsapp')}
                                             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/20 text-xs font-medium">
                                             <MessageCircle className="h-4 w-4" /> WhatsApp
                                         </button>
-                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('facebook'); }}
+                                        <button onClick={() => shareImageOnSocial('facebook')}
                                             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2]/20 transition-colors border border-[#1877F2]/20 text-xs font-medium">
                                             <Facebook className="h-4 w-4" /> Facebook
                                         </button>
-                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('twitter'); }}
+                                        <button onClick={() => shareImageOnSocial('twitter')}
                                             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-black/5 text-app-text hover:bg-black/10 transition-colors border border-border text-xs font-medium">
                                             <Twitter className="h-4 w-4" /> Twitter/X
                                         </button>
-                                        <button onClick={async () => { await copyImageToClipboard(); shareOnSocial('telegram'); }}
+                                        <button onClick={() => shareImageOnSocial('telegram')}
                                             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20 transition-colors border border-[#26A5E4]/20 text-xs font-medium">
                                             <Send className="h-4 w-4" /> Telegram
+                                        </button>
+                                        <button onClick={() => shareImageOnSocial('instagram')}
+                                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#f9ce34]/10 via-[#ee2a7b]/10 to-[#6228d7]/10 text-[#ee2a7b] hover:opacity-80 transition-all border border-[#ee2a7b]/20 text-xs font-medium">
+                                            <Instagram className="h-4 w-4" /> Instagram
                                         </button>
                                     </div>
 
@@ -298,23 +342,23 @@ export default function VerseCardModal({ isOpen, onClose, data }: VerseCardModal
                         <div className="border-t border-border/50 pt-4 block sm:hidden">
                             <p className="text-[0.65rem] font-mono uppercase tracking-widest text-app-text-muted mb-3">Compartilhar texto nas redes</p>
                             <div className="flex flex-wrap gap-2">
-                                <button onClick={() => shareOnSocial('whatsapp')}
+                                <button onClick={() => shareImageOnSocial('whatsapp')}
                                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/20 text-[0.72rem] font-medium">
                                     <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
                                 </button>
-                                <button onClick={() => shareOnSocial('facebook')}
+                                <button onClick={() => shareImageOnSocial('facebook')}
                                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2]/20 transition-colors border border-[#1877F2]/20 text-[0.72rem] font-medium">
                                     <Facebook className="h-3.5 w-3.5" /> Facebook
                                 </button>
-                                <button onClick={() => shareOnSocial('twitter')}
+                                <button onClick={() => shareImageOnSocial('twitter')}
                                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/5 text-app-text hover:bg-black/10 transition-colors border border-border text-[0.72rem] font-medium">
                                     <Twitter className="h-3.5 w-3.5" /> Twitter/X
                                 </button>
-                                <button onClick={() => shareOnSocial('telegram')}
+                                <button onClick={() => shareImageOnSocial('telegram')}
                                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20 transition-colors border border-[#26A5E4]/20 text-[0.72rem] font-medium">
                                     <Send className="h-3.5 w-3.5" /> Telegram
                                 </button>
-                                <button onClick={() => shareOnSocial('linkedin')}
+                                <button onClick={() => shareImageOnSocial('linkedin')}
                                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0077B5]/10 text-[#0077B5] hover:bg-[#0077B5]/20 transition-colors border border-[#0077B5]/20 text-[0.72rem] font-medium">
                                     <Linkedin className="h-3.5 w-3.5" /> LinkedIn
                                 </button>

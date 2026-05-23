@@ -1,4 +1,5 @@
 import { Component, ReactNode } from "react";
+import * as Sentry from "@sentry/react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -21,8 +22,10 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     return { hasError: true, countdown: 5 };
   }
 
-  componentDidCatch(error: Error) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Erro crítico capturado:", error);
+    // Envia o erro ao Sentry com stack trace, browser, rota e contexto de usuário
+    Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });
   }
 
   componentDidUpdate() {

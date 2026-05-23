@@ -454,7 +454,11 @@ export default function ReadingPage() {
       // Guard: event.key can be undefined in synthetic/extension-dispatched events
       if (!event.key) return;
       const target = event.target as HTMLElement | null;
-      const typingInField = target && ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName);
+      const typingInField = target && (
+        ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName) ||
+        target.isContentEditable ||
+        (target.closest && target.closest('[contenteditable="true"]') !== null)
+      );
 
       if (event.key.toLowerCase() === "f" && !typingInField) {
         event.preventDefault();
@@ -474,7 +478,7 @@ export default function ReadingPage() {
         return;
       }
 
-      if (isChapterPickerOpen || isSettingsOpen) return;
+      if (isChapterPickerOpen || isSettingsOpen || isNoteModalOpen) return;
 
       if (event.key === "ArrowLeft" && chapterNumber > 1) {
         event.preventDefault();
