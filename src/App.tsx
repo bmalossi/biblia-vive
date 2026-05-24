@@ -45,12 +45,19 @@ const PageFallback = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <PWAProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <ToastViewport />
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    {/*
+      BrowserRouter deve ser o provider mais externo (logo após QueryClientProvider)
+      para garantir que AuthProvider, PWAProvider e TooltipProvider possam usar
+      hooks do React Router sem gerar TypeError por contexto ausente.
+      Causa do bug: mountLazyComponent tentava resolver useNavigate antes do
+      contexto do Router estar disponível quando o Router era um provider interno.
+    */}
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <PWAProvider>
+        <AuthProvider>
+          <TooltipProvider>
             <ScrollToTop />
+            <ToastViewport />
             <Suspense fallback={<PageFallback />}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -77,10 +84,10 @@ const App = () => (
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </PWAProvider>
+          </TooltipProvider>
+        </AuthProvider>
+      </PWAProvider>
+    </BrowserRouter>
     <Analytics />
     <SpeedInsights />
   </QueryClientProvider>
