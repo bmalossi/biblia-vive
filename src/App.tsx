@@ -6,7 +6,6 @@ import { ToastViewport } from "@/components/Toast";
 import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PWAProvider } from "@/contexts/PWAContext";
-import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import ScrollToTop from "@/components/ScrollToTop";
 
@@ -88,7 +87,6 @@ const App = () => (
         </AuthProvider>
       </PWAProvider>
     </BrowserRouter>
-    <Analytics />
     <SpeedInsights />
   </QueryClientProvider>
 );

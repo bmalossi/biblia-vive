@@ -101,6 +101,20 @@ export default function HomePage() {
   return (
     <Layout>
       <div className="flex flex-col">
+        {/* Livros em destaque no topo */}
+        <section className="mt-2">
+          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.oldTestament")}</h2>
+          <BookGrid books={oldTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
+
+          <div className="my-8 border-t border-border" />
+
+          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.newTestament")}</h2>
+          <BookGrid books={newTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
+        </section>
+
+        {/* Divisor após os livros do Novo Testamento */}
+        <div className="my-8 border-t border-border" />
+
         <VerseOfDay />
 
         {/* Renderiza a seção de "Continuar Leitura" e "Plano" apenas se eles existirem. A mt-6 os empurra um pouco do versículo. */}
@@ -174,20 +188,6 @@ export default function HomePage() {
             )}
           </div>
         )}
-
-        {/* 
-          Os livros ficam com mt-2 se não houver cards secundários acima (colando praticamente no versículo).
-          Se houver cards secundários (eles adicionam conteúdo acima com mt-6), os livros vão usar mt-8. 
-        */}
-        <section className={((lastRead && !dismissed && lastReadBook) || (firstProgress && activePlanInfo)) ? "mt-8" : "mt-2"}>
-          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.oldTestament")}</h2>
-          <BookGrid books={oldTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
-
-          <div className="my-8 border-t border-border" />
-
-          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.newTestament")}</h2>
-          <BookGrid books={newTestament} currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null} version={version} />
-        </section>
 
         {/* Artigos em destaque */}
         <CarrosselArtigos />
