@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { getSession } from "@/lib/auth";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
@@ -174,10 +175,17 @@ export default function AdminArtigosPage() {
         setUploadError(null);
 
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            // Use the hardened getSession (localStorage fast-path + 5s timeout)
+            // to avoid navigator lock contention with AuthContext's
+            // visibilitychange handler which also calls getSession().
+            const session = await getSession();
+            if (!session?.access_token) {
+                throw new Error("Sessão expirada. Faça login novamente.");
+            }
+
             const headers = {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${session?.access_token}`
+                "Authorization": `Bearer ${session.access_token}`
             };
 
             // 1. Get Presigned URL for image
@@ -215,11 +223,18 @@ export default function AdminArtigosPage() {
             setSuccessMsg("Imagem enviada com sucesso!");
 
             // 4. Update manifest index (fire-and-forget, after UI is updated)
-            fetch("/api/r2-presigned-url", {
-                method: "POST",
-                headers,
-                body: JSON.stringify({ filename: "r2-media-index.json", contentType: "application/json", manifestOnly: true })
-            }).then(async r => {
+            // Re-read session for the manifest call using the same hardened helper
+            getSession().then(async (manifestSession) => {
+                if (!manifestSession?.access_token) return;
+                const mHeaders = {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${manifestSession.access_token}`
+                };
+                const r = await fetch("/api/r2-presigned-url", {
+                    method: "POST",
+                    headers: mHeaders,
+                    body: JSON.stringify({ filename: "r2-media-index.json", contentType: "application/json", manifestOnly: true })
+                });
                 if (!r.ok) return;
                 const { uploadUrl: manifestUploadUrl } = await r.json();
                 const r2PublicUrl = import.meta.env.VITE_R2_PUBLIC_URL || "";
@@ -236,7 +251,14 @@ export default function AdminArtigosPage() {
 
         } catch (err: any) {
             console.error("Upload error:", err);
-            setUploadError(err.message);
+            // Provide a user-friendly message for lock/abort errors
+            const isLockError = err instanceof Error &&
+                (err.name === "AbortError" || err.message?.includes("Lock broken") || err.message?.includes("AbortError"));
+            if (isLockError) {
+                setUploadError("Erro temporário de autenticação. Aguarde alguns segundos e tente novamente.");
+            } else {
+                setUploadError(err.message);
+            }
         } finally {
             setUploading(false);
             e.target.value = "";

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { getSession } from "@/lib/auth";
 import { Loader2, Upload, Copy, Check, Search, X, ImageIcon, AlertCircle, RefreshCw } from "lucide-react";
 
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
@@ -89,10 +90,15 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
         setUploading(true);
         setUploadError(null);
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            // Use hardened getSession (localStorage fast-path + 5s timeout)
+            // to avoid navigator lock contention with AuthContext's visibilitychange handler.
+            const session = await getSession();
+            if (!session?.access_token) {
+                throw new Error("Sessão expirada. Faça login novamente.");
+            }
             const headers = {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${session?.access_token}`
+                "Authorization": `Bearer ${session.access_token}`
             };
 
             // Step 1: Get presigned URL for the image
@@ -144,8 +150,12 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                 await updateManifest(manifestUploadUrl, newEntry);
             }
         } catch (err: any) {
-            setUploadError(err.message);
             console.error("Upload failed:", err);
+            const isLockError = err instanceof Error &&
+                (err.name === "AbortError" || err.message?.includes("Lock broken") || err.message?.includes("AbortError"));
+            setUploadError(isLockError
+                ? "Erro temporário de autenticação. Aguarde alguns segundos e tente novamente."
+                : err.message);
         } finally {
             setUploading(false);
             e.target.value = "";
