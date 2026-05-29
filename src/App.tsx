@@ -33,7 +33,15 @@ const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ArtigoPage = lazy(() => import("./pages/ArtigoPage"));
 const ArtigosIndexPage = lazy(() => import("./pages/ArtigosIndexPage"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: true,
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5 min
+    },
+  },
+});
 
 const PageFallback = () => (
   <div aria-busy="true" aria-label="Carregando..." className="flex min-h-[60vh] flex-col items-center justify-center gap-3">

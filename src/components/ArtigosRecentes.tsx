@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 interface Article {
     id: string;
@@ -13,57 +13,57 @@ interface Article {
     published_at: string | null;
 }
 
+async function fetchRecentArticles(): Promise<Article[]> {
+    const { data, error } = await supabase
+        .from("articles")
+        .select("id, title, slug, body, meta_description, cover_image_url, published_at")
+        .eq("status", "publicado")
+        .order("published_at", { ascending: false })
+        .limit(3);
+
+    if (error) throw error;
+    return data ?? [];
+}
+
 export default function ArtigosRecentes() {
-    const [articles, setArticles] = useState<Article[]>([]);
-    const [loading, setLoading] = useState(true);
+    const {
+        data: articles = [],
+        isLoading,
+        isError,
+        refetch,
+    } = useQuery({
+        queryKey: ["articles-recent"],
+        queryFn: fetchRecentArticles,
+        staleTime: 5 * 60 * 1000, // 5 min
+        refetchOnWindowFocus: true,
+        retry: 2,
+        retryDelay: (attempt) => Math.min(600 * 2 ** attempt, 5000),
+    });
 
-    useEffect(() => {
-        let isMounted = true;
-
-        async function fetchArticles(attempt = 0) {
-            try {
-                const { data, error } = await supabase
-                    .from("articles")
-                    .select("id, title, slug, body, meta_description, cover_image_url, published_at")
-                    .eq("status", "publicado")
-                    .order("published_at", { ascending: false })
-                    .limit(3);
-
-                if (!isMounted) return;
-
-                if (error) {
-                    if (error.message?.includes("AbortError") && attempt === 0) {
-                        setTimeout(() => fetchArticles(1), 600);
-                        return;
-                    }
-                    setArticles([]);
-                } else {
-                    setArticles(data ?? []);
-                }
-            } catch (err: unknown) {
-                if (!isMounted) return;
-                const isAbort =
-                    err instanceof Error &&
-                    (err.name === "AbortError" || err.message?.includes("AbortError") || err.message?.includes("Lock broken"));
-                if (isAbort && attempt === 0) {
-                    setTimeout(() => fetchArticles(1), 600);
-                    return;
-                }
-                setArticles([]);
-            } finally {
-                if (isMounted) setLoading(false);
-            }
-        }
-
-        fetchArticles();
-        return () => { isMounted = false; };
-    }, []);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-gold" />
             </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <section className="mt-8">
+                <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-app-surface py-8 text-center">
+                    <p className="text-sm text-app-text-muted">
+                        Não foi possível carregar os artigos recentes.
+                    </p>
+                    <button
+                        onClick={() => refetch()}
+                        className="inline-flex items-center gap-2 rounded-full border border-gold/50 px-4 py-2 text-sm text-gold transition-colors hover:bg-gold-bg"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                        Tentar novamente
+                    </button>
+                </div>
+            </section>
         );
     }
 
