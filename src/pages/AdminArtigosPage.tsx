@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import ImageLibraryModal from "@/components/ImageLibraryModal";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface Article {
     id: string;
@@ -70,6 +71,11 @@ function generateSlug(title: string): string {
 }
 
 export default function AdminArtigosPage() {
+    usePageMeta({
+        title: "Admin de Artigos — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const { user, loading: authLoading } = useAuth();
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [articles, setArticles] = useState<Article[]>([]);
@@ -102,12 +108,24 @@ export default function AdminArtigosPage() {
 
     async function fetchArticles() {
         setLoading(true);
-        const { data } = await supabase
-            .from("articles")
-            .select("*")
-            .order("created_at", { ascending: false });
-        setArticles(data ?? []);
-        setLoading(false);
+        try {
+            const { data, error } = await supabase
+                .from("articles")
+                .select("*")
+                .order("created_at", { ascending: false });
+            if (error) throw error;
+            setArticles(data ?? []);
+        } catch (err: unknown) {
+            // AbortError = Supabase auth lock contention; the query will succeed
+            // once the lock is released — do not surface as a fatal error.
+            const isLockError = err instanceof Error &&
+                (err.name === 'AbortError' || (err as Error).message?.includes('Lock broken'));
+            if (!isLockError) {
+                console.error('[AdminArtigosPage] fetchArticles failed:', err);
+            }
+        } finally {
+            setLoading(false);
+        }
     }
 
     function handleTitleChange(title: string) {
@@ -157,14 +175,28 @@ export default function AdminArtigosPage() {
     }
 
     async function handleDelete(id: string) {
-        await supabase.from("articles").delete().eq("id", id);
-        setDeleteConfirm(null);
-        fetchArticles();
+        try {
+            await supabase.from("articles").delete().eq("id", id);
+        } catch (err: unknown) {
+            const isLockError = err instanceof Error &&
+                (err.name === 'AbortError' || (err as Error).message?.includes('Lock broken'));
+            if (!isLockError) console.error('[AdminArtigosPage] delete failed:', err);
+        } finally {
+            setDeleteConfirm(null);
+            fetchArticles();
+        }
     }
 
     async function toggleFeatured(article: Article) {
-        await supabase.from("articles").update({ featured: !article.featured }).eq("id", article.id);
-        fetchArticles();
+        try {
+            await supabase.from("articles").update({ featured: !article.featured }).eq("id", article.id);
+        } catch (err: unknown) {
+            const isLockError = err instanceof Error &&
+                (err.name === 'AbortError' || (err as Error).message?.includes('Lock broken'));
+            if (!isLockError) console.error('[AdminArtigosPage] toggleFeatured failed:', err);
+        } finally {
+            fetchArticles();
+        }
     }
 
     async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {

@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle } from "lucide-react";
 import CommentaryQuota from "@/components/CommentaryQuota";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -56,6 +57,11 @@ function Alert({ type, message }: { type: "success" | "error"; message: string }
 // ─── AccountPage ──────────────────────────────────────────────────────────────
 
 export default function AccountPage() {
+    usePageMeta({
+        title: "Minha Conta — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const navigate = useNavigate();
     const { user, loading: authLoading, signOut, isPending } = useAuth();
     const { subscription, isPro, isTemplo, isAdmin, loading: subLoading, checkout, manageSubscription } = useSubscription();

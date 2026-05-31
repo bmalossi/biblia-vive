@@ -12,13 +12,15 @@ export default function BookPage() {
   const selectedBook = findBookBySlug(book);
   const { t } = useTranslation();
 
-  const title = selectedBook ? `${selectedBook.name} (${selectedVersion.toUpperCase()}) — ${t("app.name")}` : t("app.name");
-  const description = selectedBook ? `Leia o livro de ${selectedBook.name} completo na versão ${selectedVersion.toUpperCase()}. São ${selectedBook.chapters} capítulos do ${getTestament(selectedBook)} para seu estudo bíblico online.` : "";
+  const title = selectedBook ? `${selectedBook.name} (${selectedVersion.toUpperCase()}) — ${t("app.name")}` : `Livro não encontrado — ${t("app.name")}`;
+  const description = selectedBook ? `Leia o livro de ${selectedBook.name} completo na versão ${selectedVersion.toUpperCase()}. São ${selectedBook.chapters} capítulos do ${getTestament(selectedBook)} para seu estudo bíblico online.` : "O livro solicitado não pôde ser encontrado.";
+  const robots = selectedBook ? undefined : "noindex, nofollow";
 
   usePageMeta({
     title,
     description,
-    canonical: `/${selectedVersion}/${selectedBook?.slug}`,
+    robots,
+    canonical: `/${selectedVersion}/${selectedBook?.slug ?? ""}`,
     jsonLd: selectedBook ? [
       {
         "@context": "https://schema.org",

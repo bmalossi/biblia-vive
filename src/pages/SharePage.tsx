@@ -28,10 +28,16 @@ import {
 import { toPng } from "html-to-image";
 import { Link } from "react-router-dom";
 import { getVersion } from "@/lib/themes";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 type Tab = "cards" | "stats" | "progresso";
 
 export default function SharePage() {
+    usePageMeta({
+        title: "Compartilhar — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const [activeTab, setActiveTab] = useState<Tab>("cards");
     const { activePlan, progress, streak, progressPct } = useReadingPlan();
     const version = getVersion();

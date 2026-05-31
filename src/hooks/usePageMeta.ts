@@ -36,7 +36,14 @@ export function usePageMeta({ title, description, canonical, image, type = "webs
     upsertMeta("og:title", title, true);
     upsertMeta("twitter:title", title);
     upsertMeta("og:type", type, true);
-    if (robots) upsertMeta("robots", robots);
+    if (robots) {
+      upsertMeta("robots", robots);
+    } else {
+      const robotsTag = document.head.querySelector('meta[name="robots"]');
+      if (robotsTag) {
+        robotsTag.remove();
+      }
+    }
     if (image) {
       const absoluteImage = image.startsWith("http") ? image : `${CANONICAL_ORIGIN}${image}`;
       upsertMeta("og:image", absoluteImage, true);

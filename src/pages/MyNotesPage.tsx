@@ -19,10 +19,16 @@ import {
 } from '@/lib/notesHighlights';
 import NoteModal from '@/components/NoteModal';
 import AuthModal from '@/components/AuthModal';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 type SortOrder = 'newest' | 'oldest';
 
 export default function MyNotesPage() {
+    usePageMeta({
+        title: "Minhas Notas — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { user, isAuthenticated, signOut } = useAuth();

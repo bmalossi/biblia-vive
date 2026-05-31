@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2, AlertCircle, BookOpen } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 /**
  * ProSuccessPage — shown after Stripe Checkout redirects back to /pro/success
@@ -11,6 +12,11 @@ import { useSubscription } from "@/hooks/useSubscription";
  * This page simply waits for that update and then celebrates it.
  */
 export default function ProSuccessPage() {
+    usePageMeta({
+        title: "Assinatura PRO Ativada — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const sessionId = searchParams.get("session_id");

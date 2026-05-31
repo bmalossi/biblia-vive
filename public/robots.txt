@@ -1,4 +1,18 @@
 User-agent: *
 Allow: /
-Disallow: /busca?q=
+
+# Rotas privadas e técnicas
+Disallow: /admin
+Disallow: /auth/
+Disallow: /conta
+Disallow: /minhas-notas
+Disallow: /meu-estudo
+Disallow: /compartilhar
+Disallow: /church-display
+Disallow: /widget/
+Disallow: /pro/success
+
+# Busca com parâmetros (resultados dinâmicos)
+Disallow: /busca?
+
 Sitemap: https://www.bibliavive.com.br/sitemap.xml

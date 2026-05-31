@@ -33,3 +33,6 @@ tests/load/results/
 secrets.txt
 *.pem
 *.key
+
+# Generated Sitemap
+public/sitemap.xml

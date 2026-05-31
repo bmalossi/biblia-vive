@@ -2,6 +2,50 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// ─── localId → routeSlug map ─────────────────────────────────────────────────
+// The public/bible/pt-br/acf/ folders use "localIds" (e.g. "ps", "ho", "mk"),
+// but the app routes use canonical slugs from books.json (e.g. "sl", "os", "mc").
+// This map converts localId → routeSlug so the sitemap and canonical URLs are
+// consistent with what the React Router resolves — preventing soft 404s.
+//
+// Derived from the inverse of ROUTE_TO_LOCAL_ID in src/lib/bookResolver.ts.
+const LOCAL_ID_TO_ROUTE_SLUG = {
+  // Old Testament
+  jud:  'jz',    // Juízes   (folder=jud,  slug=jz)
+  job:  'jo',    // Jó       (folder=job,  slug=jo)
+  jo:   'joa',   // João     (folder=jo,   slug=joa)  ← NT but resolves here too
+  act:  'atos',  // Atos     (folder=act,  slug=atos)
+  '1kgs': '1rs', // 1 Reis   (folder=1kgs, slug=1rs)
+  '2kgs': '2rs', // 2 Reis   (folder=2kgs, slug=2rs)
+  '1ch':  '1cr', // 1 Crôn.  (folder=1ch,  slug=1cr)
+  '2ch':  '2cr', // 2 Crôn.  (folder=2ch,  slug=2cr)
+  ps:   'sl',    // Salmos   (folder=ps,   slug=sl)
+  prv:  'pv',    // Provérb. (folder=prv,  slug=pv)
+  so:   'ct',    // Cânticos (folder=so,   slug=ct)
+  ho:   'os',    // Oséias   (folder=ho,   slug=os)
+  hk:   'hc',    // Habacuque(folder=hk,   slug=hc)
+  zp:   'sf',    // Sofonias (folder=zp,   slug=sf)
+  hg:   'ag',    // Ageu     (folder=hg,   slug=ag)
+  mi:   'mq',    // Miquéias (folder=mi,   slug=mq)
+  mk:   'mc',    // Marcos   (folder=mk,   slug=mc)
+  lk:   'lc',    // Lucas    (folder=lk,   slug=lc)
+  eph:  'ef',    // Efésios  (folder=eph,  slug=ef)
+  ph:   'fp',    // Filipens.(folder=ph,   slug=fp)
+  jm:   'tg',    // Tiago    (folder=jm,   slug=tg)
+  re:   'ap',    // Apocalip.(folder=re,   slug=ap)
+  ezr:  'ed',    // Esdras   (folder=ezr,  slug=ed)
+  phm:  'fm',    // Filemom  (folder=phm,  slug=fm)
+};
+
+/**
+ * Given a folder name (localId from public/bible), returns the canonical route
+ * slug used in the URL (from books.json). Falls back to the folder name itself
+ * if no mapping is needed.
+ */
+function toRouteSlug(localId) {
+  return LOCAL_ID_TO_ROUTE_SLUG[localId] ?? localId;
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -96,7 +140,10 @@ async function getAvailableBooks() {
 function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
   const title = `${bookName} ${chapterNum} — ACF | Bíblia Vive`;
   const description = verses.slice(0, 3).join(' ');
-  const url = `${CANONICAL_ORIGIN}/acf/${bookSlug}/${chapterNum}`;
+  // Use the canonical route slug (from books.json) — NOT the localId folder name.
+  // e.g. Salmos: folder=ps → routeSlug=sl → URL /acf/sl/27 (not /acf/ps/27)
+  const routeSlug = toRouteSlug(bookSlug);
+  const url = `${CANONICAL_ORIGIN}/acf/${routeSlug}/${chapterNum}`;
   const text = verses.slice(0, 3).join(' ');
 
   const jsonLd = {
@@ -107,7 +154,7 @@ function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
     "isPartOf": {
       "@type": "Book",
       "name": `${bookName} — ACF`,
-      "url": `${CANONICAL_ORIGIN}/acf/${bookSlug}`
+      "url": `${CANONICAL_ORIGIN}/acf/${routeSlug}`
     },
     "text": text
   };
@@ -269,7 +316,11 @@ async function prerender() {
   const staticUrls = [
     { loc: `${CANONICAL_ORIGIN}/`, priority: '1.0', changefreq: 'daily' },
     { loc: `${CANONICAL_ORIGIN}/planos`, priority: '0.8', changefreq: 'weekly' },
-    { loc: `${CANONICAL_ORIGIN}/artigos`, priority: '0.8', changefreq: 'weekly' }
+    { loc: `${CANONICAL_ORIGIN}/artigos`, priority: '0.8', changefreq: 'weekly' },
+    { loc: `${CANONICAL_ORIGIN}/sobre`, priority: '0.5', changefreq: 'monthly' },
+    { loc: `${CANONICAL_ORIGIN}/apoiar`, priority: '0.5', changefreq: 'monthly' },
+    { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, priority: '0.3', changefreq: 'monthly' },
+    { loc: `${CANONICAL_ORIGIN}/pro`, priority: '0.8', changefreq: 'weekly' }
   ];
 
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -285,8 +336,21 @@ async function prerender() {
       continue;
     }
 
+    // Convert the folder name (localId) to the canonical route slug used in URLs.
+    // This prevents soft 404: the sitemap must use the same slug the React Router resolves.
+    const routeSlug = toRouteSlug(book.folder);
+
+    // Book index page — use routeSlug, not book.folder
+    const bookUrl = `${CANONICAL_ORIGIN}/acf/${routeSlug}`;
+    sitemap += `  <url>
+    <loc>${bookUrl}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+`;
+
     for (let chapterNum = 1; chapterNum <= bookData.chapters.length; chapterNum++) {
-      const url = `${CANONICAL_ORIGIN}/acf/${book.folder}/${chapterNum}`;
+      const url = `${CANONICAL_ORIGIN}/acf/${routeSlug}/${chapterNum}`;
       sitemap += `  <url>
     <loc>${url}</loc>
     <changefreq>weekly</changefreq>

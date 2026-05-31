@@ -304,34 +304,6 @@ export default function ReadingPage() {
   const currentTTSVerse = tts.currentVerseIndex !== null ? chapterVerses[tts.currentVerseIndex] : null;
   const shouldReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  usePageMeta({
-    canonical: selectedBook ? `/${selectedVersion}/${selectedBook.slug}/${chapterNumber}` : window.location.pathname,
-    description: selectedBook
-      ? `Leia ${selectedBook.name} capítulo ${chapterNumber} na versão ${selectedVersion.toUpperCase()}. ${chapterVerses[0]?.text?.slice(0, 140) ?? ""}...`
-      : "Leia capítulos bíblicos com foco, áudio e comparação de versões.",
-    jsonLd: selectedBook
-      ? {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        name: `${selectedBook.name} Capítulo ${chapterNumber}`,
-        headline: `${selectedBook.name} ${chapterNumber} — ${selectedVersion.toUpperCase()}`,
-        description: chapterVerses[0]?.text ?? "Leitura bíblica em português.",
-        inLanguage: "pt-BR",
-        isPartOf: {
-          "@type": "Book",
-          name: "Bíblia Sagrada",
-          inLanguage: "pt-BR",
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "Bíblia Vive",
-        },
-      }
-      : undefined,
-    title: selectedBook ? `${selectedBook.name} ${chapterNumber} — ${selectedVersion.toUpperCase()} | ${t("app.name")}` : `${t("reading.title")} | ${t("app.name")}`,
-    type: "article",
-  });
-
   const updateToolbarPosition = useCallback(
     (anchorKey: string) => {
       if (isToolbarMobile) {
@@ -791,10 +763,18 @@ export default function ReadingPage() {
   const hasNext = !!selectedBook && chapterNumber < (selectedBook?.chapters ?? 1);
   const chapterGrid = Array.from({ length: selectedBook?.chapters ?? 0 }, (_, index) => index + 1);
 
+  // Computed early so usePageMeta can inject noindex for invalid routes.
+  // Must be computed before the hook call (hooks must be unconditional).
+  const isInvalidRoute =
+    !selectedBook ||
+    (!Number.isNaN(chapterNumber) && (chapterNumber < 1 || chapterNumber > (selectedBook?.chapters ?? 1)));
+
   usePageMeta({
     title: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber} (${selectedVersion.toUpperCase()}) — ${t("app.name")}`,
     description: `Leia o capítulo ${chapterNumber} do livro de ${selectedBook?.name ?? ""} na versão ${selectedVersion.toUpperCase()} com dezenas de marcações exclusivas. Estudo online grátis.`,
     canonical: `/${selectedVersion}/${selectedBook?.slug ?? "gn"}/${chapterNumber}`,
+    // Invalid routes get noindex so the Googlebot never indexes blank/error pages.
+    robots: isInvalidRoute ? "noindex, nofollow" : undefined,
     jsonLd: selectedBook && chapterVerses.length > 0 ? [
       {
         "@context": "https://schema.org",
@@ -911,6 +891,76 @@ export default function ReadingPage() {
       </span>
     );
   };
+
+  // ─── Guard: livro não reconhecido ─────────────────────────────────────────
+  // Renders a clear 404 page with noindex so the Googlebot never sees a blank
+  // page and classifies the URL as soft 404.
+  if (!selectedBook) {
+    return (
+      <Layout>
+        {/* noindex injected via usePageMeta — declared at top of component */}
+        <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-6 text-center px-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-app-surface text-3xl">
+            📖
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl text-app-text">Livro não encontrado</h1>
+            <p className="mt-2 font-sans text-sm text-app-text-muted">
+              A abreviação <code className="rounded bg-app-raised px-1 py-0.5 font-mono text-xs">{book}</code>{" "}
+              não corresponde a nenhum livro bíblico reconhecido.
+            </p>
+          </div>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-2.5 text-sm font-medium text-app-bg hover:bg-gold/90 transition-colors"
+          >
+            Voltar ao início
+          </Link>
+        </div>
+      </Layout>
+    );
+  }
+
+  // ─── Guard: capítulo fora do intervalo válido ──────────────────────────────
+  // e.g. /acf/gn/74 (Genesis tem 50 cap), /acf/sl/151 (Salmos tem 150 cap).
+  // Returns noindex + clear message instead of blank page / infinite skeleton.
+  const isChapterOutOfRange =
+    !Number.isNaN(chapterNumber) &&
+    (chapterNumber < 1 || chapterNumber > selectedBook.chapters);
+
+  if (isChapterOutOfRange) {
+    return (
+      <Layout>
+        <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-6 text-center px-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-border bg-app-surface text-3xl">
+            📄
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl text-app-text">Capítulo não existe</h1>
+            <p className="mt-2 font-sans text-sm text-app-text-muted">
+              {selectedBook.name} tem {selectedBook.chapters}{" "}
+              {selectedBook.chapters === 1 ? "capítulo" : "capítulos"}.{" "}
+              O capítulo {chapterNumber} não existe neste livro.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link
+              to={`/${selectedVersion}/${selectedBook.slug}/1`}
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-2.5 text-sm font-medium text-app-bg hover:bg-gold/90 transition-colors"
+            >
+              Ir para o capítulo 1
+            </Link>
+            <Link
+              to={`/${selectedVersion}/${selectedBook.slug}/${selectedBook.chapters}`}
+              className="inline-flex items-center gap-2 rounded-full border border-gold/60 px-6 py-2.5 text-sm font-medium text-gold hover:bg-gold-bg transition-colors"
+            >
+              Último capítulo ({selectedBook.chapters})
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout hideHeader={preferences.focusMode} hideMobileNav={preferences.focusMode}>

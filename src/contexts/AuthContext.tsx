@@ -51,14 +51,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         // ── Single listener for the entire app ──
-        // In Supabase JS v2, onAuthStateChange fires INITIAL_SESSION as its
-        // first event, reading from localStorage synchronously.  We do NOT
-        // need a separate getSession() call; that only adds a race.
+        // IMPORTANT: The callback must be SYNCHRONOUS (not async). Supabase JS v2
+        // does NOT await the return value of onAuthStateChange callbacks. If the
+        // callback is async and contains `await supabase.auth.*` calls, those
+        // awaits run *inside* the auth Web Lock, causing contention with the next
+        // auth event and triggering "AbortError: Lock broken by another request
+        // with the 'steal' option" (DOMException code 20).
+        //
+        // Pattern: Update state synchronously, then schedule secondary async work
+        // via queueMicrotask / Promise.resolve() so it runs AFTER the lock is
+        // released by the Supabase internals.
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        } = supabase.auth.onAuthStateChange((event, session) => {
             const nextUser = session?.user ?? null;
 
+            // ── Synchronous state updates (safe inside the lock) ──────────────
             setUser(nextUser);
             // Mark initial load as done on the very first event — ANY event, not
             // just INITIAL_SESSION, so edge cases (e.g. SIGNED_IN fires first)
@@ -66,33 +74,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setLoading(false);
             setIsPending(false); // SAFETY: Reset pending on any auth event
 
-            // Refresh user object after token refresh to pick up new metadata
+            // ── Async secondary work (deferred OUTSIDE the lock) ─────────────
+            // queueMicrotask ensures these run after the current synchronous
+            // execution stack (and the Supabase lock release) completes.
             if (event === 'TOKEN_REFRESHED' && nextUser) {
-                try {
-                    const { data } = await supabase.auth.getUser();
-                    if (data.user) setUser(data.user);
-                } catch { /* non-fatal */ }
+                // Refresh user object to pick up new metadata (e.g. app_metadata).
+                // Deferred so it does not compete with the lock held by the
+                // token-refresh operation that just fired this event.
+                queueMicrotask(() => {
+                    supabase.auth.getUser().then(({ data }) => {
+                        if (data.user) setUser(data.user);
+                    }).catch((err: unknown) => {
+                        // Silently ignore AbortError — it means a concurrent auth
+                        // operation stole the lock; the next TOKEN_REFRESHED event
+                        // will retry automatically.
+                        if (err instanceof Error && (err.name === 'AbortError' || err.message?.includes('Lock broken'))) return;
+                        console.warn('[AuthContext] getUser after TOKEN_REFRESHED failed:', err);
+                    });
+                });
             }
 
-            // Migrate local data exactly once per user login
             if (event === 'SIGNED_IN' && nextUser) {
-                // Associa o usuário ao Sentry para contextualizar erros
+                // Associate user with Sentry for error context.
                 Sentry.setUser({ id: nextUser.id });
 
+                // Migrate local data exactly once per user login, deferred outside lock.
                 if (migratedUserIdRef.current !== nextUser.id) {
                     migratedUserIdRef.current = nextUser.id;
-                    try {
-                        await Promise.allSettled([
+                    queueMicrotask(() => {
+                        Promise.allSettled([
                             migrateLocalToSupabase(nextUser.id),
                             migrateLocalPlanToSupabase(nextUser.id),
-                        ]);
-                    } catch { /* non-fatal */ }
+                        ]).catch(() => { /* allSettled never rejects, belt-and-suspenders */ });
+                    });
                 }
             }
 
             if (event === 'SIGNED_OUT') {
                 migratedUserIdRef.current = null;
-                // Limpa o contexto de usuário no Sentry ao fazer logout
                 Sentry.setUser(null);
             }
         });
@@ -104,16 +123,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // antecipa esse fluxo: assim que o usuário volta à aba, tentamos
         // renovar a sessão ANTES que qualquer query autenticada seja disparada.
         const isRefreshingRef = { current: false };
-        const handleVisibilityChange = async () => {
+        const handleVisibilityChange = () => {
             if (document.visibilityState !== 'visible' || isRefreshingRef.current) return;
             isRefreshingRef.current = true;
-            try {
-                // getSession() in Supabase JS v2 natively handles refresh if autoRefreshToken is true.
-                // We call it here just to "wake up" the listener and renew the token if it expired
-                // while the tab was in background, BEFORE any other query hits the lock.
-                await supabase.auth.getSession();
-            } catch { /* non-fatal */ }
-            finally { isRefreshingRef.current = false; }
+            // Use the hardened getSession from auth.ts (localStorage fast-path +
+            // 5s timeout) so this call never hangs or steals the lock from an
+            // ongoing token refresh.
+            import('@/lib/auth').then(({ getSession }) =>
+                getSession()
+                    .catch((err: unknown) => {
+                        // AbortError here means a concurrent refresh already holds
+                        // the lock — that is fine, the token will be refreshed.
+                        if (err instanceof Error && (err.name === 'AbortError' || err.message?.includes('Lock broken'))) return;
+                        console.warn('[AuthContext] proactive session refresh failed:', err);
+                    })
+                    .finally(() => { isRefreshingRef.current = false; })
+            ).catch(() => { isRefreshingRef.current = false; });
         };
 
         document.addEventListener('visibilitychange', handleVisibilityChange);

@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import { Loader2, FileText } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface Article {
     id: string;
@@ -23,6 +24,19 @@ interface Article {
 export default function ArtigosIndexPage() {
     const [articles, setArticles] = useState<Article[]>([]);
     const [loading, setLoading] = useState(true);
+
+    usePageMeta({
+        title: "Artigos — Bíblia Vive",
+        description: "Explore artigos e conteúdos sobre a Palavra de Deus.",
+        canonical: "/artigos",
+        jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Artigos — Bíblia Vive",
+            "description": "Explore artigos e conteúdos sobre a Palavra de Deus.",
+            "url": "https://www.bibliavive.com.br/artigos"
+        }
+    });
 
     useEffect(() => {
         async function fetchArticles() {
@@ -48,8 +62,9 @@ export default function ArtigosIndexPage() {
     if (loading) {
         return (
             <Layout>
-                <div className="flex min-h-[60vh] items-center justify-center">
+                <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
                     <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                    <p className="text-sm text-app-text-muted">Carregando artigos...</p>
                 </div>
             </Layout>
         );

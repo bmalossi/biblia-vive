@@ -33,6 +33,7 @@ import {
 import { findBookGlobally } from '@/lib/books';
 import NoteModal from '@/components/NoteModal';
 import AuthModal from '@/components/AuthModal';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -70,6 +71,11 @@ function formatDate(iso: string) {
 // ─── MyStudyPage ──────────────────────────────────────────────────────────────
 
 export default function MyStudyPage() {
+    usePageMeta({
+        title: "Meu Estudo — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { user, isAuthenticated, signOut } = useAuth();

@@ -11,8 +11,15 @@ import {
     Flame, Calendar, BookOpen, CheckCircle, ArrowRight,
     Check, ChevronRight, Trophy, SkipForward, ArrowLeft,
 } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function ReadingPlansPage() {
+    usePageMeta({
+        title: "Planos de Leitura — Bíblia Vive",
+        description: "Escolha um plano de leitura bíblica e leia a Bíblia em 30, 90 ou 365 dias. Acompanhe seu progresso diário e mantenha a constância na Palavra.",
+        canonical: "/planos",
+    });
+
     const { t } = useTranslation();
     const { user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -41,8 +48,9 @@ export default function ReadingPlansPage() {
     if (isLoading) {
         return (
             <Layout>
-                <div className="flex min-h-[50vh] items-center justify-center">
+                <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-gold border-t-transparent"></div>
+                    <p className="text-sm text-app-text-muted">Carregando planos de leitura...</p>
                 </div>
             </Layout>
         );

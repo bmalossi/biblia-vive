@@ -1,8 +1,14 @@
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function NotFoundPage() {
+  usePageMeta({
+    title: "Página não encontrada — Bíblia Vive",
+    robots: "noindex, nofollow",
+  });
+
   return (
     <Layout>
       <section className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center text-center">

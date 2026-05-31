@@ -19,6 +19,7 @@ export default function WidgetDailyVerse() {
     usePageMeta({
         title: "Versículo do Dia · Bíblia Vive",
         description: "Versículo diário curado para o seu site ou blog.",
+        robots: "noindex, nofollow",
     });
 
     const dateLabel = new Date().toLocaleDateString(locale, {

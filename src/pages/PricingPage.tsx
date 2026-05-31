@@ -6,8 +6,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { AudioLines, Sparkles, BookOpenCheck, Download, CheckCircle2, ShieldCheck } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function PricingPage() {
+    usePageMeta({
+        title: "Bíblia Vive PRO — Planos de Assinatura",
+        description: "Assine o Bíblia Vive PRO ou Templo e desbloqueie anotações ilimitadas, áudio-comentários com IA, exportações em PDF e muito mais.",
+        canonical: "/pro",
+    });
+
     const { t } = useTranslation();
     const { isPro, isTemplo, loading, checkout } = useSubscription();
     const { user } = useAuth();

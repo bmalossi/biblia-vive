@@ -9,8 +9,14 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function AuthCallbackPage() {
+    usePageMeta({
+        title: "Autenticando — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const navigate = useNavigate();
 
     useEffect(() => {

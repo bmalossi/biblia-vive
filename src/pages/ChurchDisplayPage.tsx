@@ -1,10 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { onChurchMessage, sendToChurch, type ChurchVerse, type ChurchSettings } from '@/lib/churchChannel'
+import { usePageMeta } from '@/hooks/usePageMeta'
 
 type DisplayStatus = 'waiting' | 'displaying' | 'closed'
 type DisplayMode = 'verses' | 'chapter'
 
 export default function ChurchDisplayPage() {
+  usePageMeta({
+    title: "Projeção Modo Igreja — Bíblia Vive",
+    robots: "noindex, nofollow",
+  });
   const [status, setStatus] = useState<DisplayStatus>('waiting')
   const [verses, setVerses] = useState<ChurchVerse[]>([])
   const [displayMode, setDisplayMode] = useState<DisplayMode>('verses')

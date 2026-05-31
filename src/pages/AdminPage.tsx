@@ -12,6 +12,7 @@ import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
 import { Loader2, Plus, Trash2, CalendarDays, Sparkles, LogIn, XCircle, FileText, Home, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface DailyVerseRow {
     id: string;
@@ -36,6 +37,11 @@ const EMPTY_VERSE: NewVerse = {
 };
 
 export default function AdminPage() {
+    usePageMeta({
+        title: "Painel Admin — Bíblia Vive",
+        robots: "noindex, nofollow",
+    });
+
     const { user, loading: authLoading } = useAuth();
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [verses, setVerses] = useState<DailyVerseRow[]>([]);

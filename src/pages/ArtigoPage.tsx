@@ -11,6 +11,7 @@ import Layout from "@/components/Layout";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { Loader2, ArrowLeft, Calendar } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface Article {
     id: string;
@@ -61,22 +62,51 @@ export default function ArtigoPage() {
 
             setArticle(data);
             setLoading(false);
-
-            if (data.meta_title) {
-                document.title = data.meta_title;
-            } else {
-                document.title = `${data.title} — Bíblia Vive`;
-            }
         }
 
         fetchArticle();
     }, [slug]);
 
+    let title = "Carregando artigo... — Bíblia Vive";
+    let description = "Carregando artigo da Bíblia Vive...";
+    let robots = "noindex, follow";
+    let canonical = undefined;
+    let jsonLd = undefined;
+
+    if (error || (!loading && !article)) {
+        title = "Artigo não encontrado — Bíblia Vive";
+        description = "O artigo solicitado não pôde ser encontrado.";
+        robots = "noindex, nofollow";
+    } else if (article) {
+        title = article.meta_title || `${article.title} — Bíblia Vive`;
+        description = article.meta_description || article.body?.substring(0, 160).replace(/[#*_`~\[\]]/g, '') || '';
+        robots = "index, follow";
+        canonical = `/artigos/${article.slug}`;
+        jsonLd = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": article.title,
+            "description": description.substring(0, 160),
+            "url": `https://www.bibliavive.com.br/artigos/${article.slug}`
+        };
+    }
+
+    usePageMeta({
+        title,
+        description,
+        robots,
+        canonical,
+        jsonLd,
+        image: article?.cover_image_url || undefined,
+        type: "article"
+    });
+
     if (loading) {
         return (
             <Layout>
-                <div className="flex min-h-[60vh] items-center justify-center">
+                <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
                     <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                    <p className="text-sm text-app-text-muted">Carregando conteúdo do artigo...</p>
                 </div>
             </Layout>
         );
