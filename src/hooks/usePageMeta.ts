@@ -11,6 +11,7 @@ export interface PageMetaOptions {
   articlePublishedTime?: string;
   articleModifiedTime?: string;
   articleAuthor?: string;
+  fbAppId?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   // Backward compatibility mappings
   image?: string;
@@ -56,6 +57,7 @@ export function usePageMeta({
   articlePublishedTime,
   articleModifiedTime,
   articleAuthor,
+  fbAppId,
   jsonLd,
   image,
   type,
@@ -93,6 +95,7 @@ export function usePageMeta({
       removeMeta("og:image:height", true);
       removeMeta("og:image:alt", true);
       removeMeta("og:locale", true);
+      removeMeta("fb:app_id", true);
 
       removeMeta("twitter:card");
       removeMeta("twitter:title");
@@ -133,6 +136,14 @@ export function usePageMeta({
       }
       
       upsertMeta("og:locale", "pt_BR", true);
+
+      // Facebook App ID to silence debugger warning
+      const finalFbAppId = fbAppId || import.meta.env.VITE_FB_APP_ID || "1035985160869680";
+      if (finalFbAppId) {
+        upsertMeta("fb:app_id", finalFbAppId, true);
+      } else {
+        removeMeta("fb:app_id", true);
+      }
 
       // Upsert Twitter Card tags
       upsertMeta("twitter:card", "summary_large_image");
@@ -211,9 +222,9 @@ export function usePageMeta({
     articlePublishedTime,
     articleModifiedTime,
     articleAuthor,
+    fbAppId,
     jsonLd,
     image,
     type,
   ]);
 }
-

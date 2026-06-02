@@ -1,6 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // ─── localId → routeSlug map ─────────────────────────────────────────────────
 // The public/bible/pt-br/acf/ folders use "localIds" (e.g. "ps", "ho", "mk"),
@@ -57,6 +60,7 @@ const CANONICAL_ORIGIN = 'https://www.bibliavive.com.br';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const FB_APP_ID = process.env.VITE_FB_APP_ID || '1035985160869680';
 
 async function fetchPublishedArticles() {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -98,6 +102,7 @@ function generateArticleMetaTags(article) {
     'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
     'OG_TYPE': `<meta property="og:type" content="article" />`,
     'OG_IMAGE': `<meta property="og:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`}" />`,
+    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description.substring(0, 160)}" />
@@ -167,6 +172,7 @@ function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
     'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
     'OG_TYPE': `<meta property="og:type" content="website" />`,
     'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description.substring(0, 160)}" />
@@ -248,6 +254,7 @@ async function prerender() {
     'OG_DESCRIPTION': `<meta property="og:description" content="${planosDescription}" />`,
     'OG_TYPE': `<meta property="og:type" content="website" />`,
     'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${planosTitle}" />
   <meta name="twitter:description" content="${planosDescription}" />
@@ -299,6 +306,7 @@ async function prerender() {
     'OG_DESCRIPTION': `<meta property="og:description" content="${artigosIndexDescription}" />`,
     'OG_TYPE': `<meta property="og:type" content="website" />`,
     'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${artigosIndexTitle}" />
   <meta name="twitter:description" content="${artigosIndexDescription}" />
@@ -327,6 +335,7 @@ async function prerender() {
     'OG_DESCRIPTION': `<meta property="og:description" content="${homeDescription}" />`,
     'OG_TYPE': `<meta property="og:type" content="website" />`,
     'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${homeTitle}" />
   <meta name="twitter:description" content="${homeDescription}" />
