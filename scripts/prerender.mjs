@@ -314,6 +314,31 @@ async function prerender() {
   await fs.writeFile(artigosIndexPath, artigosIndexHtml, 'utf-8');
   console.log('[prerender] ✓ Generated artigos/index.html');
 
+  // Prerender Home (dist/index.html)
+  const homeTitle = 'Bíblia Vive — Leia, Estude e Compartilhe a Bíblia';
+  const homeDescription = 'Leia, estude e compartilhe a Bíblia com comentários, planos de leitura e versículo do dia.';
+  const homeUrl = `${CANONICAL_ORIGIN}/`;
+
+  const homeMetaTags = {
+    'META_TITLE': `<title>${homeTitle}</title>`,
+    'META_DESCRIPTION': `<meta name="description" content="${homeDescription}" />`,
+    'OG_URL': `<meta property="og:url" content="${homeUrl}" />`,
+    'OG_TITLE': `<meta property="og:title" content="${homeTitle}" />`,
+    'OG_DESCRIPTION': `<meta property="og:description" content="${homeDescription}" />`,
+    'OG_TYPE': `<meta property="og:type" content="website" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${homeTitle}" />
+  <meta name="twitter:description" content="${homeDescription}" />
+  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    'CANONICAL_URL': `<link rel="canonical" href="${homeUrl}" />`,
+    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bíblia Vive","url":"${homeUrl}","description":"${homeDescription}","inLanguage":"pt-BR"}</script>`
+  };
+
+  const homeHtml = replacePlaceholders(template, homeMetaTags);
+  await fs.writeFile(templatePath, homeHtml, 'utf-8');
+  console.log('[prerender] ✓ Updated dist/index.html with home meta tags');
+
   const staticUrls = [
     { loc: `${CANONICAL_ORIGIN}/`, priority: '1.0', changefreq: 'daily' },
     { loc: `${CANONICAL_ORIGIN}/planos`, priority: '0.8', changefreq: 'weekly' },
