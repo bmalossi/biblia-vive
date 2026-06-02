@@ -769,12 +769,22 @@ export default function ReadingPage() {
     !selectedBook ||
     (!Number.isNaN(chapterNumber) && (chapterNumber < 1 || chapterNumber > (selectedBook?.chapters ?? 1)));
 
+  const chapterTitle = selectedBook 
+    ? `${selectedBook.name} — Capítulo ${chapterNumber} | ${selectedVersion.toUpperCase()} | Bíblia Vive`
+    : `Livro não encontrado | Bíblia Vive`;
+
+  const versesText = chapterVerses.slice(0, 3).map(v => v.text).join(" ").trim();
+  const chapterDescription = (versesText && versesText.length > 0)
+    ? (versesText.length > 157 ? versesText.substring(0, 157) + "..." : versesText)
+    : `Leia o capítulo ${chapterNumber} do livro de ${selectedBook?.name ?? ""} na versão ${selectedVersion.toUpperCase()} com dezenas de marcações exclusivas. Estudo online grátis.`;
+
   usePageMeta({
-    title: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber} (${selectedVersion.toUpperCase()}) — ${t("app.name")}`,
-    description: `Leia o capítulo ${chapterNumber} do livro de ${selectedBook?.name ?? ""} na versão ${selectedVersion.toUpperCase()} com dezenas de marcações exclusivas. Estudo online grátis.`,
+    title: chapterTitle,
+    description: chapterDescription,
     canonical: `/${selectedVersion}/${selectedBook?.slug ?? "gn"}/${chapterNumber}`,
-    // Invalid routes get noindex so the Googlebot never indexes blank/error pages.
     robots: isInvalidRoute ? "noindex, nofollow" : undefined,
+    ogType: "website",
+    ogImage: "/og-default.png",
     jsonLd: selectedBook && chapterVerses.length > 0 ? [
       {
         "@context": "https://schema.org",

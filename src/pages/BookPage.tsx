@@ -12,7 +12,7 @@ export default function BookPage() {
   const selectedBook = findBookBySlug(book);
   const { t } = useTranslation();
 
-  const title = selectedBook ? `${selectedBook.name} (${selectedVersion.toUpperCase()}) — ${t("app.name")}` : `Livro não encontrado — ${t("app.name")}`;
+  const title = selectedBook ? `${selectedBook.name} | ${selectedVersion.toUpperCase()} | Bíblia Vive` : `Livro não encontrado | Bíblia Vive`;
   const description = selectedBook ? `Leia o livro de ${selectedBook.name} completo na versão ${selectedVersion.toUpperCase()}. São ${selectedBook.chapters} capítulos do ${getTestament(selectedBook)} para seu estudo bíblico online.` : "O livro solicitado não pôde ser encontrado.";
   const robots = selectedBook ? undefined : "noindex, nofollow";
 
@@ -21,6 +21,8 @@ export default function BookPage() {
     description,
     robots,
     canonical: `/${selectedVersion}/${selectedBook?.slug ?? ""}`,
+    ogImage: "/og-default.png",
+    ogType: "website",
     jsonLd: selectedBook ? [
       {
         "@context": "https://schema.org",

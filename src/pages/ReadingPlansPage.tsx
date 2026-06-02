@@ -15,9 +15,11 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 
 export default function ReadingPlansPage() {
     usePageMeta({
-        title: "Planos de Leitura — Bíblia Vive",
+        title: "Planos de Leitura | Bíblia Vive",
         description: "Escolha um plano de leitura bíblica e leia a Bíblia em 30, 90 ou 365 dias. Acompanhe seu progresso diário e mantenha a constância na Palavra.",
         canonical: "/planos",
+        ogImage: "/og-default.png",
+        ogType: "website",
     });
 
     const { t } = useTranslation();

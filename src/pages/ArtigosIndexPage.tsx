@@ -26,13 +26,15 @@ export default function ArtigosIndexPage() {
     const [loading, setLoading] = useState(true);
 
     usePageMeta({
-        title: "Artigos — Bíblia Vive",
+        title: "Artigos Bíblicos | Bíblia Vive",
         description: "Explore artigos e conteúdos sobre a Palavra de Deus.",
         canonical: "/artigos",
+        ogImage: "/og-default.png",
+        ogType: "website",
         jsonLd: {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Artigos — Bíblia Vive",
+            "name": "Artigos Bíblicos | Bíblia Vive",
             "description": "Explore artigos e conteúdos sobre a Palavra de Deus.",
             "url": "https://www.bibliavive.com.br/artigos"
         }

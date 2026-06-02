@@ -274,7 +274,7 @@ export default function SearchPage() {
     description: t("search.searchDescription"),
     robots: hasQuery ? "noindex,follow" : "index,follow",
     title: hasQuery ? `Resultados para '${queryParam}' — ${t("app.name")}` : `${t("nav.search")} | ${t("app.name")}`,
-    type: "website",
+    ogType: "website",
   });
 
   return (

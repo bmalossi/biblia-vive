@@ -77,7 +77,7 @@ export default function HomePage() {
   usePageMeta({
     canonical: "/",
     description: t("home.description"),
-    image: "/og/home.png",
+    ogImage: "/og-default.png",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -94,8 +94,8 @@ export default function HomePage() {
         "query-input": "required name=search_term_string",
       },
     },
-    title: t("home.title"),
-    type: "website",
+    title: "Bíblia Vive — Leia, Estude e Compartilhe a Bíblia",
+    ogType: "website",
   });
 
   return (

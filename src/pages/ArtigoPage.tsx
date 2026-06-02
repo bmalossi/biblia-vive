@@ -67,26 +67,27 @@ export default function ArtigoPage() {
         fetchArticle();
     }, [slug]);
 
-    let title = "Carregando artigo... — Bíblia Vive";
+    let title = "Carregando artigo... | Bíblia Vive";
     let description = "Carregando artigo da Bíblia Vive...";
     let robots = "noindex, follow";
     let canonical = undefined;
     let jsonLd = undefined;
 
     if (error || (!loading && !article)) {
-        title = "Artigo não encontrado — Bíblia Vive";
+        title = "Artigo não encontrado | Bíblia Vive";
         description = "O artigo solicitado não pôde ser encontrado.";
         robots = "noindex, nofollow";
     } else if (article) {
-        title = article.meta_title || `${article.title} — Bíblia Vive`;
+        title = article.meta_title || `${article.title} | Bíblia Vive`;
         description = article.meta_description || article.body?.substring(0, 160).replace(/[#*_`~\[\]]/g, '') || '';
         robots = "index, follow";
+        description = description.substring(0, 160);
         canonical = `/artigos/${article.slug}`;
         jsonLd = {
             "@context": "https://schema.org",
             "@type": "Article",
             "headline": article.title,
-            "description": description.substring(0, 160),
+            "description": description,
             "url": `https://www.bibliavive.com.br/artigos/${article.slug}`
         };
     }
@@ -97,8 +98,11 @@ export default function ArtigoPage() {
         robots,
         canonical,
         jsonLd,
-        image: article?.cover_image_url || undefined,
-        type: "article"
+        ogImage: article?.cover_image_url || "/og-default.png",
+        ogType: "article",
+        articlePublishedTime: article?.published_at || article?.created_at || undefined,
+        articleModifiedTime: article?.published_at || article?.created_at || undefined,
+        articleAuthor: "Bíblia Vive"
     });
 
     if (loading) {

@@ -97,11 +97,11 @@ function generateArticleMetaTags(article) {
     'OG_TITLE': `<meta property="og:title" content="${title}" />`,
     'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
     'OG_TYPE': `<meta property="og:type" content="article" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og/article.png`}" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`}" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description.substring(0, 160)}" />
-  <meta name="twitter:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og/article.png`}" />`,
+  <meta name="twitter:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`}" />`,
     'CANONICAL_URL': `<link rel="canonical" href="${url}" />`,
     'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"${article.title}","description":"${description.substring(0, 160)}","url":"${url}"}</script>`
   };
@@ -138,7 +138,7 @@ async function getAvailableBooks() {
 }
 
 function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
-  const title = `${bookName} ${chapterNum} — ACF | Bíblia Vive`;
+  const title = `${bookName} — Capítulo ${chapterNum} | ACF | Bíblia Vive`;
   const description = verses.slice(0, 3).join(' ');
   // Use the canonical route slug (from books.json) — NOT the localId folder name.
   // e.g. Salmos: folder=ps → routeSlug=sl → URL /acf/sl/27 (not /acf/ps/27)
@@ -165,12 +165,12 @@ function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
     'OG_URL': `<meta property="og:url" content="${url}" />`,
     'OG_TITLE': `<meta property="og:title" content="${title}" />`,
     'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
-    'OG_TYPE': `<meta property="og:type" content="article" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og/bible-chapter.png" />`,
+    'OG_TYPE': `<meta property="og:type" content="website" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description.substring(0, 160)}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og/bible-chapter.png" />`,
+  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     'CANONICAL_URL': `<link rel="canonical" href="${url}" />`,
     'JSON_LD': `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
     'SEO_CONTENT': `<h1>${bookName} ${chapterNum}</h1>` + verses.map((v, i) => `<p><sup>${i + 1}</sup> ${v}</p>`).join('')
@@ -223,7 +223,8 @@ async function prerender() {
       const metaTags = generateMetaTags(bookData.name, book.folder, chapterNum, verses);
       const prerenderedHtml = replacePlaceholders(template, metaTags);
 
-      const outputDir = path.join(DIST_DIR, 'acf', book.folder, String(chapterNum));
+      const routeSlug = toRouteSlug(book.folder);
+      const outputDir = path.join(DIST_DIR, 'acf', routeSlug, String(chapterNum));
       await fs.mkdir(outputDir, { recursive: true });
 
       const outputPath = path.join(outputDir, 'index.html');
@@ -235,7 +236,7 @@ async function prerender() {
 
   console.log(`[prerender] ✓ Generated ${totalChaptersGenerated} chapter HTML files`);
 
-  const planosTitle = 'Planos de Leitura — Bible Vive | Leia a Biblia em 30, 90 ou 365 dias';
+  const planosTitle = 'Planos de Leitura | Bíblia Vive';
   const planosDescription = 'Escolha um plano de leitura biblica e le a Biblia em 30, 90 ou 365 dias. Planos diarios com historico de progresso e sincronizacao entre dispositivos.';
   const planosUrl = `${CANONICAL_ORIGIN}/planos`;
 
@@ -246,11 +247,11 @@ async function prerender() {
     'OG_TITLE': `<meta property="og:title" content="${planosTitle}" />`,
     'OG_DESCRIPTION': `<meta property="og:description" content="${planosDescription}" />`,
     'OG_TYPE': `<meta property="og:type" content="website" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og/planos.png" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${planosTitle}" />
   <meta name="twitter:description" content="${planosDescription}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og/planos.png" />`,
+  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     'CANONICAL_URL': `<link rel="canonical" href="${planosUrl}" />`,
     'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Planos de Leitura","description":"${planosDescription}","url":"${planosUrl}"}</script>`
   };
@@ -286,7 +287,7 @@ async function prerender() {
   console.log(`[prerender] ✓ Generated ${totalArticlesGenerated} article HTML files`);
 
   // Prerender Artigos Index
-  const artigosIndexTitle = 'Artigos — Bíblia Vive';
+  const artigosIndexTitle = 'Artigos Bíblicos | Bíblia Vive';
   const artigosIndexDescription = 'Explore artigos e conteúdos sobre a Palavra de Deus.';
   const artigosIndexUrl = `${CANONICAL_ORIGIN}/artigos`;
 
@@ -297,13 +298,13 @@ async function prerender() {
     'OG_TITLE': `<meta property="og:title" content="${artigosIndexTitle}" />`,
     'OG_DESCRIPTION': `<meta property="og:description" content="${artigosIndexDescription}" />`,
     'OG_TYPE': `<meta property="og:type" content="website" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og/artigos.png" />`,
+    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${artigosIndexTitle}" />
   <meta name="twitter:description" content="${artigosIndexDescription}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og/artigos.png" />`,
+  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     'CANONICAL_URL': `<link rel="canonical" href="${artigosIndexUrl}" />`,
-    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Artigos","description":"${artigosIndexDescription}","url":"${artigosIndexUrl}"}</script>`
+    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Artigos Bíblicos","description":"${artigosIndexDescription}","url":"${artigosIndexUrl}"}</script>`
   };
 
   const artigosIndexHtml = replacePlaceholders(template, artigosIndexMetaTags);
