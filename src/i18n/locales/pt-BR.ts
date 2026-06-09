@@ -213,6 +213,10 @@ const ptBR: TranslationDict = {
    "terms.title": "Termos de Uso – Bibliavive",
    "terms.desc": "Termos de uso do Bibliavive - plataforma de estudo bíblico digital",
 
+   // About Page
+   "about.title": "Sobre o Bíblia Vive — Propósito e E-E-A-T",
+   "about.desc": "Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.",
+
    // My Study Panel (Sprint 14)
    "myStudy.title": "Meu Estudo",
    "myStudy.tabNotes": "Anotações",

@@ -99,7 +99,12 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const { t, locale } = useTranslation();
     const navigate = useNavigate();
     const { isPro } = useSubscription();
-    const { data, loading, error } = useStudyData(bookId, chapter, verse!, version);
+    const currentLang = String(locale).startsWith("pt")
+        ? "pt"
+        : String(locale).startsWith("es")
+            ? "es"
+            : "en";
+    const { data, loading, error } = useStudyData(bookId, chapter, verse!, version, currentLang);
 
     const [activeTab, setActiveTab] = useState<TabId>("context");
     const [isGenerating, setIsGenerating] = useState(false);

@@ -212,6 +212,10 @@ const es: TranslationDict = {
    // Terms Page
    "terms.title": "Términos de Uso – Bibliavive",
    "terms.desc": "Términos de uso de Bibliavive - plataforma de estudio bíblico digital",
+
+   // About Page
+   "about.title": "Sobre Bíblia Vive — Propósito y E-E-A-T",
+   "about.desc": "Entienda la misión de Bíblia Vive: proporcionar estudios y lecturas bíblicas con las mejores traducciones, manteniendo la máxima fidelidad a los textos sagrados clásicos.",
 };
 
 export default es;

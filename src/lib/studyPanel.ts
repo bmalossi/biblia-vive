@@ -37,10 +37,13 @@ export interface BookContext {
 export interface Commentary {
   author: string;
   era: string;
+  tradition?: string;
   work: string;
   year: string;
+  original_language?: string;
   text: string;
   source_url: string | null;
+  isManual?: boolean;
 }
 
 export interface StudyData {
@@ -126,6 +129,51 @@ export async function cacheStudyResponse(
   }
 }
 
+// ─── Comentários Manuais ─────────────────────────────────────────────────────
+
+/**
+ * Busca comentários inseridos manualmente pelo admin na tabela `manual_commentaries`.
+ * Retorna array vazio se não houver nenhum (nunca lança erro).
+ */
+async function getManualCommentaries(
+  bookId: string,
+  chapter: number,
+  verse: number | null | undefined,
+  language: string
+): Promise<Commentary[]> {
+  try {
+    const isChapterLevel = verse === null || verse === undefined || verse === 0;
+    const baseId = isChapterLevel
+      ? `${bookId.toUpperCase()}.${chapter}.ALL`
+      : `${bookId.toUpperCase()}.${chapter}.${verse}`;
+    const questionType = isChapterLevel ? 'chapter_commentary' : 'commentary';
+    const lang = (language || 'pt').toLowerCase();
+
+    const { data, error } = await supabase
+      .from('manual_commentaries')
+      .select('author, era, tradition, work, year, original_language, text, source_url')
+      .eq('verse_id', baseId)
+      .eq('question_type', questionType)
+      .eq('language', lang);
+
+    if (error || !data) return [];
+
+    return data.map((row: any) => ({
+      author:            row.author ?? '',
+      era:               row.era ?? '',
+      tradition:         row.tradition ?? '',
+      work:              row.work ?? '',
+      year:              row.year ?? '',
+      original_language: row.original_language ?? '',
+      text:              row.text ?? '',
+      source_url:        row.source_url ?? null,
+      isManual:          true,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 const QUOTA_STORAGE_KEY = 'bv_commentary_quota';
 
 function persistQuota(response: Response): void {
@@ -198,20 +246,31 @@ export async function requestCommentary(
         throw new Error(result?.error || result?.message || `Erro HTTP ${response.status} na chamada da API`);
       }
 
+      // Busca manuais em paralelo com o parse do resultado da IA
+      let aiCommentaries: Commentary[] = [];
       try {
         const parsed = JSON.parse(result.response || "[]");
-        return {
-          commentaries: Array.isArray(parsed)
-            ? parsed.filter((c: any) => c && typeof c === 'object' && c.author)
-            : Array.isArray(parsed?.commentaries)
-              ? parsed.commentaries.filter((c: any) => c && typeof c === 'object' && c.author)
-              : [],
-          cached: result.cached || false
-        };
+        aiCommentaries = Array.isArray(parsed)
+          ? parsed.filter((c: any) => c && typeof c === 'object' && c.author)
+          : Array.isArray(parsed?.commentaries)
+            ? parsed.commentaries.filter((c: any) => c && typeof c === 'object' && c.author)
+            : [];
       } catch (parseError) {
         console.error("Erro ao fazer parse dos comentários", parseError);
-        return { commentaries: [], cached: false };
       }
+
+      // Merge aditivo: comentários da IA primeiro, manuais depois
+      const manualCommentaries = await getManualCommentaries(
+        params.bookId,
+        params.chapter,
+        params.verse ?? null,
+        params.language ?? 'pt'
+      );
+
+      return {
+        commentaries: [...aiCommentaries, ...manualCommentaries],
+        cached: result.cached || false,
+      };
     })(),
     timeoutPromise
   ]);
@@ -243,23 +302,36 @@ function getChapterHighlight(
   return ctx.chapter_highlights[String(chapter)] ?? null;
 }
 
-// ─── Função principal ─────────────────────────────────────────────────────────
-
 /**
  * Carrega todos os dados do painel de estudo em paralelo.
  * Versículo: bookId="JHN", chapter=3, verse=16, version="acf"
+ *
+ * NOTA: Comentários manuais NÃO são incluídos aqui intencionalmente.
+ * Eles só aparecem após o usuário clicar em "Buscar comentários",
+ * que chama requestCommentary() — o qual faz o merge aditivo com a IA.
+ * Isso garante que o botão de busca sempre seja exibido quando não há
+ * cache de IA, mesmo que existam comentários manuais cadastrados.
  */
 export async function getStudyData(
   bookId: string,
   chapter: number | string,
   verse: number | string,
-  version: string = 'acf'
+  version: string = 'acf',
+  language: string = 'pt'
 ): Promise<StudyData> {
-  const verseId = buildVerseId(bookId, chapter, verse);
+  const baseId = buildVerseId(bookId, chapter, verse);
   const bookIdUpper = bookId.toUpperCase();
+  const lang = (language || 'pt').toLowerCase();
+  const verseId = lang !== 'en' ? `${baseId}:${lang}` : baseId;
 
   // Carregar tudo em paralelo para velocidade máxima
-  const [crossReferences, verseWords, theologicalExplanation, commentaries, bookContexts] = await Promise.all([
+  const [
+    crossReferences,
+    verseWords,
+    theologicalExplanation,
+    commentariesResult,
+    bookContexts,
+  ] = await Promise.all([
     getCrossRefs(bookIdUpper, chapter, verse, version),
     getVerseWords(bookIdUpper, chapter, verse),
     getCachedStudyResponse(verseId, 'explain'),
@@ -267,13 +339,52 @@ export async function getStudyData(
     loadBookContexts(),
   ]);
 
+  // Parse comentários do cache de IA (apenas IA — sem manuais)
+  let aiCommentaries: Commentary[] = [];
+  if (commentariesResult) {
+    if (Array.isArray(commentariesResult)) {
+      aiCommentaries = commentariesResult;
+    } else if (typeof commentariesResult === 'object') {
+      const resObj = commentariesResult as any;
+      if (Array.isArray(resObj.commentaries)) {
+        aiCommentaries = resObj.commentaries;
+      } else if (Array.isArray(resObj.response)) {
+        aiCommentaries = resObj.response;
+      }
+    } else if (typeof commentariesResult === 'string') {
+      try {
+        const parsed = JSON.parse(commentariesResult);
+        aiCommentaries = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed?.commentaries)
+            ? parsed.commentaries
+            : [];
+      } catch {
+        // ignore parse error
+      }
+    }
+  }
+
+  // Se houver cache de IA, mescla com os comentários manuais correspondentes
+  let finalCommentaries: Commentary[] | null = null;
+  if (aiCommentaries.length > 0) {
+    const manualCommentaries = await getManualCommentaries(
+      bookId,
+      Number(chapter),
+      Number(verse),
+      language
+    );
+    finalCommentaries = [...aiCommentaries, ...manualCommentaries];
+  }
+
   return {
     crossReferences,
     bookContext: bookContexts[bookIdUpper] ?? null,
     chapterHighlight: getChapterHighlight(bookContexts, bookIdUpper, chapter),
     verseWords,
     theologicalExplanation,
-    commentaries: Array.isArray(commentaries) ? commentaries : null,
+    // null = nenhum cache de IA → botão "Buscar" aparece no painel
+    commentaries: finalCommentaries,
     isLoadingStudy: false,
   };
 }

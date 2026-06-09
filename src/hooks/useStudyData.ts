@@ -13,7 +13,8 @@ export function useStudyData(
     bookId: string,
     chapter: number,
     verse: number | null,
-    version: string
+    version: string,
+    language: string = "pt"
 ) {
     const [data, setData] = useState<StudyData | null>(null);
     const [loading, setLoading] = useState(false);
@@ -26,11 +27,11 @@ export function useStudyData(
         }
         setLoading(true);
         setError(null);
-        getStudyData(bookId, chapter, verse, version)
+        getStudyData(bookId, chapter, verse, version, language)
             .then(setData)
             .catch(() => setError("Não foi possível carregar os dados de estudo."))
             .finally(() => setLoading(false));
-    }, [bookId, chapter, verse, version]);
+    }, [bookId, chapter, verse, version, language]);
 
     return { data, loading, error };
 }

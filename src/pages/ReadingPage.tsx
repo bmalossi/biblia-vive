@@ -249,7 +249,7 @@ export default function ReadingPage() {
       });
   }, []);
 
-  // Pre-load chapter commentary if cached
+  // Pre-load chapter commentary (AI cache + manual commentaries merged)
   useEffect(() => {
     if (!selectedBook) return;
     setCachedChapterCommentary(null); // Reset when chapter changes
@@ -260,17 +260,59 @@ export default function ReadingPage() {
         const lang = String(locale).startsWith("pt") ? "pt" : "en";
         const baseId = `${selectedBook.id.toUpperCase()}.${chapterNumber}.ALL`;
         const verseId = lang !== 'en' ? `${baseId}:${lang}` : baseId;
-        const { data } = await supabase
-          .from('ai_study_cache')
-          .select('response')
-          .eq('verse_id', verseId)
-          .eq('question_type', 'chapter_commentary')
-          .maybeSingle();
 
-        if (isMounted && data?.response && data.response !== "[]") {
-          setCachedChapterCommentary(data.response);
+        // Busca em paralelo: cache de IA + manuais
+        const [aiResult, manualResult] = await Promise.all([
+          supabase
+            .from('ai_study_cache')
+            .select('response')
+            .eq('verse_id', verseId)
+            .eq('question_type', 'chapter_commentary')
+            .maybeSingle(),
+          supabase
+            .from('manual_commentaries')
+            .select('author, era, tradition, work, year, original_language, text, source_url')
+            .eq('verse_id', baseId)
+            .eq('question_type', 'chapter_commentary')
+            .eq('language', lang),
+        ]);
+
+        if (!isMounted) return;
+
+        // Parse comentários da IA
+        let aiCommentaries: any[] = [];
+        if (aiResult.data?.response && aiResult.data.response !== "[]") {
+          try {
+            const parsed = JSON.parse(aiResult.data.response);
+            aiCommentaries = Array.isArray(parsed)
+              ? parsed
+              : Array.isArray(parsed?.commentaries)
+                ? parsed.commentaries
+                : [];
+          } catch {
+            // ignora parse error
+          }
         }
-      } catch (err) {
+
+        // Formata manuais
+        const manualCommentaries = (manualResult.data ?? []).map((row: any) => ({
+          author:            row.author ?? '',
+          era:               row.era ?? '',
+          tradition:         row.tradition ?? '',
+          work:              row.work ?? '',
+          year:              row.year ?? '',
+          original_language: row.original_language ?? '',
+          text:              row.text ?? '',
+          source_url:        row.source_url ?? null,
+          isManual:          true,
+        }));
+
+        // Apenas exibe os comentários mesclados se já existir comentário gerado pela IA (evita mostrar apenas manuais antes da busca da IA)
+        if (aiCommentaries.length > 0) {
+          const merged = [...aiCommentaries, ...manualCommentaries];
+          setCachedChapterCommentary(JSON.stringify(merged));
+        }
+      } catch {
         // Silently ignore cache check failures
       }
     };

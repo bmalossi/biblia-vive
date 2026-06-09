@@ -21,6 +21,7 @@ const ReadingPlansPage = lazy(() => import("./pages/ReadingPlansPage"));
 const SharePage = lazy(() => import("./pages/SharePage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AdminArtigosPage = lazy(() => import("./pages/AdminArtigosPage"));
+const AdminComentariosPage = lazy(() => import("./pages/AdminComentariosPage"));
 const WidgetDailyVerse = lazy(() => import("./pages/WidgetDailyVerse"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ProSuccessPage = lazy(() => import("./pages/ProSuccessPage"));
@@ -76,6 +77,7 @@ const App = () => (
                 <Route path="/compartilhar" element={<SharePage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/artigos" element={<AdminArtigosPage />} />
+                <Route path="/admin/comentarios" element={<AdminComentariosPage />} />
                 <Route path="/pro" element={<PricingPage />} />
                 <Route path="/pro/success" element={<ProSuccessPage />} />
                 <Route path="/widget/daily" element={<WidgetDailyVerse />} />
