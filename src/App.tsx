@@ -33,6 +33,7 @@ const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage"));
 const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ArtigoPage = lazy(() => import("./pages/ArtigoPage"));
 const ArtigosIndexPage = lazy(() => import("./pages/ArtigosIndexPage"));
+const HowToPage = lazy(() => import("./pages/HowToPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,6 +90,7 @@ const App = () => (
                 <Route path="/artigos" element={<ArtigosIndexPage />} />
                 <Route path="/artigos/:slug" element={<ArtigoPage />} />
                 <Route path="/meu-estudo" element={<MyStudyPage />} />
+                <Route path="/como-usar" element={<HowToPage />} />
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

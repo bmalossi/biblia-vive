@@ -25,6 +25,7 @@ import { getVersion, getTheme, type Theme } from "@/lib/themes";
 import {
   BookOpen,
   Clock3,
+  HelpCircle,
   Loader2,
   LogIn,
   LogOut,
@@ -415,6 +416,16 @@ export default function Header() {
         </div>
 
         {/* ── RIGHT: Controls ─────────────────────────────────────────────── */}
+        {/* Como usar — desktop link, right of search bar */}
+        <Link
+          to="/como-usar"
+          className="hidden lg:inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-app-surface px-3 py-1.5 text-xs font-medium text-app-text-muted transition-colors hover:bg-app-raised hover:text-app-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          aria-label="Como usar o Bíblia Vive"
+        >
+          <HelpCircle className="h-3.5 w-3.5" />
+          Como usar
+        </Link>
+
         <div className="flex flex-shrink-0 items-center gap-2">
 
           {/* PRO badge or CTA — visible from md: */}
@@ -613,6 +624,20 @@ export default function Header() {
                     {item.label}
                   </NavLink>
                 ))}
+                {/* Como usar — mobile drawer */}
+                <NavLink
+                  to="/como-usar"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                      ? "bg-app-raised text-app-text"
+                      : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                    }`
+                  }
+                >
+                  <HelpCircle className="h-4 w-4 flex-shrink-0" />
+                  Como usar
+                </NavLink>
                 {userRole === "admin" && (
                   <NavLink
                     to="/admin"
