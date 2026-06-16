@@ -15,6 +15,7 @@ interface HarpaHymnEntry {
   tituloFormatado: string;
   estrofes: number;
   hasAudio: boolean;
+  audioFile: string | null;
 }
 
 function toTitleCase(title: string): string {
@@ -33,7 +34,7 @@ function toTitleCase(title: string): string {
 
 const BASE_URL = 'https://audio.bibliavive.com.br/harpas';
 
-async function checkAudioExists(numero: number, rawTitle: string): Promise<boolean> {
+async function checkAudioExists(numero: number, rawTitle: string): Promise<string | null> {
   const numStr = String(numero).padStart(3, "0");
   const formattedTitle = toTitleCase(rawTitle);
 
@@ -53,13 +54,13 @@ async function checkAudioExists(numero: number, rawTitle: string): Promise<boole
     try {
       const response = await fetch(testUrl, { method: 'HEAD' });
       if (response.ok) {
-        return true;
+        return candidate;
       }
     } catch (err) {
       // ignore and try next candidate
     }
   }
-  return false;
+  return null;
 }
 
 async function run() {
@@ -72,7 +73,7 @@ async function run() {
 
     console.log(`Found ${numericDirs.length} hymn directories.`);
 
-    const tempHymns: Omit<HarpaHymnEntry, 'hasAudio'>[] = [];
+    const tempHymns: Omit<HarpaHymnEntry, 'hasAudio' | 'audioFile'>[] = [];
 
     for (const numero of numericDirs) {
       const dirPath = path.join(HARPA_DIR, String(numero));
@@ -125,8 +126,8 @@ async function run() {
       const batch = tempHymns.slice(i, i + concurrencyLimit);
       const batchResults = await Promise.all(
         batch.map(async (hymn) => {
-          const hasAudio = await checkAudioExists(hymn.numero, hymn.titulo);
-          return { ...hymn, hasAudio };
+          const audioFile = await checkAudioExists(hymn.numero, hymn.titulo);
+          return { ...hymn, hasAudio: audioFile !== null, audioFile };
         })
       );
       hymns.push(...batchResults);

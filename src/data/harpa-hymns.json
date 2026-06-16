@@ -4,4353 +4,4975 @@
     "titulo": "CHUVAS DE GRAÇA",
     "tituloFormatado": "Chuvas de Graça",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "001 - Chuva de Graça.mp3"
   },
   {
     "numero": 2,
     "titulo": "SAUDOSA LEMBRANÇA",
     "tituloFormatado": "Saudosa Lembrança",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "002 - Saudosa Lembrança.mp3"
   },
   {
     "numero": 3,
     "titulo": "PLENA PAZ",
     "tituloFormatado": "Plena Paz",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "003 - Plena Paz.mp3"
   },
   {
     "numero": 4,
     "titulo": "DEUS VELARÁ POR TI",
     "tituloFormatado": "Deus Velará por Ti",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 5,
     "titulo": "Ó DESCE, FOGO SANTO",
     "tituloFormatado": "Ó Desce, Fogo Santo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 6,
     "titulo": "NA MALDIÇÃO DA CRUZ",
     "tituloFormatado": "Na Maldição da Cruz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 7,
     "titulo": "CRISTO CURA, SIM!",
     "tituloFormatado": "Cristo Cura, Sim!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 8,
     "titulo": "CRISTO, O FIEL AMIGO",
     "tituloFormatado": "Cristo, o Fiel Amigo",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 9,
     "titulo": "MARCHAI, SOLDADOS DE CRISTO",
     "tituloFormatado": "Marchai, Soldados de Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 10,
     "titulo": "EU TE LOUVO",
     "tituloFormatado": "Eu Te Louvo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 11,
     "titulo": "Ó CRISTÃO, EIA AVANTE",
     "tituloFormatado": "Ó Cristão, Eia Avante",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 12,
     "titulo": "VEM JÁ, PECADOR",
     "tituloFormatado": "Vem Já, Pecador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 13,
     "titulo": "JESUS COMPROU-ME",
     "tituloFormatado": "Jesus Comprou-me",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 14,
     "titulo": "GOZO EM JESUS",
     "tituloFormatado": "Gozo em Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 15,
     "titulo": "CONVERSÃO",
     "tituloFormatado": "Conversão",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "015 - Conversão.mp3"
   },
   {
     "numero": 16,
     "titulo": "DESPERTAR PARA O TRABALHO",
     "tituloFormatado": "Despertar para o Trabalho",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 17,
     "titulo": "PENSANDO EM JESUS",
     "tituloFormatado": "Pensando em Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 18,
     "titulo": "GRATA NOVA",
     "tituloFormatado": "Grata Nova",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 19,
     "titulo": "O CONVITE DE CRISTO",
     "tituloFormatado": "O Convite de Cristo",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 20,
     "titulo": "OLHAI P'RA O CORDEIRO DE DEUS",
     "tituloFormatado": "Olhai p'ra o Cordeiro de Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 21,
     "titulo": "GLORIOSA AURORA",
     "tituloFormatado": "Gloriosa Aurora",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 22,
     "titulo": "CEIA DO SENHOR",
     "tituloFormatado": "Ceia do Senhor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 23,
     "titulo": "GLÓRIA A JESUS",
     "tituloFormatado": "Glória a Jesus",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 24,
     "titulo": "PODER PENTECOSTAL",
     "tituloFormatado": "Poder Pentecostal",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 25,
     "titulo": "JESUS, TU ÉS BOM",
     "tituloFormatado": "Jesus, Tu És Bom",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 26,
     "titulo": "A FORMOSA JERUSALEM",
     "tituloFormatado": "A Formosa Jerusalem",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 27,
     "titulo": "AMOR QUE VENCE",
     "tituloFormatado": "Amor Que Vence",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 28,
     "titulo": "DEUS VAI TE GUIAR",
     "tituloFormatado": "Deus Vai Te Guiar",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 29,
     "titulo": "O PRECIOSO SANGUE",
     "tituloFormatado": "O Precioso Sangue",
     "estrofes": 8,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 30,
     "titulo": "NÃO SOU MEU",
     "tituloFormatado": "Não Sou Meu",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 31,
     "titulo": "GLORIA AO MEU JESUS",
     "tituloFormatado": "Gloria Ao Meu Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 32,
     "titulo": "MEU CRISTO! MEU CRISTO!",
     "tituloFormatado": "Meu Cristo! Meu Cristo!",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 33,
     "titulo": "COM TUA MÃO SEGURA",
     "tituloFormatado": "Com Tua Mão Segura",
     "estrofes": 5,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "033 - Com Tua Mão Segura.mp3"
   },
   {
     "numero": 34,
     "titulo": "MILÍCIA DE JESUS",
     "tituloFormatado": "Milícia de Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 35,
     "titulo": "O GRANDE AMOR",
     "tituloFormatado": "O Grande Amor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 36,
     "titulo": "O EXILADO",
     "tituloFormatado": "O Exilado",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 37,
     "titulo": "CRISTO P'RA MIM",
     "tituloFormatado": "Cristo p'ra Mim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 38,
     "titulo": "O SENHOR E REI",
     "tituloFormatado": "O Senhor e Rei",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 39,
     "titulo": "ALVO MAIS QUE A NEVE",
     "tituloFormatado": "Alvo Mais Que a Neve",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "039 - Alvo Mais Que a Neve.mp3"
   },
   {
     "numero": 40,
     "titulo": "A CIDADE DO BOM DEUS",
     "tituloFormatado": "A Cidade do Bom Deus",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 41,
     "titulo": "A CRISTO COROAI",
     "tituloFormatado": "A Cristo Coroai",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 42,
     "titulo": "SAUDAI JESUS",
     "tituloFormatado": "Saudai Jesus",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "042 - Saudai Jesus.mp3"
   },
   {
     "numero": 43,
     "titulo": "DOCE LAR",
     "tituloFormatado": "Doce Lar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 44,
     "titulo": "OH! OUE GLÓRIA!",
     "tituloFormatado": "Oh! Oue Glória!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 45,
     "titulo": "REDENTOR ONIPOTENTE",
     "tituloFormatado": "Redentor Onipotente",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 46,
     "titulo": "UM PENDÃO REAL",
     "tituloFormatado": "Um Pendão Real",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "046 - Um Pendão Real.mp3"
   },
   {
     "numero": 47,
     "titulo": "ROCHA ETERNA",
     "tituloFormatado": "Rocha Eterna",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "047 - Rocha Eterna.mp3"
   },
   {
     "numero": 48,
     "titulo": "O DIA DO TRIUNFO DE JESUS",
     "tituloFormatado": "O Dia do Triunfo de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 50,
     "titulo": "SEMPRE FIÉIS",
     "tituloFormatado": "Sempre Fiéis",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 51,
     "titulo": "ADORAÇÃO RECONHECIDA",
     "tituloFormatado": "Adoração Reconhecida",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 52,
     "titulo": "TUDO ESTÁ BEM",
     "tituloFormatado": "Tudo Está Bem",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 53,
     "titulo": "A ESPERANÇA DA IGREJA",
     "tituloFormatado": "A Esperança da Igreja",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 54,
     "titulo": "LOUVEMOS AO REDENTOR",
     "tituloFormatado": "Louvemos Ao Redentor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 55,
     "titulo": "MA!S PERTO DA TUA CRUZ",
     "tituloFormatado": "Ma!s Perto da Tua Cruz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 56,
     "titulo": "TUDO EM CRISTO",
     "tituloFormatado": "Tudo em Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 57,
     "titulo": "VIVIFICA-NOS, SENHOR",
     "tituloFormatado": "Vivifica-nos, Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 58,
     "titulo": "NÃO TEMAS",
     "tituloFormatado": "Não Temas",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 60,
     "titulo": "EXULTAÇÃO DO CRENTE",
     "tituloFormatado": "Exultação do Crente",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 61,
     "titulo": "DEUS TOMARÁ CONTA DE TI",
     "tituloFormatado": "Deus Tomará Conta de Ti",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 62,
     "titulo": "ACHEI JESUS",
     "tituloFormatado": "Achei Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 63,
     "titulo": "ACORDAI, ACORDAI",
     "tituloFormatado": "Acordai, Acordai",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 65,
     "titulo": "QUEM IRÁ?",
     "tituloFormatado": "Quem Irá?",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 66,
     "titulo": "PRONTO A SALVAR",
     "tituloFormatado": "Pronto a Salvar",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 67,
     "titulo": "OUEM QUER IR COM CRISTO?",
     "tituloFormatado": "Ouem Quer Ir com Cristo?",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 68,
     "titulo": "GOZO DE TER SALVAÇÃO",
     "tituloFormatado": "Gozo de Ter Salvação",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 69,
     "titulo": "JESUS QUEBROU OS MEUS GRILHÕES",
     "tituloFormatado": "Jesus Quebrou os Meus Grilhões",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 70,
     "titulo": "CRISTO JESUS VAI VOLTAR",
     "tituloFormatado": "Cristo Jesus Vai Voltar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 71,
     "titulo": "SANTO ÉS TU SENHOR",
     "tituloFormatado": "Santo És Tu Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 72,
     "titulo": "RASGOU-SE O VÉU",
     "tituloFormatado": "Rasgou-se o Véu",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 73,
     "titulo": "VEM, VEM A MIM",
     "tituloFormatado": "Vem, Vem a Mim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 74,
     "titulo": "CRISTO VIRÁ",
     "tituloFormatado": "Cristo Virá",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 75,
     "titulo": "EM JESUS TENS A PALMA DA VITÓRIA",
     "tituloFormatado": "Em Jesus Tens a Palma da Vitória",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 76,
     "titulo": "VEM, Ó PRÓDIGO",
     "tituloFormatado": "Vem, Ó Pródigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 77,
     "titulo": "GUARDA O CONTACTO",
     "tituloFormatado": "Guarda o Contacto",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 78,
     "titulo": "MEU FORTE REDENTOR",
     "tituloFormatado": "Meu Forte Redentor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 79,
     "titulo": "SUA GRAÇA ME BASTA",
     "tituloFormatado": "Sua Graça Me Basta",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 80,
     "titulo": "CRISTO TE CHAMA",
     "tituloFormatado": "Cristo Te Chama",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 81,
     "titulo": "PODE SALVAR",
     "tituloFormatado": "Pode Salvar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 82,
     "titulo": "UM MEIGO SALVADOR",
     "tituloFormatado": "Um Meigo Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 83,
     "titulo": "NÃO POSSO EXPLICAR",
     "tituloFormatado": "Não Posso Explicar",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 85,
     "titulo": "DEIXAI ENTRAR O ESPÍRITO DE DEUS",
     "tituloFormatado": "Deixai Entrar o Espírito de Deus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 86,
     "titulo": "SATISFEITO COM CRISTO",
     "tituloFormatado": "Satisfeito com Cristo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 87,
     "titulo": "MEU TESTEMUNHO",
     "tituloFormatado": "Meu Testemunho",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 88,
     "titulo": "REVELA A NÓS, SENHOR",
     "tituloFormatado": "Revela a Nós, Senhor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 89,
     "titulo": "SUBLIME E GRANDE AMOR",
     "tituloFormatado": "Sublime e Grande Amor",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 90,
     "titulo": "HÁ PAZ E ALEGRIA",
     "tituloFormatado": "Há Paz e Alegria",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 91,
     "titulo": "NÍVEA LUZ",
     "tituloFormatado": "Nívea Luz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 92,
     "titulo": "O BONDOSO SALVADOR",
     "tituloFormatado": "O Bondoso Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 93,
     "titulo": "HÁ TRABALHO PRONTO",
     "tituloFormatado": "Há Trabalho Pronto",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 94,
     "titulo": "NA JERUSALÉM DE DEUS",
     "tituloFormatado": "Na Jerusalém de Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 95,
     "titulo": "OUVE, Ó PECADOR",
     "tituloFormatado": "Ouve, Ó Pecador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 96,
     "titulo": "DEIXA PENETRAR A LUZ",
     "tituloFormatado": "Deixa Penetrar a Luz",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 97,
     "titulo": "HÁ UM CAMINHO SANTO",
     "tituloFormatado": "Há Um Caminho Santo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 98,
     "titulo": "ESTARÁS VIGIANDO?",
     "tituloFormatado": "Estarás Vigiando?",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 99,
     "titulo": "EIS O DIA A DECLINAR",
     "tituloFormatado": "Eis o Dia a Declinar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 100,
     "titulo": "O BOM CONSOLADOR",
     "tituloFormatado": "O Bom Consolador",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 101,
     "titulo": "A UNÇÃO REAL",
     "tituloFormatado": "A Unção Real",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 102,
     "titulo": "CRÉ NA PROMESSA",
     "tituloFormatado": "Cré Na Promessa",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 103,
     "titulo": "CAMINHEMOS NA LUZ",
     "tituloFormatado": "Caminhemos Na Luz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 104,
     "titulo": "JESUS PROCURA A OVELHA",
     "tituloFormatado": "Jesus Procura a Ovelha",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 105,
     "titulo": "A GLORIOSA ESPERANÇA",
     "tituloFormatado": "A Gloriosa Esperança",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 106,
     "titulo": "VIVA CRISTO",
     "tituloFormatado": "Viva Cristo",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 107,
     "titulo": "FIRME NAS PROMESSAS",
     "tituloFormatado": "Firme Nas Promessas",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 108,
     "titulo": "PELEJAR POR JESUS",
     "tituloFormatado": "Pelejar por Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 109,
     "titulo": "VENHA AJESUS",
     "tituloFormatado": "Venha Ajesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 111,
     "titulo": "QUE MUDANÇA!",
     "tituloFormatado": "Que Mudança!",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 112,
     "titulo": "O NOME SOBERANO",
     "tituloFormatado": "O Nome Soberano",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 113,
     "titulo": "O CELESTE DIRETOR",
     "tituloFormatado": "O Celeste Diretor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 114,
     "titulo": "ACEITA O PERDAO DE JESUS",
     "tituloFormatado": "Aceita o Perdao de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 115,
     "titulo": "TRABALHAI E ORAI",
     "tituloFormatado": "Trabalhai e Orai",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "115 - Trabalhai e Orai.mp3"
   },
   {
     "numero": 116,
     "titulo": "LIVRE ESTOU",
     "tituloFormatado": "Livre Estou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 117,
     "titulo": "O SENHOR SALVA A TODO O PECADOR",
     "tituloFormatado": "O Senhor Salva a Todo o Pecador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 118,
     "titulo": "FACE A FACE",
     "tituloFormatado": "Face a Face",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 119,
     "titulo": "INESGOTAVEL E SEU AMOR",
     "tituloFormatado": "Inesgotavel e Seu Amor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 120,
     "titulo": "NOITE DE PAZ",
     "tituloFormatado": "Noite de Paz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 121,
     "titulo": "MARAVILHOSO E JESUS",
     "tituloFormatado": "Maravilhoso e Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 122,
     "titulo": "FOGO DIVINO",
     "tituloFormatado": "Fogo Divino",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 123,
     "titulo": "CRISTO VOLTARA",
     "tituloFormatado": "Cristo Voltara",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 124,
     "titulo": "ADORAÇÃO",
     "tituloFormatado": "Adoração",
     "estrofes": 7,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 125,
     "titulo": "QUEM DERA HOJE VIR!",
     "tituloFormatado": "Quem Dera Hoje Vir!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 126,
     "titulo": "BEM-AVENTURANÇA DO CRENTE",
     "tituloFormatado": "Bem-aventurança do Crente",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 127,
     "titulo": "O SENHOR DA CEIFA CHAMA",
     "tituloFormatado": "O Senhor da Ceifa Chama",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "127 - O Senhor da Ceifa Chama.mp3"
   },
   {
     "numero": 128,
     "titulo": "ENTREGA TEU CORAÇÃO",
     "tituloFormatado": "Entrega Teu Coração",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 129,
     "titulo": "A FONTE SALVADORA",
     "tituloFormatado": "A Fonte Salvadora",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 130,
     "titulo": "CRISTO É MEU!",
     "tituloFormatado": "Cristo É Meu!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 131,
     "titulo": "DE VALOR EM VALOR",
     "tituloFormatado": "De Valor em Valor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 132,
     "titulo": "OBREIROS DO SENHOR",
     "tituloFormatado": "Obreiros do Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 133,
     "titulo": "NO ROL DO LIVRO",
     "tituloFormatado": "No Rol do Livro",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 134,
     "titulo": "JESUS À PORTA DO CORAÇÃO",
     "tituloFormatado": "Jesus À Porta do Coração",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 135,
     "titulo": "O NOME PRECIOSO",
     "tituloFormatado": "O Nome Precioso",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 136,
     "titulo": "JESUS, NOSSO SOCORRO",
     "tituloFormatado": "Jesus, Nosso Socorro",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 137,
     "titulo": "LIBERTO DA ESCRAVIDÃO",
     "tituloFormatado": "Liberto da Escravidão",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 138,
     "titulo": "OUEM BATE É JESUS CRISTO",
     "tituloFormatado": "Ouem Bate É Jesus Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 139,
     "titulo": "JESUS, MEU ETERNO REDENTOR",
     "tituloFormatado": "Jesus, Meu Eterno Redentor",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 140,
     "titulo": "A SEGURANÇA DO CRENTE",
     "tituloFormatado": "A Segurança do Crente",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 141,
     "titulo": "GUIA-ME SEMPRE, MEU SENHOR",
     "tituloFormatado": "Guia-me Sempre, Meu Senhor",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "141 - Guia-me Sempre, Meu Senhor.mp3"
   },
   {
     "numero": 142,
     "titulo": "A CIDADE CELESTE",
     "tituloFormatado": "A Cidade Celeste",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 143,
     "titulo": "O VERDADEIRO AMIGO",
     "tituloFormatado": "O Verdadeiro Amigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 144,
     "titulo": "VEM À ASSEMBLEIA DE DEUS",
     "tituloFormatado": "Vem À Assembleia de Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 145,
     "titulo": "UNIÃO DO CRENTE COM SEU SENHOR",
     "tituloFormatado": "União do Crente com Seu Senhor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 146,
     "titulo": "CAMINHO BRILHANTE",
     "tituloFormatado": "Caminho Brilhante",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 147,
     "titulo": "SERVIR A JESUS",
     "tituloFormatado": "Servir a Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 148,
     "titulo": "BENDIREI A JESUS",
     "tituloFormatado": "Bendirei a Jesus",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 149,
     "titulo": "CANTO DO PESCADOR",
     "tituloFormatado": "Canto do Pescador",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 150,
     "titulo": "PARA CASAMENTOS",
     "tituloFormatado": "Para Casamentos",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 151,
     "titulo": "FALA, JESUS QUERIDO",
     "tituloFormatado": "Fala, Jesus Querido",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 152,
     "titulo": "PELA CRUZ AO CÉU IREI",
     "tituloFormatado": "Pela Cruz Ao Céu Irei",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 153,
     "titulo": "SOLDADOS DE CRISTO",
     "tituloFormatado": "Soldados de Cristo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 154,
     "titulo": "DOCE NOME DE JESUS",
     "tituloFormatado": "Doce Nome de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 155,
     "titulo": "IMPLORAMOS TEU PODER",
     "tituloFormatado": "Imploramos Teu Poder",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 156,
     "titulo": "A OVELHA PERDIDA",
     "tituloFormatado": "A Ovelha Perdida",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "156 - A Ovelha Perdida.mp3"
   },
   {
     "numero": 157,
     "titulo": "CRISTO, EM BREVE, VEM!",
     "tituloFormatado": "Cristo, em Breve, Vem!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 158,
     "titulo": "QUE FARÁS DE JESUS CRISTO?",
     "tituloFormatado": "Que Farás de Jesus Cristo?",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 159,
     "titulo": "CANTAI, O PEREGRINOS",
     "tituloFormatado": "Cantai, o Peregrinos",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 160,
     "titulo": "DEUS NOS OUIS SALVAR",
     "tituloFormatado": "Deus Nos Ouis Salvar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 161,
     "titulo": "NAVEGANDO P'RA TERRA CELESTE",
     "tituloFormatado": "Navegando p'ra Terra Celeste",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 162,
     "titulo": "O ESTANDARTE DA VERDADE",
     "tituloFormatado": "O Estandarte da Verdade",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 163,
     "titulo": "CRISTO MORREU POR MIM",
     "tituloFormatado": "Cristo Morreu por Mim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 164,
     "titulo": "PAZ, LUZ E AMOR",
     "tituloFormatado": "Paz, Luz e Amor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 165,
     "titulo": "A ARMADURA CRISTÃ",
     "tituloFormatado": "A Armadura Cristã",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 166,
     "titulo": "DEIXA ENTRAR O REI DA GLORIA",
     "tituloFormatado": "Deixa Entrar o Rei da Gloria",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 167,
     "titulo": "AS TESTEMUNHAS DE JESUS",
     "tituloFormatado": "As Testemunhas de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 168,
     "titulo": "MEUS IRMÃOS, NOS JUBILEMOS",
     "tituloFormatado": "Meus Irmãos, Nos Jubilemos",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 169,
     "titulo": "JESUS ME AMA",
     "tituloFormatado": "Jesus Me Ama",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "169 - Jesus Me Ama.mp3"
   },
   {
     "numero": 170,
     "titulo": "AO CALVÁRIO DE HORROR",
     "tituloFormatado": "Ao Calvário de Horror",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 171,
     "titulo": "UM PECADOR REMIDO",
     "tituloFormatado": "Um Pecador Remido",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "171 - Um Pecador Remido.mp3"
   },
   {
     "numero": 172,
     "titulo": "Ó VEM TE ENTREGAR",
     "tituloFormatado": "Ó Vem Te Entregar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 173,
     "titulo": "OS SANTOS LOUVAM AO SENHOR",
     "tituloFormatado": "Os Santos Louvam Ao Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 174,
     "titulo": "GLÓRIA, ALELUIA",
     "tituloFormatado": "Glória, Aleluia",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 175,
     "titulo": "IRMÃOS AMADOS",
     "tituloFormatado": "Irmãos Amados",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "175 - Irmão Amados.mp3"
   },
   {
     "numero": 176,
     "titulo": "SACERDOTES DO SENHOR",
     "tituloFormatado": "Sacerdotes do Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 177,
     "titulo": "SALVO ESTOU",
     "tituloFormatado": "Salvo Estou",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 178,
     "titulo": "GLORIOSA PAZ",
     "tituloFormatado": "Gloriosa Paz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 179,
     "titulo": "REDENTOR FORMOSO",
     "tituloFormatado": "Redentor Formoso",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 180,
     "titulo": "EM CRISTO FRUIMOS A PAZ",
     "tituloFormatado": "Em Cristo Fruimos a Paz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 181,
     "titulo": "VEM, CELESTE REDENTOR",
     "tituloFormatado": "Vem, Celeste Redentor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 182,
     "titulo": "JESUS NO GETSÉMANE",
     "tituloFormatado": "Jesus No Getsémane",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 183,
     "titulo": "RESSUSCITOU!",
     "tituloFormatado": "Ressuscitou!",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 184,
     "titulo": "MEU JESUS! MEU JESUS!",
     "tituloFormatado": "Meu Jesus! Meu Jesus!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 185,
     "titulo": "INVOCAÇÃO E LOUVOR",
     "tituloFormatado": "Invocação e Louvor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 186,
     "titulo": "DE VALOR EM VALOR",
     "tituloFormatado": "De Valor em Valor",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "186 - De Valor em Valor.mp3"
   },
   {
     "numero": 187,
     "titulo": "MAIS PERTO, MEU DEUS, DE TI!",
     "tituloFormatado": "Mais Perto, Meu Deus, de Ti!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 188,
     "titulo": "O GOZO DO CEU",
     "tituloFormatado": "O Gozo do Ceu",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 189,
     "titulo": "GLORIA AO SALVADOR",
     "tituloFormatado": "Gloria Ao Salvador",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 190,
     "titulo": "CRISTO! MEU CRISTO!",
     "tituloFormatado": "Cristo! Meu Cristo!",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 191,
     "titulo": "O MEU JESUS",
     "tituloFormatado": "O Meu Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 192,
     "titulo": "PELO SANGUE",
     "tituloFormatado": "Pelo Sangue",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 193,
     "titulo": "A ALMA ABATIDA",
     "tituloFormatado": "A Alma Abatida",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "193 - A Alma Abatida.mp3"
   },
   {
     "numero": 194,
     "titulo": "JESUS ME GUIARÁ",
     "tituloFormatado": "Jesus Me Guiará",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 195,
     "titulo": "BENIGNO SALVADOR",
     "tituloFormatado": "Benigno Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 196,
     "titulo": "UMA FLOR GLORIOSA",
     "tituloFormatado": "Uma Flor Gloriosa",
     "estrofes": 2,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "196 - Uma Flor Gloriosa.mp3"
   },
   {
     "numero": 197,
     "titulo": "O LAR DA GLÓRIA",
     "tituloFormatado": "O Lar da Glória",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 198,
     "titulo": "JESUS, O BOM AMIGO",
     "tituloFormatado": "Jesus, o Bom Amigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 199,
     "titulo": "A CEIA DO SENHOR",
     "tituloFormatado": "A Ceia do Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 200,
     "titulo": "O BONDOSO AMIGO",
     "tituloFormatado": "O Bondoso Amigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 201,
     "titulo": "A DECISÃO",
     "tituloFormatado": "A Decisão",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 202,
     "titulo": "LUGAR DE DELÍCIAS",
     "tituloFormatado": "Lugar de Delícias",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 203,
     "titulo": "DEIXAI AS ILUSÕES",
     "tituloFormatado": "Deixai as Ilusões",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 204,
     "titulo": "O PEREGRINO NA TERRA",
     "tituloFormatado": "O Peregrino Na Terra",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 205,
     "titulo": "GRAÇA, GRAÇA",
     "tituloFormatado": "Graça, Graça",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 206,
     "titulo": "O CLARIM NOS ALERTA",
     "tituloFormatado": "O Clarim Nos Alerta",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 207,
     "titulo": "JERUSALEM DIVINA",
     "tituloFormatado": "Jerusalem Divina",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 208,
     "titulo": "VEM A CRISTO",
     "tituloFormatado": "Vem a Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 209,
     "titulo": "A VOZ DO BOM PASTOR",
     "tituloFormatado": "A Voz do Bom Pastor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 210,
     "titulo": "FALA, FALA, SENHOR",
     "tituloFormatado": "Fala, Fala, Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 211,
     "titulo": "VEM A DEUS",
     "tituloFormatado": "Vem a Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 212,
     "titulo": "OS GUERREIROS SE PREPARAM",
     "tituloFormatado": "Os Guerreiros Se Preparam",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "212 - Os Guerreiros Se Preparam.mp3"
   },
   {
     "numero": 213,
     "titulo": "SOBRE A TERRA VOU ANDANDO",
     "tituloFormatado": "Sobre a Terra Vou Andando",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 214,
     "titulo": "DESEJAMOS IR LÁ",
     "tituloFormatado": "Desejamos Ir Lá",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "214 - Desejamos Ir Lá.mp3"
   },
   {
     "numero": 215,
     "titulo": "VER-NOS-EMOS",
     "tituloFormatado": "Ver-nos-emos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 216,
     "titulo": "LOUVAI A DEUS",
     "tituloFormatado": "Louvai a Deus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 217,
     "titulo": "OUVE SUA VOZ",
     "tituloFormatado": "Ouve Sua Voz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 218,
     "titulo": "DÁ TEU FARDO A JESUS",
     "tituloFormatado": "Dá Teu Fardo a Jesus",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 219,
     "titulo": "O AMOR DO CRIADOR",
     "tituloFormatado": "O Amor do Criador",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 220,
     "titulo": "IDE SEGAR",
     "tituloFormatado": "Ide Segar",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 221,
     "titulo": "OPERA EM MIM!",
     "tituloFormatado": "Opera em Mim!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 222,
     "titulo": "VEM A JESUS, Ó PERDIDO!",
     "tituloFormatado": "Vem a Jesus, Ó Perdido!",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 223,
     "titulo": "NA MINH'ALMA REINA PAZ",
     "tituloFormatado": "Na Minh'alma Reina Paz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 224,
     "titulo": "É O TEMPO DE SEGAR",
     "tituloFormatado": "É o Tempo de Segar",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 225,
     "titulo": "SÊ VALENTE",
     "tituloFormatado": "Sê Valente",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 226,
     "titulo": "CRISTO, TEU SANTO AMOR",
     "tituloFormatado": "Cristo, Teu Santo Amor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 227,
     "titulo": "DEUS AMOU ESTE MUNDO",
     "tituloFormatado": "Deus Amou Este Mundo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 228,
     "titulo": "ESTE MUNDO NÃO COMPREENDE",
     "tituloFormatado": "Este Mundo Não Compreende",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 229,
     "titulo": "JESUS, O MEIGO SALVADOR",
     "tituloFormatado": "Jesus, o Meigo Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 230,
     "titulo": "NÓS VOGAMOS NESTA NAU",
     "tituloFormatado": "Nós Vogamos Nesta Nau",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 231,
     "titulo": "NÃO FOI COM OURO",
     "tituloFormatado": "Não Foi com Ouro",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 232,
     "titulo": "OS BEM-AVENTURADOS",
     "tituloFormatado": "Os Bem-aventurados",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 233,
     "titulo": "A CEIA DO SENHOR",
     "tituloFormatado": "A Ceia do Senhor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 234,
     "titulo": "O GOZO DOS SANTOS",
     "tituloFormatado": "O Gozo dos Santos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 235,
     "titulo": "JÁ SEI, JA SEI",
     "tituloFormatado": "Já Sei, Ja Sei",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 236,
     "titulo": "JA NOS LAVOU",
     "tituloFormatado": "Ja Nos Lavou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 237,
     "titulo": "O GOZO DE ESTAR PREPARADO",
     "tituloFormatado": "O Gozo de Estar Preparado",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 238,
     "titulo": "O PECADOR DESALENTADO",
     "tituloFormatado": "O Pecador Desalentado",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 239,
     "titulo": "IMPLORAMOS 0 CONSOLADOR",
     "tituloFormatado": "Imploramos 0 Consolador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 240,
     "titulo": "OH DIA ALEGRE!",
     "tituloFormatado": "Oh Dia Alegre!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 241,
     "titulo": "MARCHEMOS SEM TEMOR",
     "tituloFormatado": "Marchemos Sem Temor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 242,
     "titulo": "EU CONFIO FIRMEMENTE",
     "tituloFormatado": "Eu Confio Firmemente",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 243,
     "titulo": "AO ABRIR O CULTO",
     "tituloFormatado": "Ao Abrir o Culto",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "243 - Ao Abrir o Culto.mp3"
   },
   {
     "numero": 244,
     "titulo": "LOUVAI A JESUS",
     "tituloFormatado": "Louvai a Jesus",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "244 - Louvai a Jesus.mp3"
   },
   {
     "numero": 245,
     "titulo": "PAZ DE DEUS EM JESUS ENCONTREI",
     "tituloFormatado": "Paz de Deus em Jesus Encontrei",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 246,
     "titulo": "O DESCANSO EM JESUS",
     "tituloFormatado": "O Descanso em Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 247,
     "titulo": "DEUS NOS GUARDE NO SEU AMOR",
     "tituloFormatado": "Deus Nos Guarde No Seu Amor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 248,
     "titulo": "HOSANA E GLÓRIA",
     "tituloFormatado": "Hosana e Glória",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 249,
     "titulo": "Ó VEM, SENHOR, E HABITA",
     "tituloFormatado": "Ó Vem, Senhor, e Habita",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 250,
     "titulo": "NOIVA DE JESUS, APRONTA-TE",
     "tituloFormatado": "Noiva de Jesus, Apronta-te",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 251,
     "titulo": "AO CULTO NÃO FALTAR",
     "tituloFormatado": "Ao Culto Não Faltar",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 252,
     "titulo": "SANTO, SANTO ÉS TU, SENHOR",
     "tituloFormatado": "Santo, Santo És Tu, Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 253,
     "titulo": "AVANTE, Ó CRENTES",
     "tituloFormatado": "Avante, Ó Crentes",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 254,
     "titulo": "MAIS PERTO DE JESUS",
     "tituloFormatado": "Mais Perto de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 255,
     "titulo": "MEU REDENTOR",
     "tituloFormatado": "Meu Redentor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 256,
     "titulo": "ABANDONA ESTE MUNDO DE HORROR",
     "tituloFormatado": "Abandona Este Mundo de Horror",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 257,
     "titulo": "O PERDÃO SEM IGUAL",
     "tituloFormatado": "O Perdão Sem Igual",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 258,
     "titulo": "NA ROCHA ETERNA FIRMADO",
     "tituloFormatado": "Na Rocha Eterna Firmado",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 260,
     "titulo": "AVANTE COM O NOSSO CAPITÃO",
     "tituloFormatado": "Avante com o Nosso Capitão",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 261,
     "titulo": "ALMA TRISTE, ABATIDA",
     "tituloFormatado": "Alma Triste, Abatida",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 262,
     "titulo": "SENHOR, ESTÁS COMIGO",
     "tituloFormatado": "Senhor, Estás Comigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 263,
     "titulo": "AO FIM DO CULTO",
     "tituloFormatado": "Ao Fim do Culto",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 264,
     "titulo": "O PAICELESTE",
     "tituloFormatado": "O Paiceleste",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 265,
     "titulo": "DOCE É CRER EM CRISTO",
     "tituloFormatado": "Doce É Crer em Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 266,
     "titulo": "RESGATADOSFOMOS",
     "tituloFormatado": "Resgatadosfomos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 267,
     "titulo": "JESUS, MINHA FORÇA",
     "tituloFormatado": "Jesus, Minha Força",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 268,
     "titulo": "CONFIANTE EM DEUS",
     "tituloFormatado": "Confiante em Deus",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 269,
     "titulo": "LOUVAREI AO MEU AMADO",
     "tituloFormatado": "Louvarei Ao Meu Amado",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 270,
     "titulo": "LOUVANDO AO NOSSO CRIADOR",
     "tituloFormatado": "Louvando Ao Nosso Criador",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 271,
     "titulo": "NA MANSÃO DO SALVADOR",
     "tituloFormatado": "Na Mansão do Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 272,
     "titulo": "QUANDO JESUS APARECER",
     "tituloFormatado": "Quando Jesus Aparecer",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 273,
     "titulo": "SÓ A TI   RECORREREI",
     "tituloFormatado": "Só a Ti Recorrerei",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 274,
     "titulo": "JESUS É A LUZ DO MUNDO",
     "tituloFormatado": "Jesus É a Luz do Mundo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 275,
     "titulo": "O ACORDA, DESPERTA!",
     "tituloFormatado": "O Acorda, Desperta!",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 276,
     "titulo": "EM CANAÃ EU ENTRAREI",
     "tituloFormatado": "Em Canaã Eu Entrarei",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 277,
     "titulo": "SALVO ESTAS? LIMPO ESTÁS?",
     "tituloFormatado": "Salvo Estas? Limpo Estás?",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 278,
     "titulo": "LEVAR A CRUZ",
     "tituloFormatado": "Levar a Cruz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 279,
     "titulo": "ALI OUERO IR, E TU?",
     "tituloFormatado": "Ali Ouero Ir, e Tu?",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 280,
     "titulo": "O JESUS, TE SUPLICO",
     "tituloFormatado": "O Jesus, Te Suplico",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 281,
     "titulo": "VEM SEM TARDAR",
     "tituloFormatado": "Vem Sem Tardar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 282,
     "titulo": "QUE SANGUE PRECIOSO",
     "tituloFormatado": "Que Sangue Precioso",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 283,
     "titulo": "O PASTOR E AS OVELHAS",
     "tituloFormatado": "O Pastor e as Ovelhas",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 284,
     "titulo": "BENDITO CRISTO, EIS-ME AQUI",
     "tituloFormatado": "Bendito Cristo, Eis-me Aqui",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 285,
     "titulo": "TU ÉS O MEU GOZO",
     "tituloFormatado": "Tu És o Meu Gozo",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 286,
     "titulo": "NÃO TARDA VIR JESUS!",
     "tituloFormatado": "Não Tarda Vir Jesus!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 287,
     "titulo": "OH. FOI O SANGUE",
     "tituloFormatado": "Oh. Foi o Sangue",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 288,
     "titulo": "A PALAVRA DA CRUZ",
     "tituloFormatado": "A Palavra da Cruz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 289,
     "titulo": "SOB O SANGUE TEU",
     "tituloFormatado": "Sob o Sangue Teu",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 290,
     "titulo": "TEU ESPÍRITO VEM DERRAMAR",
     "tituloFormatado": "Teu Espírito Vem Derramar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 291,
     "titulo": "A MENSAGEM DA CRUZ",
     "tituloFormatado": "A Mensagem da Cruz",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "291 - A Mensagem da Cruz.mp3"
   },
   {
     "numero": 292,
     "titulo": "QUAL O PREÇO DO PERDÃO",
     "tituloFormatado": "Qual o Preço do Perdão",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 293,
     "titulo": "JESUS NO CALVÁRIO",
     "tituloFormatado": "Jesus No Calvário",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 294,
     "titulo": "EU VOU COM JESUS",
     "tituloFormatado": "Eu Vou com Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 295,
     "titulo": "NOVO CANTO DE LOUVOR",
     "tituloFormatado": "Novo Canto de Louvor",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 296,
     "titulo": "NO JARDIM",
     "tituloFormatado": "No Jardim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 297,
     "titulo": "ABUNDÂNCIA DE CRISTO",
     "tituloFormatado": "Abundância de Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 298,
     "titulo": "AVANTE, SERVOS DE JESUS",
     "tituloFormatado": "Avante, Servos de Jesus",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 299,
     "titulo": "HÁ UM CANTO NOVO",
     "tituloFormatado": "Há Um Canto Novo",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 300,
     "titulo": "NOSSA ESPERANÇA",
     "tituloFormatado": "Nossa Esperança",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 303,
     "titulo": "PRECISAMOS DE JESUS",
     "tituloFormatado": "Precisamos de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 304,
     "titulo": "A FACE ADORADA DE JESUS",
     "tituloFormatado": "A Face Adorada de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 305,
     "titulo": "CAMPEÕES DA LUZ",
     "tituloFormatado": "Campeões da Luz",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "305 - Campeões da Luz.mp3"
   },
   {
     "numero": 306,
     "titulo": "A PALAVRA DE DEUS É UM TESOURO",
     "tituloFormatado": "A Palavra de Deus É Um Tesouro",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 308,
     "titulo": "SÓ O SANGUE DE JESUS",
     "tituloFormatado": "Só o Sangue de Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 309,
     "titulo": "AO FINDAR DO DIA",
     "tituloFormatado": "Ao Findar do Dia",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 310,
     "titulo": "AVANTE EU VOU",
     "tituloFormatado": "Avante Eu Vou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 311,
     "titulo": "JESUS, MEU SALVADOR",
     "tituloFormatado": "Jesus, Meu Salvador",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 312,
     "titulo": "A VINDA DE CRISTO",
     "tituloFormatado": "A Vinda de Cristo",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 314,
     "titulo": "O PAI BONDOSO",
     "tituloFormatado": "O Pai Bondoso",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 315,
     "titulo": "OH! AMOR BENDITO",
     "tituloFormatado": "Oh! Amor Bendito",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 316,
     "titulo": "EM BUSCA DE SIÃO",
     "tituloFormatado": "Em Busca de Sião",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 317,
     "titulo": "JESUS VEM TRIUNFANTE",
     "tituloFormatado": "Jesus Vem Triunfante",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 318,
     "titulo": "AO LAR PATERNAL",
     "tituloFormatado": "Ao Lar Paternal",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 319,
     "titulo": "AINDA HÁ LUGAR",
     "tituloFormatado": "Ainda Há Lugar",
     "estrofes": 7,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 320,
     "titulo": "GUIR A CRISTO",
     "tituloFormatado": "Guir a Cristo",
     "estrofes": 7,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 321,
     "titulo": "SÓ EM JESUS",
     "tituloFormatado": "Só em Jesus",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 322,
     "titulo": "AS SANTAS ESCRITURAS",
     "tituloFormatado": "As Santas Escrituras",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 323,
     "titulo": "LEVANTAI VOSSOS OLHOS",
     "tituloFormatado": "Levantai Vossos Olhos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 324,
     "titulo": "JESUS, O MELHOR AMIGO",
     "tituloFormatado": "Jesus, o Melhor Amigo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 325,
     "titulo": "A LUZ DO CEU RAIOU",
     "tituloFormatado": "A Luz do Ceu Raiou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 326,
     "titulo": "OH! MEU JESUS",
     "tituloFormatado": "Oh! Meu Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 327,
     "titulo": "TEU NOME PRECIOSO",
     "tituloFormatado": "Teu Nome Precioso",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 328,
     "titulo": "O PÃO DA VIDA",
     "tituloFormatado": "O Pão da Vida",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 329,
     "titulo": "JESUS E MINHA PAZ",
     "tituloFormatado": "Jesus e Minha Paz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 330,
     "titulo": "A FÉ DOS SANTOS",
     "tituloFormatado": "A Fé dos Santos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 331,
     "titulo": "Ó CARO SALVADOR",
     "tituloFormatado": "Ó Caro Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 332,
     "titulo": "PARA O CEU EU VOU",
     "tituloFormatado": "Para o Ceu Eu Vou",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 333,
     "titulo": "O CÉU, MEU LAR",
     "tituloFormatado": "O Céu, Meu Lar",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 334,
     "titulo": "O FIM VEM, CUIDADO!",
     "tituloFormatado": "O Fim Vem, Cuidado!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 335,
     "titulo": "MUI PERTO ESTÁ O DIA",
     "tituloFormatado": "Mui Perto Está o Dia",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 336,
     "titulo": "ORAÇÃO DE ELIAS",
     "tituloFormatado": "Oração de Elias",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 337,
     "titulo": "Ó BOM JESUS",
     "tituloFormatado": "Ó Bom Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 338,
     "titulo": "QUERO JESUS, A TUA LUZ",
     "tituloFormatado": "Quero Jesus, a Tua Luz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 339,
     "titulo": "JESUS RESSUSCITADO",
     "tituloFormatado": "Jesus Ressuscitado",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 340,
     "titulo": "UM POVO FORTE",
     "tituloFormatado": "Um Povo Forte",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 341,
     "titulo": "A ASPIRAÇÃO DA ALMA",
     "tituloFormatado": "A Aspiração da Alma",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 342,
     "titulo": "AS CORDAS DO CORAÇÃO",
     "tituloFormatado": "As Cordas do Coração",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 343,
     "titulo": "ABRE O CORAÇÃO",
     "tituloFormatado": "Abre o Coração",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 344,
     "titulo": "UM AMIGO ENTRE OS LÍRIOS",
     "tituloFormatado": "Um Amigo Entre os Lírios",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 345,
     "titulo": "OH! TENHO GOZO",
     "tituloFormatado": "Oh! Tenho Gozo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 346,
     "titulo": "É MEU O CÉU",
     "tituloFormatado": "É Meu o Céu",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 347,
     "titulo": "VEM A CRISTO",
     "tituloFormatado": "Vem a Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 348,
     "titulo": "LONGE DE JESUS",
     "tituloFormatado": "Longe de Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 349,
     "titulo": "OS DONS DO CÉU",
     "tituloFormatado": "Os Dons do Céu",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 350,
     "titulo": "A HISTORIA DA CRUZ",
     "tituloFormatado": "A Historia da Cruz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 351,
     "titulo": "A FELICIDADE DA SALVAÇÃO",
     "tituloFormatado": "A Felicidade da Salvação",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 352,
     "titulo": "JESUS, NOSSA ESPERANÇA",
     "tituloFormatado": "Jesus, Nossa Esperança",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 353,
     "titulo": "VEM, Ó PRÓDIGO",
     "tituloFormatado": "Vem, Ó Pródigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 354,
     "titulo": "O CUIDADO DA ALMA",
     "tituloFormatado": "O Cuidado da Alma",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 355,
     "titulo": "FALA DO AMOR DE CRISTO",
     "tituloFormatado": "Fala do Amor de Cristo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 356,
     "titulo": "ORAÇÃO DOMINICAL",
     "tituloFormatado": "Oração Dominical",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 357,
     "titulo": "O FIM DAS LUTAS",
     "tituloFormatado": "O Fim das Lutas",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 358,
     "titulo": "SENHOR, MANDA TEU PODER",
     "tituloFormatado": "Senhor, Manda Teu Poder",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 359,
     "titulo": "VEM A MIM, PECADOR",
     "tituloFormatado": "Vem a Mim, Pecador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 360,
     "titulo": "A PRECIOSA FONTE",
     "tituloFormatado": "A Preciosa Fonte",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 361,
     "titulo": "O PEREGRINO E A GLORIA",
     "tituloFormatado": "O Peregrino e a Gloria",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 363,
     "titulo": "CONSAGRAÇÃO",
     "tituloFormatado": "Consagração",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 364,
     "titulo": "OH, OUE PAZ!",
     "tituloFormatado": "Oh, Oue Paz!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 365,
     "titulo": "CONFIANÇA EM JESUS",
     "tituloFormatado": "Confiança em Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 366,
     "titulo": "O NASCIMENTO DE JESUS",
     "tituloFormatado": "O Nascimento de Jesus",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 367,
     "titulo": "ESPÍRITO CONSDLADOR",
     "tituloFormatado": "Espírito Consdlador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 368,
     "titulo": "JESUS, TUDO P'RA MIM",
     "tituloFormatado": "Jesus, Tudo p'ra Mim",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 369,
     "titulo": "SOB AS ASAS DE DEUS",
     "tituloFormatado": "Sob as Asas de Deus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 370,
     "titulo": "GRATO A TI",
     "tituloFormatado": "Grato a Ti",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "370 - Grato a Ti.mp3"
   },
   {
     "numero": 371,
     "titulo": "BREVE VEM O DIA",
     "tituloFormatado": "Breve Vem o Dia",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 372,
     "titulo": "VENCERÁ",
     "tituloFormatado": "Vencerá",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 373,
     "titulo": "VEM A TEU SALVADOR",
     "tituloFormatado": "Vem a Teu Salvador",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 374,
     "titulo": "VIDA ABUNDANTE",
     "tituloFormatado": "Vida Abundante",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 375,
     "titulo": "A IGREJA UNIVERSAL",
     "tituloFormatado": "A Igreja Universal",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 376,
     "titulo": "VAMOS TODOS TRABALHAR",
     "tituloFormatado": "Vamos Todos Trabalhar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 377,
     "titulo": "AS PROMESSAS QUE NÃO FALHAM",
     "tituloFormatado": "As Promessas Que Não Falham",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 378,
     "titulo": "AS PISADAS DO MESTRE",
     "tituloFormatado": "As Pisadas do Mestre",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 379,
     "titulo": "SALVO DE GRAÇA",
     "tituloFormatado": "Salvo de Graça",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 380,
     "titulo": "HO ABRAÃO E SEU SACRIFÍCIO",
     "tituloFormatado": "Ho Abraão e Seu Sacrifício",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 381,
     "titulo": "O CORDEIRO DE DEUS",
     "tituloFormatado": "O Cordeiro de Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 382,
     "titulo": "OLHANDO PARA O CALVÁRIO",
     "tituloFormatado": "Olhando para o Calvário",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 383,
     "titulo": "O SUSTENTO DA ALMA",
     "tituloFormatado": "O Sustento da Alma",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 384,
     "titulo": "SINTO VIDA DO SENHOR",
     "tituloFormatado": "Sinto Vida do Senhor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 385,
     "titulo": "AMEMOS 0 SENHOR",
     "tituloFormatado": "Amemos 0 Senhor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 386,
     "titulo": "VENCIDOS OS COMBATES",
     "tituloFormatado": "Vencidos os Combates",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 387,
     "titulo": "DERRAMA TEU ESPÍRITO",
     "tituloFormatado": "Derrama Teu Espírito",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 388,
     "titulo": "CANTA, Ó CRENTE",
     "tituloFormatado": "Canta, Ó Crente",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 389,
     "titulo": "LAVA-ME, Ó DEUS",
     "tituloFormatado": "Lava-me, Ó Deus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 390,
     "titulo": "UM CORAÇÃO BONDOSO",
     "tituloFormatado": "Um Coração Bondoso",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 391,
     "titulo": "JESUS NO MONTE DA ASCENSÃO",
     "tituloFormatado": "Jesus No Monte da Ascensão",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 392,
     "titulo": "PEREGRINOS SOMOS",
     "tituloFormatado": "Peregrinos Somos",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 393,
     "titulo": "HÁ UM AMIGO MUI CHEGADO",
     "tituloFormatado": "Há Um Amigo Mui Chegado",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 394,
     "titulo": "A MÃO DO ARADO!",
     "tituloFormatado": "A Mão do Arado!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 395,
     "titulo": "IDE POR TODO O MUNDO",
     "tituloFormatado": "Ide por Todo o Mundo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 396,
     "titulo": "ALÉM DO NOSSO ENTENDIMENTO",
     "tituloFormatado": "Além do Nosso Entendimento",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 397,
     "titulo": "O SALVADOR ME ACHOU",
     "tituloFormatado": "O Salvador Me Achou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 398,
     "titulo": "PERTO DO MEU REDENTOR",
     "tituloFormatado": "Perto do Meu Redentor",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 399,
     "titulo": "TERRA DE JESUS",
     "tituloFormatado": "Terra de Jesus",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 400,
     "titulo": "EM JESUS",
     "tituloFormatado": "Em Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 401,
     "titulo": "JESUS VOLTARÁ",
     "tituloFormatado": "Jesus Voltará",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 402,
     "titulo": "AO GÓLGOTA",
     "tituloFormatado": "Ao Gólgota",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 403,
     "titulo": "GOZO REAL",
     "tituloFormatado": "Gozo Real",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 404,
     "titulo": "EM GLORIA VIRA",
     "tituloFormatado": "Em Gloria Vira",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 405,
     "titulo": "QUERES PERDÃO?",
     "tituloFormatado": "Queres Perdão?",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 406,
     "titulo": "À SOMBRA DO MEU REDENTOR",
     "tituloFormatado": "À Sombra do Meu Redentor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 407,
     "titulo": "Ó CRIADOR BENDITO",
     "tituloFormatado": "Ó Criador Bendito",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 408,
     "titulo": "ABRE OS MEUS OLHOS",
     "tituloFormatado": "Abre os Meus Olhos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 409,
     "titulo": "TRABALHADORESDO EVANGELHO",
     "tituloFormatado": "Trabalhadoresdo Evangelho",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 410,
     "titulo": "JESUS, MEU REI GLORIOSO",
     "tituloFormatado": "Jesus, Meu Rei Glorioso",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 411,
     "titulo": "NÓS SOMOS TEUS",
     "tituloFormatado": "Nós Somos Teus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 412,
     "titulo": "JESUS CRISTO, BEM AMADO",
     "tituloFormatado": "Jesus Cristo, Bem Amado",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 413,
     "titulo": "MEU PASTOR",
     "tituloFormatado": "Meu Pastor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 414,
     "titulo": "TEM COMPAIXÃO DO PECADOR",
     "tituloFormatado": "Tem Compaixão do Pecador",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 415,
     "titulo": "JESUS TE QUER CURAR",
     "tituloFormatado": "Jesus Te Quer Curar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 416,
     "titulo": "QUANDO O POVO SALVO ENTRAR",
     "tituloFormatado": "Quando o Povo Salvo Entrar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 417,
     "titulo": "BASTANTE PARA MIM",
     "tituloFormatado": "Bastante para Mim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 418,
     "titulo": "SOU UM SOLDADO",
     "tituloFormatado": "Sou Um Soldado",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 419,
     "titulo": "VINDE, PECADORES",
     "tituloFormatado": "Vinde, Pecadores",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 420,
     "titulo": "O QUE BUSCAS ANSIOSO?",
     "tituloFormatado": "O Que Buscas Ansioso?",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 422,
     "titulo": "NO CÉU NÃO ENTRA PECADO",
     "tituloFormatado": "No Céu Não Entra Pecado",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 423,
     "titulo": "DE TI PRECISO MAIS",
     "tituloFormatado": "De Ti Preciso Mais",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 424,
     "titulo": "SEU PRECIOSO SANGUE",
     "tituloFormatado": "Seu Precioso Sangue",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 425,
     "titulo": "PERDIDO ANDEI",
     "tituloFormatado": "Perdido Andei",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 426,
     "titulo": "UNIÃO DOS IRMÃOS",
     "tituloFormatado": "União dos Irmãos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 427,
     "titulo": "VAI ORANDO",
     "tituloFormatado": "Vai Orando",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 428,
     "titulo": "A ESTRELA DA ALVA",
     "tituloFormatado": "A Estrela da Alva",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 429,
     "titulo": "ESCUTA O EVANGELHO",
     "tituloFormatado": "Escuta o Evangelho",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 430,
     "titulo": "O EVANGELHO DA SALVAÇÃO",
     "tituloFormatado": "O Evangelho da Salvação",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 431,
     "titulo": "CRISTO CHAMA O PECADOR",
     "tituloFormatado": "Cristo Chama o Pecador",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 432,
     "titulo": "CONSAGRADO AO SENHOR",
     "tituloFormatado": "Consagrado Ao Senhor",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 433,
     "titulo": "SOIS BEM-VINDOS",
     "tituloFormatado": "Sois Bem-vindos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 434,
     "titulo": "A TEUS PÉS",
     "tituloFormatado": "A Teus Pés",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 435,
     "titulo": "JESUS ME LEVANTOU",
     "tituloFormatado": "Jesus Me Levantou",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 436,
     "titulo": "CRENTES, CANTAI!",
     "tituloFormatado": "Crentes, Cantai!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 437,
     "titulo": "O DOM CELESTE",
     "tituloFormatado": "O Dom Celeste",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 439,
     "titulo": "AOS PES DE CRISTO PROSTRADOS",
     "tituloFormatado": "Aos Pes de Cristo Prostrados",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 440,
     "titulo": "FAZE JÁ O SEU QUERER",
     "tituloFormatado": "Faze Já o Seu Querer",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 441,
     "titulo": "A CHUVA DO CONSOLADOR",
     "tituloFormatado": "A Chuva do Consolador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 442,
     "titulo": "HISTÓRIA DE CRISTO",
     "tituloFormatado": "História de Cristo",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 443,
     "titulo": "LARGA O MUNDO!",
     "tituloFormatado": "Larga o Mundo!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 444,
     "titulo": "ESCUTA, POBRE PECADOR",
     "tituloFormatado": "Escuta, Pobre Pecador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 445,
     "titulo": "RESGATADO COM O SANGUE DE CRISTO",
     "tituloFormatado": "Resgatado com o Sangue de Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 446,
     "titulo": "Ó VEM JÁ!",
     "tituloFormatado": "Ó Vem Já!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 447,
     "titulo": "NASCER DE NOVO",
     "tituloFormatado": "Nascer de Novo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 448,
     "titulo": "CRENTES, AVANÇAI",
     "tituloFormatado": "Crentes, Avançai",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 449,
     "titulo": "À BEIRA DA ESTRADA",
     "tituloFormatado": "À Beira da Estrada",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 450,
     "titulo": "O SOL DA JUSTIÇA",
     "tituloFormatado": "O Sol da Justiça",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 451,
     "titulo": "MEU JESUS VEM",
     "tituloFormatado": "Meu Jesus Vem",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 453,
     "titulo": "DEUS É O MESMO",
     "tituloFormatado": "Deus É o Mesmo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 454,
     "titulo": "ALEGRAI-VOS, Ó REMIDOS",
     "tituloFormatado": "Alegrai-vos, Ó Remidos",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 455,
     "titulo": "O POVO DE DEUS NA TERRA",
     "tituloFormatado": "O Povo de Deus Na Terra",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 456,
     "titulo": "A FONTE TRANSBORDANTE",
     "tituloFormatado": "A Fonte Transbordante",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 457,
     "titulo": "O FESTIM DE GLÓRIA",
     "tituloFormatado": "O Festim de Glória",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 458,
     "titulo": "GUIA MEUS PASSOS",
     "tituloFormatado": "Guia Meus Passos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 459,
     "titulo": "AS FIRMES PROMESSAS",
     "tituloFormatado": "As Firmes Promessas",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 460,
     "titulo": "DIZE-O A CRISTO",
     "tituloFormatado": "Dize-o a Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 461,
     "titulo": "JESUS CHOROU SOBRE JERUSALÉM",
     "tituloFormatado": "Jesus Chorou Sobre Jerusalém",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 463,
     "titulo": "O POVO DE ABRAÃO",
     "tituloFormatado": "O Povo de Abraão",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 465,
     "titulo": "ELE SOFREU POR MIM",
     "tituloFormatado": "Ele Sofreu por Mim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 466,
     "titulo": "QUE MARAVILHA!",
     "tituloFormatado": "Que Maravilha!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 467,
     "titulo": "SOBRE AS ONDAS DO MAR",
     "tituloFormatado": "Sobre as Ondas do Mar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 468,
     "titulo": "CRISTO ESTÁ CHAMANPO",
     "tituloFormatado": "Cristo Está Chamanpo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 469,
     "titulo": "AO ESTRUGIR A TROMBETE",
     "tituloFormatado": "Ao Estrugir a Trombete",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 470,
     "titulo": "BATISMO",
     "tituloFormatado": "Batismo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 471,
     "titulo": "AVANÇAI, FIÉIS",
     "tituloFormatado": "Avançai, Fiéis",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 472,
     "titulo": "EM MEU LUGAR",
     "tituloFormatado": "Em Meu Lugar",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 473,
     "titulo": "OUTRO BEM NÃO ACHAREI",
     "tituloFormatado": "Outro Bem Não Acharei",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 474,
     "titulo": "PAZ DOCE PAZ",
     "tituloFormatado": "Paz Doce Paz",
     "estrofes": 7,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 475,
     "titulo": "EM BELÉM",
     "tituloFormatado": "Em Belém",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 476,
     "titulo": "O CEGO DE JERICÓ",
     "tituloFormatado": "O Cego de Jericó",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 477,
     "titulo": "SEDE FORTES",
     "tituloFormatado": "Sede Fortes",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 478,
     "titulo": "EIS-ME, JESUS",
     "tituloFormatado": "Eis-me, Jesus",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 479,
     "titulo": "AO RAIAR DO ANO NOVO",
     "tituloFormatado": "Ao Raiar do Ano Novo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 480,
     "titulo": "FIM DO ANO",
     "tituloFormatado": "Fim do Ano",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 481,
     "titulo": "CRISTO E SUA HUMILHAÇÃO",
     "tituloFormatado": "Cristo e Sua Humilhação",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 482,
     "titulo": "COMUNHÃO",
     "tituloFormatado": "Comunhão",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 483,
     "titulo": "ORA VEM, JESUS",
     "tituloFormatado": "Ora Vem, Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 484,
     "titulo": "MEUSPECADOS LEVOU",
     "tituloFormatado": "Meuspecados Levou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 485,
     "titulo": "ANDANDO PARA O CÉU",
     "tituloFormatado": "Andando para o Céu",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 486,
     "titulo": "VASOS TRANSBORDANTES",
     "tituloFormatado": "Vasos Transbordantes",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 487,
     "titulo": "DOXOLOGIA",
     "tituloFormatado": "Doxologia",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 488,
     "titulo": "O ÁUREO DIA",
     "tituloFormatado": "O Áureo Dia",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 489,
     "titulo": "CHEGAIPARA ADORAR",
     "tituloFormatado": "Chegaipara Adorar",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 490,
     "titulo": "PASSANDO ESTÁ",
     "tituloFormatado": "Passando Está",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 491,
     "titulo": "HÁ PODER NO SANGUE DE JESUS",
     "tituloFormatado": "Há Poder No Sangue de Jesus",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 492,
     "titulo": "JESUS VIRÁ DO CÉU",
     "tituloFormatado": "Jesus Virá do Céu",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 493,
     "titulo": "AO PAI VOLTAI",
     "tituloFormatado": "Ao Pai Voltai",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 494,
     "titulo": "JERUSALÉM CELESTIAL",
     "tituloFormatado": "Jerusalém Celestial",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 495,
     "titulo": "CRISTO À PORTA ESTÁ",
     "tituloFormatado": "Cristo À Porta Está",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 496,
     "titulo": "JESUS ME TIROU DA LAMA",
     "tituloFormatado": "Jesus Me Tirou da Lama",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 497,
     "titulo": "MEU BOM SALVADOR",
     "tituloFormatado": "Meu Bom Salvador",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 498,
     "titulo": "GUIA-ME, Ó SALVADOR",
     "tituloFormatado": "Guia-me, Ó Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 499,
     "titulo": "A SANTA BÍBLIA",
     "tituloFormatado": "A Santa Bíblia",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 500,
     "titulo": "QUERO VER A JESUS CRISTO",
     "tituloFormatado": "Quero Ver a Jesus Cristo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 501,
     "titulo": "VENCENDO COM O BOM CAPITÃO",
     "tituloFormatado": "Vencendo com o Bom Capitão",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 502,
     "titulo": "Ó PASTOR BENDITO",
     "tituloFormatado": "Ó Pastor Bendito",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 503,
     "titulo": "VIDAS CONSAGRADAS AO TRABALHO",
     "tituloFormatado": "Vidas Consagradas Ao Trabalho",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 504,
     "titulo": "MOMENTO SOLENE",
     "tituloFormatado": "Momento Solene",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 505,
     "titulo": "AS PALAVRAS DE JESUS",
     "tituloFormatado": "As Palavras de Jesus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 506,
     "titulo": "BÍBLIA SAGRADA",
     "tituloFormatado": "Bíblia Sagrada",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 507,
     "titulo": "JESUS SALVA",
     "tituloFormatado": "Jesus Salva",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 508,
     "titulo": "SUA PALAVRA REVELADA",
     "tituloFormatado": "Sua Palavra Revelada",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 509,
     "titulo": "AO PASSAR O JORDÃO",
     "tituloFormatado": "Ao Passar o Jordão",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "509 - Ao Passar o Jordão.mp3"
   },
   {
     "numero": 510,
     "titulo": "A RIOUEZA DIVINAL",
     "tituloFormatado": "A Rioueza Divinal",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 511,
     "titulo": "GLORIOSO DEUS",
     "tituloFormatado": "Glorioso Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 512,
     "titulo": "O AMOR INESGOTÁVEL",
     "tituloFormatado": "O Amor Inesgotável",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 513,
     "titulo": "MINHA ALMA TE QUER",
     "tituloFormatado": "Minha Alma Te Quer",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 514,
     "titulo": "EM GLÓRIA ESPLENDENTE",
     "tituloFormatado": "Em Glória Esplendente",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 515,
     "titulo": "SE CRISTO COMIGO VAI",
     "tituloFormatado": "Se Cristo Comigo Vai",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 516,
     "titulo": "CRISTO, MEU VERO AMIGO",
     "tituloFormatado": "Cristo, Meu Vero Amigo",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 517,
     "titulo": "CURA DIVINA",
     "tituloFormatado": "Cura Divina",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 518,
     "titulo": "SALVA-VIDAS",
     "tituloFormatado": "Salva-vidas",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 519,
     "titulo": "ACHEI JESUS, MEU SALVADOR",
     "tituloFormatado": "Achei Jesus, Meu Salvador",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 520,
     "titulo": "A DOCE E PRECIOSA VOZ",
     "tituloFormatado": "A Doce e Preciosa Voz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 521,
     "titulo": "VEM O PASSO DAR!",
     "tituloFormatado": "Vem o Passo Dar!",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 522,
     "titulo": "O REI DA GLÓRIA",
     "tituloFormatado": "O Rei da Glória",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 523,
     "titulo": "CRISTO, A FONTE ESCONDIDA",
     "tituloFormatado": "Cristo, a Fonte Escondida",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 524,
     "titulo": "CRISTO PENSA EM MIM",
     "tituloFormatado": "Cristo Pensa em Mim",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 525,
     "titulo": "VENCENDO VEM JESUS",
     "tituloFormatado": "Vencendo Vem Jesus",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "525 - Vencendo Vem Jesus.mp3"
   },
   {
     "numero": 526,
     "titulo": "GRANDIOSO ÉS TU",
     "tituloFormatado": "Grandioso És Tu",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 527,
     "titulo": "DOMINADOR É DEUS",
     "tituloFormatado": "Dominador É Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 528,
     "titulo": "EU TE AMO, Ó DEUS",
     "tituloFormatado": "Eu Te Amo, Ó Deus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 529,
     "titulo": "EM SUA GRAÇA",
     "tituloFormatado": "Em Sua Graça",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 530,
     "titulo": "VIVIFICA A TUA IGREJA",
     "tituloFormatado": "Vivifica a Tua Igreja",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 531,
     "titulo": "NOME PRECIOSO",
     "tituloFormatado": "Nome Precioso",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 532,
     "titulo": "SANTO NOME",
     "tituloFormatado": "Santo Nome",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 533,
     "titulo": "HONRAS SEJAM AO CORDEIRO",
     "tituloFormatado": "Honras Sejam Ao Cordeiro",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 534,
     "titulo": "CRISTO É REAL PRA MIM",
     "tituloFormatado": "Cristo É Real Pra Mim",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 535,
     "titulo": "TU ÉS FIEL, SENHOR",
     "tituloFormatado": "Tu És Fiel, Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 536,
     "titulo": "AMIGO SEM IGUAL",
     "tituloFormatado": "Amigo Sem Igual",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 537,
     "titulo": "SEMPRE COMIGO",
     "tituloFormatado": "Sempre Comigo",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 538,
     "titulo": "TU, SENHOR, ÉS NOSSO AMIGO",
     "tituloFormatado": "Tu, Senhor, És Nosso Amigo",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 539,
     "titulo": "AO PENSAR NA DOR CRUCIAL",
     "tituloFormatado": "Ao Pensar Na Dor Crucial",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 540,
     "titulo": "AO VER A CRUZ",
     "tituloFormatado": "Ao Ver a Cruz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 541,
     "titulo": "CALVÁRIO, REVELAÇÃO DE AMOR",
     "tituloFormatado": "Calvário, Revelação de Amor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 543,
     "titulo": "CRISTO, MEU REDENTOR",
     "tituloFormatado": "Cristo, Meu Redentor",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 544,
     "titulo": "CREIO, SENHOR",
     "tituloFormatado": "Creio, Senhor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 545,
     "titulo": "PORQUE ELE VIVE",
     "tituloFormatado": "Porque Ele Vive",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 546,
     "titulo": "MANHÃ DA RESSURREIÇÃO",
     "tituloFormatado": "Manhã da Ressurreição",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 547,
     "titulo": "O REI ESTÁ VOLTANDO",
     "tituloFormatado": "O Rei Está Voltando",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 548,
     "titulo": "BREVE JESUS HÁ DE VIR",
     "tituloFormatado": "Breve Jesus Há de Vir",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 549,
     "titulo": "ORA VEM, SENHOR JESUS",
     "tituloFormatado": "Ora Vem, Senhor Jesus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 550,
     "titulo": "BREVE ELE VOLTA",
     "tituloFormatado": "Breve Ele Volta",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 551,
     "titulo": "O SANTO ESPÍRITO",
     "tituloFormatado": "O Santo Espírito",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 552,
     "titulo": "QUANDO PARA O CÉU NÓS FORMOS",
     "tituloFormatado": "Quando para o Céu Nós Formos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 553,
     "titulo": "OH! PAI, O SANTO ESPÍRITO",
     "tituloFormatado": "Oh! Pai, o Santo Espírito",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 554,
     "titulo": "O EVANGELHO",
     "tituloFormatado": "O Evangelho",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 555,
     "titulo": "O REDENTOR",
     "tituloFormatado": "O Redentor",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 556,
     "titulo": "LÊ A BÍBLIA",
     "tituloFormatado": "Lê a Bíblia",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 557,
     "titulo": "A PALAVRA DA VIDA",
     "tituloFormatado": "A Palavra da Vida",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 558,
     "titulo": "DAÍ-ME A BÍBLIA",
     "tituloFormatado": "Daí-me a Bíblia",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 559,
     "titulo": "BÍBLIA SAGRADA",
     "tituloFormatado": "Bíblia Sagrada",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 560,
     "titulo": "TENHO PAZ EM MEU SER",
     "tituloFormatado": "Tenho Paz em Meu Ser",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 561,
     "titulo": "QUE BÊNÇÃO!",
     "tituloFormatado": "Que Bênção!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 562,
     "titulo": "AUTOR DA VIDA",
     "tituloFormatado": "Autor da Vida",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 563,
     "titulo": "SEMPRE FELIZ",
     "tituloFormatado": "Sempre Feliz",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 564,
     "titulo": "CONTA AS BÊNÇÃOS",
     "tituloFormatado": "Conta as Bênçãos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 565,
     "titulo": "TU ÉS MEU",
     "tituloFormatado": "Tu És Meu",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 566,
     "titulo": "PAZ PERFEITA, SIM, BUSQUEI",
     "tituloFormatado": "Paz Perfeita, Sim, Busquei",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 567,
     "titulo": "SOU FELIZ",
     "tituloFormatado": "Sou Feliz",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 568,
     "titulo": "MANSO E SUAVE",
     "tituloFormatado": "Manso e Suave",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "568 - Manso e Suave.mp3"
   },
   {
     "numero": 569,
     "titulo": "MORRI NA CRUZ POR TI",
     "tituloFormatado": "Morri Na Cruz por Ti",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 570,
     "titulo": "A ÚLTIMA HORA",
     "tituloFormatado": "A Última Hora",
     "estrofes": 5,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "570 - A Última Hora.mp3"
   },
   {
     "numero": 571,
     "titulo": "RENDE O CORAÇÃO",
     "tituloFormatado": "Rende o Coração",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 572,
     "titulo": "A PORTA SOU EU",
     "tituloFormatado": "A Porta Sou Eu",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 573,
     "titulo": "A GRAÇA DE NOSSO SENHOR",
     "tituloFormatado": "A Graça de Nosso Senhor",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 574,
     "titulo": "Ó PAI BONDOSO",
     "tituloFormatado": "Ó Pai Bondoso",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 575,
     "titulo": "ESPERO EM TI",
     "tituloFormatado": "Espero em Ti",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 576,
     "titulo": "ASSIM COMO ESTOU",
     "tituloFormatado": "Assim Como Estou",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 577,
     "titulo": "EM FERVENTE ORAÇÃO",
     "tituloFormatado": "Em Fervente Oração",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 578,
     "titulo": "SOSSEGAI!",
     "tituloFormatado": "Sossegai!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 579,
     "titulo": "PORQUE TE AFLIGES?",
     "tituloFormatado": "Porque Te Afliges?",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 580,
     "titulo": "SALMO 121",
     "tituloFormatado": "Salmo 121",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 581,
     "titulo": "CASTELO FORTE",
     "tituloFormatado": "Castelo Forte",
     "estrofes": 4,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "581 - Castelo Forte.mp3"
   },
   {
     "numero": 582,
     "titulo": "A BARCA DA VIDA",
     "tituloFormatado": "A Barca da Vida",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 583,
     "titulo": "SÊ TU MEU GUIA",
     "tituloFormatado": "Sê Tu Meu Guia",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 585,
     "titulo": "JESUS ME SATISFAZ",
     "tituloFormatado": "Jesus Me Satisfaz",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 586,
     "titulo": "GOZO E VIDA TENHO",
     "tituloFormatado": "Gozo e Vida Tenho",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 587,
     "titulo": "NESTE LENHO ME GLORIO",
     "tituloFormatado": "Neste Lenho Me Glorio",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 588,
     "titulo": "SOU MUI FELIZ",
     "tituloFormatado": "Sou Mui Feliz",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 589,
     "titulo": "QUÁDRUPLO AMÉM",
     "tituloFormatado": "Quádruplo Amém",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 590,
     "titulo": "CONTENTAMENTO",
     "tituloFormatado": "Contentamento",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 591,
     "titulo": "PURA, SIM, MAIS PURA",
     "tituloFormatado": "Pura, Sim, Mais Pura",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 592,
     "titulo": "O LUGAR DE BÊNÇÃO E PAZ",
     "tituloFormatado": "O Lugar de Bênção e Paz",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 593,
     "titulo": "ESTOU SEGURO",
     "tituloFormatado": "Estou Seguro",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 594,
     "titulo": "FÉ PERSISTENTE",
     "tituloFormatado": "Fé Persistente",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 595,
     "titulo": "SOMENTE A TI!",
     "tituloFormatado": "Somente a Ti!",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 596,
     "titulo": "GRATIDÃO",
     "tituloFormatado": "Gratidão",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 597,
     "titulo": "GRAÇA DOU",
     "tituloFormatado": "Graça Dou",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 598,
     "titulo": "RIQUEZAS DO CÉU",
     "tituloFormatado": "Riquezas do Céu",
     "estrofes": 7,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 599,
     "titulo": "HERDEIRO DO REINO",
     "tituloFormatado": "Herdeiro do Reino",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 600,
     "titulo": "MÃOS AO TRABALHO",
     "tituloFormatado": "Mãos Ao Trabalho",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 601,
     "titulo": "A SEARA ESTÁ MADURA",
     "tituloFormatado": "A Seara Está Madura",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 602,
     "titulo": "JUNTOS TRABALHAMOS",
     "tituloFormatado": "Juntos Trabalhamos",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 603,
     "titulo": "MÉTODO DE DEUS",
     "tituloFormatado": "Método de Deus",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 604,
     "titulo": "SENHOR, OS MENSAGEIROS TEUS",
     "tituloFormatado": "Senhor, os Mensageiros Teus",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 605,
     "titulo": "QUERO TE SERVIR",
     "tituloFormatado": "Quero Te Servir",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 606,
     "titulo": "TRIUNFO",
     "tituloFormatado": "Triunfo",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 607,
     "titulo": "LUZ APÓS TREVAS",
     "tituloFormatado": "Luz Após Trevas",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 608,
     "titulo": "SE EM TEU CAMINHO",
     "tituloFormatado": "Se em Teu Caminho",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 609,
     "titulo": "VITÓRIA DEUS DARÁ A MIM",
     "tituloFormatado": "Vitória Deus Dará a Mim",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 610,
     "titulo": "FÉ É A VITÓRIA",
     "tituloFormatado": "Fé É a Vitória",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 611,
     "titulo": "CRISTO, COMANDANTE",
     "tituloFormatado": "Cristo, Comandante",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 612,
     "titulo": "Ó PAI ETERNO",
     "tituloFormatado": "Ó Pai Eterno",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 613,
     "titulo": "VITÓRIA FINAL",
     "tituloFormatado": "Vitória Final",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 614,
     "titulo": "TERRA FELIZ",
     "tituloFormatado": "Terra Feliz",
     "estrofes": 3,
-    "hasAudio": true
+    "hasAudio": true,
+    "audioFile": "614 - Terra Feliz.mp3"
   },
   {
     "numero": 615,
     "titulo": "VOU RUMO AO MEU LAR",
     "tituloFormatado": "Vou Rumo Ao Meu Lar",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 616,
     "titulo": "QUANTO ALMEJO!",
     "tituloFormatado": "Quanto Almejo!",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 617,
     "titulo": "QUANTO ANELO",
     "tituloFormatado": "Quanto Anelo",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 618,
     "titulo": "É NOSSO O LAR",
     "tituloFormatado": "É Nosso o Lar",
     "estrofes": 6,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 619,
     "titulo": "MEU LAR, JERUSALÉM",
     "tituloFormatado": "Meu Lar, Jerusalém",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 620,
     "titulo": "NA JORNADA PARA JERUSALÉM",
     "tituloFormatado": "Na Jornada para Jerusalém",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 621,
     "titulo": "JUNTOS, NO CÉU",
     "tituloFormatado": "Juntos, No Céu",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 622,
     "titulo": "TÃO GRATO ME É LEMBRAR",
     "tituloFormatado": "Tão Grato Me É Lembrar",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 623,
     "titulo": "OH, SIM, BEM SEI",
     "tituloFormatado": "Oh, Sim, Bem Sei",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 624,
     "titulo": "ANSEIO UM LUGAR DE AMOR",
     "tituloFormatado": "Anseio Um Lugar de Amor",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 625,
     "titulo": "GLÓRIA INDIZÍVEL",
     "tituloFormatado": "Glória Indizível",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 626,
     "titulo": "TRÍPLICE AMÉM",
     "tituloFormatado": "Tríplice Amém",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 627,
     "titulo": "FINDA-SE MINHA PRISÃO",
     "tituloFormatado": "Finda-se Minha Prisão",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 628,
     "titulo": "ALÉM DO CÉU AZUL",
     "tituloFormatado": "Além do Céu Azul",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 629,
     "titulo": "CONVERSAREMOS ALI NO CÉU",
     "tituloFormatado": "Conversaremos Ali No Céu",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 630,
     "titulo": "NÃO HÁ SEPARAÇÃO NA GLÓRIA",
     "tituloFormatado": "Não Há Separação Na Glória",
     "estrofes": 1,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 631,
     "titulo": "NESTE LUGAR",
     "tituloFormatado": "Neste Lugar",
     "estrofes": 5,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 632,
     "titulo": "MAIS UM TEMPLO",
     "tituloFormatado": "Mais Um Templo",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 633,
     "titulo": "MEU BRASIL",
     "tituloFormatado": "Meu Brasil",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 634,
     "titulo": "ORAÇÃO PELA PÁTRIA",
     "tituloFormatado": "Oração Pela Pátria",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 635,
     "titulo": "EIS O BRASIL EM TUAS MÃOS",
     "tituloFormatado": "Eis o Brasil em Tuas Mãos",
     "estrofes": 3,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 636,
     "titulo": "POR NOSSA PÁTRIA ORAMOS",
     "tituloFormatado": "Por Nossa Pátria Oramos",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 637,
     "titulo": "HINO À BANDEIRA NACIONAL",
     "tituloFormatado": "Hino À Bandeira Nacional",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 638,
     "titulo": "HINO NACIONAL BRASILEIRO",
     "tituloFormatado": "Hino Nacional Brasileiro",
     "estrofes": 2,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 639,
     "titulo": "HINO DA INDEPENDÊNCIA",
     "tituloFormatado": "Hino da Independência",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   },
   {
     "numero": 640,
     "titulo": "HINO DA PROCLAMAÇÃO DA REPÚBLICA DO BRASIL",
     "tituloFormatado": "Hino da Proclamação da República do Brasil",
     "estrofes": 4,
-    "hasAudio": false
+    "hasAudio": false,
+    "audioFile": null
   }
 ]
