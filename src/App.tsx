@@ -34,6 +34,8 @@ const SupportPage = lazy(() => import("./pages/SupportPage"));
 const ArtigoPage = lazy(() => import("./pages/ArtigoPage"));
 const ArtigosIndexPage = lazy(() => import("./pages/ArtigosIndexPage"));
 const HowToPage = lazy(() => import("./pages/HowToPage"));
+const HarpaPage = lazy(() => import("./pages/HarpaPage"));
+const HarpaReadingPage = lazy(() => import("./pages/HarpaReadingPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,6 +73,8 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/busca" element={<SearchPage />} />
+                <Route path="/harpa" element={<HarpaPage />} />
+                <Route path="/harpa/:hymnNumber" element={<HarpaReadingPage />} />
                 <Route path="/:version/:book" element={<BookPage />} />
                 <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
                 <Route path="/minhas-notas" element={<MyNotesPage />} />

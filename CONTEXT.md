@@ -183,6 +183,27 @@ Função RPC no Supabase que realiza busca por similaridade de cosseno entre o e
 **Cache de Estudo (ai_study_cache)**:
 Tabela Supabase que armazena as respostas estruturadas das funções de IA para evitar chamadas redundantes à OpenAI e reduzir a latência para o Leitor. Chave primária: `verse_id` + `question_type` (ex: `JHN.3.16` + `commentary`).
 
+## Harpa Cristã
+
+**Hino**:
+Unidade mínima da Harpa Cristã que representa uma canção de louvor, contendo número sequencial (`numero`), título oficial (`titulo`), título formatado (`tituloFormatado`), quantidade de estrofes (`estrofes`) e flag de áudio (`hasAudio`).
+_Evitar_: música, louvor, canção
+
+**Estrofe**:
+Cada um dos blocos de texto que constituem a letra de um Hino. Armazenada e carregada assincronamente a partir de arquivos JSON locais em `public/bible/harpa/[numero]/[estrofe].json`.
+_Evitar_: parágrafo, estrofe de hino
+
+**Destaque do Coro**:
+Estilização visual automática (itálico e dourado) aplicada a linhas do refrão/coro de um Hino, identificadas em caixa alta e que não iniciam com número.
+_Evitar_: refrão estilizado
+
+**Sinalizador de Áudio (hasAudio)**:
+Badge visual (ícone de alto-falante `Volume2`) exibido nos cards da grade de hinos. Indica de forma estática (pré-calculada durante o build no script `generate-harpa-list.ts`) se o arquivo `.mp3` correspondente existe no R2 Cloudflare.
+_Evitar_: indicador dinâmico de áudio
+
+**Colaboração de Áudio**:
+Banner explicativo na listagem de hinos orientando sobre a identificação dos áudios e convocando leitores a contribuírem com arquivos de hinos faltantes via e-mail `suporte@bibliavive.com.br`.
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.

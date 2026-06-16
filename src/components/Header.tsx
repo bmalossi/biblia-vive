@@ -48,6 +48,7 @@ const navItems = [
   { label: "Leitura", href: "/" },
   { label: "Planos", href: "/planos" },
   { label: "Artigos", href: "/artigos" },
+  { label: "Harpa", href: "/harpa" },
 ];
 
 const HISTORY_KEY = "bv_search_history";
