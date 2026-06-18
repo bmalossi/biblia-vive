@@ -206,16 +206,30 @@ const es: TranslationDict = {
     "highlight.purple": "Morado",
     "highlight.remove": "Eliminar resaltado",
 
-   // Study meaning key (Sprint 6 bugfix)
-   "study.meaning": "Significado",
+    // Study meaning key (Sprint 6 bugfix)
+    "study.meaning": "Significado",
 
-   // Terms Page
-   "terms.title": "Términos de Uso – Bibliavive",
-   "terms.desc": "Términos de uso de Bibliavive - plataforma de estudio bíblico digital",
+    // Terms Page
+    "terms.title": "Términos de Uso – Bibliavive",
+    "terms.desc": "Términos de uso de Bibliavive - plataforma de estudio bíblico digital",
 
-   // About Page
-   "about.title": "Sobre Bíblia Vive — Propósito y E-E-A-T",
-   "about.desc": "Entienda la misión de Bíblia Vive: proporcionar estudios y lecturas bíblicas con las mejores traducciones, manteniendo la máxima fidelidad a los textos sagrados clásicos.",
+    // About Page
+    "about.title": "Sobre Bíblia Vive — Propósito y E-E-A-T",
+    "about.desc": "Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.",
+
+    // My Study Panel (Sprint 14)
+    "myStudy.title": "Mi Estudio",
+    "myStudy.tabNotes": "Notas",
+    "myStudy.tabHighlights": "Resaltados",
+    "myStudy.tabNotebooks": "Cuadernos",
+    "myStudy.emptyHighlights": "No hay resaltados todavía.",
+    "myStudy.goToVerse": "Ir al versículo",
+    "myStudy.removeHighlight": "Eliminar",
+
+    // Notebook (Sprint 19)
+    "notebook.title": "Cuaderno del Capítulo",
+    "notebook.empty": "No hay cuadernos creados en este capítulo.",
+    "notebook.placeholder": "Escribe tus reflexiones y estudios sobre este capítulo...",
 };
 
 export default es;

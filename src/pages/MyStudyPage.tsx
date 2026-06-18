@@ -6,6 +6,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+    BookText,
     Download,
     FileText,
     Filter,
@@ -34,10 +35,12 @@ import { findBookGlobally } from '@/lib/books';
 import NoteModal from '@/components/NoteModal';
 import AuthModal from '@/components/AuthModal';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import { useNotebooks } from '@/hooks/useNotebooks';
+import { cn } from '@/lib/utils';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-type TabType = 'notes' | 'highlights';
+type TabType = 'notes' | 'highlights' | 'notebooks';
 type SortOrder = 'newest' | 'oldest';
 
 const COLOR_HEX: Record<HighlightColor, string> = {
@@ -81,6 +84,7 @@ export default function MyStudyPage() {
     const { user, isAuthenticated, signOut } = useAuth();
     const { isPro } = useSubscription();
     const { notes, highlights, loading, sessionExpired, setNotes, setHighlights } = useAllStudyData();
+    const { allNotebooks, deleteNotebook } = useNotebooks();
 
     // ── UI State ──
     const [activeTab, setActiveTab] = useState<TabType>('notes');
@@ -148,6 +152,21 @@ export default function MyStudyPage() {
         setFilterColor(null);
     }
 
+    // ── Notebooks grouped by book ──
+    const notebooksByBook = useMemo(() => {
+        const map = new Map<string, typeof allNotebooks>();
+        allNotebooks.forEach(nb => {
+            const key = nb.bookId;
+            if (!map.has(key)) map.set(key, []);
+            map.get(key)!.push(nb);
+        });
+        return [...map.entries()].map(([bookId, nbs]) => ({
+            bookId,
+            bookName: findBookGlobally(bookId)?.name ?? bookId,
+            notebooks: nbs.sort((a, b) => a.chapter - b.chapter),
+        }));
+    }, [allNotebooks]);
+
     // ─────────────────────────────────────────────────────────────────────────
 
     return (
@@ -211,6 +230,22 @@ export default function MyStudyPage() {
                         }`}
                 >
                     {t('myStudy.tabHighlights')}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => handleTabChange('notebooks')}
+                    className={`px-4 py-2 text-[0.82rem] font-medium transition-colors border-b-2 -mb-px flex items-center gap-1.5 ${activeTab === 'notebooks'
+                        ? 'border-gold text-gold'
+                        : 'border-transparent text-app-text-muted hover:text-app-text'
+                        }`}
+                >
+                    <BookText className="h-3.5 w-3.5" />
+                    Cadernos
+                    {allNotebooks.length > 0 && (
+                        <span className="ml-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-gold text-[0.6rem] font-bold text-black px-0.5">
+                            {allNotebooks.length}
+                        </span>
+                    )}
                 </button>
             </div>
 
@@ -464,6 +499,75 @@ export default function MyStudyPage() {
                             </li>
                         ))}
                     </ol>
+                )
+            )}
+
+            {/* ── Notebooks tab ── */}
+            {activeTab === 'notebooks' && (
+                notebooksByBook.length === 0 ? (
+                    <div className="text-center py-16 space-y-2">
+                        <BookText className="h-8 w-8 text-app-text-muted/40 mx-auto" />
+                        <p className="text-[0.9rem] text-app-text-muted">Nenhum caderno salvo ainda.</p>
+                        <p className="text-[0.78rem] text-app-text-muted/60">
+                            Abra qualquer capítulo e clique no ícone de caderno para criar anotações.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {notebooksByBook.map(group => (
+                            <section key={group.bookId}>
+                                <h2 className="text-[0.72rem] font-mono uppercase tracking-[0.1em] text-gold mb-2">
+                                    {group.bookName}
+                                </h2>
+                                <ol className="space-y-2">
+                                    {group.notebooks.map(nb => (
+                                        <li
+                                            key={nb.id}
+                                            className="rounded-xl border border-border bg-app-surface p-4 space-y-1 hover:border-gold/30 transition-colors"
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-[0.82rem] font-semibold text-app-text line-clamp-1">
+                                                        {nb.title?.trim() || `Capítulo ${nb.chapter}`}
+                                                    </p>
+                                                    <p className="text-[0.7rem] font-mono text-app-text-muted uppercase tracking-wide">
+                                                        Cap. {nb.chapter} — {nb.version.toUpperCase()}
+                                                    </p>
+                                                </div>
+                                                <p className="shrink-0 text-[0.65rem] text-app-text-muted/50">
+                                                    {formatDate(nb.updatedAt)}
+                                                </p>
+                                            </div>
+                                            {nb.content && (
+                                                <p className="text-[0.78rem] text-app-text-muted line-clamp-2">
+                                                    {nb.content}
+                                                </p>
+                                            )}
+                                            <div className="flex gap-2 pt-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const slug = findBookGlobally(nb.bookId)?.slug ?? nb.bookId.toLowerCase();
+                                                        navigate(`/${nb.version}/${slug}/${nb.chapter}`);
+                                                    }}
+                                                    className="flex items-center gap-1 text-[0.7rem] text-app-text-muted hover:text-gold transition-colors"
+                                                >
+                                                    Ir ao capítulo →
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => deleteNotebook(nb.id)}
+                                                    className="flex items-center gap-1 text-[0.7rem] text-destructive/70 hover:text-destructive transition-colors ml-auto"
+                                                >
+                                                    <Trash2 className="h-3 w-3" /> Excluir
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </section>
+                        ))}
+                    </div>
                 )
             )}
 

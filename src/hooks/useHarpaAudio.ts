@@ -1,34 +1,25 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import hymnsData from "@/data/harpa-hymns.json";
 
 export function useHarpaAudio(hymnNumber: number | undefined, rawTitle: string | undefined) {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null); // null = checking
   const baseUrl = import.meta.env.VITE_R2_AUDIO_URL;
 
-  useEffect(() => {
+  const result = useMemo(() => {
     if (!hymnNumber || !baseUrl) {
-      setIsAvailable(false);
-      setAudioUrl(null);
-      return;
+      return { audioUrl: null, isAvailable: false };
     }
-
-    setIsAvailable(null);
-
     const hymn = hymnsData.find((h) => h.numero === hymnNumber);
     if (hymn && hymn.hasAudio && hymn.audioFile) {
-      const testUrl = `${baseUrl}/harpas/${encodeURIComponent(hymn.audioFile)}`;
-      setAudioUrl(testUrl);
-      setIsAvailable(true);
-    } else {
-      setIsAvailable(false);
-      setAudioUrl(null);
+      return {
+        audioUrl: `${baseUrl}/harpas/${encodeURIComponent(hymn.audioFile)}`,
+        isAvailable: true,
+      };
     }
+    return { audioUrl: null, isAvailable: false };
   }, [hymnNumber, baseUrl]);
 
   return {
-    audioUrl,
-    isAvailable: isAvailable ?? false,
-    checking: isAvailable === null
+    ...result,
+    checking: false,
   };
 }

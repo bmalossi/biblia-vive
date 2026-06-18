@@ -216,6 +216,18 @@ const en: TranslationDict = {
    // About Page
    "about.title": "About Bíblia Vive — Purpose and E-E-A-T",
    "about.desc": "Understand the mission of Bíblia Vive: to provide Bible studies and readings with the best translations, maintaining highest trustworthiness to classical sacred texts.",
+
+    // My Study Panel (Sprint 14)
+    "myStudy.title": "My Study",
+    "myStudy.tabNotes": "Notes",
+    "myStudy.tabHighlights": "Highlights",
+    "myStudy.tabNotebooks": "Notebooks",
+    "myStudy.emptyHighlights": "No highlights yet.",
+    "myStudy.goToVerse": "Go to verse",
+    "myStudy.removeHighlight": "Remove",
+    "notebook.title": "Chapter Notebook",
+    "notebook.empty": "No notebooks created in this chapter.",
+    "notebook.placeholder": "Write your reflections and studies on this chapter...",
 };
 
 export default en;

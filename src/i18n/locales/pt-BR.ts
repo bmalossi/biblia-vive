@@ -221,9 +221,13 @@ const ptBR: TranslationDict = {
    "myStudy.title": "Meu Estudo",
    "myStudy.tabNotes": "Anotações",
    "myStudy.tabHighlights": "Destaques",
+   "myStudy.tabNotebooks": "Cadernos",
    "myStudy.emptyHighlights": "Nenhum destaque ainda.",
    "myStudy.goToVerse": "Ir ao versículo",
    "myStudy.removeHighlight": "Remover",
+   "notebook.title": "Caderno do Capítulo",
+   "notebook.empty": "Nenhum caderno criado neste capítulo.",
+   "notebook.placeholder": "Escreva suas reflexões e estudos sobre este capítulo...",
 };
 
 export default ptBR;

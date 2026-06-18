@@ -7,7 +7,7 @@ import { toast } from "@/hooks/useToast";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle } from "lucide-react";
+import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle, CheckCircle } from "lucide-react";
 import CommentaryQuota from "@/components/CommentaryQuota";
 import { usePageMeta } from "@/hooks/usePageMeta";
 

@@ -204,6 +204,11 @@ _Evitar_: indicador dinâmico de áudio
 **Colaboração de Áudio**:
 Banner explicativo na listagem de hinos orientando sobre a identificação dos áudios e convocando leitores a contribuírem com arquivos de hinos faltantes via e-mail `suporte@bibliavive.com.br`.
 
+### Controle de Áudio
+
+**Controle de Reprodução Contínua**:
+Opções de controle de áudio adicionadas aos players (Salmos, Harpa Cristã e Áudio Narrado da Bíblia) permitindo escolher entre repetir o áudio atual indefinidamente (Modo Repetir / Loop) ou avançar e reproduzir automaticamente o próximo capítulo ou hino ao término do atual (Modo Avanço Automático / Auto-advance). Ambos os modos são mutuamente exclusivos.
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.

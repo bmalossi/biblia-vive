@@ -20,7 +20,7 @@ Mais do que uma Bíblia online, o projeto combina leitura imersiva, recursos ava
 - **Comparação paralela de versões**: visualização lado a lado com destaque para diferenças textuais entre traduções.
 - **Recursos de estudo pessoal**: marcações, destaques, anotações e experiências premium voltadas a aprofundamento individual.
 - **Harpa Cristã**: acervo completo de hinos de louvor com busca instantânea por número e título, player de áudio integrado com o R2 Cloudflare e layout de leitura com destaque automático de refrão/coro.
-- **Áudio e acessibilidade**: leitura em voz com suporte a tecnologias modernas de síntese e reprodução.
+- **Áudio e acessibilidade**: leitura em voz com suporte a tecnologias modernas de síntese e reprodução, incluindo modo de reprodução contínua (avanço automático ao próximo capítulo/hino) ou modo de repetição (loop) em todos os players de áudio (Salmos, Harpa e Áudio Narrado).
 - **Experiência offline (PWA)**: suporte a instalação em dispositivos móveis e desktop, com carregamento rápido e uso contínuo.
 
 ## 🚀 Stack e Arquitetura

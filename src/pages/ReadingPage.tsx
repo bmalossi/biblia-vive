@@ -70,6 +70,11 @@ import { exportNotesToPDF } from "@/lib/notesHighlights";
 import { cn } from "@/lib/utils";
 import { BiblicalCommentary } from "@/components/BiblicalCommentary";
 import { requestCommentary } from "@/lib/studyPanel";
+import { useNotebooks } from "@/hooks/useNotebooks";
+import { useIsMobile } from "@/hooks/use-mobile";
+import NotebookFloatingButton from "@/components/NotebookFloatingButton";
+import NotebookWorkspace from "@/components/NotebookWorkspace";
+import NotebookSheet from "@/components/NotebookSheet";
 
 interface BookContextData {
   name: string;
@@ -191,6 +196,7 @@ export default function ReadingPage() {
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
+
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
   const chapterGridRef = useRef<HTMLDivElement>(null);
   const verseRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -203,6 +209,32 @@ export default function ReadingPage() {
   const { isPro, isTemplo } = useSubscription();
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
+
+  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
+  const isMobile = useIsMobile();
+
+  const {
+    notebooks,
+    allNotebooks,
+    saveStatus: notebookSaveStatus,
+    syncError: notebookSyncError,
+    saveNotebook,
+    deleteNotebook,
+    getLocalDraft: getNotebookLocalDraft,
+    getNewLocalDraft: getNotebookNewLocalDraft,
+    activeNotebook,
+    setActiveNotebook,
+    isCreatingNew,
+    setIsCreatingNew,
+  } = useNotebooks(selectedBook?.id, chapterNumber);
+
+  const handleOpenNotebook = useCallback(() => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsNotebookOpen(true);
+  }, [user]);
 
   const { activePlan, todayDayIndex, todayRefs, todayReadRefs, isTodayCompleted, markRefRead } = useReadingPlan(user?.id ?? null);
 
@@ -1016,7 +1048,14 @@ export default function ReadingPage() {
 
   return (
     <Layout hideHeader={preferences.focusMode} hideMobileNav={preferences.focusMode}>
-      <div className="relative" id="reading-root" ref={toolbarLayerRef}>
+      <div
+        className={cn(
+          "relative transition-[padding-left] duration-300",
+          isNotebookOpen && !isMobile && "2xl:pl-[clamp(320px,28vw,440px)]"
+        )}
+        id="reading-root"
+        ref={toolbarLayerRef}
+      >
         {preferences.focusMode && selectedBook && (
           <div
             className={`sticky top-0 z-40 mx-auto mb-3 flex w-full max-w-3xl items-center justify-between rounded-full border border-border bg-app-surface px-4 py-2 transition-all duration-200 ${focusTopVisible ? "opacity-100" : "-translate-y-2 opacity-0"
@@ -1766,6 +1805,71 @@ export default function ReadingPage() {
           resetAt={rateLimitStatus.resetAt}
           limit={rateLimitStatus.limit}
         />
+
+        {/* ── Caderno do capítulo ── */}
+        {selectedBook && !preferences.focusMode && (
+          <NotebookFloatingButton
+            notebooksCount={notebooks.length}
+            onClick={handleOpenNotebook}
+            isOpen={isNotebookOpen}
+          />
+        )}
+
+        {/* Desktop sidebar — apenas montado no React quando isMobile=false */}
+        {isNotebookOpen && selectedBook && !isMobile && (
+          <NotebookWorkspace
+            notebooks={notebooks}
+            allNotebooks={allNotebooks}
+            bookId={selectedBook.id}
+            chapter={chapterNumber}
+            version={selectedVersion}
+            bookName={selectedBook.name}
+            saveStatus={notebookSaveStatus}
+            syncError={notebookSyncError}
+            onSave={saveNotebook}
+            onDelete={deleteNotebook}
+            onClose={() => setIsNotebookOpen(false)}
+            onNavigateToChapter={(bkId, ch, ver) => {
+              const bk = findBookGlobally(bkId);
+              if (bk) navigate(`/${ver}/${bk.slug}/${ch}`);
+              setIsNotebookOpen(false);
+            }}
+            getLocalDraft={getNotebookLocalDraft}
+            getNewLocalDraft={getNotebookNewLocalDraft}
+            selectedNotebook={activeNotebook}
+            setSelectedNotebook={setActiveNotebook}
+            isCreatingNew={isCreatingNew}
+            setIsCreatingNew={setIsCreatingNew}
+          />
+        )}
+
+        {/* Mobile bottom sheet — apenas montado no React quando isMobile=true */}
+        {selectedBook && isMobile && (
+          <NotebookSheet
+            open={isNotebookOpen}
+            onOpenChange={setIsNotebookOpen}
+            notebooks={notebooks}
+            allNotebooks={allNotebooks}
+            bookId={selectedBook.id}
+            chapter={chapterNumber}
+            version={selectedVersion}
+            bookName={selectedBook.name}
+            saveStatus={notebookSaveStatus}
+            syncError={notebookSyncError}
+            onSave={saveNotebook}
+            onDelete={deleteNotebook}
+            onNavigateToChapter={(bkId, ch, ver) => {
+              const bk = findBookGlobally(bkId);
+              if (bk) navigate(`/${ver}/${bk.slug}/${ch}`);
+            }}
+            getLocalDraft={getNotebookLocalDraft}
+            getNewLocalDraft={getNotebookNewLocalDraft}
+            selectedNotebook={activeNotebook}
+            setSelectedNotebook={setActiveNotebook}
+            isCreatingNew={isCreatingNew}
+            setIsCreatingNew={setIsCreatingNew}
+          />
+        )}
       </div>
     </Layout>
   );
