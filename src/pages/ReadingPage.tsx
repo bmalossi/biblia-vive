@@ -1807,11 +1807,12 @@ export default function ReadingPage() {
         />
 
         {/* ── Caderno do capítulo ── */}
-        {selectedBook && !preferences.focusMode && (
+        {selectedBook && (
           <NotebookFloatingButton
             notebooksCount={notebooks.length}
             onClick={handleOpenNotebook}
             isOpen={isNotebookOpen}
+            isFocusMode={preferences.focusMode}
           />
         )}
 

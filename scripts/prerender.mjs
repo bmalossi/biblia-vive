@@ -1,429 +1,512 @@
+/**
+ * scripts/prerender.mjs
+ * Bíblia Vive — Static HTML Pre-renderer
+ *
+ * Gera arquivos HTML estáticos indexáveis para:
+ *   • Capítulos de todas as versões da Bíblia (ACF, ARC, NVI, KJV)
+ *   • Artigos publicados (com corpo completo, via Supabase)
+ *   • Páginas institucionais (Home, Planos, Artigos index)
+ *   • Sitemap.xml unificado
+ *
+ * Requisitos: rodar APÓS `vite build` (precisa de dist/index.html).
+ */
+
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
+import { marked } from 'marked';
 
 dotenv.config();
 
-// ─── localId → routeSlug map ─────────────────────────────────────────────────
-// The public/bible/pt-br/acf/ folders use "localIds" (e.g. "ps", "ho", "mk"),
-// but the app routes use canonical slugs from books.json (e.g. "sl", "os", "mc").
-// This map converts localId → routeSlug so the sitemap and canonical URLs are
-// consistent with what the React Router resolves — preventing soft 404s.
-//
-// Derived from the inverse of ROUTE_TO_LOCAL_ID in src/lib/bookResolver.ts.
+// ─── Marked config ────────────────────────────────────────────────────────────
+marked.setOptions({ breaks: true, gfm: true });
+
+// ─── Paths ────────────────────────────────────────────────────────────────────
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const DIST_DIR     = path.resolve(PROJECT_ROOT, 'dist');
+const BIBLE_BASE   = path.resolve(PROJECT_ROOT, 'public/bible');
+
+const CANONICAL_ORIGIN = 'https://www.bibliavive.com.br';
+
+// ─── Env ──────────────────────────────────────────────────────────────────────
+const SUPABASE_URL        = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const FB_APP_ID           = process.env.VITE_FB_APP_ID || '1035985160869680';
+
+// ─── Bible versions config ────────────────────────────────────────────────────
+/**
+ * Each entry describes one Bible version that will be pre-rendered.
+ *   localPath : relative path inside public/bible/ to the version's book folders
+ *   label     : human-readable translation name shown in <title> / meta
+ *   lang      : BCP-47 language tag used in the HTML lang attribute
+ */
+const BIBLE_VERSIONS = [
+  { version: 'acf', localPath: 'pt-br/acf', label: 'ACF',  lang: 'pt-BR' },
+  { version: 'arc', localPath: 'pt-br/arc', label: 'ARC',  lang: 'pt-BR' },
+  { version: 'nvi', localPath: 'pt-br/nvi', label: 'NVI',  lang: 'pt-BR' },
+  { version: 'kjv', localPath: 'en/kjv',    label: 'KJV',  lang: 'en'    },
+];
+
+// ─── localId → routeSlug map ──────────────────────────────────────────────────
+// The public/bible folders use "localIds" (e.g. "ps", "ho", "mk"),
+// but app routes use canonical slugs from books.json (e.g. "sl", "os", "mc").
+// This map is shared by all versions (they use the same folder names).
 const LOCAL_ID_TO_ROUTE_SLUG = {
   // Old Testament
-  jud:  'jz',    // Juízes   (folder=jud,  slug=jz)
-  job:  'jo',    // Jó       (folder=job,  slug=jo)
-  jo:   'joa',   // João     (folder=jo,   slug=joa)  ← NT but resolves here too
-  act:  'atos',  // Atos     (folder=act,  slug=atos)
-  '1kgs': '1rs', // 1 Reis   (folder=1kgs, slug=1rs)
-  '2kgs': '2rs', // 2 Reis   (folder=2kgs, slug=2rs)
-  '1ch':  '1cr', // 1 Crôn.  (folder=1ch,  slug=1cr)
-  '2ch':  '2cr', // 2 Crôn.  (folder=2ch,  slug=2cr)
-  ps:   'sl',    // Salmos   (folder=ps,   slug=sl)
-  prv:  'pv',    // Provérb. (folder=prv,  slug=pv)
-  so:   'ct',    // Cânticos (folder=so,   slug=ct)
-  ho:   'os',    // Oséias   (folder=ho,   slug=os)
-  hk:   'hc',    // Habacuque(folder=hk,   slug=hc)
-  zp:   'sf',    // Sofonias (folder=zp,   slug=sf)
-  hg:   'ag',    // Ageu     (folder=hg,   slug=ag)
-  mi:   'mq',    // Miquéias (folder=mi,   slug=mq)
-  mk:   'mc',    // Marcos   (folder=mk,   slug=mc)
-  lk:   'lc',    // Lucas    (folder=lk,   slug=lc)
-  eph:  'ef',    // Efésios  (folder=eph,  slug=ef)
-  ph:   'fp',    // Filipens.(folder=ph,   slug=fp)
-  jm:   'tg',    // Tiago    (folder=jm,   slug=tg)
-  re:   'ap',    // Apocalip.(folder=re,   slug=ap)
-  ezr:  'ed',    // Esdras   (folder=ezr,  slug=ed)
-  phm:  'fm',    // Filemom  (folder=phm,  slug=fm)
+  jud:    'jz',   // Juízes
+  job:    'jo',   // Jó
+  jo:     'joa',  // João  (NT — folder=jo, route=joa)
+  act:    'atos', // Atos
+  '1kgs': '1rs',
+  '2kgs': '2rs',
+  '1ch':  '1cr',
+  '2ch':  '2cr',
+  ps:     'sl',   // Salmos
+  prv:    'pv',   // Provérbios
+  so:     'ct',   // Cânticos
+  ho:     'os',   // Oséias
+  hk:     'hc',   // Habacuque
+  zp:     'sf',   // Sofonias
+  hg:     'ag',   // Ageu
+  mi:     'mq',   // Miquéias
+  mk:     'mc',   // Marcos
+  lk:     'lc',   // Lucas
+  eph:    'ef',   // Efésios
+  ph:     'fp',   // Filipenses
+  jm:     'tg',   // Tiago
+  re:     'ap',   // Apocalipse
+  ezr:    'ed',   // Esdras
+  phm:    'fm',   // Filemom
 };
 
-/**
- * Given a folder name (localId from public/bible), returns the canonical route
- * slug used in the URL (from books.json). Falls back to the folder name itself
- * if no mapping is needed.
- */
 function toRouteSlug(localId) {
   return LOCAL_ID_TO_ROUTE_SLUG[localId] ?? localId;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PROJECT_ROOT = path.resolve(__dirname, '..');
-const DIST_DIR = path.resolve(PROJECT_ROOT, 'dist');
-const BOOKS_DATA_PATH = path.resolve(PROJECT_ROOT, 'src/data/books.json');
-const BIBLE_BASE_PATH = path.resolve(PROJECT_ROOT, 'public/bible/pt-br/acf');
-
-const CANONICAL_ORIGIN = 'https://www.bibliavive.com.br';
-
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const FB_APP_ID = process.env.VITE_FB_APP_ID || '1035985160869680';
-
-async function fetchPublishedArticles() {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-    console.warn('[prerender] Warning: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set. Skipping article prerendering.');
-    return [];
-  }
-
-  try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/articles?status=eq.publicado&select=*`, {
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Supabase query failed: ${response.status}`);
-    }
-
-    const articles = await response.json();
-    return articles;
-  } catch (err) {
-    console.warn('[prerender] Warning: Could not fetch articles from Supabase. Continuing with chapter prerendering.');
-    console.warn(err.message);
-    return [];
-  }
-}
-
-function generateArticleMetaTags(article) {
-  const title = article.meta_title || `${article.title} — Bíblia Vive`;
-  const description = article.meta_description || article.body?.substring(0, 160).replace(/[#*_`~\[\]]/g, '') || '';
-  const url = `${CANONICAL_ORIGIN}/artigos/${article.slug}`;
-
-  const metaTags = {
-    'META_TITLE': `<title>${title}</title>`,
-    'META_DESCRIPTION': `<meta name="description" content="${description.substring(0, 160)}" />`,
-    'OG_URL': `<meta property="og:url" content="${url}" />`,
-    'OG_TITLE': `<meta property="og:title" content="${title}" />`,
-    'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
-    'OG_TYPE': `<meta property="og:type" content="article" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`}" />`,
-    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${title}" />
-  <meta name="twitter:description" content="${description.substring(0, 160)}" />
-  <meta name="twitter:image" content="${article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`}" />`,
-    'CANONICAL_URL': `<link rel="canonical" href="${url}" />`,
-    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"${article.title}","description":"${description.substring(0, 160)}","url":"${url}"}</script>`
-  };
-
-  return metaTags;
-}
-
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 async function readJson(filePath) {
   const content = await fs.readFile(filePath, 'utf-8');
   return JSON.parse(content);
 }
 
-async function getAvailableBooks() {
-  const entries = await fs.readdir(BIBLE_BASE_PATH, { withFileTypes: true });
-  const books = [];
+function stripHtml(html) {
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const bookJsonPath = path.join(BIBLE_BASE_PATH, entry.name, `${entry.name}.json`);
-      try {
-        const bookData = await readJson(bookJsonPath);
-        books.push({
-          folder: entry.name,
-          name: bookData.name,
-          chapters: bookData.chapters.length
-        });
-      } catch (err) {
-        // Skip if can't read
-      }
-    }
+/**
+ * Returns all book subdirectory entries for a given version base path.
+ */
+async function getAvailableBooks(versionBasePath) {
+  const fullPath = path.join(BIBLE_BASE, versionBasePath);
+  let entries;
+  try {
+    entries = await fs.readdir(fullPath, { withFileTypes: true });
+  } catch {
+    console.warn(`[prerender] ⚠ Version path not found: ${fullPath}`);
+    return [];
   }
 
+  const books = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const bookJsonPath = path.join(fullPath, entry.name, `${entry.name}.json`);
+    try {
+      const bookData = await readJson(bookJsonPath);
+      books.push({ folder: entry.name, name: bookData.name, chapters: bookData.chapters });
+    } catch {
+      // skip unreadable books
+    }
+  }
   return books;
 }
 
-function generateMetaTags(bookName, bookSlug, chapterNum, verses) {
-  const title = `${bookName} — Capítulo ${chapterNum} | ACF | Bíblia Vive`;
-  const description = verses.slice(0, 3).join(' ');
-  // Use the canonical route slug (from books.json) — NOT the localId folder name.
-  // e.g. Salmos: folder=ps → routeSlug=sl → URL /acf/sl/27 (not /acf/ps/27)
-  const routeSlug = toRouteSlug(bookSlug);
-  const url = `${CANONICAL_ORIGIN}/acf/${routeSlug}/${chapterNum}`;
-  const text = verses.slice(0, 3).join(' ');
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Chapter",
-    "name": title,
-    "position": chapterNum,
-    "isPartOf": {
-      "@type": "Book",
-      "name": `${bookName} — ACF`,
-      "url": `${CANONICAL_ORIGIN}/acf/${routeSlug}`
-    },
-    "text": text
-  };
-
-  const metaTags = {
-    'META_TITLE': `<title>${title}</title>`,
-    'META_DESCRIPTION': `<meta name="description" content="${description.substring(0, 160)}" />`,
-    'OG_URL': `<meta property="og:url" content="${url}" />`,
-    'OG_TITLE': `<meta property="og:title" content="${title}" />`,
-    'OG_DESCRIPTION': `<meta property="og:description" content="${description.substring(0, 160)}" />`,
-    'OG_TYPE': `<meta property="og:type" content="website" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${title}" />
-  <meta name="twitter:description" content="${description.substring(0, 160)}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'CANONICAL_URL': `<link rel="canonical" href="${url}" />`,
-    'JSON_LD': `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
-    'SEO_CONTENT': `<h1>${bookName} ${chapterNum}</h1>` + verses.map((v, i) => `<p><sup>${i + 1}</sup> ${v}</p>`).join('')
-  };
-
-  return metaTags;
-}
-
+/**
+ * Replaces <!--PLACEHOLDER--> comments in the HTML template.
+ */
 function replacePlaceholders(html, metaTags) {
   let result = html;
-  for (const [placeholder, replacement] of Object.entries(metaTags)) {
-    result = result.replace(`<!--${placeholder}-->`, replacement);
+  for (const [key, value] of Object.entries(metaTags)) {
+    result = result.replace(`<!--${key}-->`, value ?? '');
   }
   return result;
 }
 
-async function prerender() {
-  console.log('[prerender] Starting...');
+// ─── Supabase ─────────────────────────────────────────────────────────────────
+async function fetchPublishedArticles() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    console.warn('[prerender] ⚠ Supabase env vars missing — skipping article prerendering.');
+    return [];
+  }
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/articles?status=eq.publicado&select=*`,
+      {
+        headers: {
+          apikey: SUPABASE_SERVICE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+        },
+      },
+    );
+    if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[prerender] ⚠ Could not fetch articles:', err.message);
+    return [];
+  }
+}
 
+// ─── Meta tag generators ──────────────────────────────────────────────────────
+
+/**
+ * Generates all <head> meta tags + SEO_CONTENT for a Bible chapter.
+ */
+function generateChapterMetaTags(bookName, localId, chapterNum, verses, version, versionLabel) {
+  const routeSlug  = toRouteSlug(localId);
+  const url        = `${CANONICAL_ORIGIN}/${version}/${routeSlug}/${chapterNum}`;
+  const title      = `${bookName} ${chapterNum} | ${versionLabel} | Bíblia Vive`;
+  const descText   = verses.slice(0, 3).join(' ').substring(0, 160);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Chapter',
+    name: title,
+    position: chapterNum,
+    isPartOf: {
+      '@type': 'Book',
+      name: `${bookName} — ${versionLabel}`,
+      url: `${CANONICAL_ORIGIN}/${version}/${routeSlug}`,
+    },
+    text: descText,
+    inLanguage: version === 'kjv' ? 'en' : 'pt-BR',
+  };
+
+  // Build the visible SEO block: h1 + all verses as <p>
+  const seoContent =
+    `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>${bookName} — Capítulo ${chapterNum} (${versionLabel})</h1>` +
+    verses.map((v, i) => `<p><sup>${i + 1}</sup> ${v}</p>`).join('') +
+    `</article>`;
+
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${descText}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${descText}" />`,
+    OG_TYPE:          `<meta property="og:type" content="website" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${descText}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
+}
+
+/**
+ * Generates all <head> meta tags + SEO_CONTENT for a published article.
+ * Uses `marked` to render the full markdown body into HTML.
+ */
+function generateArticleMetaTags(article) {
+  const title       = article.meta_title || `${article.title} — Bíblia Vive`;
+  const rawDesc     = article.meta_description
+    || stripHtml(String(article.body || '')).substring(0, 160);
+  const description = rawDesc.substring(0, 160);
+  const url         = `${CANONICAL_ORIGIN}/artigos/${article.slug}`;
+  const coverImage  = article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`;
+
+  // Render the full article body from Markdown → HTML
+  let bodyHtml = '';
+  if (article.body) {
+    try {
+      bodyHtml = marked.parse(String(article.body));
+    } catch {
+      bodyHtml = `<p>${String(article.body).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`;
+    }
+  }
+
+  // Build publication date block
+  const pubDateBlock = article.published_at
+    ? `<time datetime="${article.published_at}" style="color:#666;font-size:0.875rem;display:block;margin-bottom:1rem">${new Date(article.published_at).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' })}</time>`
+    : '';
+
+  // Cover image block
+  const coverBlock = article.cover_image_url
+    ? `<img src="${article.cover_image_url}" alt="${article.title}" style="width:100%;max-width:780px;height:auto;border-radius:8px;margin-bottom:1.5rem" />`
+    : '';
+
+  // Subtitle block
+  const subtitleBlock = article.subtitle
+    ? `<p style="font-size:1.125rem;color:#555;margin-bottom:1rem"><em>${article.subtitle}</em></p>`
+    : '';
+
+  const seoContent =
+    `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>${article.title}</h1>` +
+    subtitleBlock +
+    pubDateBlock +
+    coverBlock +
+    bodyHtml +
+    `</article>`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description,
+    url,
+    image: coverImage,
+    ...(article.published_at ? { datePublished: article.published_at } : {}),
+    ...(article.updated_at   ? { dateModified:  article.updated_at   } : {}),
+    publisher: { '@type': 'Organization', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
+    inLanguage: 'pt-BR',
+  };
+
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${description}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${description}" />`,
+    OG_TYPE:          `<meta property="og:type" content="article" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${coverImage}" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${description}" />\n  <meta name="twitter:image" content="${coverImage}" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
+}
+
+// ─── Static pages ─────────────────────────────────────────────────────────────
+
+function homeMetaTags() {
+  const title = 'Bíblia Vive — Leia, Estude e Compartilhe a Bíblia';
+  const desc  = 'Leia, estude e compartilhe a Bíblia com comentários, planos de leitura e versículo do dia.';
+  const url   = `${CANONICAL_ORIGIN}/`;
+  const seoContent =
+    `<main style="font-family:sans-serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Bíblia Vive — Leia e Estude a Bíblia Online</h1>` +
+    `<p>${desc}</p>` +
+    `<nav aria-label="Navegação principal"><ul>` +
+    `<li><a href="/acf/gn/1">Bíblia ACF — Almeida Corrigida Fiel</a></li>` +
+    `<li><a href="/arc/gn/1">Bíblia ARC — Almeida Revista e Corrigida</a></li>` +
+    `<li><a href="/nvi/gn/1">Bíblia NVI — Nova Versão Internacional</a></li>` +
+    `<li><a href="/kjv/gn/1">Bible KJV — King James Version</a></li>` +
+    `<li><a href="/artigos">Artigos Bíblicos</a></li>` +
+    `<li><a href="/planos">Planos de Leitura</a></li>` +
+    `</ul></nav>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebSite', seoContent, inLanguage: 'pt-BR' });
+}
+
+function planosMetaTags() {
+  const title = 'Planos de Leitura | Bíblia Vive';
+  const desc  = 'Escolha um plano de leitura bíblica e leia a Bíblia em 30, 90 ou 365 dias. Planos diários com histórico de progresso.';
+  const url   = `${CANONICAL_ORIGIN}/planos`;
+  const seoContent =
+    `<main style="font-family:sans-serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Planos de Leitura Bíblica</h1>` +
+    `<p>${desc}</p>` +
+    `<ul>` +
+    `<li>Plano de 30 dias — leitura intensiva</li>` +
+    `<li>Plano de 90 dias — leitura trimestral</li>` +
+    `<li>Plano de 365 dias — leitura anual completa</li>` +
+    `</ul>` +
+    `<a href="/">Voltar para a página inicial</a>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
+function artigosIndexMetaTags(articles) {
+  const title = 'Artigos Bíblicos | Bíblia Vive';
+  const desc  = 'Explore artigos e conteúdos sobre a Palavra de Deus.';
+  const url   = `${CANONICAL_ORIGIN}/artigos`;
+  const articleLinks = articles.slice(0, 30).map(a =>
+    `<li><a href="/artigos/${a.slug}">${a.title}</a></li>`
+  ).join('');
+  const seoContent =
+    `<main style="font-family:sans-serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Artigos Bíblicos</h1>` +
+    `<p>${desc}</p>` +
+    (articleLinks ? `<ul>${articleLinks}</ul>` : '') +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
+/**
+ * Shared builder for simple static pages.
+ */
+function buildStaticMeta({ title, desc, url, type, seoContent, inLanguage = 'pt-BR' }) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': type,
+    name: title,
+    description: desc,
+    url,
+    inLanguage,
+  };
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
+    OG_TYPE:          `<meta property="og:type" content="website" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
+}
+
+// ─── Sitemap helpers ──────────────────────────────────────────────────────────
+function sitemapUrl(loc, changefreq, priority) {
+  return `  <url>\n    <loc>${loc}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>\n`;
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+async function prerender() {
+  console.log('[prerender] Starting full multi-version pre-render...\n');
+
+  // Load template
   const templatePath = path.join(DIST_DIR, 'index.html');
   let template;
-
   try {
     template = await fs.readFile(templatePath, 'utf-8');
-  } catch (err) {
-    console.error(`[prerender] Error: dist/index.html not found. Run 'vite build' first.`);
+  } catch {
+    console.error('[prerender] ✗ dist/index.html not found. Run `vite build` first.');
     process.exit(1);
   }
 
-  const books = await getAvailableBooks();
+  // ── Fetch articles ──
+  const articles = await fetchPublishedArticles();
+  console.log(`[prerender] Found ${articles.length} published articles.\n`);
 
-  let totalChaptersGenerated = 0;
+  let totalChapters = 0;
+  let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
-  for (const book of books) {
-    const bookJsonPath = path.join(BIBLE_BASE_PATH, book.folder, `${book.folder}.json`);
+  // ── Bible versions loop ──
+  for (const versionCfg of BIBLE_VERSIONS) {
+    const { version, localPath, label } = versionCfg;
+    console.log(`[prerender] Processing version: ${version.toUpperCase()} (${localPath})`);
 
-    let bookData;
-    try {
-      bookData = await readJson(bookJsonPath);
-    } catch (err) {
-      console.warn(`[prerender] Warning: Could not read ${bookJsonPath}`);
+    const books = await getAvailableBooks(localPath);
+    if (books.length === 0) {
+      console.warn(`[prerender]   ⚠ No books found for ${version}. Skipping.\n`);
       continue;
     }
 
-    const chapters = bookData.chapters;
+    let versionChapters = 0;
 
-    for (let chapterNum = 1; chapterNum <= chapters.length; chapterNum++) {
-      const verses = chapters[chapterNum - 1];
-
-      const metaTags = generateMetaTags(bookData.name, book.folder, chapterNum, verses);
-      const prerenderedHtml = replacePlaceholders(template, metaTags);
-
+    for (const book of books) {
       const routeSlug = toRouteSlug(book.folder);
-      const outputDir = path.join(DIST_DIR, 'acf', routeSlug, String(chapterNum));
-      await fs.mkdir(outputDir, { recursive: true });
 
-      const outputPath = path.join(outputDir, 'index.html');
-      await fs.writeFile(outputPath, prerenderedHtml, 'utf-8');
+      // Book index URL in sitemap
+      sitemapXml += sitemapUrl(`${CANONICAL_ORIGIN}/${version}/${routeSlug}`, 'weekly', '0.7');
 
-      totalChaptersGenerated++;
+      for (let chapNum = 1; chapNum <= book.chapters.length; chapNum++) {
+        const verses = book.chapters[chapNum - 1];
+
+        const metaTags = generateChapterMetaTags(
+          book.name, book.folder, chapNum, verses, version, label
+        );
+        const html = replacePlaceholders(template, metaTags);
+
+        const outDir = path.join(DIST_DIR, version, routeSlug, String(chapNum));
+        await fs.mkdir(outDir, { recursive: true });
+        await fs.writeFile(path.join(outDir, 'index.html'), html, 'utf-8');
+
+        // Sitemap entry for chapter
+        sitemapXml += sitemapUrl(
+          `${CANONICAL_ORIGIN}/${version}/${routeSlug}/${chapNum}`,
+          'weekly', '0.8'
+        );
+
+        versionChapters++;
+      }
     }
+
+    totalChapters += versionChapters;
+    console.log(`[prerender]   ✓ ${versionChapters} chapters generated for ${version.toUpperCase()}\n`);
   }
 
-  console.log(`[prerender] ✓ Generated ${totalChaptersGenerated} chapter HTML files`);
-
-  const planosTitle = 'Planos de Leitura | Bíblia Vive';
-  const planosDescription = 'Escolha um plano de leitura biblica e le a Biblia em 30, 90 ou 365 dias. Planos diarios com historico de progresso e sincronizacao entre dispositivos.';
-  const planosUrl = `${CANONICAL_ORIGIN}/planos`;
-
-  const planosMetaTags = {
-    'META_TITLE': `<title>${planosTitle}</title>`,
-    'META_DESCRIPTION': `<meta name="description" content="${planosDescription}" />`,
-    'OG_URL': `<meta property="og:url" content="${planosUrl}" />`,
-    'OG_TITLE': `<meta property="og:title" content="${planosTitle}" />`,
-    'OG_DESCRIPTION': `<meta property="og:description" content="${planosDescription}" />`,
-    'OG_TYPE': `<meta property="og:type" content="website" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${planosTitle}" />
-  <meta name="twitter:description" content="${planosDescription}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'CANONICAL_URL': `<link rel="canonical" href="${planosUrl}" />`,
-    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Planos de Leitura","description":"${planosDescription}","url":"${planosUrl}"}</script>`
-  };
-
-  const planosHtml = replacePlaceholders(template, planosMetaTags);
-  const planosDir = path.join(DIST_DIR, 'planos');
-  await fs.mkdir(planosDir, { recursive: true });
-  const planosPath = path.join(planosDir, 'index.html');
-  await fs.writeFile(planosPath, planosHtml, 'utf-8');
-  console.log('[prerender] ✓ Generated planos/index.html');
-
-  // Prerender Artigos
-  const articles = await fetchPublishedArticles();
-  let totalArticlesGenerated = 0;
-
+  // ── Articles ──
+  console.log('[prerender] Processing articles...');
+  let totalArticles = 0;
   for (const article of articles) {
     try {
       const metaTags = generateArticleMetaTags(article);
-      const prerenderedHtml = replacePlaceholders(template, metaTags);
-
-      const outputDir = path.join(DIST_DIR, 'artigos', article.slug);
-      await fs.mkdir(outputDir, { recursive: true });
-
-      const outputPath = path.join(outputDir, 'index.html');
-      await fs.writeFile(outputPath, prerenderedHtml, 'utf-8');
-
-      totalArticlesGenerated++;
+      const html     = replacePlaceholders(template, metaTags);
+      const outDir   = path.join(DIST_DIR, 'artigos', article.slug);
+      await fs.mkdir(outDir, { recursive: true });
+      await fs.writeFile(path.join(outDir, 'index.html'), html, 'utf-8');
+      sitemapXml += sitemapUrl(`${CANONICAL_ORIGIN}/artigos/${article.slug}`, 'weekly', '0.6');
+      totalArticles++;
     } catch (err) {
-      console.warn(`[prerender] Warning: Could not prerender article ${article.slug}: ${err.message}`);
+      console.warn(`[prerender]   ⚠ Could not prerender article "${article.slug}": ${err.message}`);
     }
   }
+  console.log(`[prerender] ✓ ${totalArticles} article pages generated.\n`);
 
-  console.log(`[prerender] ✓ Generated ${totalArticlesGenerated} article HTML files`);
+  // ── Static institutional pages ──
+  console.log('[prerender] Processing static pages...');
 
-  // Prerender Artigos Index
-  const artigosIndexTitle = 'Artigos Bíblicos | Bíblia Vive';
-  const artigosIndexDescription = 'Explore artigos e conteúdos sobre a Palavra de Deus.';
-  const artigosIndexUrl = `${CANONICAL_ORIGIN}/artigos`;
-
-  const artigosIndexMetaTags = {
-    'META_TITLE': `<title>${artigosIndexTitle}</title>`,
-    'META_DESCRIPTION': `<meta name="description" content="${artigosIndexDescription}" />`,
-    'OG_URL': `<meta property="og:url" content="${artigosIndexUrl}" />`,
-    'OG_TITLE': `<meta property="og:title" content="${artigosIndexTitle}" />`,
-    'OG_DESCRIPTION': `<meta property="og:description" content="${artigosIndexDescription}" />`,
-    'OG_TYPE': `<meta property="og:type" content="website" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${artigosIndexTitle}" />
-  <meta name="twitter:description" content="${artigosIndexDescription}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'CANONICAL_URL': `<link rel="canonical" href="${artigosIndexUrl}" />`,
-    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Artigos Bíblicos","description":"${artigosIndexDescription}","url":"${artigosIndexUrl}"}</script>`
-  };
-
-  const artigosIndexHtml = replacePlaceholders(template, artigosIndexMetaTags);
-  const artigosIndexDir = path.join(DIST_DIR, 'artigos');
-  await fs.mkdir(artigosIndexDir, { recursive: true });
-  const artigosIndexPath = path.join(artigosIndexDir, 'index.html');
-  await fs.writeFile(artigosIndexPath, artigosIndexHtml, 'utf-8');
-  console.log('[prerender] ✓ Generated artigos/index.html');
-
-  // Prerender Home (dist/index.html)
-  const homeTitle = 'Bíblia Vive — Leia, Estude e Compartilhe a Bíblia';
-  const homeDescription = 'Leia, estude e compartilhe a Bíblia com comentários, planos de leitura e versículo do dia.';
-  const homeUrl = `${CANONICAL_ORIGIN}/`;
-
-  const homeMetaTags = {
-    'META_TITLE': `<title>${homeTitle}</title>`,
-    'META_DESCRIPTION': `<meta name="description" content="${homeDescription}" />`,
-    'OG_URL': `<meta property="og:url" content="${homeUrl}" />`,
-    'OG_TITLE': `<meta property="og:title" content="${homeTitle}" />`,
-    'OG_DESCRIPTION': `<meta property="og:description" content="${homeDescription}" />`,
-    'OG_TYPE': `<meta property="og:type" content="website" />`,
-    'OG_IMAGE': `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'FB_APP_ID': `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    'TWITTER_CARD': `<meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${homeTitle}" />
-  <meta name="twitter:description" content="${homeDescription}" />
-  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    'CANONICAL_URL': `<link rel="canonical" href="${homeUrl}" />`,
-    'JSON_LD': `<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bíblia Vive","url":"${homeUrl}","description":"${homeDescription}","inLanguage":"pt-BR"}</script>`
-  };
-
-  const homeHtml = replacePlaceholders(template, homeMetaTags);
+  // Home — overwrites dist/index.html
+  const homeHtml = replacePlaceholders(template, homeMetaTags());
   await fs.writeFile(templatePath, homeHtml, 'utf-8');
-  console.log('[prerender] ✓ Updated dist/index.html with home meta tags');
+  console.log('[prerender]   ✓ dist/index.html (Home)');
 
-  const staticUrls = [
-    { loc: `${CANONICAL_ORIGIN}/`, priority: '1.0', changefreq: 'daily' },
-    { loc: `${CANONICAL_ORIGIN}/planos`, priority: '0.8', changefreq: 'weekly' },
-    { loc: `${CANONICAL_ORIGIN}/artigos`, priority: '0.8', changefreq: 'weekly' },
-    { loc: `${CANONICAL_ORIGIN}/sobre`, priority: '0.5', changefreq: 'monthly' },
-    { loc: `${CANONICAL_ORIGIN}/apoiar`, priority: '0.5', changefreq: 'monthly' },
-    { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, priority: '0.3', changefreq: 'monthly' },
-    { loc: `${CANONICAL_ORIGIN}/pro`, priority: '0.8', changefreq: 'weekly' }
+  // /planos
+  const planosHtml = replacePlaceholders(template, planosMetaTags());
+  const planosDir  = path.join(DIST_DIR, 'planos');
+  await fs.mkdir(planosDir, { recursive: true });
+  await fs.writeFile(path.join(planosDir, 'index.html'), planosHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/planos/index.html');
+
+  // /artigos index
+  const artigosHtml = replacePlaceholders(template, artigosIndexMetaTags(articles));
+  const artigosDir  = path.join(DIST_DIR, 'artigos');
+  await fs.mkdir(artigosDir, { recursive: true });
+  await fs.writeFile(path.join(artigosDir, 'index.html'), artigosHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/artigos/index.html');
+
+  // ── Sitemap — static pages ──
+  const STATIC_URLS = [
+    { loc: `${CANONICAL_ORIGIN}/`,              changefreq: 'daily',   priority: '1.0' },
+    { loc: `${CANONICAL_ORIGIN}/planos`,        changefreq: 'weekly',  priority: '0.8' },
+    { loc: `${CANONICAL_ORIGIN}/artigos`,       changefreq: 'weekly',  priority: '0.8' },
+    { loc: `${CANONICAL_ORIGIN}/sobre`,         changefreq: 'monthly', priority: '0.5' },
+    { loc: `${CANONICAL_ORIGIN}/apoiar`,        changefreq: 'monthly', priority: '0.5' },
+    { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${CANONICAL_ORIGIN}/pro`,           changefreq: 'weekly',  priority: '0.8' },
   ];
-
-  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-`;
-
-  for (const book of books) {
-    const bookJsonPath = path.join(BIBLE_BASE_PATH, book.folder, `${book.folder}.json`);
-    let bookData;
-    try {
-      bookData = await readJson(bookJsonPath);
-    } catch (err) {
-      continue;
-    }
-
-    // Convert the folder name (localId) to the canonical route slug used in URLs.
-    // This prevents soft 404: the sitemap must use the same slug the React Router resolves.
-    const routeSlug = toRouteSlug(book.folder);
-
-    // Book index page — use routeSlug, not book.folder
-    const bookUrl = `${CANONICAL_ORIGIN}/acf/${routeSlug}`;
-    sitemap += `  <url>
-    <loc>${bookUrl}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-`;
-
-    for (let chapterNum = 1; chapterNum <= bookData.chapters.length; chapterNum++) {
-      const url = `${CANONICAL_ORIGIN}/acf/${routeSlug}/${chapterNum}`;
-      sitemap += `  <url>
-    <loc>${url}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-`;
-    }
+  for (const s of STATIC_URLS) {
+    sitemapXml += sitemapUrl(s.loc, s.changefreq, s.priority);
   }
+  sitemapXml += '</urlset>';
 
-  for (const staticUrl of staticUrls) {
-    sitemap += `  <url>
-    <loc>${staticUrl.loc}</loc>
-    <changefreq>${staticUrl.changefreq}</changefreq>
-    <priority>${staticUrl.priority}</priority>
-  </url>
-`;
-  }
+  // Write sitemap
+  await fs.writeFile(path.join(DIST_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
 
-  for (const article of articles) {
-    const articleUrl = `${CANONICAL_ORIGIN}/artigos/${article.slug}`;
-    sitemap += `  <url>
-    <loc>${articleUrl}</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-`;
-  }
+  // Count sitemap URLs for reporting
+  const urlCount = (sitemapXml.match(/<url>/g) || []).length;
 
-  sitemap += `</urlset>`;
-
-  const sitemapPath = path.join(DIST_DIR, 'sitemap.xml');
-  await fs.writeFile(sitemapPath, sitemap, 'utf-8');
-  console.log('[prerender] ✓ Generated sitemap.xml');
-
-  console.log('[prerender] Done!');
+  // ── Summary ──
+  console.log('\n════════════════════════════════════════════════');
+  console.log('[prerender] ✅ Done!');
+  console.log(`  Bible chapters : ${totalChapters}`);
+  console.log(`  Articles       : ${totalArticles}`);
+  console.log(`  Sitemap URLs   : ${urlCount}`);
+  console.log('════════════════════════════════════════════════\n');
 }
 
 prerender().catch(err => {
-  console.error('[prerender] Error:', err);
+  console.error('[prerender] Fatal error:', err);
   process.exit(1);
 });

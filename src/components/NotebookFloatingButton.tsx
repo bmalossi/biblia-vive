@@ -13,12 +13,14 @@ interface NotebookFloatingButtonProps {
     notebooksCount: number;
     onClick: () => void;
     isOpen: boolean;
+    isFocusMode?: boolean;
 }
 
 export default function NotebookFloatingButton({
     notebooksCount,
     onClick,
     isOpen,
+    isFocusMode = false,
 }: NotebookFloatingButtonProps) {
     const { t } = useTranslation();
 
@@ -34,7 +36,9 @@ export default function NotebookFloatingButton({
             aria-label={accessibleName}
             title={accessibleName}
             className={cn(
-                "fixed left-4 bottom-20 md:left-6 md:bottom-6 z-40",
+                "fixed left-4 z-40",
+                isFocusMode ? "bottom-6" : "bottom-20 md:bottom-6",
+                "md:left-6 md:bottom-6",
                 "flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-300",
                 "border focus:outline-none focus:ring-2 focus:ring-gold/50 hover:scale-105 active:scale-95",
                 isOpen
