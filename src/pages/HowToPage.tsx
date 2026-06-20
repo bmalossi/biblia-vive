@@ -1,15 +1,16 @@
 import { lazy, Suspense, useState } from "react";
-import { BookMarked, BookOpen, Loader2, Palette, PenLine, Quote, Share2 } from "lucide-react";
+import { BookMarked, BookOpen, Loader2, Palette, PenLine, Quote, Share2, Notebook } from "lucide-react";
 import Layout from "@/components/Layout";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const HowToStudyTab = lazy(() => import("./how-to/HowToStudyTab"));
+const HowToNotebookTab = lazy(() => import("./how-to/HowToNotebookTab"));
 const HowToNotesTab = lazy(() => import("./how-to/HowToNotesTab"));
 const HowToHighlightsTab = lazy(() => import("./how-to/HowToHighlightsTab"));
 const HowToShareTab = lazy(() => import("./how-to/HowToShareTab"));
 const HowToPlansTab = lazy(() => import("./how-to/HowToPlansTab"));
 
-type TabId = "study" | "notes" | "highlights" | "share" | "plans";
+type TabId = "study" | "notebook" | "notes" | "highlights" | "share" | "plans";
 
 interface TabDef {
   id: TabId;
@@ -25,6 +26,13 @@ const tabs: TabDef[] = [
     icon: <Quote className="h-4 w-4" />,
     label: "Estudar",
     sublabel: "Comentários teológicos",
+    badge: "novo",
+  },
+  {
+    id: "notebook",
+    icon: <Notebook className="h-4 w-4" />,
+    label: "Caderno",
+    sublabel: "Estudo dos capítulos",
     badge: "novo",
   },
   {
@@ -211,6 +219,7 @@ export default function HowToPage() {
             aria-labelledby={`tab-${activeTab}`}
           >
             {activeTab === "study" && <HowToStudyTab />}
+            {activeTab === "notebook" && <HowToNotebookTab />}
             {activeTab === "notes" && <HowToNotesTab />}
             {activeTab === "highlights" && <HowToHighlightsTab />}
             {activeTab === "share" && <HowToShareTab />}
