@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, Loader2, Trash2 } from "lucide-react";
+import { ArrowRight, Loader2, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     AlertDialog,
@@ -20,9 +20,16 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import type { ChapterNotebook } from "@/lib/notebookStore";
 import type { SaveStatus } from "@/hooks/useNotebooks";
+import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
 
 interface NotebookEditorProps {
     notebook: ChapterNotebook | null; // null = novo caderno em branco
@@ -34,6 +41,9 @@ interface NotebookEditorProps {
     onBack: () => void;
     /** Se definido, exibe botão "Ir para o capítulo" no header (útil quando vindo da aba Todos) */
     onNavigateToChapter?: () => void;
+    bookId?: string;
+    chapter?: number;
+    version?: string;
 }
 
 const SAVE_STATUS_LABELS: Record<string, string> = {
@@ -52,12 +62,47 @@ export default function NotebookEditor({
     onDelete,
     onBack,
     onNavigateToChapter,
+    bookId,
+    chapter,
+    version,
 }: NotebookEditorProps) {
     const [title, setTitle] = useState(notebook?.title || "");
     const [content, setContent] = useState(notebook?.content || "");
     const [isDeleting, setIsDeleting] = useState(false);
     const titleRef = useRef<HTMLInputElement>(null);
     const contentRef = useRef<HTMLTextAreaElement>(null);
+
+    const handleExportPDF = async () => {
+        const docNotebook: ChapterNotebook = {
+            id: notebook?.id ?? "novo",
+            userId: notebook?.userId ?? "",
+            title: title || null,
+            content: content,
+            bookId: notebook?.bookId ?? bookId ?? "",
+            chapter: notebook?.chapter ?? chapter ?? 1,
+            version: notebook?.version ?? version ?? "acf",
+            createdAt: notebook?.createdAt ?? new Date().toISOString(),
+            updatedAt: notebook?.updatedAt ?? new Date().toISOString(),
+        };
+        const titleLabel = title ? `Estudo: ${title}` : "Estudo Bíblico";
+        await exportNotebooksToPDF([docNotebook], titleLabel, title || "Estudo_Biblico");
+    };
+
+    const handleExportWord = () => {
+        const docNotebook: ChapterNotebook = {
+            id: notebook?.id ?? "novo",
+            userId: notebook?.userId ?? "",
+            title: title || null,
+            content: content,
+            bookId: notebook?.bookId ?? bookId ?? "",
+            chapter: notebook?.chapter ?? chapter ?? 1,
+            version: notebook?.version ?? version ?? "acf",
+            createdAt: notebook?.createdAt ?? new Date().toISOString(),
+            updatedAt: notebook?.updatedAt ?? new Date().toISOString(),
+        };
+        const titleLabel = title ? `Estudo: ${title}` : "Estudo Bíblico";
+        exportNotebooksToWord([docNotebook], titleLabel, title || "Estudo_Biblico");
+    };
 
     // Atualiza quando muda o caderno selecionado (ao trocar de caderno)
     useEffect(() => {
@@ -132,6 +177,35 @@ export default function NotebookEditor({
                             Ir ao capítulo
                             <ArrowRight className="h-3 w-3" />
                         </button>
+                    )}
+                    {/* Botão exportar */}
+                    {content.trim() && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    type="button"
+                                    aria-label="Exportar caderno"
+                                    title="Exportar caderno"
+                                    className="p-1.5 rounded-md text-app-text-muted hover:text-gold hover:bg-gold/10 transition-colors"
+                                >
+                                    <Download className="h-3.5 w-3.5" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[180px] bg-app-bg border-border text-app-text">
+                                <DropdownMenuItem
+                                    onClick={handleExportPDF}
+                                    className="text-xs hover:bg-gold/10 hover:text-gold cursor-pointer"
+                                >
+                                    Exportar para PDF
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={handleExportWord}
+                                    className="text-xs hover:bg-gold/10 hover:text-gold cursor-pointer"
+                                >
+                                    Exportar para Word
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     )}
                     {/* Botão excluir (apenas para cadernos existentes) */}
                     {notebook?.id && (

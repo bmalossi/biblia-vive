@@ -7,12 +7,26 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useCallback, useMemo, useState } from "react";
-import { BookText, Plus, Search, X } from "lucide-react";
+import { BookText, Plus, Search, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import NotebookEditor from "@/components/NotebookEditor";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { ChapterNotebook } from "@/lib/notebookStore";
 import type { SaveStatus } from "@/hooks/useNotebooks";
+import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
+import { ALL_BOOKS } from "@/lib/books";
+
+const bookOrderMap = new Map(ALL_BOOKS.map((book, index) => [book.id.toLowerCase(), index]));
+
+function getBookOrder(bookId: string): number {
+    return bookOrderMap.get(bookId.toLowerCase()) ?? 999;
+}
 
 interface NotebookWorkspaceProps {
     notebooks: ChapterNotebook[];
@@ -108,21 +122,89 @@ export default function NotebookWorkspace({
 }: NotebookWorkspaceProps) {
     const [activeTab, setActiveTab] = useState<TabId>("chapter");
     const [searchQuery, setSearchQuery] = useState("");
+    const [sortBy, setSortBy] = useState<"recent" | "biblical-asc" | "biblical-desc">("recent");
 
     const contextLabel = `${bookName} ${chapter} — ${version.toUpperCase()}`;
 
-    // ── Filtro por busca ──────────────────────────────────────────────────────
+    // ── Exportações em Lote ───────────────────────────────────────────────────
+    const handleExportFilteredPDF = async () => {
+        if (filtered.length === 0) return;
+        const label = activeTab === "chapter" 
+            ? `Cadernos: ${bookName} ${chapter}` 
+            : searchQuery 
+            ? `Cadernos (Busca: ${searchQuery})` 
+            : "Todos os Cadernos";
+        const filePrefix = activeTab === "chapter" 
+            ? `Cadernos_${bookName}_${chapter}` 
+            : "Todos_os_Cadernos";
+        await exportNotebooksToPDF(filtered, label, filePrefix);
+    };
+
+    const handleExportFilteredWord = () => {
+        if (filtered.length === 0) return;
+        const label = activeTab === "chapter" 
+            ? `Cadernos: ${bookName} ${chapter}` 
+            : searchQuery 
+            ? `Cadernos (Busca: ${searchQuery})` 
+            : "Todos os Cadernos";
+        const filePrefix = activeTab === "chapter" 
+            ? `Cadernos_${bookName}_${chapter}` 
+            : "Todos_os_Cadernos";
+        exportNotebooksToWord(filtered, label, filePrefix);
+    };
+
+    const handleExportAllPDF = async () => {
+        if (allNotebooks.length === 0) return;
+        await exportNotebooksToPDF(allNotebooks, "Todos os Cadernos", "Todos_os_Cadernos");
+    };
+
+    const handleExportAllWord = () => {
+        if (allNotebooks.length === 0) return;
+        exportNotebooksToWord(allNotebooks, "Todos os Cadernos", "Todos_os_Cadernos");
+    };
+
+    // ── Filtro por busca e Ordenação ──────────────────────────────────────────
     const filtered = useMemo(() => {
         const q = normalize(searchQuery);
         const source = activeTab === "chapter" ? notebooks : allNotebooks;
-        if (!q) return source;
-        return source.filter(
-            (nb) =>
-                normalize(nb.title || "").includes(q) ||
-                normalize(nb.content).includes(q) ||
-                normalize(`${nb.bookId} ${nb.chapter}`).includes(q)
-        );
-    }, [searchQuery, activeTab, notebooks, allNotebooks]);
+        
+        let result = source;
+        if (q) {
+            result = source.filter(
+                (nb) =>
+                    normalize(nb.title || "").includes(q) ||
+                    normalize(nb.content).includes(q) ||
+                    normalize(`${nb.bookId} ${nb.chapter}`).includes(q)
+            );
+        }
+
+        // Se estiver na aba "todos os cadernos", aplicar a ordenação
+        if (activeTab === "all") {
+            const sorted = [...result];
+            if (sortBy === "recent") {
+                sorted.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+            } else if (sortBy === "biblical-asc") {
+                sorted.sort((a, b) => {
+                    const orderA = getBookOrder(a.bookId);
+                    const orderB = getBookOrder(b.bookId);
+                    if (orderA !== orderB) return orderA - orderB;
+                    if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+                    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+                });
+            } else if (sortBy === "biblical-desc") {
+                sorted.sort((a, b) => {
+                    const orderA = getBookOrder(a.bookId);
+                    const orderB = getBookOrder(b.bookId);
+                    if (orderA !== orderB) return orderB - orderA;
+                    if (a.chapter !== b.chapter) return b.chapter - a.chapter;
+                    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+                });
+            }
+            return sorted;
+        }
+
+        return result;
+    }, [searchQuery, activeTab, notebooks, allNotebooks, sortBy]);
 
     const handleCreateNew = useCallback(() => {
         setSelectedNotebook(null);
@@ -203,14 +285,67 @@ export default function NotebookWorkspace({
                             Meu Caderno
                         </p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        aria-label="Fechar caderno"
-                        className="h-7 w-7 flex items-center justify-center rounded-md text-app-text-muted hover:text-app-text hover:bg-app-raised transition-colors"
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        {!isEditing && allNotebooks.length > 0 && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button
+                                        type="button"
+                                        aria-label="Exportar cadernos"
+                                        title="Exportar cadernos"
+                                        className="h-7 w-7 flex items-center justify-center rounded-md text-app-text-muted hover:text-gold hover:bg-gold/10 transition-colors"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-[220px] bg-app-bg border-border text-app-text">
+                                    {filtered.length > 0 && (
+                                        <>
+                                            <DropdownMenuItem
+                                                onClick={handleExportFilteredPDF}
+                                                className="text-xs hover:bg-gold/10 hover:text-gold cursor-pointer"
+                                            >
+                                                Exportar Filtro Atual (PDF)
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={handleExportFilteredWord}
+                                                className="text-xs hover:bg-gold/10 hover:text-gold cursor-pointer"
+                                            >
+                                                Exportar Filtro Atual (Word)
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+                                    {filtered.length > 0 && allNotebooks.length !== filtered.length && (
+                                        <div className="h-px bg-border/40 my-1" />
+                                    )}
+                                    {allNotebooks.length !== filtered.length && (
+                                        <>
+                                            <DropdownMenuItem
+                                                onClick={handleExportAllPDF}
+                                                className="text-xs hover:bg-gold/10 hover:text-gold cursor-pointer"
+                                            >
+                                                Exportar Tudo (PDF)
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={handleExportAllWord}
+                                                className="text-xs hover:bg-gold/10 hover:text-gold cursor-pointer"
+                                            >
+                                                Exportar Tudo (Word)
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            aria-label="Fechar caderno"
+                            className="h-7 w-7 flex items-center justify-center rounded-md text-app-text-muted hover:text-app-text hover:bg-app-raised transition-colors"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
                 </div>
 
                 {isEditing ? (
@@ -239,6 +374,9 @@ export default function NotebookWorkspace({
                                     )
                                     : undefined
                             }
+                            bookId={selectedNotebook?.bookId ?? bookId}
+                            chapter={selectedNotebook?.chapter ?? chapter}
+                            version={selectedNotebook?.version ?? version}
                         />
                     </div>
                 ) : (
@@ -287,6 +425,45 @@ export default function NotebookWorkspace({
                                 )}
                             </div>
                         </div>
+
+                        {/* Ordenação */}
+                        {activeTab === "all" && allNotebooks.length > 0 && (
+                            <div className="px-4 py-1.5 flex items-center justify-between shrink-0 border-b border-border/30 bg-app-surface/20">
+                                <span className="text-[0.65rem] text-app-text-muted font-medium">Ordenar:</span>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSortBy("recent")}
+                                        className={cn(
+                                            "text-[0.65rem] transition-colors hover:text-gold",
+                                            sortBy === "recent" ? "text-gold font-semibold" : "text-app-text-muted"
+                                        )}
+                                    >
+                                        Recentes
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSortBy("biblical-asc")}
+                                        className={cn(
+                                            "text-[0.65rem] transition-colors hover:text-gold",
+                                            sortBy === "biblical-asc" ? "text-gold font-semibold" : "text-app-text-muted"
+                                        )}
+                                    >
+                                        Livro ↑
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSortBy("biblical-desc")}
+                                        className={cn(
+                                            "text-[0.65rem] transition-colors hover:text-gold",
+                                            sortBy === "biblical-desc" ? "text-gold font-semibold" : "text-app-text-muted"
+                                        )}
+                                    >
+                                        Livro ↓
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Lista de cadernos */}
                         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 py-2 space-y-2">
