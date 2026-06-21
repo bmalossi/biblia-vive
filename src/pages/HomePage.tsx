@@ -101,6 +101,7 @@ export default function HomePage() {
   return (
     <Layout>
       <div className="flex flex-col">
+        <h1 className="sr-only">Bíblia Vive — Leia e Estude a Bíblia Online</h1>
         {/* Livros em destaque no topo */}
         <section className="mt-2">
           <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.oldTestament")}</h2>
