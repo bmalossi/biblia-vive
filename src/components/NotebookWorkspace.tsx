@@ -259,12 +259,7 @@ export default function NotebookWorkspace({
 
     return (
         <>
-            {/* Backdrop para telas intermediárias */}
-            <div
-                className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] 2xl:hidden animate-in fade-in"
-                onClick={onClose}
-                aria-hidden="true"
-            />
+
 
             {/* Painel principal */}
             <aside

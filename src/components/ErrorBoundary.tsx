@@ -23,6 +23,16 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    const isChunkError =
+      error.message.includes('Failed to fetch dynamically imported module') ||
+      error.message.includes('Loading chunk') ||
+      error.message.includes('Loading CSS chunk');
+
+    if (isChunkError) {
+      window.location.reload();
+      return;
+    }
+
     console.error("Erro crítico capturado:", error);
     // Envia o erro ao Sentry com stack trace, browser, rota e contexto de usuário
     Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });

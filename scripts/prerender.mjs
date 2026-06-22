@@ -379,6 +379,7 @@ async function prerender() {
   let template;
   try {
     template = await fs.readFile(templatePath, 'utf-8');
+    await fs.writeFile(path.join(DIST_DIR, 'index-template.html'), template, 'utf-8');
   } catch {
     console.error('[prerender] ✗ dist/index.html not found. Run `vite build` first.');
     process.exit(1);

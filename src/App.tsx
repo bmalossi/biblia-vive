@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { PWAProvider } from "@/contexts/PWAContext";
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import ScrollToTop from "@/components/ScrollToTop";
+import { NotebookProvider } from "@/contexts/NotebookContext";
+import GlobalNotebookContainer from "@/components/GlobalNotebookContainer";
 
 
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -67,38 +69,41 @@ const App = () => (
       <PWAProvider>
         <AuthProvider>
           <TooltipProvider>
-            <ScrollToTop />
-            <ToastViewport />
-            <Suspense fallback={<PageFallback />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/busca" element={<SearchPage />} />
-                <Route path="/harpa" element={<HarpaPage />} />
-                <Route path="/harpa/:hymnNumber" element={<HarpaReadingPage />} />
-                <Route path="/:version/:book" element={<BookPage />} />
-                <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
-                <Route path="/minhas-notas" element={<MyNotesPage />} />
-                <Route path="/planos" element={<ReadingPlansPage />} />
-                <Route path="/compartilhar" element={<SharePage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/admin/artigos" element={<AdminArtigosPage />} />
-                <Route path="/admin/comentarios" element={<AdminComentariosPage />} />
-                <Route path="/pro" element={<PricingPage />} />
-                <Route path="/pro/success" element={<ProSuccessPage />} />
-                <Route path="/widget/daily" element={<WidgetDailyVerse />} />
-                <Route path="/church-display" element={<ChurchDisplayPage />} />
-                <Route path="/conta" element={<AccountPage />} />
-                <Route path="/sobre" element={<AboutPage />} />
-                <Route path="/termos-de-uso" element={<TermsPage />} />
-                <Route path="/apoiar" element={<SupportPage />} />
-                <Route path="/artigos" element={<ArtigosIndexPage />} />
-                <Route path="/artigos/:slug" element={<ArtigoPage />} />
-                <Route path="/meu-estudo" element={<MyStudyPage />} />
-                <Route path="/como-usar" element={<HowToPage />} />
-                <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Suspense>
+            <NotebookProvider>
+              <ScrollToTop />
+              <ToastViewport />
+              <Suspense fallback={<PageFallback />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/busca" element={<SearchPage />} />
+                  <Route path="/harpa" element={<HarpaPage />} />
+                  <Route path="/harpa/:hymnNumber" element={<HarpaReadingPage />} />
+                  <Route path="/:version/:book" element={<BookPage />} />
+                  <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
+                  <Route path="/minhas-notas" element={<MyNotesPage />} />
+                  <Route path="/planos" element={<ReadingPlansPage />} />
+                  <Route path="/compartilhar" element={<SharePage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/admin/artigos" element={<AdminArtigosPage />} />
+                  <Route path="/admin/comentarios" element={<AdminComentariosPage />} />
+                  <Route path="/pro" element={<PricingPage />} />
+                  <Route path="/pro/success" element={<ProSuccessPage />} />
+                  <Route path="/widget/daily" element={<WidgetDailyVerse />} />
+                  <Route path="/church-display" element={<ChurchDisplayPage />} />
+                  <Route path="/conta" element={<AccountPage />} />
+                  <Route path="/sobre" element={<AboutPage />} />
+                  <Route path="/termos-de-uso" element={<TermsPage />} />
+                  <Route path="/apoiar" element={<SupportPage />} />
+                  <Route path="/artigos" element={<ArtigosIndexPage />} />
+                  <Route path="/artigos/:slug" element={<ArtigoPage />} />
+                  <Route path="/meu-estudo" element={<MyStudyPage />} />
+                  <Route path="/como-usar" element={<HowToPage />} />
+                  <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+              <GlobalNotebookContainer />
+            </NotebookProvider>
           </TooltipProvider>
         </AuthProvider>
       </PWAProvider>

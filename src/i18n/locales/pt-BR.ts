@@ -10,7 +10,7 @@ const ptBR: TranslationDict = {
   "nav.search": "Buscar",
   "nav.settings": "Configurações",
   "nav.language": "Idioma",
-  "nav.planos": "Planos de Leitura",
+  "nav.planos": "Jornadas de Leitura",
 
   // Home Page
   "home.title": "Bíblia Vive — Leia a Bíblia em Português | Melhor Experiência Online",
@@ -47,6 +47,8 @@ const ptBR: TranslationDict = {
   "reading.chaptersCount": "{count} capítulos",
   "reading.currentlyAt": "Você está em {book} {chapter}",
   "reading.verse": "Versículo",
+  "reading.continueTo": "Continue para {reference}",
+  "reading.backTo": "Voltar para {reference}",
 
   // Search Page
   "search.title": "Busca Bíblica",

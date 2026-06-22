@@ -10,7 +10,7 @@ const en: TranslationDict = {
     "nav.search": "Search",
     "nav.settings": "Settings",
     "nav.language": "Language",
-    "nav.planos": "Reading Plans",
+    "nav.planos": "Reading Journeys",
 
     // Home Page
     "home.title": "Living Bible — Read the Bible Online | Best Reading Experience",
@@ -47,6 +47,8 @@ const en: TranslationDict = {
     "reading.chaptersCount": "{count} chapters",
     "reading.currentlyAt": "You are at {book} {chapter}",
     "reading.verse": "Verse",
+    "reading.continueTo": "Continue to {reference}",
+    "reading.backTo": "Back to {reference}",
 
     // Search Page
     "search.title": "Bible Search",

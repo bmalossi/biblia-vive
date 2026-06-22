@@ -115,6 +115,7 @@ export function useReadingPreferences({ rootId = "reading-root" }: UseReadingPre
     setPreferences((current) => {
       const next = { ...current, [key]: value };
       localStorage.setItem(STORAGE_KEYS[key], String(value));
+      window.dispatchEvent(new CustomEvent("bv-preference-change", { detail: { key, value } }));
       return next;
     });
   }, []);

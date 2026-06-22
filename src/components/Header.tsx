@@ -46,7 +46,7 @@ import PwaInstallCard from "@/components/PwaInstallCard";
 
 const navItems = [
   { label: "Leitura", href: "/" },
-  { label: "Planos", href: "/planos" },
+  { label: "Jornadas", href: "/planos" },
   { label: "Artigos", href: "/artigos" },
   { label: "Harpa", href: "/harpa" },
 ];
@@ -108,6 +108,10 @@ export default function Header() {
   const [avatarError, setAvatarError] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => getTheme());
 
+  const [stickyTitle, setStickyTitle] = useState<{ title: string; visible: boolean }>({ title: "", visible: false });
+  const [scrollProgress, setScrollProgress] = useState<number | null>(null);
+  const [isFocusMode, setIsFocusMode] = useState(() => localStorage.getItem("bv_focus_mode") === "true");
+
   const inputRef = useRef<HTMLInputElement>(null);
   const searchWrapperRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -136,6 +140,45 @@ export default function Header() {
       window.removeEventListener("bv-theme-change", handleThemeChange);
     };
   }, []);
+
+  useEffect(() => {
+    const handleStickyTitle = (e: Event) => {
+      const customEvent = e as CustomEvent<{ title: string; visible: boolean }>;
+      setStickyTitle(customEvent.detail);
+    };
+
+    const handleScrollProgress = (e: Event) => {
+      const customEvent = e as CustomEvent<{ progress: number }>;
+      setScrollProgress(customEvent.detail.progress);
+    };
+
+    const handlePreferenceChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ key: string; value: any }>;
+      if (customEvent.detail.key === "focusMode") {
+        setIsFocusMode(customEvent.detail.value);
+      }
+    };
+
+    window.addEventListener("bv-sticky-title", handleStickyTitle);
+    window.addEventListener("bv-scroll-progress", handleScrollProgress);
+    window.addEventListener("bv-preference-change", handlePreferenceChange);
+
+    return () => {
+      window.removeEventListener("bv-sticky-title", handleStickyTitle);
+      window.removeEventListener("bv-scroll-progress", handleScrollProgress);
+      window.removeEventListener("bv-preference-change", handlePreferenceChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const pathParts = location.pathname.split("/").filter(Boolean);
+    const isReadingPath = pathParts.length === 3 && ["acf", "nvi", "arc", "kja", "aa", "kjv", "bbe", "rvr"].includes(pathParts[0].toLowerCase());
+    
+    if (!isReadingPath) {
+      setStickyTitle({ title: "", visible: false });
+      setScrollProgress(null);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -330,6 +373,53 @@ export default function Header() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
+  if (isFocusMode) {
+    return (
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-app-bg/85 backdrop-blur-md">
+        <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-4 md:h-[60px] md:px-6">
+          {/* LEFT: Logo + Chapter Title (Permanent) */}
+          <div className="flex items-center gap-4 md:gap-6">
+            <Link className="flex-shrink-0 flex items-center gap-2 group" onClick={onLogoClick} to="/">
+              <img
+                alt="Bíblia Vive"
+                width="160"
+                height="32"
+                className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
+                src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
+              />
+            </Link>
+            {stickyTitle.title && (
+              <span className="inline-flex items-center gap-1.5 text-sm md:text-base font-serif font-semibold text-app-text animate-fade-in max-w-[140px] sm:max-w-none truncate">
+                <span className="text-border select-none">/</span>
+                {stickyTitle.title}
+              </span>
+            )}
+          </div>
+
+          {/* RIGHT: Exit Focus Mode Button */}
+          <button
+            type="button"
+            className="text-xs text-app-text-muted hover:text-app-text rounded-full hover:bg-app-surface px-3 py-1.5 border border-border/50 transition-colors"
+            onClick={() => {
+              localStorage.setItem("bv_focus_mode", "false");
+              window.dispatchEvent(new CustomEvent("bv-preference-change", { detail: { key: "focusMode", value: false } }));
+            }}
+          >
+            {t("reading.exitFocus")}
+          </button>
+        </div>
+
+        {/* Bottom progress bar */}
+        {scrollProgress !== null && (
+          <div
+            className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-100 ease-out"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        )}
+      </header>
+    );
+  }
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b border-border transition-colors duration-200 ${isScrolled ? "bg-app-bg/85 backdrop-blur-md" : "bg-app-bg"
@@ -352,6 +442,13 @@ export default function Header() {
               src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
             />
           </Link>
+
+          {stickyTitle.visible && stickyTitle.title && (
+            <span className="inline-flex items-center gap-1.5 text-sm md:text-base font-serif font-semibold text-app-text animate-fade-in max-w-[140px] sm:max-w-none truncate">
+              <span className="text-border select-none">/</span>
+              {stickyTitle.title}
+            </span>
+          )}
 
           <nav aria-label="Navegação principal" className="hidden lg:flex h-full items-center gap-5">
             {navItems.map((item) => (
@@ -773,6 +870,12 @@ export default function Header() {
             {t("search.closeSearch")}
           </button>
         </div>
+      )}
+      {scrollProgress !== null && (
+        <div
+          className="absolute bottom-0 left-0 h-[2px] bg-gold transition-all duration-100 ease-out"
+          style={{ width: `${scrollProgress}%` }}
+        />
       )}
     </header>
   );

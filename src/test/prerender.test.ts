@@ -91,13 +91,16 @@ async function prerenderChapter(template, bookName, bookSlug, chapterNum, verses
 }
 
 function extractJsonLd(html) {
-  const match = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/);
-  if (!match) return null;
-  try {
-    return JSON.parse(match[1]);
-  } catch {
-    return null;
+  const matches = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)];
+  for (const match of matches) {
+    try {
+      const parsed = JSON.parse(match[1]);
+      if (parsed["@type"] === "Chapter") {
+        return parsed;
+      }
+    } catch {}
   }
+  return null;
 }
 
 describe("prerender", () => {
@@ -105,8 +108,13 @@ describe("prerender", () => {
   let books: { folder: string; name: string; chapters: number }[];
 
   beforeAll(async () => {
-    const templatePath = path.join(DIST_DIR, "index.html");
-    template = await fs.readFile(templatePath, "utf-8");
+    let templatePath = path.join(DIST_DIR, "index-template.html");
+    try {
+      template = await fs.readFile(templatePath, "utf-8");
+    } catch {
+      templatePath = path.join(DIST_DIR, "index.html");
+      template = await fs.readFile(templatePath, "utf-8");
+    }
     books = await getAvailableBooks();
   });
 

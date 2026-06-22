@@ -58,7 +58,7 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "@/hooks/useToast";
 import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
-import { findBookBySlug, findBookGlobally } from "@/lib/books";
+import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
 import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2 } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
@@ -70,11 +70,8 @@ import { exportNotesToPDF } from "@/lib/notesHighlights";
 import { cn } from "@/lib/utils";
 import { BiblicalCommentary } from "@/components/BiblicalCommentary";
 import { requestCommentary } from "@/lib/studyPanel";
-import { useNotebooks } from "@/hooks/useNotebooks";
 import { useIsMobile } from "@/hooks/use-mobile";
-import NotebookFloatingButton from "@/components/NotebookFloatingButton";
-import NotebookWorkspace from "@/components/NotebookWorkspace";
-import NotebookSheet from "@/components/NotebookSheet";
+import { useNotebookContext } from "@/contexts/NotebookContext";
 
 interface BookContextData {
   name: string;
@@ -210,23 +207,19 @@ export default function ReadingPage() {
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
 
-  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const {
-    notebooks,
-    allNotebooks,
-    saveStatus: notebookSaveStatus,
-    syncError: notebookSyncError,
-    saveNotebook,
-    deleteNotebook,
-    getLocalDraft: getNotebookLocalDraft,
-    getNewLocalDraft: getNotebookNewLocalDraft,
-    activeNotebook,
-    setActiveNotebook,
-    isCreatingNew,
-    setIsCreatingNew,
-  } = useNotebooks(selectedBook?.id, chapterNumber);
+    isOpen: isNotebookOpen,
+    setIsOpen: setIsNotebookOpen,
+    setNotebookContext,
+  } = useNotebookContext();
+
+  useEffect(() => {
+    if (selectedBook && chapterNumber) {
+      setNotebookContext(selectedBook.id, chapterNumber, selectedVersion, selectedBook.name);
+    }
+  }, [selectedBook?.id, chapterNumber, selectedVersion, selectedBook?.name, setNotebookContext]);
 
   const handleOpenNotebook = useCallback(() => {
     if (!user) {
@@ -711,11 +704,117 @@ export default function ReadingPage() {
     currentButton?.scrollIntoView({ block: "center", behavior: shouldReduceMotion ? "auto" : "smooth" });
   }, [chapterNumber, isChapterPickerOpen, shouldReduceMotion]);
 
-  const goToChapter = (nextChapter: number) => {
-    if (!selectedBook) return;
-    navigate(`/${selectedVersion}/${selectedBook.slug}/${nextChapter}`);
+  const goToChapter = (nextChapter: number, bookSlug?: string) => {
+    const slug = bookSlug || selectedBook?.slug;
+    if (!slug) return;
+    navigate(`/${selectedVersion}/${slug}/${nextChapter}`);
     window.scrollTo({ top: 0, behavior: "auto" });
   };
+
+  // Resolves the next and previous chapter/book context across the entire Bible
+  const nextChapterInfo = useMemo(() => {
+    if (!selectedBook) return null;
+    const { allBooks } = getBooksForLocale(locale);
+    const bookIndex = allBooks.findIndex((b) => b.id === selectedBook.id);
+
+    if (chapterNumber < selectedBook.chapters) {
+      return { book: selectedBook, chapter: chapterNumber + 1 };
+    } else if (bookIndex !== -1 && bookIndex < allBooks.length - 1) {
+      return { book: allBooks[bookIndex + 1], chapter: 1 };
+    }
+    return null; // Revelation 22
+  }, [selectedBook, chapterNumber, locale]);
+
+  const prevChapterInfo = useMemo(() => {
+    if (!selectedBook) return null;
+    const { allBooks } = getBooksForLocale(locale);
+    const bookIndex = allBooks.findIndex((b) => b.id === selectedBook.id);
+
+    if (chapterNumber > 1) {
+      return { book: selectedBook, chapter: chapterNumber - 1 };
+    } else if (bookIndex > 0) {
+      const prevBook = allBooks[bookIndex - 1];
+      return { book: prevBook, chapter: prevBook.chapters };
+    }
+    return null; // Genesis 1
+  }, [selectedBook, chapterNumber, locale]);
+
+  // Sticky chapter title and scroll progress tracking
+  useEffect(() => {
+    if (!selectedBook) return;
+
+    const titleText = `${selectedBook.name} ${chapterNumber}`;
+
+    const handleScrollUpdates = () => {
+      // 1. Calculate Sticky Title visibility
+      const titleElement = document.querySelector("#reading-root h1");
+      if (titleElement) {
+        const rect = titleElement.getBoundingClientRect();
+        // If the bottom of the H1 title is above the header (60px), it is scrolled past!
+        const isSticky = rect.bottom < 60;
+        window.dispatchEvent(
+          new CustomEvent("bv-sticky-title", {
+            detail: {
+              title: titleText,
+              visible: isSticky,
+            },
+          })
+        );
+      } else {
+        window.dispatchEvent(
+          new CustomEvent("bv-sticky-title", {
+            detail: {
+              title: titleText,
+              visible: false,
+            },
+          })
+        );
+      }
+
+      // 2. Calculate Reading Progress of <article>
+      const article = document.querySelector("#reading-root article");
+      if (!article) return;
+
+      const rect = article.getBoundingClientRect();
+      const articleHeight = rect.height;
+      const windowHeight = window.innerHeight;
+      
+      const start = (article as HTMLElement).offsetTop;
+      const end = start + articleHeight - windowHeight;
+      const current = window.scrollY;
+
+      let progress = 0;
+      if (end > start) {
+        progress = Math.max(0, Math.min(100, ((current - start) / (end - start)) * 100));
+      } else {
+        progress = current >= start ? 100 : 0;
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("bv-scroll-progress", {
+          detail: { progress },
+        })
+      );
+    };
+
+    window.addEventListener("scroll", handleScrollUpdates, { passive: true });
+    handleScrollUpdates();
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollUpdates);
+      // Clean up header state
+      window.dispatchEvent(
+        new CustomEvent("bv-sticky-title", {
+          detail: { title: "", visible: false },
+        })
+      );
+      window.dispatchEvent(
+        new CustomEvent("bv-scroll-progress", {
+          detail: { progress: null },
+        })
+      );
+    };
+  }, [selectedBook, chapterNumber, location.pathname]);
 
   const handleVersionChange = (nextVersion: BibleVersion) => {
     setVersion(nextVersion);
@@ -1047,26 +1146,15 @@ export default function ReadingPage() {
   }
 
   return (
-    <Layout hideHeader={preferences.focusMode} hideMobileNav={preferences.focusMode}>
+    <Layout hideHeader={false} hideMobileNav={preferences.focusMode}>
       <div
         className={cn(
           "relative transition-[padding-left] duration-300",
-          isNotebookOpen && !isMobile && "2xl:pl-[clamp(320px,28vw,440px)]"
+          isNotebookOpen && !isMobile && "lg:pl-[clamp(320px,28vw,440px)]"
         )}
         id="reading-root"
         ref={toolbarLayerRef}
       >
-        {preferences.focusMode && selectedBook && (
-          <div
-            className={`sticky top-0 z-40 mx-auto mb-3 flex w-full max-w-3xl items-center justify-between rounded-full border border-border bg-app-surface px-4 py-2 transition-all duration-200 ${focusTopVisible ? "opacity-100" : "-translate-y-2 opacity-0"
-              }`}
-          >
-            <span className="text-sm text-app-text">{selectedBook.name} {chapterNumber}</span>
-            <Button onClick={() => updatePreference("focusMode", false)} size="sm" type="button" variant="ghost">
-              {t("reading.exitFocus")}
-            </Button>
-          </div>
-        )}
 
         {!preferences.focusMode && (
           <>
@@ -1752,30 +1840,65 @@ export default function ReadingPage() {
 
 
         {selectedBook && !preferences.focusMode && (
-          <footer className="mx-auto mt-2 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-12 md:px-6" role="contentinfo">
+          <footer className="mx-auto mt-6 mb-12 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-8 md:px-6" role="contentinfo">
             <div className="flex w-full items-center justify-center gap-3">
-              <Button className="group" disabled={!hasPrev} onClick={() => goToChapter(chapterNumber - 1)} type="button" variant="outline">
-                {t("reading.prevChapter")}
-              </Button>
-              <Button className="group" disabled={!hasNext} onClick={() => goToChapter(chapterNumber + 1)} type="button" variant="outline">
-                {t("reading.nextChapter")}
-              </Button>
+              {prevChapterInfo && (
+                <Button
+                  className="group flex-1 max-w-[300px] h-10 text-xs sm:text-sm"
+                  onClick={() => goToChapter(prevChapterInfo.chapter, prevChapterInfo.book.slug)}
+                  type="button"
+                  variant="outline"
+                >
+                  ← {t("reading.backTo", { reference: `${prevChapterInfo.book.name} ${prevChapterInfo.chapter}` })}
+                </Button>
+              )}
+
+              {nextChapterInfo ? (
+                <Button
+                  className="group flex-1 max-w-[300px] h-10 text-xs sm:text-sm"
+                  onClick={() => goToChapter(nextChapterInfo.chapter, nextChapterInfo.book.slug)}
+                  type="button"
+                  variant="outline"
+                >
+                  {t("reading.continueTo", { reference: `${nextChapterInfo.book.name} ${nextChapterInfo.chapter}` })} →
+                </Button>
+              ) : (
+                <Button
+                  className="group flex-1 max-w-[300px] h-10 text-xs sm:text-sm"
+                  onClick={() => navigate("/")}
+                  type="button"
+                  variant="outline"
+                >
+                  Concluir Leitura ✓
+                </Button>
+              )}
             </div>
-            <span className="font-sans text-sm text-app-text-muted">
-              {chapterNumber} / {selectedBook.chapters}
-            </span>
           </footer>
         )}
 
         {selectedBook && preferences.focusMode && (
           <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
-            <Button className="h-8 px-3 text-xs" onClick={() => updatePreference("focusMode", false)} type="button" variant="outline">
+            <Button className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised" onClick={() => updatePreference("focusMode", false)} type="button" variant="outline">
               {t("reading.exitFocus")}
             </Button>
-            <Button className="h-8 px-3 text-xs" disabled={!hasPrev} onClick={() => goToChapter(chapterNumber - 1)} type="button" variant="outline">
+            <Button
+              className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised"
+              disabled={!prevChapterInfo}
+              onClick={() => prevChapterInfo && goToChapter(prevChapterInfo.chapter, prevChapterInfo.book.slug)}
+              type="button"
+              variant="outline"
+              aria-label="Capítulo anterior"
+            >
               ←
             </Button>
-            <Button className="h-8 px-3 text-xs" disabled={!hasNext} onClick={() => goToChapter(chapterNumber + 1)} type="button" variant="outline">
+            <Button
+              className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised"
+              disabled={!nextChapterInfo}
+              onClick={() => nextChapterInfo && goToChapter(nextChapterInfo.chapter, nextChapterInfo.book.slug)}
+              type="button"
+              variant="outline"
+              aria-label="Próximo capítulo"
+            >
               →
             </Button>
           </div>
@@ -1806,71 +1929,7 @@ export default function ReadingPage() {
           limit={rateLimitStatus.limit}
         />
 
-        {/* ── Caderno do capítulo ── */}
-        {selectedBook && (
-          <NotebookFloatingButton
-            notebooksCount={notebooks.length}
-            onClick={handleOpenNotebook}
-            isOpen={isNotebookOpen}
-            isFocusMode={preferences.focusMode}
-          />
-        )}
-
-        {/* Desktop sidebar — apenas montado no React quando isMobile=false */}
-        {isNotebookOpen && selectedBook && !isMobile && (
-          <NotebookWorkspace
-            notebooks={notebooks}
-            allNotebooks={allNotebooks}
-            bookId={selectedBook.id}
-            chapter={chapterNumber}
-            version={selectedVersion}
-            bookName={selectedBook.name}
-            saveStatus={notebookSaveStatus}
-            syncError={notebookSyncError}
-            onSave={saveNotebook}
-            onDelete={deleteNotebook}
-            onClose={() => setIsNotebookOpen(false)}
-            onNavigateToChapter={(bkId, ch, ver) => {
-              const bk = findBookGlobally(bkId);
-              if (bk) navigate(`/${ver}/${bk.slug}/${ch}`);
-              setIsNotebookOpen(false);
-            }}
-            getLocalDraft={getNotebookLocalDraft}
-            getNewLocalDraft={getNotebookNewLocalDraft}
-            selectedNotebook={activeNotebook}
-            setSelectedNotebook={setActiveNotebook}
-            isCreatingNew={isCreatingNew}
-            setIsCreatingNew={setIsCreatingNew}
-          />
-        )}
-
-        {/* Mobile bottom sheet — apenas montado no React quando isMobile=true */}
-        {selectedBook && isMobile && (
-          <NotebookSheet
-            open={isNotebookOpen}
-            onOpenChange={setIsNotebookOpen}
-            notebooks={notebooks}
-            allNotebooks={allNotebooks}
-            bookId={selectedBook.id}
-            chapter={chapterNumber}
-            version={selectedVersion}
-            bookName={selectedBook.name}
-            saveStatus={notebookSaveStatus}
-            syncError={notebookSyncError}
-            onSave={saveNotebook}
-            onDelete={deleteNotebook}
-            onNavigateToChapter={(bkId, ch, ver) => {
-              const bk = findBookGlobally(bkId);
-              if (bk) navigate(`/${ver}/${bk.slug}/${ch}`);
-            }}
-            getLocalDraft={getNotebookLocalDraft}
-            getNewLocalDraft={getNotebookNewLocalDraft}
-            selectedNotebook={activeNotebook}
-            setSelectedNotebook={setActiveNotebook}
-            isCreatingNew={isCreatingNew}
-            setIsCreatingNew={setIsCreatingNew}
-          />
-        )}
+        {/* O caderno e o botão flutuante são renderizados globalmente em GlobalNotebookContainer */}
       </div>
     </Layout>
   );

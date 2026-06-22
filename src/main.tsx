@@ -24,8 +24,15 @@ if ("serviceWorker" in navigator) {
   });
 }
 
+// Stale deployment recovery: recarrega quando chunk não é encontrado após novo deploy
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault()
+  window.location.reload()
+})
+
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <App />
   </ErrorBoundary>,
 );
+

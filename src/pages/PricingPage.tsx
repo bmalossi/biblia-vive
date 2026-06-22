@@ -7,6 +7,7 @@ import { AudioLines, Sparkles, BookOpenCheck, Download, CheckCircle2, ShieldChec
 import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import PricingComparison from "@/components/PricingComparison";
 
 export default function PricingPage() {
     usePageMeta({
@@ -52,17 +53,71 @@ export default function PricingPage() {
                         Sua assinatura ajuda a sustentar o Bíblia Vive, avançar com novas missões e espalhar a Palavra de Deus. Como agradecimento, você desbloqueia comentários teológicos profundos e ferramentas avançadas de estudo.
                     </p>
                 </div>
-
+      
                 {/* Pricing Cards - Moved to Top */}
-                <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 items-start">
+                <div className="max-w-5xl mx-auto grid lg:grid-cols-3 md:grid-cols-1 gap-6 items-start mb-8">
+                    {/* Card Gratuito */}
+                    <div className="bg-app-surface border border-border rounded-3xl p-8 lg:p-10 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-slate-500/5 rounded-full blur-[100px] pointer-events-none -mr-32 -mt-32" />
+
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-serif text-app-text">Plano Gratuito</h3>
+                            <div className="relative flex items-center gap-2 px-3 pt-1.5 pb-1 bg-gradient-to-r from-[#2c2c2e] to-[#1c1c1e] border border-[#3a3a3c] rounded-md shadow-md">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#8e8e93] animate-pulse"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#d1d1d6]">
+                                    Livre
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <span className="text-5xl font-bold text-app-text tracking-tight">R$0,00</span>
+                        </div>
+
+                        <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
+                            Acesse a leitura diária, busque passagens e salve seu progresso básico e anotações pessoais gratuitamente mediante cadastro.
+                        </p>
+
+                        <ul className="space-y-4 mb-8">
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                                <span>Acesso a todos os livros e versículos</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                                <span>Busca por palavra e referência</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm text-app-text text-app-text-muted">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-500/50 flex-shrink-0" />
+                                <span>Salvar progresso e caderno (requer cadastro)</span>
+                            </li>
+                        </ul>
+
+                        {!user ? (
+                            <Button
+                                onClick={() => setAuthModalOpen(true)}
+                                className="w-full h-14 bg-app-raised hover:bg-app-raised/80 text-app-text font-bold transition-all shadow-md rounded-xl text-base"
+                            >
+                                Criar Conta Grátis
+                            </Button>
+                        ) : (
+                            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
+                                <ShieldCheck className="w-5 h-5" /> Conta Ativa
+                            </div>
+                        )}
+                    </div>
+
                     {/* Card PRO */}
                     <div className="bg-app-surface border border-border rounded-3xl p-8 lg:p-10 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-gold/10 rounded-full blur-[100px] pointer-events-none -mr-32 -mt-32" />
 
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-2xl font-serif text-app-text">Plano PRO</h3>
-                            <div className="bg-gold/20 text-gold text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
-                                Mensal
+                            <h3 className="text-2xl font-serif text-app-text">Plano <br />PRO</h3>
+                            <div className="relative flex items-center gap-2 px-3 pt-1.5 pb-1 bg-gradient-to-r from-[#443818] to-[#2c240f] border border-[#685623] rounded-md shadow-md">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#e5c158] animate-pulse"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#fbf0cd]">
+                                    Mensal
+                                </span>
                             </div>
                         </div>
 
@@ -157,7 +212,7 @@ export default function PricingPage() {
                             </Button>
                         ) : isTemplo ? (
                             <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl flex items-center justify-center gap-2 font-medium">
-                                <ShieldCheck className="w-5 h-5" /> Plano Ativado!
+                                <ShieldCheck className="w-5 h-5" /> Plano Ativo!
                             </div>
                         ) : (
                             <Button
@@ -171,11 +226,14 @@ export default function PricingPage() {
                     </div>
                 </div>
 
-                <div className="text-center mt-6">
+                <div className="text-center mt-6 mb-12">
                     <p className="text-xs text-app-text-muted">
                         Cancelamento fácil e a qualquer momento.
                     </p>
                 </div>
+
+                {/* Plan Comparison Section */}
+                <PricingComparison />
 
                 {/* Features List - Moved to Bottom */}
                 <div className="mt-20 max-w-5xl mx-auto border-t border-border/50 pt-16">

@@ -10,7 +10,7 @@ const es: TranslationDict = {
     "nav.search": "Buscar",
     "nav.settings": "Configuración",
     "nav.language": "Idioma",
-    "nav.planos": "Planes de Lectura",
+    "nav.planos": "Jornadas de Lectura",
 
     // Home Page
     "home.title": "Biblia Viva — Lee la Biblia en Línea | Mejor Experiencia de Lectura",
@@ -47,6 +47,8 @@ const es: TranslationDict = {
     "reading.chaptersCount": "{count} capítulos",
     "reading.currentlyAt": "Estás en {book} {chapter}",
     "reading.verse": "Versículo",
+    "reading.continueTo": "Continuar a {reference}",
+    "reading.backTo": "Volver a {reference}",
 
     // Search Page
     "search.title": "Búsqueda Bíblica",
