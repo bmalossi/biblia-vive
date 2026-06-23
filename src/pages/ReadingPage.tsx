@@ -517,7 +517,7 @@ export default function ReadingPage() {
         return;
       }
 
-      if (isChapterPickerOpen || isSettingsOpen || isNoteModalOpen) return;
+      if (isChapterPickerOpen || isSettingsOpen || isNoteModalOpen || isNotebookOpen || typingInField) return;
 
       if (event.key === "ArrowLeft" && chapterNumber > 1) {
         event.preventDefault();
@@ -538,6 +538,8 @@ export default function ReadingPage() {
     chapterNumber,
     isChapterPickerOpen,
     isSettingsOpen,
+    isNoteModalOpen,
+    isNotebookOpen,
     navigate,
     preferences.focusMode,
     selectedBook,
