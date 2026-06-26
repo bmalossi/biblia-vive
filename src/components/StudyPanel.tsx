@@ -110,7 +110,15 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const [isGenerating, setIsGenerating] = useState(false);
     const [rateLimitStatus, setRateLimitStatus] = useState<{ open: boolean, resetAt: number | null, limit: number }>({ open: false, resetAt: null, limit: 10 });
     const [localCommentary, setLocalCommentary] = useState<string | null>(null);
-    const [hasFreeCommentary, setHasFreeCommentary] = useState(() => !localStorage.getItem('bv_free_commentary_used'));
+    const [freeCommentaryCount, setFreeCommentaryCount] = useState(() => {
+        const usedStr = localStorage.getItem('bv_free_commentaries_used_count');
+        if (usedStr !== null) {
+            return Math.max(0, 3 - parseInt(usedStr, 10));
+        }
+        const legacy = localStorage.getItem('bv_free_commentary_used');
+        return legacy === 'true' ? 2 : 3;
+    });
+    const hasFreeCommentary = freeCommentaryCount > 0;
     const [strongsCache, setStrongsCache] = useState<Record<string, StrongsEntry>>({});
     const [strongsLoading, setStrongsLoading] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -218,8 +226,10 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
             setLocalCommentary(JSON.stringify(commentaries));
 
             if (!isPro) {
+                const newUsed = (3 - freeCommentaryCount) + 1;
+                localStorage.setItem('bv_free_commentaries_used_count', String(newUsed));
                 localStorage.setItem('bv_free_commentary_used', 'true');
-                setHasFreeCommentary(false);
+                setFreeCommentaryCount(3 - newUsed);
             }
 
             toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
@@ -581,7 +591,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                             <div className="space-y-1.5">
                                                 <h3 className="text-sm font-semibold text-app-text">Recurso Exclusivo PRO</h3>
                                                 <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                    Você já utilizou sua análise teológica gratuita. Assine para ter acesso a 10 comentários por hora de teólogos históricos e renomados.
+                                                    Você já utilizou seus 3 comentários teológicos gratuitos. Assine para ter acesso a 10 comentários por hora de teólogos históricos e renomados.
                                                 </p>
                                             </div>
                                             <Button
@@ -615,7 +625,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                             {t("study.commentaryIntro")}
                                                         </p>
                                                         <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                            Acesse perspectivas bíblicas de teólogos renomados sobre este versículo específico. {(!isPro && hasFreeCommentary) && <strong className="text-gold block mt-2">Você tem 1 comentário gratuito disponível.</strong>}
+                                                            Acesse perspectivas bíblicas de teólogos renomados sobre este versículo específico. {(!isPro && freeCommentaryCount > 0) && <strong className="text-gold block mt-2">Você tem {freeCommentaryCount} {freeCommentaryCount === 1 ? 'comentário gratuito disponível' : 'comentários gratuitos disponíveis'}.</strong>}
                                                         </p>
                                                     </div>
                                                     <Button

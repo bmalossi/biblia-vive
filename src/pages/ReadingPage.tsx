@@ -60,7 +60,7 @@ import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
 import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
-import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2 } from "lucide-react";
+import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -191,6 +191,14 @@ export default function ReadingPage() {
   const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
   const [cachedChapterCommentary, setCachedChapterCommentary] = useState<string | null>(null);
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
+  const [freeChapterCommentaryCount, setFreeChapterCommentaryCount] = useState(() => {
+    const usedStr = localStorage.getItem('bv_free_chapter_commentaries_used_count');
+    if (usedStr !== null) {
+      return Math.max(0, 3 - parseInt(usedStr, 10));
+    }
+    const legacy = localStorage.getItem('bv_free_chapter_commentary_used');
+    return legacy === 'true' ? 2 : 3;
+  });
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
 
@@ -892,7 +900,7 @@ export default function ReadingPage() {
   };
 
   const handleChapterCommentary = async () => {
-    if (!isPro) {
+    if (!isPro && freeChapterCommentaryCount <= 0 && !cachedChapterCommentary) {
       navigate('/pro');
       return;
     }
@@ -914,6 +922,12 @@ export default function ReadingPage() {
         language: String(locale).startsWith("pt") ? "pt" : "en",
       });
       setCachedChapterCommentary(JSON.stringify(commentaries));
+      if (!isPro) {
+        const newUsed = (3 - freeChapterCommentaryCount) + 1;
+        localStorage.setItem('bv_free_chapter_commentaries_used_count', String(newUsed));
+        localStorage.setItem('bv_free_chapter_commentary_used', 'true');
+        setFreeChapterCommentaryCount(3 - newUsed);
+      }
       toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
       setTimeout(() => {
         document.getElementById('chapter-commentary-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -1693,30 +1707,57 @@ export default function ReadingPage() {
                   {/* Chapter Commentary Button in Sidebar */}
                   <div className="w-full mt-8 border-t border-border/50 pt-6 flex flex-col items-center justify-center">
                     {isPro && <CommentaryQuota compact className="w-full mb-4 px-2" />}
-                    <Button
-                      onClick={handleChapterCommentary}
-                      disabled={isChapterCommentaryLoading}
-                      type="button"
-                      className={cn(
-                        "w-full h-auto py-3.5 flex-col gap-2 text-center rounded-xl transition-all shadow-sm",
-                        isChapterCommentaryLoading
-                          ? "bg-app-raised/50 border border-border cursor-not-allowed"
-                          : "bg-gold-bg/20 text-gold hover:bg-gold-bg/40 border-gold/30 border hover:border-gold/50"
-                      )}
-                      variant="outline"
-                    >
-                      {isChapterCommentaryLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-app-text-muted" />
-                      ) : (
-                        <FileText className="h-5 w-5" />
-                      )}
-                      <span className={cn(
-                        "text-[0.68rem] uppercase tracking-wide leading-tight",
-                        isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
-                      )}>
-                        {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentário" : "Comentar Capítulo"}
-                      </span>
-                    </Button>
+                    {!isPro && freeChapterCommentaryCount === 0 && !cachedChapterCommentary ? (
+                      <div className="w-full rounded-xl border border-gold/20 bg-gold-bg/10 p-5 text-center space-y-3 animate-in fade-in">
+                        <div className="mx-auto w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center">
+                          <Lock className="h-5 w-5 text-gold" />
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-xs font-semibold text-app-text">Recurso Exclusivo PRO</h3>
+                          <p className="text-[0.7rem] text-app-text-muted leading-relaxed">
+                            Você já utilizou seus 3 comentários gratuitos de capítulos. Assine para ter acesso ilimitado a comentários de capítulos e versículos por hora.
+                          </p>
+                        </div>
+                        <Button
+                          className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold text-xs py-2 h-auto"
+                          onClick={() => navigate('/pro')}
+                        >
+                          Assinar Plano Premium
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={handleChapterCommentary}
+                          disabled={isChapterCommentaryLoading}
+                          type="button"
+                          className={cn(
+                            "w-full h-auto py-3.5 flex-col gap-2 text-center rounded-xl transition-all shadow-sm",
+                            isChapterCommentaryLoading
+                              ? "bg-app-raised/50 border border-border cursor-not-allowed"
+                              : "bg-gold-bg/20 text-gold hover:bg-gold-bg/40 border-gold/30 border hover:border-gold/50"
+                          )}
+                          variant="outline"
+                        >
+                          {isChapterCommentaryLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-app-text-muted" />
+                          ) : (
+                            <FileText className="h-5 w-5" />
+                          )}
+                          <span className={cn(
+                            "text-[0.68rem] uppercase tracking-wide leading-tight",
+                            isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
+                          )}>
+                            {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentário" : "Comentar Capítulo"}
+                          </span>
+                        </Button>
+                        {!isPro && !cachedChapterCommentary && (
+                          <p className="text-[0.68rem] text-app-text-muted mt-2 text-center">
+                            Você tem <strong className="text-gold">{freeChapterCommentaryCount}</strong> {freeChapterCommentaryCount === 1 ? 'comentário gratuito de capítulo disponível' : 'comentários gratuitos de capítulos disponíveis'}.
+                          </p>
+                        )}
+                      </>
+                    )}
 
                     {cachedChapterCommentary && (
                       <div id="chapter-commentary-section" className="w-full mt-8 animate-in fade-in duration-700">
