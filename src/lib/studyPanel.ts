@@ -218,12 +218,20 @@ export async function requestCommentary(
       // We manually construct the fetch request and use the hardened getSession.
       const session = await getSession();
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+      // Always include the apikey (anon key) so Supabase doesn't block with 401.
+      // If the user is logged in, also send the Authorization bearer token so the
+      // edge function can identify them and grant PRO access.
       const response = await fetch(`${supabaseUrl}/functions/v1/commentary`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+          'apikey': supabaseAnonKey,
+          ...(session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : { Authorization: `Bearer ${supabaseAnonKey}` }
+          ),
         },
         body: JSON.stringify(params)
       });

@@ -38,18 +38,23 @@ export async function signOut() {
 export async function getSession() {
     try {
         // FAST FALLBACK: Supabase v2 lock bugs can cause getSession() to hang eternally.
-        // Try reading synchronously from localStorage first (storageKey: 'bv-auth-token')
+        // Try reading synchronously from localStorage first (storageKey: 'bv-auth-token').
+        // NOTE: Supabase v2 stores the session object inside a "currentSession" key,
+        // NOT directly at the root. We handle both formats for compatibility.
         const localData = typeof window !== 'undefined' ? localStorage.getItem('bv-auth-token') : null;
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
-                const token = parsed?.access_token;
-                // Very basic expiry check (optional, but good practice)
-                if (token && parsed?.expires_at) {
-                    const expiresAt = parsed.expires_at * 1000;
-                    if (Date.now() < expiresAt) {
-                        return { access_token: token, user: parsed.user };
+                // Supabase v2 format: { currentSession: { access_token, expires_at, user, ... } }
+                // Supabase v1 / some builds: access_token at root
+                const session = parsed?.currentSession ?? parsed;
+                const token = session?.access_token;
+                const expiresAt = session?.expires_at ?? parsed?.expiresAt;
+                if (token && expiresAt) {
+                    if (Date.now() < expiresAt * 1000) {
+                        return { access_token: token, user: session.user };
                     }
+                    // Token expired — fall through to SDK refresh
                 }
             } catch (err) {
                 console.warn('Silent local session parse error', err);
