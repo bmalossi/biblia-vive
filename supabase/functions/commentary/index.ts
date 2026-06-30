@@ -404,7 +404,8 @@ Deno.serve(async (req) => {
             const ratelimitId = isPro && userId ? `user:${userId}` : `ip:${clientIp}`;
             const limitConfig = isPro
                 ? Ratelimit.slidingWindow(RATE_LIMIT, "1 h")
-                : Ratelimit.slidingWindow(1, "1 d");
+                : Ratelimit.slidingWindow(3, "1 d"); // 3 comentários gratuitos por dia (igual ao frontend)
+            const userLimit = isPro ? RATE_LIMIT : 3;
             const ratelimit   = new Ratelimit({ redis, limiter: limitConfig, prefix: "bv:commentary" });
             const { success, limit, remaining, reset } = await ratelimit.limit(ratelimitId);
             const rlHeaders   = buildRateLimitHeaders(corsHeaders, remaining, reset);
@@ -424,7 +425,7 @@ Deno.serve(async (req) => {
                     status: 429,
                 });
                 return new Response(
-                    JSON.stringify({ error: "limite_atingido", message: "Você atingiu o limite de comentários desta hora.", reset_at: reset, limit: RATE_LIMIT }),
+                    JSON.stringify({ error: "limite_atingido", message: "Você atingiu o limite de comentários de hoje.", reset_at: reset, limit: userLimit }),
                     { status: 429, headers: rlHeaders }
                 );
             }

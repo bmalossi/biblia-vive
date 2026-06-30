@@ -330,24 +330,63 @@ export default function AdminUsuariosPage() {
         setLoading(true);
         setError(null);
         try {
-            const [listResult, countResult] = await Promise.all([
-                supabase.rpc("admin_list_users", {
-                    p_search: debouncedSearch,
-                    p_limit: PAGE_SIZE,
-                    p_offset: page * PAGE_SIZE,
-                }),
-                supabase.rpc("admin_count_users", { p_search: debouncedSearch }),
-            ]);
-            if (listResult.error) throw listResult.error;
-            if (countResult.error) throw countResult.error;
-            setUsers((listResult.data as UserRow[]) ?? []);
-            setTotalCount(countResult.data as number ?? 0);
+            // Tentativa 1: usar RPC admin_list_users (requer sprint20-schema.sql executado)
+            const listResult = await supabase.rpc("admin_list_users", {
+                p_search: debouncedSearch,
+                p_limit: PAGE_SIZE,
+                p_offset: page * PAGE_SIZE,
+            });
+
+            if (!listResult.error) {
+                const countResult = await supabase.rpc("admin_count_users", { p_search: debouncedSearch });
+                setUsers((listResult.data as UserRow[]) ?? []);
+                setTotalCount(!countResult.error ? (countResult.data as number ?? 0) : (listResult.data as UserRow[]).length);
+                return;
+            }
+
+            // Tentativa 2 (fallback): buscar diretamente de user_subscriptions via RLS.
+            // Funciona sem o SQL executado, mas só mostra usuários que têm assinatura.
+            console.warn("RPC admin_list_users indisponível, usando fallback via user_subscriptions.", listResult.error);
+
+            let query = supabase
+                .from("user_subscriptions")
+                .select("user_id, status, plan_type, current_period_end, cancel_at_period_end, stripe_customer_id, updated_at", { count: "exact" })
+                .order("updated_at", { ascending: false })
+                .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+            if (debouncedSearch) {
+                // Sem acesso a auth.users, não conseguimos filtrar por email no fallback
+                // Mostra aviso e lista sem filtro
+            }
+
+            const { data: subs, error: subsError, count } = await query;
+            if (subsError) throw subsError;
+
+            const mapped: UserRow[] = (subs ?? []).map((s: any) => ({
+                user_id: s.user_id,
+                email: `${s.user_id.slice(0, 8)}...` + " (execute sprint20-schema.sql para ver e-mail)",
+                created_at: s.updated_at ?? new Date().toISOString(),
+                last_sign_in_at: null,
+                plan_type: (s.plan_type || "none") as UserRow["plan_type"],
+                sub_status: (s.status || "none") as UserRow["sub_status"],
+                current_period_end: s.current_period_end ?? null,
+                cancel_at_period_end: s.cancel_at_period_end ?? false,
+                stripe_customer_id: s.stripe_customer_id ?? null,
+            }));
+
+            setUsers(mapped);
+            setTotalCount(count ?? mapped.length);
+
+            if (!debouncedSearch) {
+                setError("⚠️ Modo parcial: execute sprint20-schema.sql no Supabase SQL Editor para ver todos os usuários com e-mail e cadastro.");
+            }
         } catch (err: any) {
             setError(err.message ?? "Erro ao carregar usuários.");
         } finally {
             setLoading(false);
         }
     }, [isAdmin, debouncedSearch, page]);
+
 
     useEffect(() => { fetchUsers(); }, [fetchUsers]);
 

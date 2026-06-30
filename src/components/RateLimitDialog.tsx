@@ -44,7 +44,7 @@ export function RateLimitDialog({ open, onOpenChange, resetAt, limit }: RateLimi
                         Limite Atingido
                     </DialogTitle>
                     <DialogDescription className="text-[0.95rem] text-app-text-muted leading-relaxed max-w-sm mx-auto">
-                        Você utilizou todos os <strong className="text-app-text">{limit} comentários</strong> disponíveis para esta hora.
+                        Você utilizou todos os <strong className="text-app-text">{limit} comentário{limit !== 1 ? 's' : ''}</strong> disponíveis {limit <= 3 ? 'para hoje' : 'para esta hora'}.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -58,10 +58,21 @@ export function RateLimitDialog({ open, onOpenChange, resetAt, limit }: RateLimi
                 </div>
 
                 <p className="text-[0.8rem] text-app-text-muted/80 leading-relaxed px-2">
-                    Para garantir a qualidade e estabilidade da extração dos comentários teológicos para todos os usuários, aplicamos este limite por hora.
+                    {limit <= 3
+                        ? "Usuários gratuitos têm 3 comentários por dia. Assine o PRO para comentários ilimitados."
+                        : "Para garantir a qualidade e estabilidade da extração dos comentários teológicos para todos os usuários, aplicamos este limite por hora."
+                    }
                 </p>
 
                 <div className="pt-2 flex flex-col gap-3">
+                    {limit <= 3 && (
+                        <Button
+                            className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold gap-2"
+                            onClick={() => { onOpenChange(false); navigate('/pro'); }}
+                        >
+                            Assinar PRO — Comentários Ilimitados
+                        </Button>
+                    )}
                     <Button
                         variant="outline"
                         className="w-full bg-app-raised border-border text-app-text hover:bg-app-raised/80"
