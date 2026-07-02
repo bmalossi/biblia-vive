@@ -212,11 +212,11 @@ const es: TranslationDict = {
     "study.meaning": "Significado",
 
     // Terms Page
-    "terms.title": "Términos de Uso – Bibliavive",
-    "terms.desc": "Términos de uso de Bibliavive - plataforma de estudio bíblico digital",
+    "terms.title": "Términos de Uso — Bíblia Vive",
+    "terms.desc": "Términos de uso de Bíblia Vive — plataforma de estudio bíblico digital",
 
     // About Page
-    "about.title": "Sobre Bíblia Vive — Propósito y E-E-A-T",
+    "about.title": "Sobre Bíblia Vive — Misión y Propósito | Bíblia Vive",
     "about.desc": "Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.",
 
     // My Study Panel (Sprint 14)

@@ -14,7 +14,7 @@ export default function SupportPage() {
     const PIX_KEY = "suporte@bibliavive.com.br";
 
     usePageMeta({
-        title: "Apoie a Bíblia Vive | Contribua com nosso projeto missionário",
+        title: "Apoie a Bíblia Vive — Contribua com o Projeto | Bíblia Vive",
         description: "A Bíblia Vive é uma plataforma 99% gratuita. Apoie nosso projeto com doações voluntárias e ajude o desenvolvedor a manter a Palavra de Deus acessível a todos.",
         canonical: "/apoiar",
         jsonLd: [

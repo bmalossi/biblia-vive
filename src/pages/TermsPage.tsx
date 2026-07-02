@@ -6,15 +6,15 @@ export default function TermsPage() {
     const { t } = useTranslation();
 
     usePageMeta({
-        title: t("terms.title", { defaultValue: "Termos de Uso – Bibliavive" }),
-        description: t("terms.desc", { defaultValue: "Termos de uso do Bibliavive - plataforma de estudo bíblico digital" }),
+        title: t("terms.title", { defaultValue: "Termos de Uso — Bíblia Vive" }),
+        description: t("terms.desc", { defaultValue: "Termos de uso do Bíblia Vive — plataforma de estudo bíblico digital" }),
         canonical: "/termos-de-uso",
     });
 
     return (
         <Layout>
             <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-                <h1 className="text-4xl font-serif text-app-text mb-6">📜 Termos de Uso – Bibliavive</h1>
+                <h1 className="text-4xl font-serif text-app-text mb-6">📜 Termos de Uso — Bíblia Vive</h1>
                 <p className="text-sm text-app-text-muted mb-8">
                     Última atualização: <span className="font-medium">[preencher data]</span>
                 </p>

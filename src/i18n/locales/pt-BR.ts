@@ -211,13 +211,13 @@ const ptBR: TranslationDict = {
    // Study meaning key (Sprint 6 bugfix)
    "study.meaning": "Significado",
 
-   // Terms Page
-   "terms.title": "Termos de Uso – Bibliavive",
-   "terms.desc": "Termos de uso do Bibliavive - plataforma de estudo bíblico digital",
+    // Terms Page
+    "terms.title": "Termos de Uso — Bíblia Vive",
+    "terms.desc": "Termos de uso do Bíblia Vive — plataforma de estudo bíblico digital",
 
-   // About Page
-   "about.title": "Sobre o Bíblia Vive — Propósito e E-E-A-T",
-   "about.desc": "Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.",
+    // About Page
+    "about.title": "Sobre o Bíblia Vive — Missão e Propósito | Bíblia Vive",
+    "about.desc": "Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.",
 
    // My Study Panel (Sprint 14)
    "myStudy.title": "Meu Estudo",

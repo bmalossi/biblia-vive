@@ -959,8 +959,8 @@ export default function ReadingPage() {
     (!Number.isNaN(chapterNumber) && (chapterNumber < 1 || chapterNumber > (selectedBook?.chapters ?? 1)));
 
   const chapterTitle = selectedBook 
-    ? `${selectedBook.name} — Capítulo ${chapterNumber} | ${selectedVersion.toUpperCase()} | Bíblia Vive`
-    : `Livro não encontrado | Bíblia Vive`;
+    ? `${selectedBook.name} ${chapterNumber} — ${selectedVersion.toUpperCase()} — Bíblia Vive`
+    : `Livro não encontrado — Bíblia Vive`;
 
   const versesText = chapterVerses.slice(0, 3).map(v => v.text).join(" ").trim();
   const chapterDescription = (versesText && versesText.length > 0)

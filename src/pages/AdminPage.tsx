@@ -5,11 +5,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
-import { Navigate, NavLink, Link } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
+import AdminNav from "@/components/AdminNav";
 import { Loader2, Plus, Trash2, CalendarDays, Sparkles, LogIn, XCircle, FileText, Home, Settings, BookOpen, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePageMeta } from "@/hooks/usePageMeta";
@@ -220,61 +221,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex gap-2 border-b border-border pb-4">
-                    <NavLink
-                        to="/admin"
-                        end
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-gold/10 text-gold"
-                                    : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-                            }`
-                        }
-                    >
-                        <Home className="h-4 w-4" />
-                        Versículos do Dia
-                    </NavLink>
-                    <NavLink
-                        to="/admin/artigos"
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-gold/10 text-gold"
-                                    : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-                            }`
-                        }
-                    >
-                        <FileText className="h-4 w-4" />
-                        Artigos
-                    </NavLink>
-                    <NavLink
-                        to="/admin/comentarios"
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-gold/10 text-gold"
-                                    : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-                            }`
-                        }
-                    >
-                        <BookOpen className="h-4 w-4" />
-                        Comentários
-                    </NavLink>
-                    <NavLink
-                        to="/admin/usuarios"
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                                isActive
-                                    ? "bg-gold/10 text-gold"
-                                    : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-                            }`
-                        }
-                    >
-                        <Users className="h-4 w-4" />
-                        Usuários
-                    </NavLink>
-                </nav>
+                <AdminNav />
 
                 {/* Form */}
                 <div className="rounded-2xl border border-border bg-app-surface p-6 space-y-4">

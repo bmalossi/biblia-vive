@@ -115,8 +115,8 @@ export default function HarpaReadingPage() {
       : "Leia as letras dos hinos da Harpa Cristã.",
     ogImage: "/og-default.png",
     title: hymnInfo
-      ? `Hino ${hymnInfo.numero}: ${hymnInfo.tituloFormatado} — Harpa Cristã`
-      : "Harpa Cristã",
+      ? `Harpa Cristã — Hino ${hymnInfo.numero}: ${hymnInfo.tituloFormatado} — Bíblia Vive`
+      : "Harpa Cristã — Bíblia Vive",
     ogType: "article",
   });
 

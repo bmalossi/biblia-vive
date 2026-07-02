@@ -11,6 +11,11 @@ import Layout from "@/components/Layout";
 import { Loader2, FileText } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
+interface Author {
+    name: string;
+    slug: string;
+}
+
 interface Article {
     id: string;
     title: string;
@@ -19,6 +24,7 @@ interface Article {
     meta_description: string | null;
     cover_image_url: string | null;
     published_at: string | null;
+    author?: Author | null;
 }
 
 export default function ArtigosIndexPage() {
@@ -44,7 +50,7 @@ export default function ArtigosIndexPage() {
         async function fetchArticles() {
             const { data } = await supabase
                 .from("articles")
-                .select("id, title, slug, body, meta_description, cover_image_url, published_at")
+                .select("id, title, slug, body, meta_description, cover_image_url, published_at, author:article_authors(name, slug)")
                 .eq("status", "publicado")
                 .order("published_at", { ascending: false });
 
@@ -111,15 +117,20 @@ export default function ArtigosIndexPage() {
                                             {article.meta_description}
                                         </p>
                                     )}
-                                    {article.published_at && (
-                                        <p className="mt-3 text-xs text-app-text-muted">
-                                            {new Date(article.published_at).toLocaleDateString("pt-BR", {
-                                                day: "numeric",
-                                                month: "short",
-                                                year: "numeric",
-                                            })}
-                                        </p>
-                                    )}
+                                    <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs text-app-text-muted">
+                                        <span className="font-medium text-gold/80 truncate max-w-[150px]">
+                                            {article.author ? article.author.name : "Bíblia Vive"}
+                                        </span>
+                                        {article.published_at && (
+                                            <span>
+                                                {new Date(article.published_at).toLocaleDateString("pt-BR", {
+                                                    day: "numeric",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                })}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </Link>
                         ))}

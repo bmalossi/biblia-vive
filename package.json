@@ -16,7 +16,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "sitemap": "tsx src/scripts/generateSitemap.ts"
+    "sitemap": "tsx src/scripts/generateSitemap.ts",
+    "indexnow:core": "tsx scripts/indexnow-notify.ts config/indexnow-core-urls.json",
+    "indexnow:sitemap": "tsx scripts/indexnow-sitemap.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1044.0",

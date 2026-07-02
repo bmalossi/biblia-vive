@@ -107,7 +107,10 @@ Unidade mínima de indexação SEO — corresponde exatamente a uma Referência 
 _Evitar_: página de versículo (muito granular), página de livro (pouco granular)
 
 **Placeholder SEO**:
-Comentário HTML inserido no `index.html` e substituído pelo script de prerendering com os valores reais de cada rota. Exemplo: `<!--META_TITLE-->` → `<title>Gênesis 1 — ACF | Bíblia Vive</title>`.
+Comentários HTML e tags de fallback inseridas no `index.html` que são substituídos pelo script de prerendering com os valores reais de cada rota. Para evitar a ausência de títulos antes da hidratação do React, o `index.html` possui uma tag `<title>` estática de fallback, a qual é substituída em memória pelo placeholder `<!--META_TITLE-->` no início da pré-renderização para evitar a duplicação de tags de título nas páginas finais geradas.
+
+**Notificação IndexNow**:
+Mecanismo que notifica mecanismos de busca (como o Bing) sobre URLs novas ou atualizadas utilizando a API do IndexNow. Implementado em `scripts/indexnow-notify.ts` (para submissão de lista manual/core via `npm run indexnow:core`) e `scripts/indexnow-sitemap.ts` (para submissão em massa de todas as 5.027 URLs extraídas do sitemap via `npm run indexnow:sitemap`). Utiliza variáveis de ambiente `INDEXNOW_KEY` e `INDEXNOW_HOST` e aponta para o `keyLocation` da chave correspondente hospedada no Vercel.
 
 **Prerendering de Artigos**:
 Etapa adicionada ao script `scripts/prerender.mjs` existente que itera sobre os Artigos Publicados no Supabase e gera HTML estático para cada rota `/artigos/[slug]`. Executa após o prerendering de capítulos bíblicos. Falhas na query de artigos geram apenas um warning no log sem abortar o prerendering de capítulos.

@@ -142,7 +142,7 @@ async function fetchPublishedArticles() {
   }
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/articles?status=eq.publicado&select=*`,
+      `${SUPABASE_URL}/rest/v1/articles?status=eq.publicado&select=*,author:article_authors(*)`,
       {
         headers: {
           apikey: SUPABASE_SERVICE_KEY,
@@ -158,6 +158,26 @@ async function fetchPublishedArticles() {
   }
 }
 
+async function fetchPublishedAuthors() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/article_authors?select=*`,
+      {
+        headers: {
+          apikey: SUPABASE_SERVICE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+        },
+      },
+    );
+    if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[prerender] ⚠ Could not fetch authors:', err.message);
+    return [];
+  }
+}
+
 // ─── Meta tag generators ──────────────────────────────────────────────────────
 
 /**
@@ -166,7 +186,7 @@ async function fetchPublishedArticles() {
 function generateChapterMetaTags(bookName, localId, chapterNum, verses, version, versionLabel) {
   const routeSlug  = toRouteSlug(localId);
   const url        = `${CANONICAL_ORIGIN}/${version}/${routeSlug}/${chapterNum}`;
-  const title      = `${bookName} ${chapterNum} | ${versionLabel} | Bíblia Vive`;
+  const title      = `${bookName} ${chapterNum} — ${versionLabel} — Bíblia Vive`;
   const descText   = verses.slice(0, 3).join(' ').substring(0, 160);
 
   const jsonLd = {
@@ -252,6 +272,16 @@ function generateArticleMetaTags(article) {
     bodyHtml +
     `</article>`;
 
+  const authorPerson = article.author
+    ? {
+        '@type': 'Person',
+        name: article.author.name,
+        ...(article.author.role ? { jobTitle: article.author.role } : {}),
+        ...(article.author.church ? { worksFor: { '@type': 'Organization', name: article.author.church } } : {}),
+        ...(article.author.avatar_url ? { image: article.author.avatar_url } : {}),
+      }
+    : { '@type': 'Organization', name: 'Bíblia Vive', url: CANONICAL_ORIGIN };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -259,6 +289,7 @@ function generateArticleMetaTags(article) {
     description,
     url,
     image: coverImage,
+    author: authorPerson,
     ...(article.published_at ? { datePublished: article.published_at } : {}),
     ...(article.updated_at   ? { dateModified:  article.updated_at   } : {}),
     publisher: { '@type': 'Organization', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
@@ -379,15 +410,18 @@ async function prerender() {
   let template;
   try {
     template = await fs.readFile(templatePath, 'utf-8');
+    template = template.replace('<title>Bíblia Vive — Leia, Estude e Compartilhe a Bíblia</title>', '<!--META_TITLE-->');
     await fs.writeFile(path.join(DIST_DIR, 'index-template.html'), template, 'utf-8');
   } catch {
     console.error('[prerender] ✗ dist/index.html not found. Run `vite build` first.');
     process.exit(1);
   }
 
-  // ── Fetch articles ──
+  // ── Fetch articles & authors ──
   const articles = await fetchPublishedArticles();
   console.log(`[prerender] Found ${articles.length} published articles.\n`);
+  const authors = await fetchPublishedAuthors();
+  console.log(`[prerender] Found ${authors.length} authors.\n`);
 
   let totalChapters = 0;
   let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
@@ -455,6 +489,49 @@ async function prerender() {
   }
   console.log(`[prerender] ✓ ${totalArticles} article pages generated.\n`);
 
+  // ── Author profile pages ──
+  console.log('[prerender] Processing author profile pages...');
+  let totalAuthors = 0;
+  for (const author of authors) {
+    try {
+      const title = `${author.name} — Colunista Bíblia Vive`;
+      const desc  = author.bio
+        ? author.bio.substring(0, 160)
+        : `Explore artigos e reflexões escritos por ${author.name} na Bíblia Vive.`;
+      const url   = `${CANONICAL_ORIGIN}/autor/${author.slug}`;
+      const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: author.name,
+        description: desc,
+        url,
+        ...(author.avatar_url ? { image: author.avatar_url } : {}),
+        ...(author.role ? { jobTitle: author.role } : {}),
+        ...(author.church ? { worksFor: { '@type': 'Organization', name: author.church } } : {}),
+      };
+      const authorMetaTags = buildStaticMeta({ title, desc, url, type: 'ProfilePage', seoContent:
+        `<main style="font-family:sans-serif;max-width:780px;margin:0 auto;padding:1rem">` +
+        `<h1>${author.name}</h1>` +
+        (author.role ? `<p><strong>${author.role}</strong></p>` : '') +
+        (author.church ? `<p>${author.church}</p>` : '') +
+        (author.city ? `<p>${author.city}</p>` : '') +
+        `<p>${desc}</p>` +
+        `</main>`,
+      });
+      // Override JSON_LD with Person schema
+      authorMetaTags.JSON_LD = `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
+      const html    = replacePlaceholders(template, authorMetaTags);
+      const outDir  = path.join(DIST_DIR, 'autor', author.slug);
+      await fs.mkdir(outDir, { recursive: true });
+      await fs.writeFile(path.join(outDir, 'index.html'), html, 'utf-8');
+      sitemapXml += sitemapUrl(`${CANONICAL_ORIGIN}/autor/${author.slug}`, 'weekly', '0.5');
+      totalAuthors++;
+    } catch (err) {
+      console.warn(`[prerender]   ⚠ Could not prerender author "${author.slug}": ${err.message}`);
+    }
+  }
+  console.log(`[prerender] ✓ ${totalAuthors} author profile pages generated.\n`);
+
   // ── Static institutional pages ──
   console.log('[prerender] Processing static pages...');
 
@@ -503,6 +580,7 @@ async function prerender() {
   console.log('[prerender] ✅ Done!');
   console.log(`  Bible chapters : ${totalChapters}`);
   console.log(`  Articles       : ${totalArticles}`);
+  console.log(`  Authors        : ${totalAuthors}`);
   console.log(`  Sitemap URLs   : ${urlCount}`);
   console.log('════════════════════════════════════════════════\n');
 }

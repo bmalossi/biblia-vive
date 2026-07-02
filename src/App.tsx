@@ -39,6 +39,8 @@ const ArtigosIndexPage = lazy(() => import("./pages/ArtigosIndexPage"));
 const HowToPage = lazy(() => import("./pages/HowToPage"));
 const HarpaPage = lazy(() => import("./pages/HarpaPage"));
 const HarpaReadingPage = lazy(() => import("./pages/HarpaReadingPage"));
+const AdminAutoresPage = lazy(() => import('./pages/AdminAutoresPage'));
+const AuthorPage = lazy(() => import('./pages/AuthorPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -86,6 +88,7 @@ const App = () => (
                   <Route path="/compartilhar" element={<SharePage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/admin/artigos" element={<AdminArtigosPage />} />
+                  <Route path="/admin/autores" element={<AdminAutoresPage />} />
                   <Route path="/admin/comentarios" element={<AdminComentariosPage />} />
                   <Route path="/admin/usuarios" element={<AdminUsuariosPage />} />
                   <Route path="/pro" element={<PricingPage />} />
@@ -98,6 +101,7 @@ const App = () => (
                   <Route path="/apoiar" element={<SupportPage />} />
                   <Route path="/artigos" element={<ArtigosIndexPage />} />
                   <Route path="/artigos/:slug" element={<ArtigoPage />} />
+                  <Route path="/autor/:slug" element={<AuthorPage />} />
                   <Route path="/meu-estudo" element={<MyStudyPage />} />
                   <Route path="/como-usar" element={<HowToPage />} />
                   <Route path="/auth/callback" element={<AuthCallbackPage />} />

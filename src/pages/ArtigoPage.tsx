@@ -10,8 +10,19 @@ import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
-import { Loader2, ArrowLeft, Calendar } from "lucide-react";
+import { Loader2, ArrowLeft, Calendar, Check, User, Building2, MapPin } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
+
+interface Author {
+    id: string;
+    name: string;
+    slug: string;
+    avatar_url: string | null;
+    bio: string;
+    church: string | null;
+    city: string | null;
+    role: string | null;
+}
 
 interface Article {
     id: string;
@@ -26,6 +37,9 @@ interface Article {
     published_at: string | null;
     line_height?: string;
     letter_spacing?: string;
+    author_id?: string | null;
+    reviewed_by?: string | null;
+    author?: Author | null;
 }
 
 export default function ArtigoPage() {
@@ -44,7 +58,7 @@ export default function ArtigoPage() {
 
             const { data, error: fetchError } = await supabase
                 .from("articles")
-                .select("*")
+                .select("*, author:article_authors(*)")
                 .eq("slug", slug)
                 .single();
 
@@ -88,7 +102,16 @@ export default function ArtigoPage() {
             "@type": "Article",
             "headline": article.title,
             "description": description,
-            "url": `https://www.bibliavive.com.br/artigos/${article.slug}`
+            "url": `https://www.bibliavive.com.br/artigos/${article.slug}`,
+            "author": {
+                "@type": "Person",
+                "name": article.author ? article.author.name : "Bíblia Vive",
+                "jobTitle": article.author ? (article.author.role || undefined) : undefined,
+                "worksFor": article.author && article.author.church ? {
+                    "@type": "Organization",
+                    "name": article.author.church
+                } : undefined
+            }
         };
     }
 
@@ -102,7 +125,7 @@ export default function ArtigoPage() {
         ogType: "article",
         articlePublishedTime: article?.published_at || article?.created_at || undefined,
         articleModifiedTime: article?.published_at || article?.created_at || undefined,
-        articleAuthor: "Bíblia Vive"
+        articleAuthor: article?.author ? article.author.name : "Bíblia Vive"
     });
 
     if (loading) {
@@ -166,12 +189,20 @@ export default function ArtigoPage() {
                     <h1 className="font-serif text-3xl leading-tight text-app-text md:text-4xl">
                         {article.title}
                     </h1>
-                    {formattedDate && (
-                        <div className="mt-4 flex items-center gap-2 text-sm text-app-text-muted">
-                            <Calendar className="h-4 w-4" />
-                            {formattedDate}
-                        </div>
-                    )}
+                    <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-app-text-muted">
+                        {formattedDate && (
+                            <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-gold/80" />
+                                {formattedDate}
+                            </div>
+                        )}
+                        {article.reviewed_by && (
+                            <div className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 border border-gold/25 px-3 py-0.5 text-xs text-gold font-medium">
+                                <Check className="h-3.5 w-3.5" />
+                                <span>Revisado por: {article.reviewed_by}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Body — article-prose overrides Tailwind Typography with design-system vars */}
@@ -186,6 +217,64 @@ export default function ArtigoPage() {
                 >
                     <ReactMarkdown remarkPlugins={[remarkBreaks]}>{article.body}</ReactMarkdown>
                 </div>
+
+                {/* Author Box */}
+                {article.author && (
+                    <div className="mt-12 rounded-2xl border border-border bg-app-surface p-6 md:p-8 flex flex-col sm:flex-row gap-6 items-center sm:items-start shadow-md relative overflow-hidden">
+                        {/* Soft visual glowing element */}
+                        <div className="absolute -left-6 -top-6 h-20 w-20 rounded-full bg-gold/5 blur-xl" />
+
+                        {article.author.avatar_url ? (
+                            <img
+                                src={article.author.avatar_url}
+                                alt={article.author.name}
+                                className="relative z-10 h-20 w-20 rounded-full object-cover border border-gold/30 flex-shrink-0 shadow-sm"
+                            />
+                        ) : (
+                            <div className="relative z-10 h-20 w-20 rounded-full bg-app-raised flex items-center justify-center border border-border flex-shrink-0 shadow-sm">
+                                <User className="h-10 w-10 text-app-text-muted" />
+                            </div>
+                        )}
+
+                        <div className="relative z-10 space-y-2.5 text-center sm:text-left flex-1 min-w-0">
+                            <div>
+                                <span className="text-[10px] font-sans font-semibold uppercase tracking-wider text-gold/80 block">
+                                    Sobre o autor
+                                </span>
+                                <Link
+                                    to={`/autor/${article.author.slug}`}
+                                    className="font-serif text-xl font-bold text-app-text hover:text-gold transition-colors mt-0.5 inline-block"
+                                >
+                                    {article.author.name}
+                                </Link>
+                                {article.author.role && (
+                                    <p className="text-xs text-gold font-medium mt-0.5">
+                                        {article.author.role}
+                                    </p>
+                                )}
+                            </div>
+
+                            <p className="text-sm text-app-text-muted leading-relaxed">
+                                {article.author.bio}
+                            </p>
+
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-app-text-muted pt-1 border-t border-border/40">
+                                {article.author.church && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Building2 className="h-3.5 w-3.5 text-gold/60" />
+                                        {article.author.church}
+                                    </span>
+                                )}
+                                {article.author.city && (
+                                    <span className="flex items-center gap-1.5">
+                                        <MapPin className="h-3.5 w-3.5 text-gold/60" />
+                                        {article.author.city}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </article>
         </Layout>
     );

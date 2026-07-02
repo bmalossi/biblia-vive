@@ -6,11 +6,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { NavLink, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
+import AdminNav from "@/components/AdminNav";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { ALL_BOOKS } from "@/lib/books";
 import {
@@ -105,7 +106,7 @@ function groupEntries(rows: ManualCommentaryRow[]): GroupedEntry[] {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function AdminComentariosPage() {
-  usePageMeta({ title: "Admin — Comentários | Bíblia Vive", robots: "noindex, nofollow" });
+  usePageMeta({ title: "Admin — Comentários — Bíblia Vive", robots: "noindex, nofollow" });
 
   const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -297,42 +298,7 @@ export default function AdminComentariosPage() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex gap-2 border-b border-border pb-4 flex-wrap">
-          <NavLink
-            to="/admin"
-            end
-            className={({ isActive }) =>
-              `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                isActive ? "bg-gold/10 text-gold" : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-              }`
-            }
-          >
-            <Home className="h-4 w-4" />
-            Versículos do Dia
-          </NavLink>
-          <NavLink
-            to="/admin/artigos"
-            className={({ isActive }) =>
-              `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                isActive ? "bg-gold/10 text-gold" : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-              }`
-            }
-          >
-            <FileText className="h-4 w-4" />
-            Artigos
-          </NavLink>
-          <NavLink
-            to="/admin/comentarios"
-            className={({ isActive }) =>
-              `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                isActive ? "bg-gold/10 text-gold" : "text-app-text-muted hover:bg-app-surface hover:text-app-text"
-              }`
-            }
-          >
-            <BookOpen className="h-4 w-4" />
-            Comentários
-          </NavLink>
-        </nav>
+        <AdminNav />
 
         {/* ── Formulário ── */}
         <div className="rounded-2xl border border-border bg-app-surface p-6 space-y-5">

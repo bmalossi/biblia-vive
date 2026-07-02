@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import ImageLibraryModal from "@/components/ImageLibraryModal";
+import AdminNav from "@/components/AdminNav";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface Article {
@@ -29,6 +30,13 @@ interface Article {
     featured: boolean;
     created_at: string;
     published_at: string | null;
+    author_id?: string | null;
+    reviewed_by?: string | null;
+}
+
+interface Author {
+    id: string;
+    name: string;
 }
 
 interface ArticleFormData {
@@ -41,6 +49,8 @@ interface ArticleFormData {
     featured: boolean;
     line_height: string;
     letter_spacing: string;
+    author_id: string;
+    reviewed_by: string;
 }
 
 const EMPTY_FORM: ArticleFormData = {
@@ -53,6 +63,8 @@ const EMPTY_FORM: ArticleFormData = {
     featured: false,
     line_height: "1.75",
     letter_spacing: "0em",
+    author_id: "",
+    reviewed_by: "",
 };
 
 function generateSlug(title: string): string {
@@ -91,6 +103,7 @@ export default function AdminArtigosPage() {
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [libraryOpen, setLibraryOpen] = useState(false);
+    const [authors, setAuthors] = useState<Author[]>([]);
 
     useEffect(() => {
         if (authLoading) return;
@@ -103,8 +116,24 @@ export default function AdminArtigosPage() {
     }, [user, authLoading]);
 
     useEffect(() => {
-        if (isAdmin) fetchArticles();
+        if (isAdmin) {
+            fetchArticles();
+            fetchAuthors();
+        }
     }, [isAdmin]);
+
+    async function fetchAuthors() {
+        try {
+            const { data, error } = await supabase
+                .from("article_authors")
+                .select("id, name")
+                .order("name", { ascending: true });
+            if (error) throw error;
+            setAuthors(data ?? []);
+        } catch (err) {
+            console.error('[AdminArtigosPage] fetchAuthors failed:', err);
+        }
+    }
 
     async function fetchArticles() {
         setLoading(true);
@@ -151,6 +180,8 @@ export default function AdminArtigosPage() {
             cover_image_url: form.cover_image_url || null,
             featured: form.featured,
             published_at: publish ? new Date().toISOString() : (editingId ? undefined : null),
+            author_id: form.author_id || null,
+            reviewed_by: form.reviewed_by || null,
         };
 
         let error;
@@ -309,6 +340,8 @@ export default function AdminArtigosPage() {
             featured: article.featured,
             line_height: (article as Article & { line_height?: string }).line_height ?? "1.75",
             letter_spacing: (article as Article & { letter_spacing?: string }).letter_spacing ?? "0em",
+            author_id: article.author_id ?? "",
+            reviewed_by: article.reviewed_by ?? "",
         });
         setView("form");
     }
@@ -395,6 +428,8 @@ export default function AdminArtigosPage() {
                     )}
                 </div>
 
+                <AdminNav />
+
                 {view === "list" && (
                     <>
                         {loading ? (
@@ -474,6 +509,31 @@ export default function AdminArtigosPage() {
                                         className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
                                         placeholder="slug-do-artigo"
                                     />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1">Autor do Artigo</label>
+                                        <select
+                                            value={form.author_id}
+                                            onChange={e => setForm(f => ({ ...f, author_id: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
+                                        >
+                                            <option value="">Selecione um autor (opcional)</option>
+                                            {authors.map(author => (
+                                                <option key={author.id} value={author.id}>{author.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1">Revisão Pastoral (opcional)</label>
+                                        <input
+                                            type="text"
+                                            value={form.reviewed_by}
+                                            onChange={e => setForm(f => ({ ...f, reviewed_by: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
+                                            placeholder="Ex: Pr. Cláudio da Igreja Batista"
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-xs text-app-text-muted mb-1">Imagem de Capa</label>

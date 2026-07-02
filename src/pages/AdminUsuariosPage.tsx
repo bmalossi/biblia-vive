@@ -5,11 +5,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
+import AdminNav from "@/components/AdminNav";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { Button } from "@/components/ui/button";
 import {
@@ -274,25 +275,12 @@ function EditModal({
     );
 }
 
-// ── Componente de navegação Admin (reutilizado do padrão existente) ───────────
 
-function AdminNav() {
-    const linkCls = ({ isActive }: { isActive: boolean }) =>
-        `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive ? "bg-gold/10 text-gold" : "text-app-text-muted hover:bg-app-surface hover:text-app-text"}`;
-    return (
-        <nav className="flex flex-wrap gap-2 border-b border-border pb-4">
-            <NavLink to="/admin" end className={linkCls}><Home className="h-4 w-4" />Versículos do Dia</NavLink>
-            <NavLink to="/admin/artigos" className={linkCls}><FileText className="h-4 w-4" />Artigos</NavLink>
-            <NavLink to="/admin/comentarios" className={linkCls}><BookOpen className="h-4 w-4" />Comentários</NavLink>
-            <NavLink to="/admin/usuarios" className={linkCls}><Users className="h-4 w-4" />Usuários</NavLink>
-        </nav>
-    );
-}
 
 // ── Página Principal ──────────────────────────────────────────────────────────
 
 export default function AdminUsuariosPage() {
-    usePageMeta({ title: "Admin: Usuários — Bíblia Vive", robots: "noindex, nofollow" });
+    usePageMeta({ title: "Admin — Usuários — Bíblia Vive", robots: "noindex, nofollow" });
 
     const { user, loading: authLoading } = useAuth();
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);

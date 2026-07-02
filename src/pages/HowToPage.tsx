@@ -71,7 +71,7 @@ export default function HowToPage() {
   const [activeTab, setActiveTab] = useState<TabId>("study");
 
   usePageMeta({
-    title: "Como usar o Bíblia Vive — Guia de Estudo e Leitura",
+    title: "Como usar o Bíblia Vive — Guia de Estudo | Bíblia Vive",
     description:
       "Aprenda a usar as ferramentas do Bíblia Vive: comentários teológicos históricos, notas em versículos, destaques coloridos, compartilhamento e planos de leitura.",
     canonical: "/como-usar",

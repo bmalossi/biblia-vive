@@ -7,7 +7,7 @@ export default function AboutPage() {
     const { t } = useTranslation();
 
     usePageMeta({
-        title: t("about.title", { defaultValue: "Sobre o Bíblia Vive — Propósito e E-E-A-T" }),
+        title: t("about.title", { defaultValue: "Sobre o Bíblia Vive — Missão e Propósito | Bíblia Vive" }),
         description: t("about.desc", { defaultValue: "Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos." }),
         canonical: "/sobre",
         jsonLd: [
