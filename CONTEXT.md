@@ -212,7 +212,38 @@ Banner explicativo na listagem de hinos orientando sobre a identificação dos �
 **Controle de Reprodução Contínua**:
 Opções de controle de áudio adicionadas aos players (Salmos, Harpa Cristã e Áudio Narrado da Bíblia) permitindo escolher entre repetir o áudio atual indefinidamente (Modo Repetir / Loop) ou avançar e reproduzir automaticamente o próximo capítulo ou hino ao término do atual (Modo Avanço Automático / Auto-advance). Ambos os modos são mutuamente exclusivos.
 
+## Léxico Hebraico
+
+**Léxico de Enriquecimento**:
+Camada adicional de dados lexicográficos hebraicos integrada ao painel de estudo, proveniente do OpenScriptures HebrewLexicon. Complementa os dados do Strong's sem substituí-los.
+_Evitar_: léxico alternativo, léxico completo, substituição do Strong's
+
+**Pipeline de Conversão**:
+Script offline TypeScript (`scripts/build-hebrew-lexicon.ts`) que parseia os XMLs do OpenScriptures e gera o arquivo `public/data/strongs_hebrew_os.json`. Executado manualmente por desenvolvedores, não faz parte do build da aplicação.
+_Evitar_: script de build, script de CI, script de geração automática
+
+**Raiz Trilítere**:
+Texto hebraico da raiz morfológica de uma palavra, exibido na aba Língua como contexto educativo. Inferida do `LexicalIndex.xml`; omitida se não houver confiança suficiente.
+_Evitar_: raiz Strong, raiz pai, número da raiz
+
+**Família Lexical**:
+Grupo semântico ao qual uma palavra hebraica pertence, representado pelo sentido em inglês da entrada raiz no `LexicalIndex.xml` (ex.: "perish", "father"). O rótulo na UI é localizado; o valor permanece em inglês.
+_Evitar_: grupo de palavras, família semântica, categoria
+
+**Resumo BDB**:
+Texto compacto (250–400 chars) extraído do primeiro sentido principal da entrada no Brown-Driver-Briggs Lexicon. Representa um preview lexicográfico de alto valor para o leitor, não uma transcrição acadêmica completa.
+_Evitar_: BDB completo, definição BDB, comentário lexical
+
+**Tags de Uso**:
+Lista curta (máx. 6–8 itens) de termos lexicográficos normalizados, extraídos do campo `<usage>` do `HebrewStrong.xml`, exibidos como chips na UI. Descrevem os usos canônicos da palavra.
+_Evitar_: glossário de uso, sinônimos, lista de ocorrências
+
+**Accordion Lexical**:
+Componente de expansão "Ver mais ▾" no card da aba Língua que revela os campos de enriquecimento (Raiz, Família Lexical, Tags de Uso, Resumo BDB). Inicia fechado por padrão para preservar a experiência de leitura rápida.
+_Evitar_: detalhes expandidos, painel avançado, modo especialista
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.
 - "Bíblia Vive Leitura" aparece no nome do repositório por razão histórica; o nome canônico do produto é **Bíblia Vive**.
+- "léxico hebraico" pode referir-se ao `strongs_hebrew.json` original (Strong's) ou ao novo `strongs_hebrew_os.json` (OpenScriptures). Usar **Léxico de Enriquecimento** para o novo e **Léxico Strong's** para o original.

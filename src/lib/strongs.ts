@@ -22,6 +22,16 @@ export interface StrongsEntry {
   definition_pt?: string; // Tradução para PT-BR
   definition_es?: string; // Tradução para ES
   occurrences?: number;  // Quantas vezes aparece na Bíblia
+  usage_tags?: string[];
+  usage_tags_pt?: string[];  // Chips de uso traduzidos para PT-BR
+  usage_tags_es?: string[];  // Chips de uso traduzidos para ES
+  root?: string;
+  word_group?: string;
+  word_group_pt?: string;    // Família lexical traduzida para PT-BR
+  word_group_es?: string;    // Família lexical traduzida para ES
+  bdb_short?: string;
+  bdb_short_pt?: string;     // Resumo BDB em PT-BR
+  bdb_short_es?: string;     // Resumo BDB em ES
 }
 
 export interface VerseWord {
@@ -46,7 +56,7 @@ async function loadGreek(): Promise<Record<string, StrongsEntry>> {
 async function loadHebrew(): Promise<Record<string, StrongsEntry>> {
   if (hebrewCache) return hebrewCache;
   try {
-    const res = await fetch('/data/strongs_hebrew.json');
+    const res = await fetch('/data/strongs_hebrew_os.json');
     if (!res.ok) throw new Error('Hebrew lexicon unavailable');
     hebrewCache = await res.json();
     return hebrewCache!;

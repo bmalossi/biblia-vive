@@ -131,6 +131,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const [originalTextLoading, setOriginalTextLoading] = useState(false);
     const [hoveredWord, setHoveredWord] = useState<string | null>(null);
     const [clickedWord, setClickedWord] = useState<string | null>(null);
+    const [isLexiconExpanded, setIsLexiconExpanded] = useState(false);
 
 
 
@@ -187,6 +188,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
         if (activeTab === "language" && bookId && chapter && verse) {
             setOriginalTextLoading(true);
             setClickedWord(null); // Reset click state when changing verse/tab
+            setIsLexiconExpanded(false); // Reset accordion state
             getOriginalVerseText(bookId, chapter, verse)
                 .then(text => setOriginalText(text))
                 .catch(() => setOriginalText(null))
@@ -448,7 +450,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                     : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
                                             )}>
                                                 <Languages className="h-3 w-3" />
-                                                Idioma original: {getLanguageLabel(bookId)}
+                                                {t("study.originalLanguage")}: {getLanguageLabel(bookId)}
                                             </span>
                                         </div>
 
@@ -520,7 +522,10 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                                     : "border-border bg-app-surface hover:border-gold/40"
                                                             )}
                                                             onClick={() => {
-                                                                if (wordOriginalText) setClickedWord(isSelected ? null : wordOriginalText);
+                                                                if (wordOriginalText) {
+                                                                    setClickedWord(isSelected ? null : wordOriginalText);
+                                                                    setIsLexiconExpanded(false);
+                                                                }
                                                             }}
                                                             onMouseEnter={() => { if (wordOriginalText) setHoveredWord(wordOriginalText); }}
                                                             onMouseLeave={() => setHoveredWord(null)}
@@ -545,7 +550,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                             {/* Transliteration */}
                                                             {entry?.translit && (
                                                                 <p className="text-[0.75rem] font-medium italic text-app-text-muted">
-                                                                    <span className="not-italic font-normal mr-1.5 text-[0.68rem] uppercase tracking-wide opacity-60">Transliteração:</span>
+                                                                    <span className="not-italic font-normal mr-1.5 text-[0.68rem] uppercase tracking-wide opacity-60">{t("study.transliteration")}:</span>
                                                                     {entry.translit}
                                                                 </p>
                                                             )}
@@ -569,6 +574,99 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                                 <p className="text-[0.65rem] text-app-text-muted/50 mt-1">
                                                                     Aparece {entry.occurrences}x na Bíblia
                                                                 </p>
+                                                            )}
+
+                                                            {/* Accordion Lexical */}
+                                                            {isSelected && entry && (entry.root || entry.word_group || entry.usage_tags || entry.bdb_short) && (
+                                                                <div 
+                                                                    className="mt-3 border-t border-border/40 pt-2"
+                                                                    onClick={(e) => e.stopPropagation()} // Prevent toggling selection
+                                                                >
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setIsLexiconExpanded(!isLexiconExpanded)}
+                                                                        className="flex items-center justify-between w-full py-1 text-[0.72rem] font-medium text-gold hover:text-gold/80 transition-colors"
+                                                                    >
+                                                                        <span>{isLexiconExpanded ? t("study.hideMore") : t("study.showMore")}</span>
+                                                                        <span className={cn("transition-transform duration-200 text-[0.8rem] leading-none", isLexiconExpanded ? "rotate-180" : "")}>▾</span>
+                                                                    </button>
+
+                                                                    {isLexiconExpanded && (
+                                                                        <div className="mt-2.5 space-y-3 pl-1 text-[0.75rem] text-app-text-muted animate-in fade-in slide-in-from-top-1 duration-200">
+                                                                            {/* Raiz */}
+                                                                            {entry.root && (
+                                                                                <div className="flex items-baseline gap-2">
+                                                                                    <span className="font-mono text-[0.65rem] uppercase tracking-wide opacity-60 shrink-0">{t("study.lexicalRoot")}:</span>
+                                                                                    <span className="font-serif text-[0.95rem] text-amber-700 dark:text-amber-400 font-bold" dir="rtl">{entry.root}</span>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {/* Família Lexical */}
+                                                                            {entry.word_group && (
+                                                                                <div className="flex items-baseline gap-2">
+                                                                                    <span className="font-mono text-[0.65rem] uppercase tracking-wide opacity-60 shrink-0">{t("study.lexicalFamily")}:</span>
+                                                                                    <span className="font-medium text-app-text capitalize">
+                                                                                        {locale.startsWith('pt')
+                                                                                            ? (entry.word_group_pt || entry.word_group)
+                                                                                            : locale.startsWith('es')
+                                                                                                ? (entry.word_group_es || entry.word_group)
+                                                                                                : entry.word_group}
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {/* Usos */}
+                                                                            {entry.usage_tags && entry.usage_tags.length > 0 && (
+                                                                                <div className="space-y-1">
+                                                                                    <span className="font-mono text-[0.65rem] uppercase tracking-wide opacity-60 block">{t("study.usages")}:</span>
+                                                                                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                                                                        {(locale.startsWith('pt')
+                                                                                            ? (entry.usage_tags_pt || entry.usage_tags)
+                                                                                            : locale.startsWith('es')
+                                                                                                ? (entry.usage_tags_es || entry.usage_tags)
+                                                                                                : entry.usage_tags
+                                                                                        ).map((tag, tIdx) => (
+                                                                                            <span 
+                                                                                                key={tIdx} 
+                                                                                                className="inline-flex items-center rounded bg-app-raised/80 px-2 py-0.5 text-[0.65rem] font-medium text-app-text border border-border/30 hover:border-gold/30 transition-colors"
+                                                                                            >
+                                                                                                {tag}
+                                                                                            </span>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {/* Resumo BDB */}
+                                                                            {entry.bdb_short && (function() {
+                                                                                const bdbText =
+                                                                                    locale.startsWith('pt')
+                                                                                        ? (entry.bdb_short_pt || entry.bdb_short)
+                                                                                        : locale.startsWith('es')
+                                                                                            ? (entry.bdb_short_es || entry.bdb_short)
+                                                                                            : entry.bdb_short;
+                                                                                const isOriginal = locale.startsWith('pt')
+                                                                                    ? !entry.bdb_short_pt
+                                                                                    : locale.startsWith('es')
+                                                                                        ? !entry.bdb_short_es
+                                                                                        : false;
+                                                                                return (
+                                                                                    <div className="space-y-1 border-t border-border/20 pt-2.5 mt-2">
+                                                                                        <div className="flex items-baseline justify-between">
+                                                                                            <span className="font-mono text-[0.65rem] uppercase tracking-wide opacity-60 block">{t("study.bdbSummary")}:</span>
+                                                                                            {isOriginal && (
+                                                                                                <span className="text-[0.55rem] font-mono opacity-40 uppercase tracking-widest">{locale.startsWith("es") ? "fuente en inglés" : "fonte em inglês"}</span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <p className="text-[0.74rem] leading-relaxed text-app-text-muted/90 italic font-serif">
+                                                                                            "{bdbText}"
+                                                                                        </p>
+                                                                                    </div>
+                                                                                );
+                                                                            })()}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </div>
                                                     );

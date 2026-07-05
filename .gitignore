@@ -36,3 +36,6 @@ secrets.txt
 
 # Generated Sitemap
 public/sitemap.xml
+
+# OpenScriptures raw lexicon data XMLs (large files)
+scripts/data/openscriptures/
