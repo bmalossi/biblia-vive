@@ -204,7 +204,7 @@ export async function requestCommentary(
     version: string;
     language?: string;
   }
-): Promise<{ commentaries: Commentary[]; cached: boolean }> {
+): Promise<{ commentaries: Commentary[]; cached: boolean; remaining?: number }> {
   const timeoutPromise = new Promise<any>((_, reject) => {
     setTimeout(() => {
       reject(new Error('A geração do comentário demorou mais que o esperado (Timeout de 1m30s). Verifique sua conexão ou tente novamente.'));
@@ -239,6 +239,9 @@ export async function requestCommentary(
       // Persist quota info from headers (available on all non-cached responses)
       persistQuota(response);
 
+      const remainingHeader = response.headers.get('X-RateLimit-Remaining');
+      const remaining = remainingHeader ? Number(remainingHeader) : undefined;
+
       const result = await response.json();
 
       // Handle rate limit
@@ -246,7 +249,9 @@ export async function requestCommentary(
         const err = new Error(result?.message || 'Limite de comentários atingido') as any;
         err.code = 'RATE_LIMITED';
         err.reset_at = result?.reset_at ?? (Date.now() + 3600000);
-        err.limit = result?.limit ?? 10;
+        const limitHeader = response.headers.get('X-RateLimit-Limit');
+        err.limit = limitHeader ? Number(limitHeader) : (result?.limit ?? 10);
+        err.remaining = 0;
         throw err;
       }
 
@@ -278,6 +283,7 @@ export async function requestCommentary(
       return {
         commentaries: [...aiCommentaries, ...manualCommentaries],
         cached: result.cached || false,
+        remaining
       };
     })(),
     timeoutPromise

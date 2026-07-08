@@ -182,12 +182,13 @@ function stripSacredTextsHeader(text: string): string {
 // ─── Build rate limit headers ─────────────────────────────────────────────────
 function buildRateLimitHeaders(
     corsHeaders: Record<string, string>,
+    limit: number,
     remaining: number,
     resetAt: number
 ): Record<string, string> {
     return {
         ...corsHeaders,
-        'X-RateLimit-Limit':     String(RATE_LIMIT),
+        'X-RateLimit-Limit':     String(limit),
         'X-RateLimit-Remaining': String(Math.max(0, remaining)),
         'X-RateLimit-Reset':     String(resetAt),
     };
@@ -401,14 +402,14 @@ Deno.serve(async (req) => {
         if (upstashUrl && upstashToken) {
             const clientIp    = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
             const redis       = new Redis({ url: upstashUrl, token: upstashToken });
-            const ratelimitId = isPro && userId ? `user:${userId}` : `ip:${clientIp}`;
+            const ratelimitId = userId ? `user:${userId}` : `ip:${clientIp}`;
             const limitConfig = isPro
                 ? Ratelimit.slidingWindow(RATE_LIMIT, "1 h")
                 : Ratelimit.slidingWindow(3, "1 d"); // 3 comentários gratuitos por dia (igual ao frontend)
             const userLimit = isPro ? RATE_LIMIT : 3;
             const ratelimit   = new Ratelimit({ redis, limiter: limitConfig, prefix: "bv:commentary" });
             const { success, limit, remaining, reset } = await ratelimit.limit(ratelimitId);
-            const rlHeaders   = buildRateLimitHeaders(corsHeaders, remaining, reset);
+            const rlHeaders   = buildRateLimitHeaders(corsHeaders, limit, remaining, reset);
             if (!success) {
                 const totalDuration = Date.now() - startTime;
                 await log("warn", "rate_limit_hit", {

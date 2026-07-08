@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useCommentaryQuota } from "@/hooks/useCommentaryQuota";
 import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, Hash, HelpCircle, Lock, Quote, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -110,15 +111,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
     const [isGenerating, setIsGenerating] = useState(false);
     const [rateLimitStatus, setRateLimitStatus] = useState<{ open: boolean, resetAt: number | null, limit: number }>({ open: false, resetAt: null, limit: 10 });
     const [localCommentary, setLocalCommentary] = useState<string | null>(null);
-    const [freeCommentaryCount, setFreeCommentaryCount] = useState(() => {
-        const usedStr = localStorage.getItem('bv_free_commentaries_used_count');
-        if (usedStr !== null) {
-            return Math.max(0, 3 - parseInt(usedStr, 10));
-        }
-        const legacy = localStorage.getItem('bv_free_commentary_used');
-        return legacy === 'true' ? 2 : 3;
-    });
-    const hasFreeCommentary = freeCommentaryCount > 0;
+    const { remaining: freeCommentaryCount, canUse: hasFreeCommentary, consume: consumeFreeCommentary, setRemaining: setRemainingFreeCommentary } = useCommentaryQuota('verse');
     const [strongsCache, setStrongsCache] = useState<Record<string, StrongsEntry>>({});
     const [strongsLoading, setStrongsLoading] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -216,7 +209,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
 
         try {
             setIsGenerating(true);
-            const { commentaries } = await requestCommentary({
+            const { commentaries, remaining: serverRemaining } = await requestCommentary({
                 bookId,
                 chapter,
                 verse: verse!,
@@ -228,17 +221,22 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
             setLocalCommentary(JSON.stringify(commentaries));
 
             if (!isPro) {
-                const newUsed = (3 - freeCommentaryCount) + 1;
-                localStorage.setItem('bv_free_commentaries_used_count', String(newUsed));
-                localStorage.setItem('bv_free_commentary_used', 'true');
-                setFreeCommentaryCount(3 - newUsed);
+                if (serverRemaining !== undefined) {
+                    setRemainingFreeCommentary(serverRemaining);
+                } else {
+                    consumeFreeCommentary();
+                }
             }
 
             toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
         } catch (err: any) {
             console.error(err);
             if (err.code === 'RATE_LIMITED') {
-                setRateLimitStatus({ open: true, resetAt: err.reset_at, limit: err.limit });
+                if (!isPro) {
+                    setRemainingFreeCommentary(0);
+                }
+                const finalLimit = !isPro ? 3 : err.limit;
+                setRateLimitStatus({ open: true, resetAt: err.reset_at, limit: finalLimit });
             } else {
                 toast({ message: "Erro ao gerar comentários: " + err.message, type: "error" });
             }

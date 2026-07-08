@@ -72,6 +72,7 @@ import { BiblicalCommentary } from "@/components/BiblicalCommentary";
 import { requestCommentary } from "@/lib/studyPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotebookContext } from "@/contexts/NotebookContext";
+import { useCommentaryQuota } from "@/hooks/useCommentaryQuota";
 
 interface BookContextData {
   name: string;
@@ -191,14 +192,7 @@ export default function ReadingPage() {
   const [redLetterVerses, setRedLetterVerses] = useState<Record<string, Record<string, number[]>> | null>(null);
   const [cachedChapterCommentary, setCachedChapterCommentary] = useState<string | null>(null);
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
-  const [freeChapterCommentaryCount, setFreeChapterCommentaryCount] = useState(() => {
-    const usedStr = localStorage.getItem('bv_free_chapter_commentaries_used_count');
-    if (usedStr !== null) {
-      return Math.max(0, 3 - parseInt(usedStr, 10));
-    }
-    const legacy = localStorage.getItem('bv_free_chapter_commentary_used');
-    return legacy === 'true' ? 2 : 3;
-  });
+  const { remaining: freeChapterCommentaryCount, canUse: hasFreeChapterCommentary, consume: consumeFreeChapterCommentary, setRemaining: setRemainingFreeChapterCommentary } = useCommentaryQuota('chapter');
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
 
@@ -900,7 +894,7 @@ export default function ReadingPage() {
   };
 
   const handleChapterCommentary = async () => {
-    if (!isPro && freeChapterCommentaryCount <= 0 && !cachedChapterCommentary) {
+    if (!isPro && !hasFreeChapterCommentary && !cachedChapterCommentary) {
       navigate('/pro');
       return;
     }
@@ -913,7 +907,7 @@ export default function ReadingPage() {
 
     setIsChapterCommentaryLoading(true);
     try {
-      const { commentaries } = await requestCommentary({
+      const { commentaries, remaining: serverRemaining } = await requestCommentary({
         bookId: selectedBook.id,
         chapter: chapterNumber,
         verse: null,
@@ -923,10 +917,11 @@ export default function ReadingPage() {
       });
       setCachedChapterCommentary(JSON.stringify(commentaries));
       if (!isPro) {
-        const newUsed = (3 - freeChapterCommentaryCount) + 1;
-        localStorage.setItem('bv_free_chapter_commentaries_used_count', String(newUsed));
-        localStorage.setItem('bv_free_chapter_commentary_used', 'true');
-        setFreeChapterCommentaryCount(3 - newUsed);
+        if (serverRemaining !== undefined) {
+          setRemainingFreeChapterCommentary(serverRemaining);
+        } else {
+          consumeFreeChapterCommentary();
+        }
       }
       toast({ message: "Comentário teológico gerado com sucesso.", type: "prompt", duration: Infinity });
       setTimeout(() => {
@@ -934,7 +929,11 @@ export default function ReadingPage() {
       }, 100);
     } catch (e: any) {
       if (e.code === 'RATE_LIMITED') {
-        setRateLimitStatus({ open: true, resetAt: e.reset_at, limit: e.limit });
+        if (!isPro) {
+          setRemainingFreeChapterCommentary(0);
+        }
+        const finalLimit = !isPro ? 3 : e.limit;
+        setRateLimitStatus({ open: true, resetAt: e.reset_at, limit: finalLimit });
       } else {
         toast({ message: "Erro: " + e.message, type: "error" });
       }
