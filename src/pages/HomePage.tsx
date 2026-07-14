@@ -149,7 +149,7 @@ export default function HomePage() {
 
                 <div className="mt-3">
                   <Link
-                    className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm text-gold transition-colors hover:bg-gold-bg hover:text-gold"
+                    className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm text-gold transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold"
                     to={`/${lastRead.versao}/${lastRead.livro}/${lastRead.capitulo}`}
                   >
                     {t("home.continue")}
@@ -179,7 +179,7 @@ export default function HomePage() {
 
                 <div className="mt-3">
                   <Link
-                    className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm font-extralight text-white transition-colors hover:bg-gold-hover hover:text-white bg-gold"
+                    className="inline-flex items-center rounded-full border border-gold/50 px-3 py-1.5 text-sm font-extralight text-white transition-colors hover:bg-gold/90 hover:text-white bg-gold"
                     to={`/planos?id=${activePlanInfo.id}`}
                   >
                     Retomar Leitura

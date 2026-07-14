@@ -757,541 +757,711 @@
       {
         "day": 1,
         "refs": [
-          "nt_placeholder/1"
+          "mt/1",
+          "mt/2",
+          "mt/3"
         ]
       },
       {
         "day": 2,
         "refs": [
-          "nt_placeholder/2"
+          "mt/4",
+          "mt/5",
+          "mt/6"
         ]
       },
       {
         "day": 3,
         "refs": [
-          "nt_placeholder/3"
+          "mt/7",
+          "mt/8",
+          "mt/9"
         ]
       },
       {
         "day": 4,
         "refs": [
-          "nt_placeholder/4"
+          "mt/10",
+          "mt/11",
+          "mt/12"
         ]
       },
       {
         "day": 5,
         "refs": [
-          "nt_placeholder/5"
+          "mt/13",
+          "mt/14",
+          "mt/15"
         ]
       },
       {
         "day": 6,
         "refs": [
-          "nt_placeholder/6"
+          "mt/16",
+          "mt/17",
+          "mt/18"
         ]
       },
       {
         "day": 7,
         "refs": [
-          "nt_placeholder/7"
+          "mt/19",
+          "mt/20",
+          "mt/21"
         ]
       },
       {
         "day": 8,
         "refs": [
-          "nt_placeholder/8"
+          "mt/22",
+          "mt/23",
+          "mt/24"
         ]
       },
       {
         "day": 9,
         "refs": [
-          "nt_placeholder/9"
+          "mt/25",
+          "mt/26",
+          "mt/27"
         ]
       },
       {
         "day": 10,
         "refs": [
-          "nt_placeholder/10"
+          "mt/28",
+          "mc/1",
+          "mc/2"
         ]
       },
       {
         "day": 11,
         "refs": [
-          "nt_placeholder/11"
+          "mc/3",
+          "mc/4",
+          "mc/5"
         ]
       },
       {
         "day": 12,
         "refs": [
-          "nt_placeholder/12"
+          "mc/6",
+          "mc/7",
+          "mc/8"
         ]
       },
       {
         "day": 13,
         "refs": [
-          "nt_placeholder/13"
+          "mc/9",
+          "mc/10",
+          "mc/11"
         ]
       },
       {
         "day": 14,
         "refs": [
-          "nt_placeholder/14"
+          "mc/12",
+          "mc/13",
+          "mc/14"
         ]
       },
       {
         "day": 15,
         "refs": [
-          "nt_placeholder/15"
+          "mc/15",
+          "mc/16",
+          "lc/1"
         ]
       },
       {
         "day": 16,
         "refs": [
-          "nt_placeholder/16"
+          "lc/2",
+          "lc/3",
+          "lc/4"
         ]
       },
       {
         "day": 17,
         "refs": [
-          "nt_placeholder/17"
+          "lc/5",
+          "lc/6",
+          "lc/7"
         ]
       },
       {
         "day": 18,
         "refs": [
-          "nt_placeholder/18"
+          "lc/8",
+          "lc/9",
+          "lc/10"
         ]
       },
       {
         "day": 19,
         "refs": [
-          "nt_placeholder/19"
+          "lc/11",
+          "lc/12",
+          "lc/13"
         ]
       },
       {
         "day": 20,
         "refs": [
-          "nt_placeholder/20"
+          "lc/14",
+          "lc/15",
+          "lc/16"
         ]
       },
       {
         "day": 21,
         "refs": [
-          "nt_placeholder/21"
+          "lc/17",
+          "lc/18",
+          "lc/19"
         ]
       },
       {
         "day": 22,
         "refs": [
-          "nt_placeholder/22"
+          "lc/20",
+          "lc/21",
+          "lc/22"
         ]
       },
       {
         "day": 23,
         "refs": [
-          "nt_placeholder/23"
+          "lc/23",
+          "lc/24",
+          "joa/1"
         ]
       },
       {
         "day": 24,
         "refs": [
-          "nt_placeholder/24"
+          "joa/2",
+          "joa/3",
+          "joa/4"
         ]
       },
       {
         "day": 25,
         "refs": [
-          "nt_placeholder/25"
+          "joa/5",
+          "joa/6",
+          "joa/7"
         ]
       },
       {
         "day": 26,
         "refs": [
-          "nt_placeholder/26"
+          "joa/8",
+          "joa/9",
+          "joa/10"
         ]
       },
       {
         "day": 27,
         "refs": [
-          "nt_placeholder/27"
+          "joa/11",
+          "joa/12",
+          "joa/13"
         ]
       },
       {
         "day": 28,
         "refs": [
-          "nt_placeholder/28"
+          "joa/14",
+          "joa/15",
+          "joa/16"
         ]
       },
       {
         "day": 29,
         "refs": [
-          "nt_placeholder/29"
+          "joa/17",
+          "joa/18",
+          "joa/19"
         ]
       },
       {
         "day": 30,
         "refs": [
-          "nt_placeholder/30"
+          "joa/20",
+          "joa/21",
+          "atos/1"
         ]
       },
       {
         "day": 31,
         "refs": [
-          "nt_placeholder/31"
+          "atos/2",
+          "atos/3",
+          "atos/4"
         ]
       },
       {
         "day": 32,
         "refs": [
-          "nt_placeholder/32"
+          "atos/5",
+          "atos/6",
+          "atos/7"
         ]
       },
       {
         "day": 33,
         "refs": [
-          "nt_placeholder/33"
+          "atos/8",
+          "atos/9",
+          "atos/10"
         ]
       },
       {
         "day": 34,
         "refs": [
-          "nt_placeholder/34"
+          "atos/11",
+          "atos/12",
+          "atos/13"
         ]
       },
       {
         "day": 35,
         "refs": [
-          "nt_placeholder/35"
+          "atos/14",
+          "atos/15",
+          "atos/16"
         ]
       },
       {
         "day": 36,
         "refs": [
-          "nt_placeholder/36"
+          "atos/17",
+          "atos/18",
+          "atos/19"
         ]
       },
       {
         "day": 37,
         "refs": [
-          "nt_placeholder/37"
+          "atos/20",
+          "atos/21",
+          "atos/22"
         ]
       },
       {
         "day": 38,
         "refs": [
-          "nt_placeholder/38"
+          "atos/23",
+          "atos/24",
+          "atos/25"
         ]
       },
       {
         "day": 39,
         "refs": [
-          "nt_placeholder/39"
+          "atos/26",
+          "atos/27",
+          "atos/28"
         ]
       },
       {
         "day": 40,
         "refs": [
-          "nt_placeholder/40"
+          "rm/1",
+          "rm/2",
+          "rm/3"
         ]
       },
       {
         "day": 41,
         "refs": [
-          "nt_placeholder/41"
+          "rm/4",
+          "rm/5",
+          "rm/6"
         ]
       },
       {
         "day": 42,
         "refs": [
-          "nt_placeholder/42"
+          "rm/7",
+          "rm/8",
+          "rm/9"
         ]
       },
       {
         "day": 43,
         "refs": [
-          "nt_placeholder/43"
+          "rm/10",
+          "rm/11",
+          "rm/12"
         ]
       },
       {
         "day": 44,
         "refs": [
-          "nt_placeholder/44"
+          "rm/13",
+          "rm/14",
+          "rm/15"
         ]
       },
       {
         "day": 45,
         "refs": [
-          "nt_placeholder/45"
+          "rm/16",
+          "1co/1",
+          "1co/2"
         ]
       },
       {
         "day": 46,
         "refs": [
-          "nt_placeholder/46"
+          "1co/3",
+          "1co/4",
+          "1co/5"
         ]
       },
       {
         "day": 47,
         "refs": [
-          "nt_placeholder/47"
+          "1co/6",
+          "1co/7",
+          "1co/8"
         ]
       },
       {
         "day": 48,
         "refs": [
-          "nt_placeholder/48"
+          "1co/9",
+          "1co/10",
+          "1co/11"
         ]
       },
       {
         "day": 49,
         "refs": [
-          "nt_placeholder/49"
+          "1co/12",
+          "1co/13",
+          "1co/14"
         ]
       },
       {
         "day": 50,
         "refs": [
-          "nt_placeholder/50"
+          "1co/15",
+          "1co/16",
+          "2co/1"
         ]
       },
       {
         "day": 51,
         "refs": [
-          "nt_placeholder/51"
+          "2co/2",
+          "2co/3",
+          "2co/4"
         ]
       },
       {
         "day": 52,
         "refs": [
-          "nt_placeholder/52"
+          "2co/5",
+          "2co/6",
+          "2co/7"
         ]
       },
       {
         "day": 53,
         "refs": [
-          "nt_placeholder/53"
+          "2co/8",
+          "2co/9",
+          "2co/10"
         ]
       },
       {
         "day": 54,
         "refs": [
-          "nt_placeholder/54"
+          "2co/11",
+          "2co/12",
+          "2co/13"
         ]
       },
       {
         "day": 55,
         "refs": [
-          "nt_placeholder/55"
+          "gl/1",
+          "gl/2",
+          "gl/3"
         ]
       },
       {
         "day": 56,
         "refs": [
-          "nt_placeholder/56"
+          "gl/4",
+          "gl/5",
+          "gl/6"
         ]
       },
       {
         "day": 57,
         "refs": [
-          "nt_placeholder/57"
+          "ef/1",
+          "ef/2",
+          "ef/3"
         ]
       },
       {
         "day": 58,
         "refs": [
-          "nt_placeholder/58"
+          "ef/4",
+          "ef/5",
+          "ef/6"
         ]
       },
       {
         "day": 59,
         "refs": [
-          "nt_placeholder/59"
+          "fp/1",
+          "fp/2",
+          "fp/3"
         ]
       },
       {
         "day": 60,
         "refs": [
-          "nt_placeholder/60"
+          "fp/4",
+          "cl/1",
+          "cl/2"
         ]
       },
       {
         "day": 61,
         "refs": [
-          "nt_placeholder/61"
+          "cl/3",
+          "cl/4",
+          "1ts/1"
         ]
       },
       {
         "day": 62,
         "refs": [
-          "nt_placeholder/62"
+          "1ts/2",
+          "1ts/3",
+          "1ts/4"
         ]
       },
       {
         "day": 63,
         "refs": [
-          "nt_placeholder/63"
+          "1ts/5",
+          "2ts/1",
+          "2ts/2"
         ]
       },
       {
         "day": 64,
         "refs": [
-          "nt_placeholder/64"
+          "2ts/3",
+          "1tm/1",
+          "1tm/2"
         ]
       },
       {
         "day": 65,
         "refs": [
-          "nt_placeholder/65"
+          "1tm/3",
+          "1tm/4",
+          "1tm/5"
         ]
       },
       {
         "day": 66,
         "refs": [
-          "nt_placeholder/66"
+          "1tm/6",
+          "2tm/1",
+          "2tm/2"
         ]
       },
       {
         "day": 67,
         "refs": [
-          "nt_placeholder/67"
+          "2tm/3",
+          "2tm/4",
+          "tt/1"
         ]
       },
       {
         "day": 68,
         "refs": [
-          "nt_placeholder/68"
+          "tt/2",
+          "tt/3",
+          "fm/1"
         ]
       },
       {
         "day": 69,
         "refs": [
-          "nt_placeholder/69"
+          "hb/1",
+          "hb/2",
+          "hb/3"
         ]
       },
       {
         "day": 70,
         "refs": [
-          "nt_placeholder/70"
+          "hb/4",
+          "hb/5",
+          "hb/6"
         ]
       },
       {
         "day": 71,
         "refs": [
-          "nt_placeholder/71"
+          "hb/7",
+          "hb/8",
+          "hb/9"
         ]
       },
       {
         "day": 72,
         "refs": [
-          "nt_placeholder/72"
+          "hb/10",
+          "hb/11",
+          "hb/12"
         ]
       },
       {
         "day": 73,
         "refs": [
-          "nt_placeholder/73"
+          "hb/13",
+          "tg/1",
+          "tg/2"
         ]
       },
       {
         "day": 74,
         "refs": [
-          "nt_placeholder/74"
+          "tg/3",
+          "tg/4",
+          "tg/5"
         ]
       },
       {
         "day": 75,
         "refs": [
-          "nt_placeholder/75"
+          "1pe/1",
+          "1pe/2",
+          "1pe/3"
         ]
       },
       {
         "day": 76,
         "refs": [
-          "nt_placeholder/76"
+          "1pe/4",
+          "1pe/5",
+          "2pe/1"
         ]
       },
       {
         "day": 77,
         "refs": [
-          "nt_placeholder/77"
+          "2pe/2",
+          "2pe/3",
+          "1jo/1"
         ]
       },
       {
         "day": 78,
         "refs": [
-          "nt_placeholder/78"
+          "1jo/2",
+          "1jo/3",
+          "1jo/4"
         ]
       },
       {
         "day": 79,
         "refs": [
-          "nt_placeholder/79"
+          "1jo/5",
+          "2jo/1",
+          "3jo/1"
         ]
       },
       {
         "day": 80,
         "refs": [
-          "nt_placeholder/80"
+          "jd/1",
+          "ap/1",
+          "ap/2"
         ]
       },
       {
         "day": 81,
         "refs": [
-          "nt_placeholder/81"
+          "ap/3",
+          "ap/4"
         ]
       },
       {
         "day": 82,
         "refs": [
-          "nt_placeholder/82"
+          "ap/5",
+          "ap/6"
         ]
       },
       {
         "day": 83,
         "refs": [
-          "nt_placeholder/83"
+          "ap/7",
+          "ap/8"
         ]
       },
       {
         "day": 84,
         "refs": [
-          "nt_placeholder/84"
+          "ap/9",
+          "ap/10"
         ]
       },
       {
         "day": 85,
         "refs": [
-          "nt_placeholder/85"
+          "ap/11",
+          "ap/12"
         ]
       },
       {
         "day": 86,
         "refs": [
-          "nt_placeholder/86"
+          "ap/13",
+          "ap/14"
         ]
       },
       {
         "day": 87,
         "refs": [
-          "nt_placeholder/87"
+          "ap/15",
+          "ap/16"
         ]
       },
       {
         "day": 88,
         "refs": [
-          "nt_placeholder/88"
+          "ap/17",
+          "ap/18"
         ]
       },
       {
         "day": 89,
         "refs": [
-          "nt_placeholder/89"
+          "ap/19",
+          "ap/20"
         ]
       },
       {
         "day": 90,
         "refs": [
-          "nt_placeholder/90"
+          "ap/21",
+          "ap/22"
         ]
       }
     ]
@@ -1305,2191 +1475,3015 @@
       {
         "day": 1,
         "refs": [
-          "bible_placeholder/1"
+          "gn/1",
+          "gn/2",
+          "gn/3",
+          "gn/4"
         ]
       },
       {
         "day": 2,
         "refs": [
-          "bible_placeholder/2"
+          "gn/5",
+          "gn/6",
+          "gn/7",
+          "gn/8"
         ]
       },
       {
         "day": 3,
         "refs": [
-          "bible_placeholder/3"
+          "gn/9",
+          "gn/10",
+          "gn/11",
+          "gn/12"
         ]
       },
       {
         "day": 4,
         "refs": [
-          "bible_placeholder/4"
+          "gn/13",
+          "gn/14",
+          "gn/15",
+          "gn/16"
         ]
       },
       {
         "day": 5,
         "refs": [
-          "bible_placeholder/5"
+          "gn/17",
+          "gn/18",
+          "gn/19",
+          "gn/20"
         ]
       },
       {
         "day": 6,
         "refs": [
-          "bible_placeholder/6"
+          "gn/21",
+          "gn/22",
+          "gn/23",
+          "gn/24"
         ]
       },
       {
         "day": 7,
         "refs": [
-          "bible_placeholder/7"
+          "gn/25",
+          "gn/26",
+          "gn/27",
+          "gn/28"
         ]
       },
       {
         "day": 8,
         "refs": [
-          "bible_placeholder/8"
+          "gn/29",
+          "gn/30",
+          "gn/31",
+          "gn/32"
         ]
       },
       {
         "day": 9,
         "refs": [
-          "bible_placeholder/9"
+          "gn/33",
+          "gn/34",
+          "gn/35",
+          "gn/36"
         ]
       },
       {
         "day": 10,
         "refs": [
-          "bible_placeholder/10"
+          "gn/37",
+          "gn/38",
+          "gn/39",
+          "gn/40"
         ]
       },
       {
         "day": 11,
         "refs": [
-          "bible_placeholder/11"
+          "gn/41",
+          "gn/42",
+          "gn/43",
+          "gn/44"
         ]
       },
       {
         "day": 12,
         "refs": [
-          "bible_placeholder/12"
+          "gn/45",
+          "gn/46",
+          "gn/47",
+          "gn/48"
         ]
       },
       {
         "day": 13,
         "refs": [
-          "bible_placeholder/13"
+          "gn/49",
+          "gn/50",
+          "ex/1",
+          "ex/2"
         ]
       },
       {
         "day": 14,
         "refs": [
-          "bible_placeholder/14"
+          "ex/3",
+          "ex/4",
+          "ex/5",
+          "ex/6"
         ]
       },
       {
         "day": 15,
         "refs": [
-          "bible_placeholder/15"
+          "ex/7",
+          "ex/8",
+          "ex/9",
+          "ex/10"
         ]
       },
       {
         "day": 16,
         "refs": [
-          "bible_placeholder/16"
+          "ex/11",
+          "ex/12",
+          "ex/13",
+          "ex/14"
         ]
       },
       {
         "day": 17,
         "refs": [
-          "bible_placeholder/17"
+          "ex/15",
+          "ex/16",
+          "ex/17",
+          "ex/18"
         ]
       },
       {
         "day": 18,
         "refs": [
-          "bible_placeholder/18"
+          "ex/19",
+          "ex/20",
+          "ex/21",
+          "ex/22"
         ]
       },
       {
         "day": 19,
         "refs": [
-          "bible_placeholder/19"
+          "ex/23",
+          "ex/24",
+          "ex/25",
+          "ex/26"
         ]
       },
       {
         "day": 20,
         "refs": [
-          "bible_placeholder/20"
+          "ex/27",
+          "ex/28",
+          "ex/29",
+          "ex/30"
         ]
       },
       {
         "day": 21,
         "refs": [
-          "bible_placeholder/21"
+          "ex/31",
+          "ex/32",
+          "ex/33",
+          "ex/34"
         ]
       },
       {
         "day": 22,
         "refs": [
-          "bible_placeholder/22"
+          "ex/35",
+          "ex/36",
+          "ex/37",
+          "ex/38"
         ]
       },
       {
         "day": 23,
         "refs": [
-          "bible_placeholder/23"
+          "ex/39",
+          "ex/40",
+          "lv/1",
+          "lv/2"
         ]
       },
       {
         "day": 24,
         "refs": [
-          "bible_placeholder/24"
+          "lv/3",
+          "lv/4",
+          "lv/5",
+          "lv/6"
         ]
       },
       {
         "day": 25,
         "refs": [
-          "bible_placeholder/25"
+          "lv/7",
+          "lv/8",
+          "lv/9",
+          "lv/10"
         ]
       },
       {
         "day": 26,
         "refs": [
-          "bible_placeholder/26"
+          "lv/11",
+          "lv/12",
+          "lv/13",
+          "lv/14"
         ]
       },
       {
         "day": 27,
         "refs": [
-          "bible_placeholder/27"
+          "lv/15",
+          "lv/16",
+          "lv/17",
+          "lv/18"
         ]
       },
       {
         "day": 28,
         "refs": [
-          "bible_placeholder/28"
+          "lv/19",
+          "lv/20",
+          "lv/21",
+          "lv/22"
         ]
       },
       {
         "day": 29,
         "refs": [
-          "bible_placeholder/29"
+          "lv/23",
+          "lv/24",
+          "lv/25",
+          "lv/26"
         ]
       },
       {
         "day": 30,
         "refs": [
-          "bible_placeholder/30"
+          "lv/27",
+          "nm/1",
+          "nm/2",
+          "nm/3"
         ]
       },
       {
         "day": 31,
         "refs": [
-          "bible_placeholder/31"
+          "nm/4",
+          "nm/5",
+          "nm/6",
+          "nm/7"
         ]
       },
       {
         "day": 32,
         "refs": [
-          "bible_placeholder/32"
+          "nm/8",
+          "nm/9",
+          "nm/10",
+          "nm/11"
         ]
       },
       {
         "day": 33,
         "refs": [
-          "bible_placeholder/33"
+          "nm/12",
+          "nm/13",
+          "nm/14",
+          "nm/15"
         ]
       },
       {
         "day": 34,
         "refs": [
-          "bible_placeholder/34"
+          "nm/16",
+          "nm/17",
+          "nm/18",
+          "nm/19"
         ]
       },
       {
         "day": 35,
         "refs": [
-          "bible_placeholder/35"
+          "nm/20",
+          "nm/21",
+          "nm/22",
+          "nm/23"
         ]
       },
       {
         "day": 36,
         "refs": [
-          "bible_placeholder/36"
+          "nm/24",
+          "nm/25",
+          "nm/26",
+          "nm/27"
         ]
       },
       {
         "day": 37,
         "refs": [
-          "bible_placeholder/37"
+          "nm/28",
+          "nm/29",
+          "nm/30",
+          "nm/31"
         ]
       },
       {
         "day": 38,
         "refs": [
-          "bible_placeholder/38"
+          "nm/32",
+          "nm/33",
+          "nm/34",
+          "nm/35"
         ]
       },
       {
         "day": 39,
         "refs": [
-          "bible_placeholder/39"
+          "nm/36",
+          "dt/1",
+          "dt/2",
+          "dt/3"
         ]
       },
       {
         "day": 40,
         "refs": [
-          "bible_placeholder/40"
+          "dt/4",
+          "dt/5",
+          "dt/6",
+          "dt/7"
         ]
       },
       {
         "day": 41,
         "refs": [
-          "bible_placeholder/41"
+          "dt/8",
+          "dt/9",
+          "dt/10",
+          "dt/11"
         ]
       },
       {
         "day": 42,
         "refs": [
-          "bible_placeholder/42"
+          "dt/12",
+          "dt/13",
+          "dt/14",
+          "dt/15"
         ]
       },
       {
         "day": 43,
         "refs": [
-          "bible_placeholder/43"
+          "dt/16",
+          "dt/17",
+          "dt/18",
+          "dt/19"
         ]
       },
       {
         "day": 44,
         "refs": [
-          "bible_placeholder/44"
+          "dt/20",
+          "dt/21",
+          "dt/22",
+          "dt/23"
         ]
       },
       {
         "day": 45,
         "refs": [
-          "bible_placeholder/45"
+          "dt/24",
+          "dt/25",
+          "dt/26",
+          "dt/27"
         ]
       },
       {
         "day": 46,
         "refs": [
-          "bible_placeholder/46"
+          "dt/28",
+          "dt/29",
+          "dt/30",
+          "dt/31"
         ]
       },
       {
         "day": 47,
         "refs": [
-          "bible_placeholder/47"
+          "dt/32",
+          "dt/33",
+          "dt/34",
+          "js/1"
         ]
       },
       {
         "day": 48,
         "refs": [
-          "bible_placeholder/48"
+          "js/2",
+          "js/3",
+          "js/4",
+          "js/5"
         ]
       },
       {
         "day": 49,
         "refs": [
-          "bible_placeholder/49"
+          "js/6",
+          "js/7",
+          "js/8",
+          "js/9"
         ]
       },
       {
         "day": 50,
         "refs": [
-          "bible_placeholder/50"
+          "js/10",
+          "js/11",
+          "js/12",
+          "js/13"
         ]
       },
       {
         "day": 51,
         "refs": [
-          "bible_placeholder/51"
+          "js/14",
+          "js/15",
+          "js/16",
+          "js/17"
         ]
       },
       {
         "day": 52,
         "refs": [
-          "bible_placeholder/52"
+          "js/18",
+          "js/19",
+          "js/20",
+          "js/21"
         ]
       },
       {
         "day": 53,
         "refs": [
-          "bible_placeholder/53"
+          "js/22",
+          "js/23",
+          "js/24",
+          "jz/1"
         ]
       },
       {
         "day": 54,
         "refs": [
-          "bible_placeholder/54"
+          "jz/2",
+          "jz/3",
+          "jz/4",
+          "jz/5"
         ]
       },
       {
         "day": 55,
         "refs": [
-          "bible_placeholder/55"
+          "jz/6",
+          "jz/7",
+          "jz/8",
+          "jz/9"
         ]
       },
       {
         "day": 56,
         "refs": [
-          "bible_placeholder/56"
+          "jz/10",
+          "jz/11",
+          "jz/12",
+          "jz/13"
         ]
       },
       {
         "day": 57,
         "refs": [
-          "bible_placeholder/57"
+          "jz/14",
+          "jz/15",
+          "jz/16",
+          "jz/17"
         ]
       },
       {
         "day": 58,
         "refs": [
-          "bible_placeholder/58"
+          "jz/18",
+          "jz/19",
+          "jz/20",
+          "jz/21"
         ]
       },
       {
         "day": 59,
         "refs": [
-          "bible_placeholder/59"
+          "rt/1",
+          "rt/2",
+          "rt/3",
+          "rt/4"
         ]
       },
       {
         "day": 60,
         "refs": [
-          "bible_placeholder/60"
+          "1sm/1",
+          "1sm/2",
+          "1sm/3",
+          "1sm/4"
         ]
       },
       {
         "day": 61,
         "refs": [
-          "bible_placeholder/61"
+          "1sm/5",
+          "1sm/6",
+          "1sm/7",
+          "1sm/8"
         ]
       },
       {
         "day": 62,
         "refs": [
-          "bible_placeholder/62"
+          "1sm/9",
+          "1sm/10",
+          "1sm/11",
+          "1sm/12"
         ]
       },
       {
         "day": 63,
         "refs": [
-          "bible_placeholder/63"
+          "1sm/13",
+          "1sm/14",
+          "1sm/15",
+          "1sm/16"
         ]
       },
       {
         "day": 64,
         "refs": [
-          "bible_placeholder/64"
+          "1sm/17",
+          "1sm/18",
+          "1sm/19",
+          "1sm/20"
         ]
       },
       {
         "day": 65,
         "refs": [
-          "bible_placeholder/65"
+          "1sm/21",
+          "1sm/22",
+          "1sm/23",
+          "1sm/24"
         ]
       },
       {
         "day": 66,
         "refs": [
-          "bible_placeholder/66"
+          "1sm/25",
+          "1sm/26",
+          "1sm/27",
+          "1sm/28"
         ]
       },
       {
         "day": 67,
         "refs": [
-          "bible_placeholder/67"
+          "1sm/29",
+          "1sm/30",
+          "1sm/31",
+          "2sm/1"
         ]
       },
       {
         "day": 68,
         "refs": [
-          "bible_placeholder/68"
+          "2sm/2",
+          "2sm/3",
+          "2sm/4",
+          "2sm/5"
         ]
       },
       {
         "day": 69,
         "refs": [
-          "bible_placeholder/69"
+          "2sm/6",
+          "2sm/7",
+          "2sm/8",
+          "2sm/9"
         ]
       },
       {
         "day": 70,
         "refs": [
-          "bible_placeholder/70"
+          "2sm/10",
+          "2sm/11",
+          "2sm/12",
+          "2sm/13"
         ]
       },
       {
         "day": 71,
         "refs": [
-          "bible_placeholder/71"
+          "2sm/14",
+          "2sm/15",
+          "2sm/16",
+          "2sm/17"
         ]
       },
       {
         "day": 72,
         "refs": [
-          "bible_placeholder/72"
+          "2sm/18",
+          "2sm/19",
+          "2sm/20",
+          "2sm/21"
         ]
       },
       {
         "day": 73,
         "refs": [
-          "bible_placeholder/73"
+          "2sm/22",
+          "2sm/23",
+          "2sm/24",
+          "1rs/1"
         ]
       },
       {
         "day": 74,
         "refs": [
-          "bible_placeholder/74"
+          "1rs/2",
+          "1rs/3",
+          "1rs/4",
+          "1rs/5"
         ]
       },
       {
         "day": 75,
         "refs": [
-          "bible_placeholder/75"
+          "1rs/6",
+          "1rs/7",
+          "1rs/8",
+          "1rs/9"
         ]
       },
       {
         "day": 76,
         "refs": [
-          "bible_placeholder/76"
+          "1rs/10",
+          "1rs/11",
+          "1rs/12",
+          "1rs/13"
         ]
       },
       {
         "day": 77,
         "refs": [
-          "bible_placeholder/77"
+          "1rs/14",
+          "1rs/15",
+          "1rs/16",
+          "1rs/17"
         ]
       },
       {
         "day": 78,
         "refs": [
-          "bible_placeholder/78"
+          "1rs/18",
+          "1rs/19",
+          "1rs/20",
+          "1rs/21"
         ]
       },
       {
         "day": 79,
         "refs": [
-          "bible_placeholder/79"
+          "1rs/22",
+          "2rs/1",
+          "2rs/2",
+          "2rs/3"
         ]
       },
       {
         "day": 80,
         "refs": [
-          "bible_placeholder/80"
+          "2rs/4",
+          "2rs/5",
+          "2rs/6",
+          "2rs/7"
         ]
       },
       {
         "day": 81,
         "refs": [
-          "bible_placeholder/81"
+          "2rs/8",
+          "2rs/9",
+          "2rs/10",
+          "2rs/11"
         ]
       },
       {
         "day": 82,
         "refs": [
-          "bible_placeholder/82"
+          "2rs/12",
+          "2rs/13",
+          "2rs/14",
+          "2rs/15"
         ]
       },
       {
         "day": 83,
         "refs": [
-          "bible_placeholder/83"
+          "2rs/16",
+          "2rs/17",
+          "2rs/18",
+          "2rs/19"
         ]
       },
       {
         "day": 84,
         "refs": [
-          "bible_placeholder/84"
+          "2rs/20",
+          "2rs/21",
+          "2rs/22",
+          "2rs/23"
         ]
       },
       {
         "day": 85,
         "refs": [
-          "bible_placeholder/85"
+          "2rs/24",
+          "2rs/25",
+          "1cr/1",
+          "1cr/2"
         ]
       },
       {
         "day": 86,
         "refs": [
-          "bible_placeholder/86"
+          "1cr/3",
+          "1cr/4",
+          "1cr/5",
+          "1cr/6"
         ]
       },
       {
         "day": 87,
         "refs": [
-          "bible_placeholder/87"
+          "1cr/7",
+          "1cr/8",
+          "1cr/9",
+          "1cr/10"
         ]
       },
       {
         "day": 88,
         "refs": [
-          "bible_placeholder/88"
+          "1cr/11",
+          "1cr/12",
+          "1cr/13",
+          "1cr/14"
         ]
       },
       {
         "day": 89,
         "refs": [
-          "bible_placeholder/89"
+          "1cr/15",
+          "1cr/16",
+          "1cr/17",
+          "1cr/18"
         ]
       },
       {
         "day": 90,
         "refs": [
-          "bible_placeholder/90"
+          "1cr/19",
+          "1cr/20",
+          "1cr/21",
+          "1cr/22"
         ]
       },
       {
         "day": 91,
         "refs": [
-          "bible_placeholder/91"
+          "1cr/23",
+          "1cr/24",
+          "1cr/25",
+          "1cr/26"
         ]
       },
       {
         "day": 92,
         "refs": [
-          "bible_placeholder/92"
+          "1cr/27",
+          "1cr/28",
+          "1cr/29",
+          "2cr/1"
         ]
       },
       {
         "day": 93,
         "refs": [
-          "bible_placeholder/93"
+          "2cr/2",
+          "2cr/3",
+          "2cr/4",
+          "2cr/5"
         ]
       },
       {
         "day": 94,
         "refs": [
-          "bible_placeholder/94"
+          "2cr/6",
+          "2cr/7",
+          "2cr/8",
+          "2cr/9"
         ]
       },
       {
         "day": 95,
         "refs": [
-          "bible_placeholder/95"
+          "2cr/10",
+          "2cr/11",
+          "2cr/12"
         ]
       },
       {
         "day": 96,
         "refs": [
-          "bible_placeholder/96"
+          "2cr/13",
+          "2cr/14",
+          "2cr/15"
         ]
       },
       {
         "day": 97,
         "refs": [
-          "bible_placeholder/97"
+          "2cr/16",
+          "2cr/17",
+          "2cr/18"
         ]
       },
       {
         "day": 98,
         "refs": [
-          "bible_placeholder/98"
+          "2cr/19",
+          "2cr/20",
+          "2cr/21"
         ]
       },
       {
         "day": 99,
         "refs": [
-          "bible_placeholder/99"
+          "2cr/22",
+          "2cr/23",
+          "2cr/24"
         ]
       },
       {
         "day": 100,
         "refs": [
-          "bible_placeholder/100"
+          "2cr/25",
+          "2cr/26",
+          "2cr/27"
         ]
       },
       {
         "day": 101,
         "refs": [
-          "bible_placeholder/101"
+          "2cr/28",
+          "2cr/29",
+          "2cr/30"
         ]
       },
       {
         "day": 102,
         "refs": [
-          "bible_placeholder/102"
+          "2cr/31",
+          "2cr/32",
+          "2cr/33"
         ]
       },
       {
         "day": 103,
         "refs": [
-          "bible_placeholder/103"
+          "2cr/34",
+          "2cr/35",
+          "2cr/36"
         ]
       },
       {
         "day": 104,
         "refs": [
-          "bible_placeholder/104"
+          "ed/1",
+          "ed/2",
+          "ed/3"
         ]
       },
       {
         "day": 105,
         "refs": [
-          "bible_placeholder/105"
+          "ed/4",
+          "ed/5",
+          "ed/6"
         ]
       },
       {
         "day": 106,
         "refs": [
-          "bible_placeholder/106"
+          "ed/7",
+          "ed/8",
+          "ed/9"
         ]
       },
       {
         "day": 107,
         "refs": [
-          "bible_placeholder/107"
+          "ed/10",
+          "ne/1",
+          "ne/2"
         ]
       },
       {
         "day": 108,
         "refs": [
-          "bible_placeholder/108"
+          "ne/3",
+          "ne/4",
+          "ne/5"
         ]
       },
       {
         "day": 109,
         "refs": [
-          "bible_placeholder/109"
+          "ne/6",
+          "ne/7",
+          "ne/8"
         ]
       },
       {
         "day": 110,
         "refs": [
-          "bible_placeholder/110"
+          "ne/9",
+          "ne/10",
+          "ne/11"
         ]
       },
       {
         "day": 111,
         "refs": [
-          "bible_placeholder/111"
+          "ne/12",
+          "ne/13",
+          "et/1"
         ]
       },
       {
         "day": 112,
         "refs": [
-          "bible_placeholder/112"
+          "et/2",
+          "et/3",
+          "et/4"
         ]
       },
       {
         "day": 113,
         "refs": [
-          "bible_placeholder/113"
+          "et/5",
+          "et/6",
+          "et/7"
         ]
       },
       {
         "day": 114,
         "refs": [
-          "bible_placeholder/114"
+          "et/8",
+          "et/9",
+          "et/10"
         ]
       },
       {
         "day": 115,
         "refs": [
-          "bible_placeholder/115"
+          "jo/1",
+          "jo/2",
+          "jo/3"
         ]
       },
       {
         "day": 116,
         "refs": [
-          "bible_placeholder/116"
+          "jo/4",
+          "jo/5",
+          "jo/6"
         ]
       },
       {
         "day": 117,
         "refs": [
-          "bible_placeholder/117"
+          "jo/7",
+          "jo/8",
+          "jo/9"
         ]
       },
       {
         "day": 118,
         "refs": [
-          "bible_placeholder/118"
+          "jo/10",
+          "jo/11",
+          "jo/12"
         ]
       },
       {
         "day": 119,
         "refs": [
-          "bible_placeholder/119"
+          "jo/13",
+          "jo/14",
+          "jo/15"
         ]
       },
       {
         "day": 120,
         "refs": [
-          "bible_placeholder/120"
+          "jo/16",
+          "jo/17",
+          "jo/18"
         ]
       },
       {
         "day": 121,
         "refs": [
-          "bible_placeholder/121"
+          "jo/19",
+          "jo/20",
+          "jo/21"
         ]
       },
       {
         "day": 122,
         "refs": [
-          "bible_placeholder/122"
+          "jo/22",
+          "jo/23",
+          "jo/24"
         ]
       },
       {
         "day": 123,
         "refs": [
-          "bible_placeholder/123"
+          "jo/25",
+          "jo/26",
+          "jo/27"
         ]
       },
       {
         "day": 124,
         "refs": [
-          "bible_placeholder/124"
+          "jo/28",
+          "jo/29",
+          "jo/30"
         ]
       },
       {
         "day": 125,
         "refs": [
-          "bible_placeholder/125"
+          "jo/31",
+          "jo/32",
+          "jo/33"
         ]
       },
       {
         "day": 126,
         "refs": [
-          "bible_placeholder/126"
+          "jo/34",
+          "jo/35",
+          "jo/36"
         ]
       },
       {
         "day": 127,
         "refs": [
-          "bible_placeholder/127"
+          "jo/37",
+          "jo/38",
+          "jo/39"
         ]
       },
       {
         "day": 128,
         "refs": [
-          "bible_placeholder/128"
+          "jo/40",
+          "jo/41",
+          "jo/42"
         ]
       },
       {
         "day": 129,
         "refs": [
-          "bible_placeholder/129"
+          "sl/1",
+          "sl/2",
+          "sl/3"
         ]
       },
       {
         "day": 130,
         "refs": [
-          "bible_placeholder/130"
+          "sl/4",
+          "sl/5",
+          "sl/6"
         ]
       },
       {
         "day": 131,
         "refs": [
-          "bible_placeholder/131"
+          "sl/7",
+          "sl/8",
+          "sl/9"
         ]
       },
       {
         "day": 132,
         "refs": [
-          "bible_placeholder/132"
+          "sl/10",
+          "sl/11",
+          "sl/12"
         ]
       },
       {
         "day": 133,
         "refs": [
-          "bible_placeholder/133"
+          "sl/13",
+          "sl/14",
+          "sl/15"
         ]
       },
       {
         "day": 134,
         "refs": [
-          "bible_placeholder/134"
+          "sl/16",
+          "sl/17",
+          "sl/18"
         ]
       },
       {
         "day": 135,
         "refs": [
-          "bible_placeholder/135"
+          "sl/19",
+          "sl/20",
+          "sl/21"
         ]
       },
       {
         "day": 136,
         "refs": [
-          "bible_placeholder/136"
+          "sl/22",
+          "sl/23",
+          "sl/24"
         ]
       },
       {
         "day": 137,
         "refs": [
-          "bible_placeholder/137"
+          "sl/25",
+          "sl/26",
+          "sl/27"
         ]
       },
       {
         "day": 138,
         "refs": [
-          "bible_placeholder/138"
+          "sl/28",
+          "sl/29",
+          "sl/30"
         ]
       },
       {
         "day": 139,
         "refs": [
-          "bible_placeholder/139"
+          "sl/31",
+          "sl/32",
+          "sl/33"
         ]
       },
       {
         "day": 140,
         "refs": [
-          "bible_placeholder/140"
+          "sl/34",
+          "sl/35",
+          "sl/36"
         ]
       },
       {
         "day": 141,
         "refs": [
-          "bible_placeholder/141"
+          "sl/37",
+          "sl/38",
+          "sl/39"
         ]
       },
       {
         "day": 142,
         "refs": [
-          "bible_placeholder/142"
+          "sl/40",
+          "sl/41",
+          "sl/42"
         ]
       },
       {
         "day": 143,
         "refs": [
-          "bible_placeholder/143"
+          "sl/43",
+          "sl/44",
+          "sl/45"
         ]
       },
       {
         "day": 144,
         "refs": [
-          "bible_placeholder/144"
+          "sl/46",
+          "sl/47",
+          "sl/48"
         ]
       },
       {
         "day": 145,
         "refs": [
-          "bible_placeholder/145"
+          "sl/49",
+          "sl/50",
+          "sl/51"
         ]
       },
       {
         "day": 146,
         "refs": [
-          "bible_placeholder/146"
+          "sl/52",
+          "sl/53",
+          "sl/54"
         ]
       },
       {
         "day": 147,
         "refs": [
-          "bible_placeholder/147"
+          "sl/55",
+          "sl/56",
+          "sl/57"
         ]
       },
       {
         "day": 148,
         "refs": [
-          "bible_placeholder/148"
+          "sl/58",
+          "sl/59",
+          "sl/60"
         ]
       },
       {
         "day": 149,
         "refs": [
-          "bible_placeholder/149"
+          "sl/61",
+          "sl/62",
+          "sl/63"
         ]
       },
       {
         "day": 150,
         "refs": [
-          "bible_placeholder/150"
+          "sl/64",
+          "sl/65",
+          "sl/66"
         ]
       },
       {
         "day": 151,
         "refs": [
-          "bible_placeholder/151"
+          "sl/67",
+          "sl/68",
+          "sl/69"
         ]
       },
       {
         "day": 152,
         "refs": [
-          "bible_placeholder/152"
+          "sl/70",
+          "sl/71",
+          "sl/72"
         ]
       },
       {
         "day": 153,
         "refs": [
-          "bible_placeholder/153"
+          "sl/73",
+          "sl/74",
+          "sl/75"
         ]
       },
       {
         "day": 154,
         "refs": [
-          "bible_placeholder/154"
+          "sl/76",
+          "sl/77",
+          "sl/78"
         ]
       },
       {
         "day": 155,
         "refs": [
-          "bible_placeholder/155"
+          "sl/79",
+          "sl/80",
+          "sl/81"
         ]
       },
       {
         "day": 156,
         "refs": [
-          "bible_placeholder/156"
+          "sl/82",
+          "sl/83",
+          "sl/84"
         ]
       },
       {
         "day": 157,
         "refs": [
-          "bible_placeholder/157"
+          "sl/85",
+          "sl/86",
+          "sl/87"
         ]
       },
       {
         "day": 158,
         "refs": [
-          "bible_placeholder/158"
+          "sl/88",
+          "sl/89",
+          "sl/90"
         ]
       },
       {
         "day": 159,
         "refs": [
-          "bible_placeholder/159"
+          "sl/91",
+          "sl/92",
+          "sl/93"
         ]
       },
       {
         "day": 160,
         "refs": [
-          "bible_placeholder/160"
+          "sl/94",
+          "sl/95",
+          "sl/96"
         ]
       },
       {
         "day": 161,
         "refs": [
-          "bible_placeholder/161"
+          "sl/97",
+          "sl/98",
+          "sl/99"
         ]
       },
       {
         "day": 162,
         "refs": [
-          "bible_placeholder/162"
+          "sl/100",
+          "sl/101",
+          "sl/102"
         ]
       },
       {
         "day": 163,
         "refs": [
-          "bible_placeholder/163"
+          "sl/103",
+          "sl/104",
+          "sl/105"
         ]
       },
       {
         "day": 164,
         "refs": [
-          "bible_placeholder/164"
+          "sl/106",
+          "sl/107",
+          "sl/108"
         ]
       },
       {
         "day": 165,
         "refs": [
-          "bible_placeholder/165"
+          "sl/109",
+          "sl/110",
+          "sl/111"
         ]
       },
       {
         "day": 166,
         "refs": [
-          "bible_placeholder/166"
+          "sl/112",
+          "sl/113",
+          "sl/114"
         ]
       },
       {
         "day": 167,
         "refs": [
-          "bible_placeholder/167"
+          "sl/115",
+          "sl/116",
+          "sl/117"
         ]
       },
       {
         "day": 168,
         "refs": [
-          "bible_placeholder/168"
+          "sl/118",
+          "sl/119",
+          "sl/120"
         ]
       },
       {
         "day": 169,
         "refs": [
-          "bible_placeholder/169"
+          "sl/121",
+          "sl/122",
+          "sl/123"
         ]
       },
       {
         "day": 170,
         "refs": [
-          "bible_placeholder/170"
+          "sl/124",
+          "sl/125",
+          "sl/126"
         ]
       },
       {
         "day": 171,
         "refs": [
-          "bible_placeholder/171"
+          "sl/127",
+          "sl/128",
+          "sl/129"
         ]
       },
       {
         "day": 172,
         "refs": [
-          "bible_placeholder/172"
+          "sl/130",
+          "sl/131",
+          "sl/132"
         ]
       },
       {
         "day": 173,
         "refs": [
-          "bible_placeholder/173"
+          "sl/133",
+          "sl/134",
+          "sl/135"
         ]
       },
       {
         "day": 174,
         "refs": [
-          "bible_placeholder/174"
+          "sl/136",
+          "sl/137",
+          "sl/138"
         ]
       },
       {
         "day": 175,
         "refs": [
-          "bible_placeholder/175"
+          "sl/139",
+          "sl/140",
+          "sl/141"
         ]
       },
       {
         "day": 176,
         "refs": [
-          "bible_placeholder/176"
+          "sl/142",
+          "sl/143",
+          "sl/144"
         ]
       },
       {
         "day": 177,
         "refs": [
-          "bible_placeholder/177"
+          "sl/145",
+          "sl/146",
+          "sl/147"
         ]
       },
       {
         "day": 178,
         "refs": [
-          "bible_placeholder/178"
+          "sl/148",
+          "sl/149",
+          "sl/150"
         ]
       },
       {
         "day": 179,
         "refs": [
-          "bible_placeholder/179"
+          "pv/1",
+          "pv/2",
+          "pv/3"
         ]
       },
       {
         "day": 180,
         "refs": [
-          "bible_placeholder/180"
+          "pv/4",
+          "pv/5",
+          "pv/6"
         ]
       },
       {
         "day": 181,
         "refs": [
-          "bible_placeholder/181"
+          "pv/7",
+          "pv/8",
+          "pv/9"
         ]
       },
       {
         "day": 182,
         "refs": [
-          "bible_placeholder/182"
+          "pv/10",
+          "pv/11",
+          "pv/12"
         ]
       },
       {
         "day": 183,
         "refs": [
-          "bible_placeholder/183"
+          "pv/13",
+          "pv/14",
+          "pv/15"
         ]
       },
       {
         "day": 184,
         "refs": [
-          "bible_placeholder/184"
+          "pv/16",
+          "pv/17",
+          "pv/18"
         ]
       },
       {
         "day": 185,
         "refs": [
-          "bible_placeholder/185"
+          "pv/19",
+          "pv/20",
+          "pv/21"
         ]
       },
       {
         "day": 186,
         "refs": [
-          "bible_placeholder/186"
+          "pv/22",
+          "pv/23",
+          "pv/24"
         ]
       },
       {
         "day": 187,
         "refs": [
-          "bible_placeholder/187"
+          "pv/25",
+          "pv/26",
+          "pv/27"
         ]
       },
       {
         "day": 188,
         "refs": [
-          "bible_placeholder/188"
+          "pv/28",
+          "pv/29",
+          "pv/30"
         ]
       },
       {
         "day": 189,
         "refs": [
-          "bible_placeholder/189"
+          "pv/31",
+          "ec/1",
+          "ec/2"
         ]
       },
       {
         "day": 190,
         "refs": [
-          "bible_placeholder/190"
+          "ec/3",
+          "ec/4",
+          "ec/5"
         ]
       },
       {
         "day": 191,
         "refs": [
-          "bible_placeholder/191"
+          "ec/6",
+          "ec/7",
+          "ec/8"
         ]
       },
       {
         "day": 192,
         "refs": [
-          "bible_placeholder/192"
+          "ec/9",
+          "ec/10",
+          "ec/11"
         ]
       },
       {
         "day": 193,
         "refs": [
-          "bible_placeholder/193"
+          "ec/12",
+          "ct/1",
+          "ct/2"
         ]
       },
       {
         "day": 194,
         "refs": [
-          "bible_placeholder/194"
+          "ct/3",
+          "ct/4",
+          "ct/5"
         ]
       },
       {
         "day": 195,
         "refs": [
-          "bible_placeholder/195"
+          "ct/6",
+          "ct/7",
+          "ct/8"
         ]
       },
       {
         "day": 196,
         "refs": [
-          "bible_placeholder/196"
+          "is/1",
+          "is/2",
+          "is/3"
         ]
       },
       {
         "day": 197,
         "refs": [
-          "bible_placeholder/197"
+          "is/4",
+          "is/5",
+          "is/6"
         ]
       },
       {
         "day": 198,
         "refs": [
-          "bible_placeholder/198"
+          "is/7",
+          "is/8",
+          "is/9"
         ]
       },
       {
         "day": 199,
         "refs": [
-          "bible_placeholder/199"
+          "is/10",
+          "is/11",
+          "is/12"
         ]
       },
       {
         "day": 200,
         "refs": [
-          "bible_placeholder/200"
+          "is/13",
+          "is/14",
+          "is/15"
         ]
       },
       {
         "day": 201,
         "refs": [
-          "bible_placeholder/201"
+          "is/16",
+          "is/17",
+          "is/18"
         ]
       },
       {
         "day": 202,
         "refs": [
-          "bible_placeholder/202"
+          "is/19",
+          "is/20",
+          "is/21"
         ]
       },
       {
         "day": 203,
         "refs": [
-          "bible_placeholder/203"
+          "is/22",
+          "is/23",
+          "is/24"
         ]
       },
       {
         "day": 204,
         "refs": [
-          "bible_placeholder/204"
+          "is/25",
+          "is/26",
+          "is/27"
         ]
       },
       {
         "day": 205,
         "refs": [
-          "bible_placeholder/205"
+          "is/28",
+          "is/29",
+          "is/30"
         ]
       },
       {
         "day": 206,
         "refs": [
-          "bible_placeholder/206"
+          "is/31",
+          "is/32",
+          "is/33"
         ]
       },
       {
         "day": 207,
         "refs": [
-          "bible_placeholder/207"
+          "is/34",
+          "is/35",
+          "is/36"
         ]
       },
       {
         "day": 208,
         "refs": [
-          "bible_placeholder/208"
+          "is/37",
+          "is/38",
+          "is/39"
         ]
       },
       {
         "day": 209,
         "refs": [
-          "bible_placeholder/209"
+          "is/40",
+          "is/41",
+          "is/42"
         ]
       },
       {
         "day": 210,
         "refs": [
-          "bible_placeholder/210"
+          "is/43",
+          "is/44",
+          "is/45"
         ]
       },
       {
         "day": 211,
         "refs": [
-          "bible_placeholder/211"
+          "is/46",
+          "is/47",
+          "is/48"
         ]
       },
       {
         "day": 212,
         "refs": [
-          "bible_placeholder/212"
+          "is/49",
+          "is/50",
+          "is/51"
         ]
       },
       {
         "day": 213,
         "refs": [
-          "bible_placeholder/213"
+          "is/52",
+          "is/53",
+          "is/54"
         ]
       },
       {
         "day": 214,
         "refs": [
-          "bible_placeholder/214"
+          "is/55",
+          "is/56",
+          "is/57"
         ]
       },
       {
         "day": 215,
         "refs": [
-          "bible_placeholder/215"
+          "is/58",
+          "is/59",
+          "is/60"
         ]
       },
       {
         "day": 216,
         "refs": [
-          "bible_placeholder/216"
+          "is/61",
+          "is/62",
+          "is/63"
         ]
       },
       {
         "day": 217,
         "refs": [
-          "bible_placeholder/217"
+          "is/64",
+          "is/65",
+          "is/66"
         ]
       },
       {
         "day": 218,
         "refs": [
-          "bible_placeholder/218"
+          "jr/1",
+          "jr/2",
+          "jr/3"
         ]
       },
       {
         "day": 219,
         "refs": [
-          "bible_placeholder/219"
+          "jr/4",
+          "jr/5",
+          "jr/6"
         ]
       },
       {
         "day": 220,
         "refs": [
-          "bible_placeholder/220"
+          "jr/7",
+          "jr/8",
+          "jr/9"
         ]
       },
       {
         "day": 221,
         "refs": [
-          "bible_placeholder/221"
+          "jr/10",
+          "jr/11",
+          "jr/12"
         ]
       },
       {
         "day": 222,
         "refs": [
-          "bible_placeholder/222"
+          "jr/13",
+          "jr/14",
+          "jr/15"
         ]
       },
       {
         "day": 223,
         "refs": [
-          "bible_placeholder/223"
+          "jr/16",
+          "jr/17",
+          "jr/18"
         ]
       },
       {
         "day": 224,
         "refs": [
-          "bible_placeholder/224"
+          "jr/19",
+          "jr/20",
+          "jr/21"
         ]
       },
       {
         "day": 225,
         "refs": [
-          "bible_placeholder/225"
+          "jr/22",
+          "jr/23",
+          "jr/24"
         ]
       },
       {
         "day": 226,
         "refs": [
-          "bible_placeholder/226"
+          "jr/25",
+          "jr/26",
+          "jr/27"
         ]
       },
       {
         "day": 227,
         "refs": [
-          "bible_placeholder/227"
+          "jr/28",
+          "jr/29",
+          "jr/30"
         ]
       },
       {
         "day": 228,
         "refs": [
-          "bible_placeholder/228"
+          "jr/31",
+          "jr/32",
+          "jr/33"
         ]
       },
       {
         "day": 229,
         "refs": [
-          "bible_placeholder/229"
+          "jr/34",
+          "jr/35",
+          "jr/36"
         ]
       },
       {
         "day": 230,
         "refs": [
-          "bible_placeholder/230"
+          "jr/37",
+          "jr/38",
+          "jr/39"
         ]
       },
       {
         "day": 231,
         "refs": [
-          "bible_placeholder/231"
+          "jr/40",
+          "jr/41",
+          "jr/42"
         ]
       },
       {
         "day": 232,
         "refs": [
-          "bible_placeholder/232"
+          "jr/43",
+          "jr/44",
+          "jr/45"
         ]
       },
       {
         "day": 233,
         "refs": [
-          "bible_placeholder/233"
+          "jr/46",
+          "jr/47",
+          "jr/48"
         ]
       },
       {
         "day": 234,
         "refs": [
-          "bible_placeholder/234"
+          "jr/49",
+          "jr/50",
+          "jr/51"
         ]
       },
       {
         "day": 235,
         "refs": [
-          "bible_placeholder/235"
+          "jr/52",
+          "lm/1",
+          "lm/2"
         ]
       },
       {
         "day": 236,
         "refs": [
-          "bible_placeholder/236"
+          "lm/3",
+          "lm/4",
+          "lm/5"
         ]
       },
       {
         "day": 237,
         "refs": [
-          "bible_placeholder/237"
+          "ez/1",
+          "ez/2",
+          "ez/3"
         ]
       },
       {
         "day": 238,
         "refs": [
-          "bible_placeholder/238"
+          "ez/4",
+          "ez/5",
+          "ez/6"
         ]
       },
       {
         "day": 239,
         "refs": [
-          "bible_placeholder/239"
+          "ez/7",
+          "ez/8",
+          "ez/9"
         ]
       },
       {
         "day": 240,
         "refs": [
-          "bible_placeholder/240"
+          "ez/10",
+          "ez/11",
+          "ez/12"
         ]
       },
       {
         "day": 241,
         "refs": [
-          "bible_placeholder/241"
+          "ez/13",
+          "ez/14",
+          "ez/15"
         ]
       },
       {
         "day": 242,
         "refs": [
-          "bible_placeholder/242"
+          "ez/16",
+          "ez/17",
+          "ez/18"
         ]
       },
       {
         "day": 243,
         "refs": [
-          "bible_placeholder/243"
+          "ez/19",
+          "ez/20",
+          "ez/21"
         ]
       },
       {
         "day": 244,
         "refs": [
-          "bible_placeholder/244"
+          "ez/22",
+          "ez/23",
+          "ez/24"
         ]
       },
       {
         "day": 245,
         "refs": [
-          "bible_placeholder/245"
+          "ez/25",
+          "ez/26",
+          "ez/27"
         ]
       },
       {
         "day": 246,
         "refs": [
-          "bible_placeholder/246"
+          "ez/28",
+          "ez/29",
+          "ez/30"
         ]
       },
       {
         "day": 247,
         "refs": [
-          "bible_placeholder/247"
+          "ez/31",
+          "ez/32",
+          "ez/33"
         ]
       },
       {
         "day": 248,
         "refs": [
-          "bible_placeholder/248"
+          "ez/34",
+          "ez/35",
+          "ez/36"
         ]
       },
       {
         "day": 249,
         "refs": [
-          "bible_placeholder/249"
+          "ez/37",
+          "ez/38",
+          "ez/39"
         ]
       },
       {
         "day": 250,
         "refs": [
-          "bible_placeholder/250"
+          "ez/40",
+          "ez/41",
+          "ez/42"
         ]
       },
       {
         "day": 251,
         "refs": [
-          "bible_placeholder/251"
+          "ez/43",
+          "ez/44",
+          "ez/45"
         ]
       },
       {
         "day": 252,
         "refs": [
-          "bible_placeholder/252"
+          "ez/46",
+          "ez/47",
+          "ez/48"
         ]
       },
       {
         "day": 253,
         "refs": [
-          "bible_placeholder/253"
+          "dn/1",
+          "dn/2",
+          "dn/3"
         ]
       },
       {
         "day": 254,
         "refs": [
-          "bible_placeholder/254"
+          "dn/4",
+          "dn/5",
+          "dn/6"
         ]
       },
       {
         "day": 255,
         "refs": [
-          "bible_placeholder/255"
+          "dn/7",
+          "dn/8",
+          "dn/9"
         ]
       },
       {
         "day": 256,
         "refs": [
-          "bible_placeholder/256"
+          "dn/10",
+          "dn/11",
+          "dn/12"
         ]
       },
       {
         "day": 257,
         "refs": [
-          "bible_placeholder/257"
+          "os/1",
+          "os/2",
+          "os/3"
         ]
       },
       {
         "day": 258,
         "refs": [
-          "bible_placeholder/258"
+          "os/4",
+          "os/5",
+          "os/6"
         ]
       },
       {
         "day": 259,
         "refs": [
-          "bible_placeholder/259"
+          "os/7",
+          "os/8",
+          "os/9"
         ]
       },
       {
         "day": 260,
         "refs": [
-          "bible_placeholder/260"
+          "os/10",
+          "os/11",
+          "os/12"
         ]
       },
       {
         "day": 261,
         "refs": [
-          "bible_placeholder/261"
+          "os/13",
+          "os/14",
+          "jl/1"
         ]
       },
       {
         "day": 262,
         "refs": [
-          "bible_placeholder/262"
+          "jl/2",
+          "jl/3",
+          "am/1"
         ]
       },
       {
         "day": 263,
         "refs": [
-          "bible_placeholder/263"
+          "am/2",
+          "am/3",
+          "am/4"
         ]
       },
       {
         "day": 264,
         "refs": [
-          "bible_placeholder/264"
+          "am/5",
+          "am/6",
+          "am/7"
         ]
       },
       {
         "day": 265,
         "refs": [
-          "bible_placeholder/265"
+          "am/8",
+          "am/9",
+          "ob/1"
         ]
       },
       {
         "day": 266,
         "refs": [
-          "bible_placeholder/266"
+          "jn/1",
+          "jn/2",
+          "jn/3"
         ]
       },
       {
         "day": 267,
         "refs": [
-          "bible_placeholder/267"
+          "jn/4",
+          "mq/1",
+          "mq/2"
         ]
       },
       {
         "day": 268,
         "refs": [
-          "bible_placeholder/268"
+          "mq/3",
+          "mq/4",
+          "mq/5"
         ]
       },
       {
         "day": 269,
         "refs": [
-          "bible_placeholder/269"
+          "mq/6",
+          "mq/7",
+          "na/1"
         ]
       },
       {
         "day": 270,
         "refs": [
-          "bible_placeholder/270"
+          "na/2",
+          "na/3",
+          "hc/1"
         ]
       },
       {
         "day": 271,
         "refs": [
-          "bible_placeholder/271"
+          "hc/2",
+          "hc/3",
+          "sf/1"
         ]
       },
       {
         "day": 272,
         "refs": [
-          "bible_placeholder/272"
+          "sf/2",
+          "sf/3",
+          "ag/1"
         ]
       },
       {
         "day": 273,
         "refs": [
-          "bible_placeholder/273"
+          "ag/2",
+          "zc/1",
+          "zc/2"
         ]
       },
       {
         "day": 274,
         "refs": [
-          "bible_placeholder/274"
+          "zc/3",
+          "zc/4",
+          "zc/5"
         ]
       },
       {
         "day": 275,
         "refs": [
-          "bible_placeholder/275"
+          "zc/6",
+          "zc/7",
+          "zc/8"
         ]
       },
       {
         "day": 276,
         "refs": [
-          "bible_placeholder/276"
+          "zc/9",
+          "zc/10",
+          "zc/11"
         ]
       },
       {
         "day": 277,
         "refs": [
-          "bible_placeholder/277"
+          "zc/12",
+          "zc/13",
+          "zc/14"
         ]
       },
       {
         "day": 278,
         "refs": [
-          "bible_placeholder/278"
+          "ml/1",
+          "ml/2",
+          "ml/3"
         ]
       },
       {
         "day": 279,
         "refs": [
-          "bible_placeholder/279"
+          "ml/4",
+          "mt/1",
+          "mt/2"
         ]
       },
       {
         "day": 280,
         "refs": [
-          "bible_placeholder/280"
+          "mt/3",
+          "mt/4",
+          "mt/5"
         ]
       },
       {
         "day": 281,
         "refs": [
-          "bible_placeholder/281"
+          "mt/6",
+          "mt/7",
+          "mt/8"
         ]
       },
       {
         "day": 282,
         "refs": [
-          "bible_placeholder/282"
+          "mt/9",
+          "mt/10",
+          "mt/11"
         ]
       },
       {
         "day": 283,
         "refs": [
-          "bible_placeholder/283"
+          "mt/12",
+          "mt/13",
+          "mt/14"
         ]
       },
       {
         "day": 284,
         "refs": [
-          "bible_placeholder/284"
+          "mt/15",
+          "mt/16",
+          "mt/17"
         ]
       },
       {
         "day": 285,
         "refs": [
-          "bible_placeholder/285"
+          "mt/18",
+          "mt/19",
+          "mt/20"
         ]
       },
       {
         "day": 286,
         "refs": [
-          "bible_placeholder/286"
+          "mt/21",
+          "mt/22",
+          "mt/23"
         ]
       },
       {
         "day": 287,
         "refs": [
-          "bible_placeholder/287"
+          "mt/24",
+          "mt/25",
+          "mt/26"
         ]
       },
       {
         "day": 288,
         "refs": [
-          "bible_placeholder/288"
+          "mt/27",
+          "mt/28",
+          "mc/1"
         ]
       },
       {
         "day": 289,
         "refs": [
-          "bible_placeholder/289"
+          "mc/2",
+          "mc/3",
+          "mc/4"
         ]
       },
       {
         "day": 290,
         "refs": [
-          "bible_placeholder/290"
+          "mc/5",
+          "mc/6",
+          "mc/7"
         ]
       },
       {
         "day": 291,
         "refs": [
-          "bible_placeholder/291"
+          "mc/8",
+          "mc/9",
+          "mc/10"
         ]
       },
       {
         "day": 292,
         "refs": [
-          "bible_placeholder/292"
+          "mc/11",
+          "mc/12",
+          "mc/13"
         ]
       },
       {
         "day": 293,
         "refs": [
-          "bible_placeholder/293"
+          "mc/14",
+          "mc/15",
+          "mc/16"
         ]
       },
       {
         "day": 294,
         "refs": [
-          "bible_placeholder/294"
+          "lc/1",
+          "lc/2",
+          "lc/3"
         ]
       },
       {
         "day": 295,
         "refs": [
-          "bible_placeholder/295"
+          "lc/4",
+          "lc/5",
+          "lc/6"
         ]
       },
       {
         "day": 296,
         "refs": [
-          "bible_placeholder/296"
+          "lc/7",
+          "lc/8",
+          "lc/9"
         ]
       },
       {
         "day": 297,
         "refs": [
-          "bible_placeholder/297"
+          "lc/10",
+          "lc/11",
+          "lc/12"
         ]
       },
       {
         "day": 298,
         "refs": [
-          "bible_placeholder/298"
+          "lc/13",
+          "lc/14",
+          "lc/15"
         ]
       },
       {
         "day": 299,
         "refs": [
-          "bible_placeholder/299"
+          "lc/16",
+          "lc/17",
+          "lc/18"
         ]
       },
       {
         "day": 300,
         "refs": [
-          "bible_placeholder/300"
+          "lc/19",
+          "lc/20",
+          "lc/21"
         ]
       },
       {
         "day": 301,
         "refs": [
-          "bible_placeholder/301"
+          "lc/22",
+          "lc/23",
+          "lc/24"
         ]
       },
       {
         "day": 302,
         "refs": [
-          "bible_placeholder/302"
+          "joa/1",
+          "joa/2",
+          "joa/3"
         ]
       },
       {
         "day": 303,
         "refs": [
-          "bible_placeholder/303"
+          "joa/4",
+          "joa/5",
+          "joa/6"
         ]
       },
       {
         "day": 304,
         "refs": [
-          "bible_placeholder/304"
+          "joa/7",
+          "joa/8",
+          "joa/9"
         ]
       },
       {
         "day": 305,
         "refs": [
-          "bible_placeholder/305"
+          "joa/10",
+          "joa/11",
+          "joa/12"
         ]
       },
       {
         "day": 306,
         "refs": [
-          "bible_placeholder/306"
+          "joa/13",
+          "joa/14",
+          "joa/15"
         ]
       },
       {
         "day": 307,
         "refs": [
-          "bible_placeholder/307"
+          "joa/16",
+          "joa/17",
+          "joa/18"
         ]
       },
       {
         "day": 308,
         "refs": [
-          "bible_placeholder/308"
+          "joa/19",
+          "joa/20",
+          "joa/21"
         ]
       },
       {
         "day": 309,
         "refs": [
-          "bible_placeholder/309"
+          "atos/1",
+          "atos/2",
+          "atos/3"
         ]
       },
       {
         "day": 310,
         "refs": [
-          "bible_placeholder/310"
+          "atos/4",
+          "atos/5",
+          "atos/6"
         ]
       },
       {
         "day": 311,
         "refs": [
-          "bible_placeholder/311"
+          "atos/7",
+          "atos/8",
+          "atos/9"
         ]
       },
       {
         "day": 312,
         "refs": [
-          "bible_placeholder/312"
+          "atos/10",
+          "atos/11",
+          "atos/12"
         ]
       },
       {
         "day": 313,
         "refs": [
-          "bible_placeholder/313"
+          "atos/13",
+          "atos/14",
+          "atos/15"
         ]
       },
       {
         "day": 314,
         "refs": [
-          "bible_placeholder/314"
+          "atos/16",
+          "atos/17",
+          "atos/18"
         ]
       },
       {
         "day": 315,
         "refs": [
-          "bible_placeholder/315"
+          "atos/19",
+          "atos/20",
+          "atos/21"
         ]
       },
       {
         "day": 316,
         "refs": [
-          "bible_placeholder/316"
+          "atos/22",
+          "atos/23",
+          "atos/24"
         ]
       },
       {
         "day": 317,
         "refs": [
-          "bible_placeholder/317"
+          "atos/25",
+          "atos/26",
+          "atos/27"
         ]
       },
       {
         "day": 318,
         "refs": [
-          "bible_placeholder/318"
+          "atos/28",
+          "rm/1",
+          "rm/2"
         ]
       },
       {
         "day": 319,
         "refs": [
-          "bible_placeholder/319"
+          "rm/3",
+          "rm/4",
+          "rm/5"
         ]
       },
       {
         "day": 320,
         "refs": [
-          "bible_placeholder/320"
+          "rm/6",
+          "rm/7",
+          "rm/8"
         ]
       },
       {
         "day": 321,
         "refs": [
-          "bible_placeholder/321"
+          "rm/9",
+          "rm/10",
+          "rm/11"
         ]
       },
       {
         "day": 322,
         "refs": [
-          "bible_placeholder/322"
+          "rm/12",
+          "rm/13",
+          "rm/14"
         ]
       },
       {
         "day": 323,
         "refs": [
-          "bible_placeholder/323"
+          "rm/15",
+          "rm/16",
+          "1co/1"
         ]
       },
       {
         "day": 324,
         "refs": [
-          "bible_placeholder/324"
+          "1co/2",
+          "1co/3",
+          "1co/4"
         ]
       },
       {
         "day": 325,
         "refs": [
-          "bible_placeholder/325"
+          "1co/5",
+          "1co/6",
+          "1co/7"
         ]
       },
       {
         "day": 326,
         "refs": [
-          "bible_placeholder/326"
+          "1co/8",
+          "1co/9",
+          "1co/10"
         ]
       },
       {
         "day": 327,
         "refs": [
-          "bible_placeholder/327"
+          "1co/11",
+          "1co/12",
+          "1co/13"
         ]
       },
       {
         "day": 328,
         "refs": [
-          "bible_placeholder/328"
+          "1co/14",
+          "1co/15",
+          "1co/16"
         ]
       },
       {
         "day": 329,
         "refs": [
-          "bible_placeholder/329"
+          "2co/1",
+          "2co/2",
+          "2co/3"
         ]
       },
       {
         "day": 330,
         "refs": [
-          "bible_placeholder/330"
+          "2co/4",
+          "2co/5",
+          "2co/6"
         ]
       },
       {
         "day": 331,
         "refs": [
-          "bible_placeholder/331"
+          "2co/7",
+          "2co/8",
+          "2co/9"
         ]
       },
       {
         "day": 332,
         "refs": [
-          "bible_placeholder/332"
+          "2co/10",
+          "2co/11",
+          "2co/12"
         ]
       },
       {
         "day": 333,
         "refs": [
-          "bible_placeholder/333"
+          "2co/13",
+          "gl/1",
+          "gl/2"
         ]
       },
       {
         "day": 334,
         "refs": [
-          "bible_placeholder/334"
+          "gl/3",
+          "gl/4",
+          "gl/5"
         ]
       },
       {
         "day": 335,
         "refs": [
-          "bible_placeholder/335"
+          "gl/6",
+          "ef/1",
+          "ef/2"
         ]
       },
       {
         "day": 336,
         "refs": [
-          "bible_placeholder/336"
+          "ef/3",
+          "ef/4",
+          "ef/5"
         ]
       },
       {
         "day": 337,
         "refs": [
-          "bible_placeholder/337"
+          "ef/6",
+          "fp/1",
+          "fp/2"
         ]
       },
       {
         "day": 338,
         "refs": [
-          "bible_placeholder/338"
+          "fp/3",
+          "fp/4",
+          "cl/1"
         ]
       },
       {
         "day": 339,
         "refs": [
-          "bible_placeholder/339"
+          "cl/2",
+          "cl/3",
+          "cl/4"
         ]
       },
       {
         "day": 340,
         "refs": [
-          "bible_placeholder/340"
+          "1ts/1",
+          "1ts/2",
+          "1ts/3"
         ]
       },
       {
         "day": 341,
         "refs": [
-          "bible_placeholder/341"
+          "1ts/4",
+          "1ts/5",
+          "2ts/1"
         ]
       },
       {
         "day": 342,
         "refs": [
-          "bible_placeholder/342"
+          "2ts/2",
+          "2ts/3",
+          "1tm/1"
         ]
       },
       {
         "day": 343,
         "refs": [
-          "bible_placeholder/343"
+          "1tm/2",
+          "1tm/3",
+          "1tm/4"
         ]
       },
       {
         "day": 344,
         "refs": [
-          "bible_placeholder/344"
+          "1tm/5",
+          "1tm/6",
+          "2tm/1"
         ]
       },
       {
         "day": 345,
         "refs": [
-          "bible_placeholder/345"
+          "2tm/2",
+          "2tm/3",
+          "2tm/4"
         ]
       },
       {
         "day": 346,
         "refs": [
-          "bible_placeholder/346"
+          "tt/1",
+          "tt/2",
+          "tt/3"
         ]
       },
       {
         "day": 347,
         "refs": [
-          "bible_placeholder/347"
+          "fm/1",
+          "hb/1",
+          "hb/2"
         ]
       },
       {
         "day": 348,
         "refs": [
-          "bible_placeholder/348"
+          "hb/3",
+          "hb/4",
+          "hb/5"
         ]
       },
       {
         "day": 349,
         "refs": [
-          "bible_placeholder/349"
+          "hb/6",
+          "hb/7",
+          "hb/8"
         ]
       },
       {
         "day": 350,
         "refs": [
-          "bible_placeholder/350"
+          "hb/9",
+          "hb/10",
+          "hb/11"
         ]
       },
       {
         "day": 351,
         "refs": [
-          "bible_placeholder/351"
+          "hb/12",
+          "hb/13",
+          "tg/1"
         ]
       },
       {
         "day": 352,
         "refs": [
-          "bible_placeholder/352"
+          "tg/2",
+          "tg/3",
+          "tg/4"
         ]
       },
       {
         "day": 353,
         "refs": [
-          "bible_placeholder/353"
+          "tg/5",
+          "1pe/1",
+          "1pe/2"
         ]
       },
       {
         "day": 354,
         "refs": [
-          "bible_placeholder/354"
+          "1pe/3",
+          "1pe/4",
+          "1pe/5"
         ]
       },
       {
         "day": 355,
         "refs": [
-          "bible_placeholder/355"
+          "2pe/1",
+          "2pe/2",
+          "2pe/3"
         ]
       },
       {
         "day": 356,
         "refs": [
-          "bible_placeholder/356"
+          "1jo/1",
+          "1jo/2",
+          "1jo/3"
         ]
       },
       {
         "day": 357,
         "refs": [
-          "bible_placeholder/357"
+          "1jo/4",
+          "1jo/5",
+          "2jo/1"
         ]
       },
       {
         "day": 358,
         "refs": [
-          "bible_placeholder/358"
+          "3jo/1",
+          "jd/1",
+          "ap/1"
         ]
       },
       {
         "day": 359,
         "refs": [
-          "bible_placeholder/359"
+          "ap/2",
+          "ap/3",
+          "ap/4"
         ]
       },
       {
         "day": 360,
         "refs": [
-          "bible_placeholder/360"
+          "ap/5",
+          "ap/6",
+          "ap/7"
         ]
       },
       {
         "day": 361,
         "refs": [
-          "bible_placeholder/361"
+          "ap/8",
+          "ap/9",
+          "ap/10"
         ]
       },
       {
         "day": 362,
         "refs": [
-          "bible_placeholder/362"
+          "ap/11",
+          "ap/12",
+          "ap/13"
         ]
       },
       {
         "day": 363,
         "refs": [
-          "bible_placeholder/363"
+          "ap/14",
+          "ap/15",
+          "ap/16"
         ]
       },
       {
         "day": 364,
         "refs": [
-          "bible_placeholder/364"
+          "ap/17",
+          "ap/18",
+          "ap/19"
         ]
       },
       {
         "day": 365,
         "refs": [
-          "bible_placeholder/365"
+          "ap/20",
+          "ap/21",
+          "ap/22"
         ]
       }
     ]

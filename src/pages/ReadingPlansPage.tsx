@@ -122,8 +122,8 @@ export default function ReadingPlansPage() {
                                             }
                                         }}
                                         className={hasStarted
-                                            ? "w-full bg-app-raised hover:bg-gold/10 text-gold border border-gold/30 shadow-sm"
-                                            : "w-full bg-gold hover:bg-gold-hover text-white shadow-md shadow-gold/20"}
+                                            ? "w-full bg-app-raised hover:bg-gold hover:text-primary-foreground hover:border-gold text-gold border border-gold/30 shadow-sm"
+                                            : "w-full bg-gold hover:bg-gold/90 text-white shadow-md shadow-gold/20"}
                                     >
                                         {hasStarted ? "Retomar Leitura" : "Iniciar Plano"}
                                     </Button>

@@ -69,7 +69,7 @@ export default function BookPage() {
       <section className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-2 sm:grid-cols-[repeat(auto-fill,minmax(56px,1fr))]">
         {Array.from({ length: selectedBook.chapters }, (_, index) => index + 1).map((chapter) => (
           <Link
-            className="flex h-12 items-center justify-center rounded-lg border border-border bg-app-raised font-sans text-sm text-app-text transition-colors hover:border-gold hover:bg-gold-bg"
+            className="flex h-12 items-center justify-center rounded-lg border border-border bg-app-raised font-sans text-sm text-app-text transition-colors hover:border-gold hover:bg-gold hover:text-primary-foreground"
             key={chapter}
             to={`/${selectedVersion}/${selectedBook.slug}/${chapter}`}
           >

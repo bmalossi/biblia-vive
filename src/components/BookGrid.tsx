@@ -17,12 +17,14 @@ export default function BookGrid({ books, version, currentReading }: BookGridPro
         <Tooltip key={book.id}>
           <TooltipTrigger asChild>
             <Link
-              className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold-bg hover:shadow-sm"
+              className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm group"
               to={`/${version}/${book.slug}`}
             >
-              {currentReading?.slug === book.slug && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold" />}
-              <p className="truncate font-sans text-[0.72rem] font-medium text-app-text">{book.name}</p>
-              <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted">{t("reading.chaptersCount", { count: book.chapters })}</p>
+              {currentReading?.slug === book.slug && (
+                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold group-hover:bg-primary-foreground" />
+              )}
+              <p className="truncate font-sans text-[0.72rem] font-medium text-app-text group-hover:text-primary-foreground">{book.name}</p>
+              <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted group-hover:text-primary-foreground/80">{t("reading.chaptersCount", { count: book.chapters })}</p>
             </Link>
           </TooltipTrigger>
           {currentReading?.slug === book.slug && (

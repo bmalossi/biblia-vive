@@ -114,21 +114,21 @@ export default function HarpaPage() {
                 <Tooltip key={hymn.numero}>
                   <TooltipTrigger asChild>
                     <Link
-                      className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold-bg hover:shadow-sm"
+                      className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm group"
                       to={`/harpa/${hymn.numero}`}
                     >
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <p className="font-mono text-[0.6rem] text-gold opacity-70">
+                        <p className="font-mono text-[0.6rem] text-gold opacity-70 group-hover:text-primary-foreground group-hover:opacity-80">
                           {String(hymn.numero).padStart(3, "0")}
                         </p>
                         {hymn.hasAudio && (
-                          <Volume2 className="h-3.5 w-3.5 text-gold/80" />
+                          <Volume2 className="h-3.5 w-3.5 text-gold/80 group-hover:text-primary-foreground/80" />
                         )}
                       </div>
-                      <p className="truncate font-sans text-[0.72rem] font-medium text-app-text">
+                      <p className="truncate font-sans text-[0.72rem] font-medium text-app-text group-hover:text-primary-foreground">
                         {hymn.tituloFormatado}
                       </p>
-                      <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted">
+                      <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted group-hover:text-primary-foreground/70">
                         {hymn.estrofes} {hymn.estrofes === 1 ? "estrofe" : "estrofes"}
                       </p>
                     </Link>

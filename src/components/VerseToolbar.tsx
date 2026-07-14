@@ -81,10 +81,10 @@ export default function VerseToolbar({
           aria-label={t("toolbar.ariaStudy", { ref: ariaReference })}
           aria-pressed={studyOpen}
           className={cn(
-            "h-9 gap-1.5 font-medium transition-colors",
+            "h-9 gap-1.5 font-medium transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold",
             studyOpen
-              ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg"
-              : "border-gold/40 text-gold hover:bg-gold-bg/30",
+              ? "border-gold bg-gold-bg text-gold"
+              : "border-gold/40 text-gold",
           )}
           onClick={onStudy}
           ref={firstButtonRef}
@@ -99,7 +99,7 @@ export default function VerseToolbar({
         {/* Copy */}
         <Button
           aria-label={t("toolbar.ariaCopy", { ref: ariaReference })}
-          className="h-9"
+          className="h-9 hover:bg-gold hover:text-primary-foreground hover:border-gold"
           onClick={onCopy}
           size="sm"
           type="button"
@@ -112,7 +112,7 @@ export default function VerseToolbar({
         {/* Share */}
         <Button
           aria-label={t("toolbar.ariaShare", { ref: ariaReference })}
-          className="h-9"
+          className="h-9 hover:bg-gold hover:text-primary-foreground hover:border-gold"
           onClick={onShare}
           size="sm"
           type="button"
@@ -127,7 +127,7 @@ export default function VerseToolbar({
           <Button
             aria-label={t("toolbar.ariaHighlight", { ref: ariaReference })}
             aria-pressed={!!activeHighlight}
-            className={cn("h-9 gap-1.5", hlBadge)}
+            className={cn("h-9 gap-1.5 hover:!bg-gold hover:!text-primary-foreground hover:!border-gold", hlBadge)}
             onClick={() => setShowPicker(p => !p)}
             size="sm"
             type="button"
@@ -152,7 +152,10 @@ export default function VerseToolbar({
         <Button
           aria-label={t("toolbar.ariaNote", { ref: ariaReference })}
           aria-pressed={hasNote}
-          className={cn("h-9 gap-1.5", hasNote && "border-gold/60 text-gold")}
+          className={cn(
+            "h-9 gap-1.5 hover:bg-gold hover:text-primary-foreground hover:border-gold",
+            hasNote && "border-gold/60 text-gold"
+          )}
           onClick={onNote}
           size="sm"
           type="button"

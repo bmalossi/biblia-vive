@@ -539,7 +539,7 @@ export default function Header() {
 
           <Link
             to="/apoiar"
-            className="hidden md:inline-flex h-7 items-center gap-1 rounded-full border border-gold/30 bg-transparent px-2.5 text-xs font-medium text-gold opacity-80 transition-all hover:bg-gold/10 hover:opacity-100 flex-shrink-0"
+            className="hidden md:inline-flex h-7 items-center gap-1 rounded-full border border-gold/30 bg-transparent px-2.5 text-xs font-medium text-gold opacity-80 transition-all hover:bg-gold hover:text-primary-foreground hover:border-gold hover:opacity-100 flex-shrink-0"
           >
             <Heart className="h-3 w-3" />
             Apoiar
@@ -619,7 +619,7 @@ export default function Header() {
             <Link
               to="/apoiar"
               aria-label="Apoiar o projeto"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 bg-gold/5 text-gold md:hidden transition-colors hover:bg-gold/10"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 bg-gold/5 text-gold md:hidden transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold"
             >
               <Heart className="h-4 w-4" />
             </Link>
