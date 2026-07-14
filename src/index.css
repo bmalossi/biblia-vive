@@ -361,3 +361,12 @@ All colors MUST be HSL.
   animation: gold-glow 2s ease-in-out infinite;
 }
 
+/* Garante que cliques passem pelo container do Portal Radix para permitir interação com a Bíblia ao fundo */
+div[data-radix-portal] {
+  pointer-events: none;
+}
+div[data-radix-portal] > * {
+  pointer-events: auto;
+}
+
+

@@ -127,16 +127,21 @@ export default function NotebookSheet({
 }: NotebookSheetProps) {
     const isEditing = isCreatingNew || selectedNotebook !== null;
     const sheetMode = isEditing ? "editor" : "list";
-    const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.35);
+    const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.95);
     const [activeTab, setActiveTab] = useState<TabId>("chapter");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState<"recent" | "biblical-asc" | "biblical-desc">("recent");
 
+    // Sincronizar o activeSnapPoint para abrir totalmente ao abrir o drawer
+    useEffect(() => {
+        if (open) {
+            setActiveSnapPoint(0.95);
+        }
+    }, [open]);
+
     // Sincronizar o activeSnapPoint quando o estado de edição muda
     useEffect(() => {
-        if (!isEditing) {
-            setActiveSnapPoint(0.35);
-        } else {
+        if (isEditing) {
             setActiveSnapPoint(0.95);
         }
     }, [isEditing]);
@@ -238,7 +243,7 @@ export default function NotebookSheet({
     const handleBack = useCallback(() => {
         setSelectedNotebook(null);
         setIsCreatingNew(false);
-        setActiveSnapPoint(0.35);
+        setActiveSnapPoint(0.95);
     }, [setSelectedNotebook, setIsCreatingNew]);
 
     const handleSave = useCallback((data: { id?: string; title: string | null; content: string }, immediate?: boolean) => {
@@ -287,13 +292,21 @@ export default function NotebookSheet({
             open={open}
             onOpenChange={handleOpenChange}
             dismissible={sheetMode === "list"}
-            snapPoints={[0.35, 0.95]}
+            snapPoints={sheetMode === "editor" ? [0.35, 0.95] : [0.95]}
             activeSnapPoint={activeSnapPoint}
             setActiveSnapPoint={setActiveSnapPoint}
-            shouldScaleBackground
+            defaultSnapPoint={0.95}
+            shouldScaleBackground={false}
+            modal={false}
         >
             <DrawerPrimitive.Portal>
-                <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
+                <DrawerPrimitive.Overlay 
+                    onClick={() => onOpenChange(false)}
+                    className={cn(
+                        "fixed inset-0 z-50 bg-black/40 transition-opacity duration-300",
+                        activeSnapPoint === 0.35 ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
+                    )}
+                />
                 <DrawerPrimitive.Content
                     aria-label="Caderno do capítulo"
                     className={cn(
