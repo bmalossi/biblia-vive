@@ -24,10 +24,127 @@ function normalizeText(text: string) {
     return text.normalize("NFD").replace(/[\u0300-\u036f\u0591-\u05C7]/g, "").toLowerCase();
 }
 
+// ─── Hebrew-specific matching helpers ────────────────────────────────────────
+// Common Hebrew proclitic prefixes (single consonants that weld to the next word):
+// ב (in/with), ו (and), ה (the/interrogative), ל (to/for), כ (as/like), מ (from), ש (that/who)
+const HEB_PREFIXES = ['\u05D1', '\u05D5', '\u05D4', '\u05DC', '\u05DB', '\u05DE', '\u05E9'];
+
+/**
+ * Normalizes final (sofit) letter forms to their medial equivalents.
+ * Hebrew has five letters with distinct word-final shapes:
+ *   ף (pe-sofit U+05E3)  → פ (pe U+05E4)
+ *   ם (mem-sofit U+05DD) → מ (mem U+05DE)
+ *   ן (nun-sofit U+05DF) → נ (nun U+05E0)
+ *   ך (kaf-sofit U+05DA) → כ (kaf U+05DB)
+ *   ץ (tsadi-sofit U+05E5) → צ (tsadi U+05E6)
+ * The lexicon stores lemmas with sofit forms at the end, but when a word takes a
+ * suffix (e.g. ו, ים) the letter is no longer final, so the text uses the medial form.
+ */
+function normalizeFinalLetters(word: string): string {
+    return word
+        .replace(/\u05E3/g, '\u05E4')  // ף → פ
+        .replace(/\u05DD/g, '\u05DE')  // ם → מ
+        .replace(/\u05DF/g, '\u05E0')  // ן → נ
+        .replace(/\u05DA/g, '\u05DB')  // ך → כ
+        .replace(/\u05E5/g, '\u05E6'); // ץ → צ
+}
+
+/**
+ * Returns the search lemma with interior vav (ו), yod (י), and alef (א) removed.
+ * These letters often act as matres lectionis (vowel carriers) in the full
+ * lexicon form but are absent in the consonant-only text stored in the JSON.
+ * Examples:
+ *   "בוא" (bet-vav-alef) → "בא" (bet-alef)  — defective form of 'to come'
+ *   "יזרעאלית" → "יזרעלית"                    — alef mater in proper name Jezreel
+ * Only removes interior occurrences (not first or last char) to avoid over-stripping.
+ */
+function stripMatresLectionis(word: string): string {
+    if (word.length <= 2) return word;
+    let result = word[0];
+    for (let i = 1; i < word.length - 1; i++) {
+        const cp = word.charCodeAt(i);
+        // Skip interior ו (vav), י (yod), or א (alef) — common matres lectionis
+        if (cp === 0x05D5 || cp === 0x05D9 || cp === 0x05D0) continue;
+        result += word[i];
+    }
+    result += word[word.length - 1];
+    return result;
+}
+
+/**
+ * Prepare all forms of a search lemma for matching:
+ *  - normalize final letters (sofit → medial)
+ *  - strip matres lectionis
+ * Returns [normalizedFull, defective]
+ */
+function prepareLemmaForms(searchLemma: string): [string, string] {
+    const normalized = normalizeFinalLetters(searchLemma);
+    const defective = stripMatresLectionis(normalized);
+    return [normalized, defective];
+}
+
+/**
+ * Pass 2: For a given search lemma (already stripped of niqqud) and a text token,
+ * returns true when the token "contains" the lemma accounting for:
+ * 1. Exact token match (e.g. "דוד" === "דוד")
+ * 2. Token with one or more leading proclitic prefixes stripped matches the lemma
+ *    (e.g. token "ודוד" → strip "ו" → "דוד" === "דוד")
+ * 3. Any of the above using the defective form of the lemma (matres stripped)
+ *    (e.g. lemma "בוא" → defective "בא"; token "בבא" → strip "ב" → "בא" === "בא")
+ * 4. Final-letter normalization applied to both sides
+ *
+ * Matching is ALWAYS at full-token level to prevent false positives from substring search.
+ */
+function hebrewTokenMatches(token: string, searchLemma: string): boolean {
+    const [normalized, defective] = prepareLemmaForms(searchLemma);
+    const normToken = normalizeFinalLetters(token);
+
+    // Build all prefix-stripped variants of the token (strip up to 3 leading prefixes)
+    const tokenVariants: string[] = [normToken];
+    let cur = normToken;
+    for (let i = 0; i < 3 && cur.length > 1; i++) {
+        if (HEB_PREFIXES.includes(cur[0])) {
+            cur = cur.slice(1);
+            tokenVariants.push(cur);
+        } else break;
+    }
+
+    for (const variant of tokenVariants) {
+        const defVariant = stripMatresLectionis(variant);
+        if (
+            variant === normalized || 
+            variant === defective ||
+            defVariant === defective ||
+            defVariant === normalized
+        ) return true;
+    }
+    return false;
+}
+
+/**
+ * Pass 3: substring containment — checks if the lemma's consonants appear
+ * as a contiguous substring within the text token (handles verb conjugations
+ * with prefixes + suffixes, e.g. "שרף" inside "וישרפו").
+ * Only applies to lemmas with ≥ 3 consonants to avoid false positives.
+ */
+function hebrewTokenContains(token: string, searchLemma: string): boolean {
+    if (searchLemma.length < 3) return false;
+    const [normalized, defective] = prepareLemmaForms(searchLemma);
+    const normToken = normalizeFinalLetters(token);
+    const defToken = stripMatresLectionis(normToken);
+    return (
+        normToken.includes(normalized) || 
+        (defective.length >= 3 && normToken.includes(defective)) ||
+        (defective.length >= 3 && defToken.includes(defective))
+    );
+}
+
+
+
 function HighlightOriginalText({ text, hoveredWord, clickedWord, isHebrew }: { text: string, hoveredWord: string | null, clickedWord: string | null, isHebrew: boolean }) {
     // FONT SIZE: Change 'text-[0.9rem]' below to adjust the original text size.
     // File: src/components/StudyPanel.tsx — function HighlightOriginalText
-    if (!hoveredWord && !clickedWord) return <p className="text-app-text leading-relaxed text-[0.9rem]">{text}</p>;
+    if (!hoveredWord && !clickedWord) return <p className={cn("text-app-text leading-relaxed text-[0.9rem]", isHebrew && "font-hebrew")}>{text}</p>;
 
     const wordsToHighlight = [hoveredWord, clickedWord].filter(Boolean) as string[];
     let parts: { text: string, type: 'normal' | 'hover' | 'click' }[] = [{ text: text, type: 'normal' }];
@@ -46,32 +163,85 @@ function HighlightOriginalText({ text, hoveredWord, clickedWord, isHebrew }: { t
                 continue;
             }
 
+            // ── Pass 1: existing substring search ──────────────────────────
             // Normalize the source text the same way
             const normalizedPart = part.text.normalize("NFD").replace(/[\u0300-\u036f\u0591-\u05C7]/g, "");
             const regex = new RegExp(`(${escaped})`, 'gi');
             const matches = [...normalizedPart.matchAll(regex)];
 
-            if (matches.length === 0) {
-                newParts.push(part);
+            if (matches.length > 0) {
+                // Re-build from original text using match indices
+                let lastIndex = 0;
+                for (const match of matches) {
+                    const start = match.index!;
+                    const end = start + match[0].length;
+                    if (start > lastIndex) newParts.push({ text: part.text.slice(lastIndex, start), type: 'normal' });
+                    newParts.push({ text: part.text.slice(start, end), type: hw === clickedWord ? 'click' : 'hover' });
+                    lastIndex = end;
+                }
+                if (lastIndex < part.text.length) newParts.push({ text: part.text.slice(lastIndex), type: 'normal' });
                 continue;
             }
 
-            // Re-build from original text using match indices
-            let lastIndex = 0;
-            for (const match of matches) {
-                const start = match.index!;
-                const end = start + match[0].length;
-                if (start > lastIndex) newParts.push({ text: part.text.slice(lastIndex, start), type: 'normal' });
-                newParts.push({ text: part.text.slice(start, end), type: hw === clickedWord ? 'click' : 'hover' });
-                lastIndex = end;
+            // ── Pass 2: Hebrew token-level matching (prefix + defective spelling) ──
+            // Only runs when Pass 1 found nothing AND we are in a Hebrew context.
+            if (isHebrew) {
+                // Split on whitespace, preserving offsets in the original part.text
+                const tokenRegex = /\S+/g;
+                let tokenMatch: RegExpExecArray | null;
+                // Collect all matching token ranges first, then rebuild
+                const tokenHits: Array<{ start: number; end: number }> = [];
+                while ((tokenMatch = tokenRegex.exec(normalizedPart)) !== null) {
+                    const tokenStr = tokenMatch[0];
+                    if (hebrewTokenMatches(tokenStr, cleanHw)) {
+                        tokenHits.push({ start: tokenMatch.index, end: tokenMatch.index + tokenMatch[0].length });
+                    }
+                }
+
+                if (tokenHits.length > 0) {
+                    let lastIndex = 0;
+                    for (const { start, end } of tokenHits) {
+                        if (start > lastIndex) newParts.push({ text: part.text.slice(lastIndex, start), type: 'normal' });
+                        newParts.push({ text: part.text.slice(start, end), type: hw === clickedWord ? 'click' : 'hover' });
+                        lastIndex = end;
+                    }
+                    if (lastIndex < part.text.length) newParts.push({ text: part.text.slice(lastIndex), type: 'normal' });
+                    continue;
+                }
+
+                // ── Pass 3: Hebrew substring containment (verb conjugations & possessive suffixes) ──
+                // Handles cases where the root consonants appear inside a longer conjugated form,
+                // e.g. lemma "שרף" found inside "וישרפו", lemma "אנוש"/"אנש" inside "ואנשיו".
+                // Only runs for lemmas with ≥ 3 consonants to prevent false positives.
+                const tokenHits3: Array<{ start: number; end: number }> = [];
+                const tokenRegex3 = /\S+/g;
+                let tokenMatch3: RegExpExecArray | null;
+                while ((tokenMatch3 = tokenRegex3.exec(normalizedPart)) !== null) {
+                    if (hebrewTokenContains(tokenMatch3[0], cleanHw)) {
+                        tokenHits3.push({ start: tokenMatch3.index, end: tokenMatch3.index + tokenMatch3[0].length });
+                    }
+                }
+
+                if (tokenHits3.length > 0) {
+                    let lastIndex = 0;
+                    for (const { start, end } of tokenHits3) {
+                        if (start > lastIndex) newParts.push({ text: part.text.slice(lastIndex, start), type: 'normal' });
+                        newParts.push({ text: part.text.slice(start, end), type: hw === clickedWord ? 'click' : 'hover' });
+                        lastIndex = end;
+                    }
+                    if (lastIndex < part.text.length) newParts.push({ text: part.text.slice(lastIndex), type: 'normal' });
+                    continue;
+                }
             }
-            if (lastIndex < part.text.length) newParts.push({ text: part.text.slice(lastIndex), type: 'normal' });
+
+            // No match at all — keep part unchanged
+            newParts.push(part);
         }
         parts = newParts;
     }
 
     return (
-        <p className="text-app-text leading-relaxed text-[0.9rem]">
+        <p className={cn("text-app-text leading-relaxed text-[0.9rem]", isHebrew && "font-hebrew")}>
             {parts.map((p, i) => {
                 if (p.type === 'click') {
                     return <mark key={i} className={cn("bg-gold text-app-bg font-bold rounded-sm px-0.5", isHebrew && "inline-block")}>{p.text}</mark>;
@@ -295,7 +465,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                     <p className="mb-1 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-gold">
                         {bookId} {chapter}:{verse} · {version.toUpperCase()}
                     </p>
-                    <p className="font-serif text-[0.88rem] italic leading-relaxed text-app-text line-clamp-3">
+                    <p className={cn(version === "org" && getLanguageLabel(bookId) === "Hebraico" ? "font-hebrew" : "font-serif", "text-[0.88rem] italic leading-relaxed text-app-text line-clamp-3")}>
                         "{verseText}"
                     </p>
                 </div>
@@ -531,7 +701,8 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                             {/* Word + code badge */}
                                                             <div className="flex items-start justify-between gap-2">
                                                                 <p className={cn(
-                                                                    "font-mono tracking-wider leading-tight transition-transform",
+                                                                    "leading-tight transition-transform",
+                                                                    isGreek ? "font-mono tracking-wider" : "font-hebrew",
                                                                     isSelected ? "text-[1.2rem] text-gold" : "text-[0.95rem]",
                                                                     !isSelected && (isGreek ? "text-blue-600 dark:text-blue-400" : "text-amber-700 dark:text-amber-400")
                                                                 )}>

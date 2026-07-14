@@ -1,20 +1,50 @@
 const STATIC_CACHE = "bv-static-v1";
 const BIBLE_CACHE = "bv-bible-v1";
 const PAGES_CACHE = "bv-pages-v1";
+
 const BIBLE_MAX_ENTRIES = 150;
 const BIBLE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+const STATIC_MAX_ENTRIES = 150;
+const STATIC_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+const PAGES_MAX_ENTRIES = 50;
+const PAGES_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 const FONT_MAX_AGE = 365 * 24 * 60 * 60 * 1000;
 
 const isGoogleFont = (url) => url.origin.includes("fonts.googleapis.com") || url.origin.includes("fonts.gstatic.com");
 const isR2Media = (url) => url.hostname === "midia.bibliavive.com.br" || url.hostname.endsWith(".bibliavive.com.br");
 const isBibleApi = (url) => url.hostname.includes("api.scripture.api.bible") || url.hostname.includes("raw.githubusercontent.com");
 const isStaticAsset = (request) => ["style", "script", "font", "image"].includes(request.destination);
+const isThirdPartyScript = (url) => {
+  const host = url.hostname;
+  return (
+    host.includes("googletagmanager.com") ||
+    host.includes("google-analytics.com") ||
+    host.includes("doubleclick.net") ||
+    host.includes("googlesyndication.com")
+  );
+};
 
 self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
-async function pruneBibleCache() {
-  const cache = await caches.open(BIBLE_CACHE);
+self.addEventListener("activate", (event) => {
+  const cacheAllowlist = [STATIC_CACHE, BIBLE_CACHE, PAGES_CACHE];
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheAllowlist.includes(cacheName)) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+      await self.clients.claim();
+    })()
+  );
+});
+
+async function pruneCache(cacheName, maxEntries, maxAge) {
+  const cache = await caches.open(cacheName);
   const keys = await cache.keys();
   const stamped = await Promise.all(
     keys.map(async (req) => {
@@ -25,14 +55,14 @@ async function pruneBibleCache() {
   );
 
   const fresh = stamped
-    .filter((item) => Date.now() - item.savedAt <= BIBLE_MAX_AGE)
+    .filter((item) => Date.now() - item.savedAt <= maxAge)
     .sort((a, b) => a.savedAt - b.savedAt);
 
-  const stale = stamped.filter((item) => Date.now() - item.savedAt > BIBLE_MAX_AGE);
+  const stale = stamped.filter((item) => Date.now() - item.savedAt > maxAge);
   await Promise.all(stale.map((item) => cache.delete(item.req)));
 
-  if (fresh.length > BIBLE_MAX_ENTRIES) {
-    const removable = fresh.slice(0, fresh.length - BIBLE_MAX_ENTRIES);
+  if (fresh.length > maxEntries) {
+    const removable = fresh.slice(0, fresh.length - maxEntries);
     await Promise.all(removable.map((item) => cache.delete(item.req)));
   }
 }
@@ -67,6 +97,9 @@ self.addEventListener("fetch", (event) => {
   // Intercepting them causes CSP connect-src violations.
   if (isR2Media(url)) return;
 
+  // Exclude third-party scripts (analytics/ads) from cache
+  if (isThirdPartyScript(url)) return;
+
   if (request.mode === "navigate") {
     event.respondWith(
       (async () => {
@@ -76,7 +109,9 @@ self.addEventListener("fetch", (event) => {
 
         try {
           const response = await Promise.race([network, timeout]);
-          await pageCache.put(request, response.clone());
+          const stamped = await withSavedAt(response);
+          await pageCache.put(request, stamped.clone());
+          event.waitUntil(pruneCache(PAGES_CACHE, PAGES_MAX_ENTRIES, PAGES_MAX_AGE));
           return response;
         } catch {
           return (await pageCache.match(request)) || (await caches.match("/offline.html")) || Response.error();
@@ -95,7 +130,7 @@ self.addEventListener("fetch", (event) => {
           .then(async (response) => {
             const stamped = await withSavedAt(response);
             await cache.put(request, stamped.clone());
-            await pruneBibleCache();
+            await pruneCache(BIBLE_CACHE, BIBLE_MAX_ENTRIES, BIBLE_MAX_AGE);
             return response;
           })
           .catch(() => null);
@@ -118,6 +153,7 @@ self.addEventListener("fetch", (event) => {
               .then(async (response) => {
                 const stamped = await withSavedAt(response);
                 await cache.put(request, stamped);
+                await pruneCache(STATIC_CACHE, STATIC_MAX_ENTRIES, STATIC_MAX_AGE);
               })
               .catch(() => null);
             return cached;
@@ -127,8 +163,10 @@ self.addEventListener("fetch", (event) => {
         const response = await fetch(request);
         const stamped = await withSavedAt(response);
         await cache.put(request, stamped.clone());
+        event.waitUntil(pruneCache(STATIC_CACHE, STATIC_MAX_ENTRIES, STATIC_MAX_AGE));
         return response;
       })(),
     );
   }
 });
+

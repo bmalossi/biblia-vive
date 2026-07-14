@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout";
 import SettingsPanel from "@/components/SettingsPanel";
 import StudyPanel from "@/components/StudyPanel";
-import { prefetchLexicons } from "@/lib/strongs";
+import { prefetchLexicons, getLanguageLabel } from "@/lib/strongs";
 import AudioPlayer from "@/components/AudioPlayer";
 import WorshipCard from "@/components/WorshipCard";
 import VerseToolbar from "@/components/VerseToolbar";
@@ -162,6 +162,9 @@ export default function ReadingPage() {
   const selectedVersion = isBibleVersion(version) ? version : getVersion();
   const selectedBook = findBookGlobally(book);
   const chapterNumber = Number(chapter || "1");
+
+  // True only when reading the original-language version AND the book is Hebrew (OT)
+  const isHebrewReading = selectedVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico";
 
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1530,9 +1533,10 @@ export default function ReadingPage() {
                             style={{ marginBottom: "var(--verse-spacing)" }}
                           >
                             <p
-                              className="text-app-text flex items-start gap-2"
+                              className={cn("text-app-text flex items-start gap-2", isHebrewReading && "font-hebrew")}
+                              dir={isHebrewReading ? "rtl" : undefined}
                               style={{
-                                fontFamily: "var(--font-reading)",
+                                fontFamily: isHebrewReading ? "var(--font-hebrew)" : "var(--font-reading)",
                                 fontSize: "var(--font-size-reading)",
                                 lineHeight: "1.85",
                               }}
@@ -1637,9 +1641,10 @@ export default function ReadingPage() {
                               style={{ marginBottom: "var(--verse-spacing)" }}
                             >
                               <p
-                                className="text-app-text"
+                                className={cn("text-app-text", compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" && "font-hebrew")}
+                                dir={compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "rtl" : undefined}
                                 style={{
-                                  fontFamily: "var(--font-reading)",
+                                  fontFamily: compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "var(--font-hebrew)" : "var(--font-reading)",
                                   fontSize: "var(--font-size-reading)",
                                   lineHeight: "1.85",
                                 }}
