@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prerender.mjs",
+    "build:full": "vite build && robocopy public dist /E /NFL /NDL /NJH /NJS /nc /ns /np /MT:8 & node scripts/prerender.mjs",
     "prerender": "node scripts/prerender.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

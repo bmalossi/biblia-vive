@@ -37,18 +37,43 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const FB_APP_ID           = process.env.VITE_FB_APP_ID || '1035985160869680';
 
 // ─── Bible versions config ────────────────────────────────────────────────────
-/**
- * Each entry describes one Bible version that will be pre-rendered.
- *   localPath : relative path inside public/bible/ to the version's book folders
- *   label     : human-readable translation name shown in <title> / meta
- *   lang      : BCP-47 language tag used in the HTML lang attribute
- */
-const BIBLE_VERSIONS = [
-  { version: 'acf', localPath: 'pt-br/acf', label: 'ACF',  lang: 'pt-BR' },
-  { version: 'arc', localPath: 'pt-br/arc', label: 'ARC',  lang: 'pt-BR' },
-  { version: 'nvi', localPath: 'pt-br/nvi', label: 'NVI',  lang: 'pt-BR' },
-  { version: 'kjv', localPath: 'en/kjv',    label: 'KJV',  lang: 'en'    },
-];
+const VERSION_METADATA = {
+  acf: { label: 'ACF', lang: 'pt-BR' },
+  arc: { label: 'ARC', lang: 'pt-BR' },
+  nvi: { label: 'NVI', lang: 'pt-BR' },
+  aa:  { label: 'AA',  lang: 'pt-BR' },
+  kja: { label: 'KJA', lang: 'pt-BR' },
+  kjv: { label: 'KJV', lang: 'en'    },
+  bbe: { label: 'BBE', lang: 'en'    },
+  rvr: { label: 'RVR', lang: 'es'    },
+};
+
+async function discoverVersions() {
+  const versions = [];
+  const langDirs = ['pt-br', 'en', 'es'];
+  for (const lang of langDirs) {
+    const langPath = path.join(BIBLE_BASE, lang);
+    try {
+      const entries = await fs.readdir(langPath, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          const version = entry.name.toLowerCase();
+          const meta = VERSION_METADATA[version] || { label: version.toUpperCase(), lang: lang === 'pt-br' ? 'pt-BR' : lang };
+          versions.push({
+            version,
+            localPath: `${lang}/${version}`,
+            label: meta.label,
+            lang: meta.lang
+          });
+        }
+      }
+    } catch (err) {
+      // Ignore if dir doesn't exist
+    }
+  }
+  return versions;
+}
+
 
 // ─── localId → routeSlug map ──────────────────────────────────────────────────
 // The public/bible folders use "localIds" (e.g. "ps", "ho", "mk"),
@@ -159,9 +184,9 @@ const FOLDER_TO_CONTEXT_KEY = {
   jm:    'JAS',
   '1pe': '1PE',
   '2pe': '2PE',
-  '1jo': '1JO',
-  '2jo': '2JO',
-  '3jo': '3JO',
+  '1jo': '1JN',
+  '2jo': '2JN',
+  '3jo': '3JN',
   jd:    'JUD',
   re:    'REV',
 };
@@ -213,7 +238,7 @@ async function getAvailableBooks(versionBasePath) {
 function replacePlaceholders(html, metaTags) {
   let result = html;
   for (const [key, value] of Object.entries(metaTags)) {
-    result = result.replace(`<!--${key}-->`, value ?? '');
+    result = result.replaceAll(`<!--${key}-->`, value ?? '');
   }
   return result;
 }
@@ -619,11 +644,19 @@ async function prerender() {
 
   // Load template
   const templatePath = path.join(DIST_DIR, 'index.html');
+  const savedTemplatePath = path.join(DIST_DIR, 'index-template.html');
   let template;
   try {
-    template = await fs.readFile(templatePath, 'utf-8');
-    template = template.replace('<title>Bíblia Vive — Leia, Estude e Compartilhe a Bíblia</title>', '<!--META_TITLE-->');
-    await fs.writeFile(path.join(DIST_DIR, 'index-template.html'), template, 'utf-8');
+    // Tenta primeiro ler o template salvo para evitar ler o index.html já sobrescrito
+    try {
+      template = await fs.readFile(savedTemplatePath, 'utf-8');
+      console.log('[prerender] loaded template from index-template.html');
+    } catch {
+      template = await fs.readFile(templatePath, 'utf-8');
+      template = template.replace('<title>Bíblia Vive — Leia, Estude e Compartilhe a Bíblia</title>', '<!--META_TITLE-->');
+      await fs.writeFile(savedTemplatePath, template, 'utf-8');
+      console.log('[prerender] loaded template from index.html and saved to index-template.html');
+    }
   } catch {
     console.error('[prerender] ✗ dist/index.html not found. Run `vite build` first.');
     process.exit(1);
@@ -638,8 +671,10 @@ async function prerender() {
   let totalChapters = 0;
   let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
+  const bibleVersions = await discoverVersions();
+
   // ── Bible versions loop ──
-  for (const versionCfg of BIBLE_VERSIONS) {
+  for (const versionCfg of bibleVersions) {
     const { version, localPath, label } = versionCfg;
     console.log(`[prerender] Processing version: ${version.toUpperCase()} (${localPath})`);
 

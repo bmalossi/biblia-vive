@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => ({
       ignored: ['**/public/bible/**']
     }
   },
+  build: {
+    // public/bible has 250k+ files — we copy them separately after build
+    // to avoid Vite hanging for 20+ minutes during the copy phase.
+    copyPublicDir: false,
+  },
   plugins: [react()].filter(Boolean),
   resolve: {
     alias: {
