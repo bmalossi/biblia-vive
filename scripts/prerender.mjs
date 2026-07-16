@@ -86,6 +86,90 @@ function toRouteSlug(localId) {
   return LOCAL_ID_TO_ROUTE_SLUG[localId] ?? localId;
 }
 
+// ─── localId (folder name) → book-contexts.json OSIS key ─────────────────────
+// book-contexts.json uses uppercase OSIS IDs (GEN, EXO, PSA…).
+// The public/bible folder names use Portuguese abbreviations (gn, ex, ps…).
+const FOLDER_TO_CONTEXT_KEY = {
+  // Pentateuco
+  gn:    'GEN',
+  ex:    'EXO',
+  lv:    'LEV',
+  nm:    'NUM',
+  dt:    'DEU',
+  // Históricos
+  js:    'JOS',
+  jud:   'JDG',
+  rt:    'RUT',
+  '1sm': '1SA',
+  '2sm': '2SA',
+  '1kgs':'1KI',
+  '2kgs':'2KI',
+  '1ch': '1CH',
+  '2ch': '2CH',
+  ezr:   'EZR',
+  ne:    'NEH',
+  et:    'EST',
+  // Poéticos
+  job:   'JOB',
+  ps:    'PSA',
+  prv:   'PRO',
+  ec:    'ECC',
+  so:    'SNG',
+  // Profetas maiores
+  is:    'ISA',
+  jr:    'JER',
+  lm:    'LAM',
+  ez:    'EZK',
+  dn:    'DAN',
+  // Profetas menores
+  ho:    'HOS',
+  jl:    'JOL',
+  am:    'AMO',
+  ob:    'OBA',
+  jn:    'JON',
+  mi:    'MIC',
+  na:    'NAM',
+  hk:    'HAB',
+  zp:    'ZEP',
+  hg:    'HAG',
+  zc:    'ZEC',
+  ml:    'MAL',
+  // Evangelhos e Atos
+  mt:    'MAT',
+  mk:    'MRK',
+  lk:    'LUK',
+  jo:    'JHN',
+  act:   'ACT',
+  // Epístolas de Paulo
+  rm:    'ROM',
+  '1co': '1CO',
+  '2co': '2CO',
+  gl:    'GAL',
+  eph:   'EPH',
+  ph:    'PHP',
+  cl:    'COL',
+  '1ts': '1TH',
+  '2ts': '2TH',
+  '1tm': '1TI',
+  '2tm': '2TI',
+  tt:    'TIT',
+  phm:   'PHM',
+  // Epístolas gerais
+  hb:    'HEB',
+  jm:    'JAS',
+  '1pe': '1PE',
+  '2pe': '2PE',
+  '1jo': '1JO',
+  '2jo': '2JO',
+  '3jo': '3JO',
+  jd:    'JUD',
+  re:    'REV',
+};
+
+function toContextKey(folder) {
+  return FOLDER_TO_CONTEXT_KEY[folder] ?? folder.toUpperCase();
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 async function readJson(filePath) {
   const content = await fs.readFile(filePath, 'utf-8');
@@ -179,6 +263,123 @@ async function fetchPublishedAuthors() {
 }
 
 // ─── Meta tag generators ──────────────────────────────────────────────────────
+
+/**
+ * Generates all <head> meta tags + SEO_CONTENT for a Bible *book* index page.
+ * The SEO_CONTENT block is fully semantic HTML so crawlers and LLMs can read it
+ * without executing JavaScript.
+ */
+function generateBookMetaTags(bookName, folder, routeSlug, version, versionLabel, bookCtx) {
+  const url   = `${CANONICAL_ORIGIN}/${version}/${routeSlug}`;
+  const theme = bookCtx?.theme ?? '';
+  const desc  = theme
+    ? `${bookName}: ${theme.substring(0, 140)}`
+    : `Leia o livro de ${bookName} completo na versão ${versionLabel}. Bíblia Vive.`;
+
+  // ── Helper: escape HTML entities ──
+  const esc = (s) => String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  // ── Context section (only when bookCtx is available) ──
+  let contextSection = '';
+  if (bookCtx) {
+    // Tema Central
+    const themeBlock = bookCtx.theme
+      ? `<div><h3>Tema Central</h3><p>${esc(bookCtx.theme)}</p></div>`
+      : '';
+
+    // Contexto Histórico (summary)
+    const summaryBlock = bookCtx.summary
+      ? `<div><h3>Contexto Histórico</h3><p>${esc(bookCtx.summary)}</p></div>`
+      : '';
+
+    // Metadados em dl
+    const metaRows = [
+      bookCtx.author         && `<div><dt>Autor</dt><dd>${esc(bookCtx.author)}</dd></div>`,
+      bookCtx.period_written && `<div><dt>Período</dt><dd>${esc(bookCtx.period_written)}</dd></div>`,
+      bookCtx.period_events  && `<div><dt>Eventos</dt><dd>${esc(bookCtx.period_events)}</dd></div>`,
+      bookCtx.genre          && `<div><dt>Gênero</dt><dd>${esc(bookCtx.genre)}</dd></div>`,
+      bookCtx.audience       && `<div><dt>Público</dt><dd>${esc(bookCtx.audience)}</dd></div>`,
+    ].filter(Boolean).join('');
+    const metaBlock = metaRows
+      ? `<dl>${metaRows}</dl>`
+      : '';
+
+    // Temas-chave
+    const keyThemesBlock = bookCtx.key_themes?.length
+      ? `<section><h3>Temas-chave</h3><ul>${bookCtx.key_themes.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>`
+      : '';
+
+    // Pessoas-chave
+    const keyPeopleBlock = bookCtx.key_people?.length
+      ? `<section><h3>Pessoas-chave</h3><ul>${bookCtx.key_people.map(p => `<li>${esc(p)}</li>`).join('')}</ul></section>`
+      : '';
+
+    // Lugares-chave
+    const keyPlacesBlock = bookCtx.key_places?.length
+      ? `<section><h3>Lugares-chave</h3><ul>${bookCtx.key_places.map(p => `<li>${esc(p)}</li>`).join('')}</ul></section>`
+      : '';
+
+    contextSection =
+      `<section aria-label="Contexto de ${esc(bookName)}">` +
+      `<h2>Sobre ${esc(bookName)}</h2>` +
+      themeBlock +
+      summaryBlock +
+      metaBlock +
+      keyThemesBlock +
+      keyPeopleBlock +
+      keyPlacesBlock +
+      `</section>`;
+  }
+
+  // ── Chapter navigation links ──
+  const totalChapters = bookCtx?.chapters ?? 0;
+  const chapLinks = totalChapters > 0
+    ? Array.from({ length: totalChapters }, (_, i) =>
+        `<li><a href="/${version}/${routeSlug}/${i + 1}">Capítulo ${i + 1}</a></li>`
+      ).join('')
+    : '';
+  const chapNav = chapLinks
+    ? `<nav aria-label="Capítulos de ${esc(bookName)}"><ol>${chapLinks}</ol></nav>`
+    : '';
+
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>${esc(bookName)} — ${esc(versionLabel)} — Bíblia Vive</h1>` +
+    contextSection +
+    chapNav +
+    `</main>`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: `${bookName} — ${versionLabel}`,
+    description: desc,
+    url,
+    inLanguage: version === 'kjv' ? 'en' : 'pt-BR',
+    ...(bookCtx?.author         ? { author: { '@type': 'Person', name: bookCtx.author } } : {}),
+    ...(totalChapters > 0       ? { numberOfPages: totalChapters } : {}),
+    isPartOf: { '@type': 'WebSite', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
+  };
+
+  return {
+    META_TITLE:       `<title>${esc(bookName)} — ${esc(versionLabel)} — Bíblia Vive</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${esc(desc)}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${esc(bookName)} — ${esc(versionLabel)} — Bíblia Vive" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${esc(desc)}" />`,
+    OG_TYPE:          `<meta property="og:type" content="book" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${esc(bookName)} — ${esc(versionLabel)} — Bíblia Vive" />
+  <meta name="twitter:description" content="${esc(desc)}" />
+  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
+}
 
 /**
  * Generates all <head> meta tags + SEO_CONTENT for a Bible chapter.
@@ -405,6 +606,17 @@ function sitemapUrl(loc, changefreq, priority) {
 async function prerender() {
   console.log('[prerender] Starting full multi-version pre-render...\n');
 
+  // ── Load book contexts (public/bible/book-contexts.json) ──────────────────
+  let bookContexts = {};
+  try {
+    const ctxPath = path.join(PROJECT_ROOT, 'public', 'bible', 'book-contexts.json');
+    const ctxRaw  = await fs.readFile(ctxPath, 'utf-8');
+    bookContexts  = JSON.parse(ctxRaw);
+    console.log(`[prerender] Loaded book contexts for ${Object.keys(bookContexts).length} books.\n`);
+  } catch (err) {
+    console.warn('[prerender] ⚠ Could not load book-contexts.json:', err.message);
+  }
+
   // Load template
   const templatePath = path.join(DIST_DIR, 'index.html');
   let template;
@@ -440,7 +652,22 @@ async function prerender() {
     let versionChapters = 0;
 
     for (const book of books) {
-      const routeSlug = toRouteSlug(book.folder);
+      const routeSlug  = toRouteSlug(book.folder);
+      const contextKey = toContextKey(book.folder);
+      const bookCtx    = bookContexts[contextKey] ?? null;
+
+      // ── Generate book index page (SEO: tema, resumo, autor, capítulos) ──
+      try {
+        const bookMeta = generateBookMetaTags(
+          book.name, book.folder, routeSlug, version, label, bookCtx
+        );
+        const bookHtml = replacePlaceholders(template, bookMeta);
+        const bookDir  = path.join(DIST_DIR, version, routeSlug);
+        await fs.mkdir(bookDir, { recursive: true });
+        await fs.writeFile(path.join(bookDir, 'index.html'), bookHtml, 'utf-8');
+      } catch (err) {
+        console.warn(`[prerender]   ⚠ Could not generate book page ${version}/${routeSlug}: ${err.message}`);
+      }
 
       // Book index URL in sitemap
       sitemapXml += sitemapUrl(`${CANONICAL_ORIGIN}/${version}/${routeSlug}`, 'weekly', '0.7');
