@@ -435,10 +435,10 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                 tabIndex={-1}
                 className={cn(
                     "fixed bottom-0 right-0 z-50 flex flex-col",
-                    "w-full max-w-full border-t border-border bg-app-bg shadow-2xl",
+                    "w-full max-w-full rounded-t-2xl border-t border-border bg-app-bg shadow-2xl lg:rounded-t-none",
                     "lg:top-[60px] lg:bottom-0 lg:border-l lg:border-t-0 lg:w-[320px] lg:max-h-[calc(100vh-60px)]",
                     "transition-transform duration-300 ease-out",
-                    "max-h-[75vh] lg:max-h-none",
+                    "h-[90vh] lg:h-auto max-h-[90vh] lg:max-h-none",
                     "animate-in slide-in-from-bottom-4 lg:slide-in-from-right-4",
                 )}
                 aria-label={t("study.panelLabel")}

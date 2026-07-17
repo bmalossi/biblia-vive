@@ -66,26 +66,44 @@ export default function VerseToolbar({
 
   const hlBadge = activeHighlight ? HIGHLIGHT_CLASSES[activeHighlight] : undefined;
 
+  const buttonClassName = cn(
+    "font-medium transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold shrink-0",
+    isMobile
+      ? "h-7 text-[0.7rem] px-2.5 gap-1 [&_svg]:size-3"
+      : "h-8 text-xs px-3.5 gap-1.5 [&_svg]:size-3.5",
+  );
+
   return (
     <div
       aria-label={t("toolbar.ariaToolbar", { ref: ariaReference })}
       aria-orientation="horizontal"
       className={cn(
-        "z-40 rounded-[10px] border border-border bg-app-surface p-2 shadow-md transition-all duration-150 ease-out",
+        "z-40 rounded-[10px] border border-border bg-app-surface shadow-md transition-all duration-150 ease-out",
         "animate-in fade-in-0 slide-in-from-top-1",
-        isMobile ? "absolute inset-x-3" : "absolute",
+        isMobile ? "absolute inset-x-3 p-1.5" : "absolute p-2",
       )}
       data-verse-toolbar="true"
       role="toolbar"
       style={floatingStyle}
     >
-      <div className="flex items-center gap-1.5 flex-wrap">
+      {/* Close Button - positioned offboard at the top right */}
+      <button
+        aria-label={t("settings.close")}
+        className="absolute z-50 h-5 w-5 rounded-full bg-app-surface border border-border text-app-text-muted hover:text-app-text hover:bg-app-raised flex items-center justify-center shadow-md transition-colors shrink-0"
+        onClick={onClose}
+        style={{ top: "-6px", right: "-6px" }}
+        type="button"
+      >
+        <X className="h-3 w-3" />
+      </button>
+
+      <div className={cn("flex items-center flex-wrap", isMobile ? "gap-1" : "gap-1.5")}>
         {/* Study Button */}
         <Button
           aria-label={t("toolbar.ariaStudy", { ref: ariaReference })}
           aria-pressed={studyOpen}
           className={cn(
-            "h-9 gap-1.5 font-medium transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold",
+            buttonClassName,
             studyOpen
               ? "border-gold bg-gold-bg text-gold"
               : "border-gold/40 text-gold",
@@ -96,33 +114,33 @@ export default function VerseToolbar({
           type="button"
           variant="outline"
         >
-          <BookOpen className="h-3.5 w-3.5" />
+          <BookOpen className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {t("toolbar.study")}
         </Button>
 
         {/* Copy */}
         <Button
           aria-label={t("toolbar.ariaCopy", { ref: ariaReference })}
-          className="h-9 hover:bg-gold hover:text-primary-foreground hover:border-gold"
+          className={buttonClassName}
           onClick={onCopy}
           size="sm"
           type="button"
           variant="outline"
         >
-          <Clipboard className="h-3.5 w-3.5" />
+          <Clipboard className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {copyLabel}
         </Button>
 
         {/* Share */}
         <Button
           aria-label={t("toolbar.ariaShare", { ref: ariaReference })}
-          className="h-9 hover:bg-gold hover:text-primary-foreground hover:border-gold"
+          className={buttonClassName}
           onClick={onShare}
           size="sm"
           type="button"
           variant="outline"
         >
-          <Share2 className="h-3.5 w-3.5" />
+          <Share2 className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {shareLabel}
         </Button>
 
@@ -131,13 +149,13 @@ export default function VerseToolbar({
           <Button
             aria-label={t("toolbar.ariaHighlight", { ref: ariaReference })}
             aria-pressed={!!activeHighlight}
-            className={cn("h-9 gap-1.5 hover:!bg-gold hover:!text-primary-foreground hover:!border-gold", hlBadge)}
+            className={cn(buttonClassName, hlBadge)}
             onClick={() => setShowPicker(p => !p)}
             size="sm"
             type="button"
             variant="outline"
           >
-            <Highlighter className="h-3.5 w-3.5" />
+            <Highlighter className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
             {t("toolbar.highlight")}
           </Button>
 
@@ -157,7 +175,7 @@ export default function VerseToolbar({
           aria-label={t("toolbar.ariaNote", { ref: ariaReference })}
           aria-pressed={hasNote}
           className={cn(
-            "h-9 gap-1.5 hover:bg-gold hover:text-primary-foreground hover:border-gold",
+            buttonClassName,
             hasNote && "border-gold/60 text-gold"
           )}
           onClick={onNote}
@@ -165,20 +183,8 @@ export default function VerseToolbar({
           type="button"
           variant="outline"
         >
-          <PencilLine className="h-3.5 w-3.5" />
+          <PencilLine className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
           {t("toolbar.note")}
-        </Button>
-
-        {/* Close Button */}
-        <Button
-          aria-label={t("settings.close")}
-          className="h-9 w-9 p-0 rounded-full hover:bg-app-raised text-app-text-muted flex items-center justify-center shrink-0 border border-border/40 hover:border-border ml-auto"
-          onClick={onClose}
-          size="sm"
-          type="button"
-          variant="ghost"
-        >
-          <X className="h-4 w-4" />
         </Button>
       </div>
     </div>
