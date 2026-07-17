@@ -52,6 +52,7 @@ const es: TranslationDict = {
 
     // Search Page
     "search.title": "Búsqueda Bíblica",
+    "search.searching": "Buscando...",
     "search.subtitle": "Encuentra términos, temas y referencias con rapidez.",
     "search.placeholder": "Ej: amor, fe, Juan 3:16",
     "search.inputPlaceholder": "Buscar versículo, tema o referencia...",

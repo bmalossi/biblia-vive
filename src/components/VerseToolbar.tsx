@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clipboard, Highlighter, PencilLine, Share2, BookOpen } from "lucide-react";
+import { Clipboard, Highlighter, PencilLine, Share2, BookOpen, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/i18n";
 import HighlightPicker, { HIGHLIGHT_CLASSES } from "@/components/HighlightPicker";
@@ -16,6 +16,7 @@ interface VerseToolbarProps {
   onHighlight: (color: HighlightColor) => void;
   onRemoveHighlight: () => void;
   onNote: () => void;
+  onClose: () => void;
   position: { left: number; top: number } | null;
   shareLabel: string;
   visible: boolean;
@@ -34,6 +35,7 @@ export default function VerseToolbar({
   onHighlight,
   onRemoveHighlight,
   onNote,
+  onClose,
   copyLabel,
   shareLabel,
   ariaReference,
@@ -54,7 +56,9 @@ export default function VerseToolbar({
   if (!visible) return null;
 
   const floatingStyle = isMobile
-    ? undefined
+    ? {
+      top: position?.top ?? 0,
+    }
     : {
       left: position?.left ?? 0,
       top: position?.top ?? 0,
@@ -69,7 +73,7 @@ export default function VerseToolbar({
       className={cn(
         "z-40 rounded-[10px] border border-border bg-app-surface p-2 shadow-md transition-all duration-150 ease-out",
         "animate-in fade-in-0 slide-in-from-top-1",
-        isMobile ? "fixed inset-x-3 bottom-16" : "absolute",
+        isMobile ? "absolute inset-x-3" : "absolute",
       )}
       data-verse-toolbar="true"
       role="toolbar"
@@ -163,6 +167,18 @@ export default function VerseToolbar({
         >
           <PencilLine className="h-3.5 w-3.5" />
           {t("toolbar.note")}
+        </Button>
+
+        {/* Close Button */}
+        <Button
+          aria-label={t("settings.close")}
+          className="h-9 w-9 p-0 rounded-full hover:bg-app-raised text-app-text-muted flex items-center justify-center shrink-0 border border-border/40 hover:border-border ml-auto"
+          onClick={onClose}
+          size="sm"
+          type="button"
+          variant="ghost"
+        >
+          <X className="h-4 w-4" />
         </Button>
       </div>
     </div>

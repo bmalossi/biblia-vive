@@ -12,7 +12,7 @@ import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParse
 import { getVersion, isBibleVersion } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { ArrowRight, BookOpen, Search, SearchX, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Loader2, Search, SearchX, Sparkles } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -442,10 +442,16 @@ export default function SearchPage() {
       )}
 
       {loading && mode === "text" && (
-        <div className="mt-8 space-y-3">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton className="h-20 w-full bg-app-surface" key={index} />
-          ))}
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center gap-2 px-1 text-sm text-app-text-muted">
+            <Loader2 className="h-4 w-4 animate-spin text-gold" />
+            <span>{t("search.searching")}</span>
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton className="h-20 w-full bg-app-surface" key={index} />
+            ))}
+          </div>
         </div>
       )}
 

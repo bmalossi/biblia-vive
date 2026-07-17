@@ -378,26 +378,29 @@ export default function ReadingPage() {
 
   const updateToolbarPosition = useCallback(
     (anchorKey: string) => {
-      if (isToolbarMobile) {
-        setToolbarPosition(null);
-        return;
-      }
-
       const verseElement = verseRefs.current[anchorKey];
       const layer = toolbarLayerRef.current;
       if (!verseElement || !layer) return;
 
       const verseRect = verseElement.getBoundingClientRect();
       const layerRect = layer.getBoundingClientRect();
-      const toolbarWidth = 360;
       const padding = 12;
-      const preferredLeft = verseRect.left - layerRect.left;
-      const maxLeft = Math.max(padding, layerRect.width - toolbarWidth - padding);
 
-      setToolbarPosition({
-        left: Math.min(Math.max(preferredLeft, padding), maxLeft),
-        top: verseRect.bottom - layerRect.top + 8,
-      });
+      if (isToolbarMobile) {
+        setToolbarPosition({
+          left: 12,
+          top: verseRect.bottom - layerRect.top + 8,
+        });
+      } else {
+        const toolbarWidth = 360;
+        const preferredLeft = verseRect.left - layerRect.left;
+        const maxLeft = Math.max(padding, layerRect.width - toolbarWidth - padding);
+
+        setToolbarPosition({
+          left: Math.min(Math.max(preferredLeft, padding), maxLeft),
+          top: verseRect.bottom - layerRect.top + 8,
+        });
+      }
     },
     [isToolbarMobile],
   );
@@ -606,7 +609,7 @@ export default function ReadingPage() {
   }, [chapterNumber, compareEnabled, compareVersion, selectedVersion, tts.stop]);
 
   useEffect(() => {
-    if (!selectedVerse || isToolbarMobile) return;
+    if (!selectedVerse) return;
     updateToolbarPosition(selectedVerse.anchorKey);
     const onResize = () => updateToolbarPosition(selectedVerse.anchorKey);
     window.addEventListener("resize", onResize);
@@ -1844,6 +1847,7 @@ export default function ReadingPage() {
             if (!selectedVerse) return;
             setIsNoteModalOpen(true);
           }}
+          onClose={() => setSelectedVerse(null)}
           activeHighlight={selectedVerse ? getHighlightForVerse(Number(selectedVerse.verseNumber)) : null}
           hasNote={selectedVerse ? !!getNoteForVerse(Number(selectedVerse.verseNumber)) : false}
           position={toolbarPosition}
