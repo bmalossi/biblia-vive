@@ -1,0 +1,34 @@
+# Bíblia Vive
+
+> Plataforma brasileira dedicada à leitura, estudo e compartilhamento das Escrituras Sagradas, oferecendo múltiplas versões, planos de leitura, Harpa Cristã e ferramentas avançadas de estudo teológico.
+
+Esta curadoria auxilia agentes de IA a compreender a estrutura do site, mapeando os recursos principais e as páginas indicadas para consulta e referência de conteúdo.
+
+## Bíblia Online
+
+- [Bíblia Vive](https://www.bibliavive.com.br/): Página principal que fornece acesso à busca de textos sagrados, versículo diário e navegação para os livros do Antigo e Novo Testamento.
+- [Gênesis na Bíblia NVI](https://www.bibliavive.com.br/nvi/gn): Resumo introdutório do livro de Gênesis na versão NVI, contendo contexto histórico, autoria, época de composição e temas centrais.
+- [Gênesis 1 na Almeida Corrigida Fiel (ACF)](https://www.bibliavive.com.br/acf/gn/1): Texto integral do primeiro capítulo de Gênesis na tradução Almeida Corrigida Fiel (ACF), servindo como modelo de leitura e estrutura textual.
+- [João 3 na Nova Versão Internacional (NVI)](https://www.bibliavive.com.br/nvi/joa/3): Texto bíblico de João 3 integrado à interface de estudos unificada, permitindo ouvir o áudio (TTS), abrir o caderno de anotações simultâneas, analisar palavras no grego/hebraico (Strong) e consultar comentários teológicos.
+- [Busca Bíblica](https://www.bibliavive.com.br/busca): Ferramenta de busca global por termos, personagens históricos, conceitos teológicos e referências bíblicas específicas.
+
+## Recursos de Estudo
+
+- [Planos de Leitura](https://www.bibliavive.com.br/planos): Cronogramas e rotinas estruturadas de leitura bíblica diária, auxiliando usuários a organizar o estudo anual ou temático.
+- [Como Usar o Bíblia Vive](https://www.bibliavive.com.br/como-usar): Manual do usuário com tutoriais para explorar a interface de estudo integrado, incluindo o uso do caderno de notas e o acesso ao acervo teológico.
+
+## Harpa e Conteúdo
+
+- [Harpa Cristã](https://www.bibliavive.com.br/harpa): Catálogo dos hinos tradicionais da Harpa Cristã, organizados por número e título, com mecanismo de busca integrado.
+- [Hino 15 da Harpa Cristã](https://www.bibliavive.com.br/harpa/15): Exemplo de página de hino ("Ó Doce Nome de Jesus"), exibindo a letra completa do hino 15 e recurso de áudio associado.
+- [Artigos Bíblicos](https://www.bibliavive.com.br/artigos): Índice de artigos teológicos, reflexões pastorais e estudos bíblicos classificados por autor e tema.
+
+## Institucional
+
+- [Sobre a Plataforma](https://www.bibliavive.com.br/sobre): Explicação da missão institucional do projeto, compromisso com a integridade das traduções (diretrizes E-E-A-T) e autonomia eclesiástica.
+
+## Optional
+
+- [Bíblia Vive PRO](https://www.bibliavive.com.br/pro): Detalhes dos planos de assinatura da versão PRO, oferecendo recursos adicionais e possibilitando o suporte financeiro à plataforma.
+- [Apoiar o Projeto](https://www.bibliavive.com.br/apoiar): Informações sobre doações voluntárias e formas de apoiar financeiramente o desenvolvimento independente da plataforma via PIX.
+- [Termos de Uso e Privacidade](https://www.bibliavive.com.br/termos-de-uso): Termos de serviço, propriedade intelectual de traduções protegidas e diretrizes de privacidade e uso de dados dos usuários.
