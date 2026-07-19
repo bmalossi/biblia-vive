@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Music2, Mic, Guitar, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -38,6 +38,70 @@ function isChorusLine(line: string): boolean {
   if (!trimmed) return false;
   // Chorus lines are fully uppercase and do NOT start with a digit (verse number)
   return trimmed === trimmed.toUpperCase() && !/^\d/.test(trimmed);
+}
+
+/**
+ * Bloco de créditos exibido ao final do hino quando este possui campo `credits`
+ * no `harpa-hymns.json`. Apenas hinos com créditos registrados (ex.: 322) exibem
+ * este bloco — todos os demais não são afetados.
+ */
+function HymnCredits({ credits }: {
+  credits: { voice?: string; guitar?: string; sourceUrl?: string } | undefined;
+}) {
+  if (!credits) return null;
+  const hasAny = credits.voice || credits.guitar || credits.sourceUrl;
+  if (!hasAny) return null;
+
+  return (
+    <section
+      aria-label="Créditos da gravação"
+      className="mt-8 rounded-xl border border-border bg-app-raised/40 px-4 py-4 md:px-5"
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold/10 ring-1 ring-gold/20 text-gold">
+          <Music2 className="h-3.5 w-3.5" />
+        </span>
+        <h2 className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-gold">
+          Créditos da gravação
+        </h2>
+      </div>
+
+      <ul className="space-y-2 text-sm text-app-text">
+        {credits.voice && (
+          <li className="flex items-start gap-2.5">
+            <Mic className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-app-text-muted" />
+            <span>
+              <span className="text-app-text-muted">Voz: </span>
+              <span className="font-medium">{credits.voice}</span>
+            </span>
+          </li>
+        )}
+        {credits.guitar && (
+          <li className="flex items-start gap-2.5">
+            <Guitar className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-app-text-muted" />
+            <span>
+              <span className="text-app-text-muted">Violão: </span>
+              <span className="font-medium">{credits.guitar}</span>
+            </span>
+          </li>
+        )}
+        {credits.sourceUrl && (
+          <li className="flex items-start gap-2.5">
+            <ExternalLink className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-app-text-muted" />
+            <a
+              href={credits.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold hover:text-gold/80 underline decoration-gold/30 underline-offset-2"
+            >
+              <span className="text-app-text-muted">Fonte: </span>
+              Música
+            </a>
+          </li>
+        )}
+      </ul>
+    </section>
+  );
 }
 
 export default function HarpaReadingPage() {
@@ -266,6 +330,8 @@ export default function HarpaReadingPage() {
                 ))}
               </div>
             )}
+            {/* Credits block — displayed only for hymns with a `credits` field (ex.: 322) */}
+            {!loading && !error && <HymnCredits credits={hymnInfo.credits} />}
           </article>
         </div>
 

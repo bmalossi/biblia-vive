@@ -2492,8 +2492,13 @@
     "titulo": "AS SANTAS ESCRITURAS",
     "tituloFormatado": "As Santas Escrituras",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "322 - As Santas Escrituras.mp3",
+    "credits": {
+      "voice": "Juscelino Duarte",
+      "guitar": "Tiago",
+      "sourceUrl": "https://www.youtube.com/watch?v=DKEtpNajY1E&list=RDDKEtpNajY1E&start_radio=1"
+    }
   },
   {
     "numero": 323,
