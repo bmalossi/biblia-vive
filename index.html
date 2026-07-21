@@ -99,6 +99,19 @@
     .skip-link:focus {
       transform: translateY(0);
     }
+
+    /* Visually-hidden but accessible shell for prerendered SEO content.
+       Keeps content in the DOM for crawlers and screen readers, but out
+       of the visible viewport from the very first paint (no FOUC flash).
+       Equivalent to the standard sr-only pattern. */
+    .bv-seo-shell {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -127,7 +140,7 @@
 
 <body>
   <a class="skip-link" href="#main-content">Ir para o conteúdo</a>
-  <div id="root"><!--SEO_CONTENT--></div>
+  <div id="root"><div class="bv-seo-shell"><!--SEO_CONTENT--></div></div>
   <noscript><!--SEO_CONTENT--></noscript>
   <script type="module" src="/src/main.tsx"></script>
 </body>
