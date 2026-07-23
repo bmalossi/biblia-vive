@@ -2,7 +2,6 @@ import BookGrid from "@/components/BookGrid";
 import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
 import VerseOfDay from "@/components/VerseOfDay";
-import CarrosselArtigos from "@/components/CarrosselArtigos";
 import ArtigosRecentes from "@/components/ArtigosRecentes";
 import { findBookBySlug, getBooksForLocale } from "@/lib/books";
 import { getVersion } from "@/lib/themes";
@@ -191,7 +190,6 @@ export default function HomePage() {
         )}
 
         {/* Artigos em destaque */}
-        <CarrosselArtigos />
         <ArtigosRecentes />
 
         {/* Card PWA no final da página */}

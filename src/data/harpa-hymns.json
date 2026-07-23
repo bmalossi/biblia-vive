@@ -4947,37 +4947,5 @@
     "estrofes": 4,
     "hasAudio": false,
     "audioFile": null
-  },
-  {
-    "numero": 637,
-    "titulo": "HINO À BANDEIRA NACIONAL",
-    "tituloFormatado": "Hino À Bandeira Nacional",
-    "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
-  },
-  {
-    "numero": 638,
-    "titulo": "HINO NACIONAL BRASILEIRO",
-    "tituloFormatado": "Hino Nacional Brasileiro",
-    "estrofes": 2,
-    "hasAudio": false,
-    "audioFile": null
-  },
-  {
-    "numero": 639,
-    "titulo": "HINO DA INDEPENDÊNCIA",
-    "tituloFormatado": "Hino da Independência",
-    "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
-  },
-  {
-    "numero": 640,
-    "titulo": "HINO DA PROCLAMAÇÃO DA REPÚBLICA DO BRASIL",
-    "tituloFormatado": "Hino da Proclamação da República do Brasil",
-    "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
   }
 ]

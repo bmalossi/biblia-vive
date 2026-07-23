@@ -1,8 +1,9 @@
 import Layout from "@/components/Layout";
 import hymnsData from "@/data/harpa-hymns.json";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import HarpaTimeline from "@/components/HarpaTimeline";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, X, Volume2 } from "lucide-react";
+import { Search, X, Volume2, History } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 
@@ -40,7 +41,7 @@ export default function HarpaPage() {
   usePageMeta({
     canonical: "/harpa",
     description:
-      "Leia, pesquise e ouça os hinos tradicionais da Harpa Cristã. Mais de 640 hinos com busca instantânea e áudio de adoração.",
+      "Leia, pesquise e ouça os hinos tradicionais da Harpa Cristã. 636 hinos com busca instantânea, linha do tempo histórica e áudio de adoração.",
     ogImage: "/og-default.png",
     title: "Harpa Cristã — Hinos de Adoração e Louvor | Bíblia Vive",
     ogType: "website",
@@ -49,28 +50,38 @@ export default function HarpaPage() {
   return (
     <Layout>
       <div className="flex flex-col">
-        {/* Search Bar */}
-        <section className="mt-8 text-center">
-          <div className="mx-auto flex w-full max-w-[480px] items-center gap-2 relative">
-            <Search className="pointer-events-none absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
-            <input
-              type="text"
-              className="h-11 w-full rounded-full border border-border bg-app-raised pl-12 pr-10 text-sm text-app-text focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 placeholder:text-app-text-muted"
-              placeholder="Buscar hino por número ou título..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Buscar hino"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text transition-colors"
-                aria-label="Limpar busca"
-                type="button"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
+        {/* Search Bar & Anchor Button */}
+        <section className="mt-8">
+          <div className="mx-auto flex w-full max-w-[640px] flex-col sm:flex-row items-center gap-3">
+            <div className="relative flex-1 w-full">
+              <Search className="pointer-events-none absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
+              <input
+                type="text"
+                className="h-11 w-full rounded-full border border-border bg-app-raised pl-12 pr-10 text-sm text-app-text focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 placeholder:text-app-text-muted"
+                placeholder="Buscar hino por número ou título..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Buscar hino"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text transition-colors"
+                  aria-label="Limpar busca"
+                  type="button"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            <a
+              href="#historia"
+              className="inline-flex h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 text-xs font-medium text-gold hover:bg-gold hover:text-primary-foreground transition-all duration-200 shadow-sm"
+            >
+              <History className="h-4 w-4" />
+              <span>História da Harpa</span>
+            </a>
           </div>
         </section>
 
@@ -155,6 +166,9 @@ export default function HarpaPage() {
             </div>
           )}
         </section>
+
+        {/* History Timeline */}
+        <HarpaTimeline />
       </div>
     </Layout>
   );

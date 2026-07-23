@@ -753,6 +753,62 @@ function comoUsarMetaTags() {
   };
 }
 
+function harpaMetaTags() {
+  const title = 'Harpa Cristã — Hinos de Adoração e Louvor | Bíblia Vive';
+  const desc  = 'Leia, pesquise e ouça os hinos tradicionais da Harpa Cristã. 636 hinos com busca instantânea, linha do tempo histórica e áudio de adoração.';
+  const url   = `${CANONICAL_ORIGIN}/harpa`;
+
+  const seoContent =
+`<main class="bv-seo-only" style="font-family:Georgia,'Times New Roman',serif;max-width:780px;margin:0 auto;padding:1rem;line-height:1.65;color:#1a1a1a">
+  <h1>Harpa Cristã — Hinos de Adoração e Louvor</h1>
+  <p>A Harpa Cristã é o hinário oficial das Assembleias de Deus no Brasil, nascido em 1922 e continuamente ampliado e revisado até se tornar o hinário pentecostal mais conhecido do país. Acesse os 636 hinos tradicionais da Harpa Cristã no Bíblia Vive com busca por número ou título e áudio para adoração.</p>
+
+  <h2>História da Harpa Cristã</h2>
+  <h3>Contexto anterior à Harpa Cristã</h3>
+  <ul>
+    <li><strong>1861 – Salmos e Hinos:</strong> Publicação do hinário congregacional Salmos e Hinos, usado pela Assembleia de Deus em seus primeiros anos, junto com outros hinos protestantes tradicionais.</li>
+    <li><strong>1917–1921 – Hinários precursores:</strong> Missionários suecos da AD em Belém (PA) organizam um hinário com 194 hinos (1917) e depois lançam o Cantor Pentecostal (1921), com 44 hinos e 10 corinhos, já destacando a doutrina pentecostal.</li>
+  </ul>
+
+  <h3>Linha do tempo da Harpa Cristã</h3>
+  <ul>
+    <li><strong>1922 – 1ª edição da Harpa Cristã:</strong> Lançada pela AD em Recife (PE), torna-se o hinário oficial das Assembleias de Deus, com hinos para culto público, Santa Ceia, batismo, casamento, apresentação de crianças e cultos fúnebres; tiragem inicial de mil exemplares, distribuídos por Samuel Nyström.</li>
+    <li><strong>1923 – 2ª edição (300 hinos):</strong> Impressa no Rio de Janeiro, amplia o conteúdo para 300 hinos, consolidando o uso nacional da Harpa Cristã entre as igrejas assembleianas.</li>
+    <li><strong>1932 – Ampliação para 400 hinos:</strong> Novos cânticos são acrescentados e o hinário chega a 400 hinos, acompanhando o crescimento do movimento pentecostal no Brasil.</li>
+    <li><strong>1937 – Harpa Cristã com música:</strong> A Convenção Geral das Assembleias de Deus, reunida em São Paulo, nomeia uma comissão (incluindo Emílio Conde, Samuel Nyström e Paulo Leivas Macalão) para elaborar a primeira Harpa Cristã com letra e música, que se torna referência para o cântico congregacional.</li>
+    <li><strong>Décadas seguintes – Edição clássica com 524 hinos:</strong> Ao longo dos anos são acrescentados novos cânticos até chegar à famosa edição com 524 hinos; até 1981, todos foram revisados em letra e música, com grande participação do pastor Paulo Leivas Macalão.</li>
+    <li><strong>1979 – Revisão geral oficial:</strong> O Conselho Administrativo da CPAD e a CGADB nomeiam uma nova comissão para revisar música e letras da Harpa Cristã, com apoio técnico especializado em correção musical e textual.</li>
+    <li><strong>1992 – Harpa Cristã Atualizada:</strong> Lançada com ajustes de linguagem e forma, é adotada por algumas igrejas, mas boa parte das Assembleias de Deus mantém a Harpa Tradicional como preferida.</li>
+    <li><strong>1999 – Harpa Cristã Ampliada (640 hinos):</strong> A CPAD lança a Harpa Cristã Ampliada, acrescentando 116 novos hinos para atender melhor às necessidades cerimoniais e litúrgicas da igreja, totalizando 640 cânticos.</li>
+    <li><strong>2001–2010 – Ajuste para 636 hinos:</strong> O hinário passa por nova atualização, retirando quatro hinos pátrios nacionais e fixando o número em 636 hinos.</li>
+    <li><strong>2022 – 100 anos da Harpa Cristã:</strong> A Harpa Cristã completa um século de existência, reconhecida como o hinário mais conhecido e amado do Brasil, ultrapassando fronteiras denominacionais e marcando a história da hinódia pentecostal.</li>
+  </ul>
+</main>`;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MusicComposition',
+    name: 'Harpa Cristã',
+    description: desc,
+    url,
+  };
+
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
+    OG_TYPE:          `<meta property="og:type" content="website" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
+}
+
 /**
  * Shared builder for simple static pages.
  */
@@ -982,9 +1038,17 @@ async function prerender() {
   await fs.writeFile(path.join(comoUsarDir, 'index.html'), comoUsarHtml, 'utf-8');
   console.log('[prerender]   ✓ dist/como-usar/index.html');
 
+  // /harpa — Harpa Cristã index & full timeline history exposed as static HTML
+  const harpaHtml = replacePlaceholders(template, harpaMetaTags());
+  const harpaDir  = path.join(DIST_DIR, 'harpa');
+  await fs.mkdir(harpaDir, { recursive: true });
+  await fs.writeFile(path.join(harpaDir, 'index.html'), harpaHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/harpa/index.html');
+
   // ── Sitemap — static pages ──
   const STATIC_URLS = [
     { loc: `${CANONICAL_ORIGIN}/`,              changefreq: 'daily',   priority: '1.0' },
+    { loc: `${CANONICAL_ORIGIN}/harpa`,         changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/planos`,        changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/artigos`,       changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/como-usar`,     changefreq: 'monthly', priority: '0.7' },
