@@ -46,7 +46,8 @@ import PwaInstallCard from "@/components/PwaInstallCard";
 
 const navItems = [
   { label: "Leitura", href: "/" },
-  { label: "Jornadas", href: "/planos" },
+  { label: "Jornadas", href: "/jornadas" },
+  { label: "Planos", href: "/planos" },
   { label: "Artigos", href: "/artigos" },
   { label: "Harpa", href: "/harpa" },
 ];

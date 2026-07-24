@@ -14,7 +14,7 @@ const mobileNav = [
   { icon: Home, label: "Início", to: "/" },
   { icon: BookOpen, label: "Ler", to: (version: string) => `/${version}/gn` },
   { icon: Search, label: "Buscar", to: "/busca" },
-  { icon: Library, label: "Jornadas", to: "/planos" },
+  { icon: Library, label: "Jornadas", to: "/jornadas" },
   { icon: Share2, label: "Compartilhar", to: "/compartilhar" },
 ];
 

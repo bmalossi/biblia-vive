@@ -40,6 +40,8 @@ const HowToPage = lazy(() => import("./pages/HowToPage"));
 const HarpaPage = lazy(() => import("./pages/HarpaPage"));
 const HarpaReadingPage = lazy(() => import("./pages/HarpaReadingPage"));
 const AdminAutoresPage = lazy(() => import('./pages/AdminAutoresPage'));
+const AdminCapitulosPage = lazy(() => import('./pages/AdminCapitulosPage'));
+const JornadasPage = lazy(() => import('./pages/JornadasPage'));
 const AuthorPage = lazy(() => import('./pages/AuthorPage'));
 
 const queryClient = new QueryClient({
@@ -85,8 +87,10 @@ const App = () => (
                   <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
                   <Route path="/minhas-notas" element={<MyNotesPage />} />
                   <Route path="/planos" element={<ReadingPlansPage />} />
+                  <Route path="/jornadas" element={<JornadasPage />} />
                   <Route path="/compartilhar" element={<SharePage />} />
                   <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/admin/capitulos" element={<AdminCapitulosPage />} />
                   <Route path="/admin/artigos" element={<AdminArtigosPage />} />
                   <Route path="/admin/autores" element={<AdminAutoresPage />} />
                   <Route path="/admin/comentarios" element={<AdminComentariosPage />} />

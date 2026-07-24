@@ -1,7 +1,7 @@
 import BookGrid from "@/components/BookGrid";
 import Layout from "@/components/Layout";
 import SearchBar from "@/components/SearchBar";
-import VerseOfDay from "@/components/VerseOfDay";
+import CapituloDeHojeSection from "@/components/CapituloDeHojeSection";
 import ArtigosRecentes from "@/components/ArtigosRecentes";
 import { findBookBySlug, getBooksForLocale } from "@/lib/books";
 import { getVersion } from "@/lib/themes";
@@ -115,7 +115,7 @@ export default function HomePage() {
         {/* Divisor após os livros do Novo Testamento */}
         <div className="my-8 border-t border-border" />
 
-        <VerseOfDay />
+        <CapituloDeHojeSection />
 
         {/* Renderiza a seção de "Continuar Leitura" e "Plano" apenas se eles existirem. A mt-6 os empurra um pouco do versículo. */}
         {((lastRead && !dismissed && lastReadBook) || (firstProgress && activePlanInfo)) && (

@@ -46,3 +46,12 @@ public/sitemap.xml
 
 # OpenScriptures raw lexicon data XMLs (large files)
 scripts/data/openscriptures/
+
+# Planning, Briefs, Prompts & Internal Docs (Do not commit)
+brief-*.md
+*-plan.html
+*-roadmap.html
+chapter-notebook-prompt.md
+tickets.md
+docs/spec-*.md
+docs/plan-*.md

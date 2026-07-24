@@ -48,9 +48,13 @@ _Evitar_: anotação, comentário, observação
 Uma tradução/edição específica da Bíblia, identificada por sigla. O produto suporta múltiplos idiomas e versões simultaneamente. Versões disponíveis: pt-br (AA, ACF, ARC, KJA, NVI), en (BBE, KJV), es (RVR).
 _Evitar_: tradução (ambíguo), idioma (incompleto — uma versão é idioma + editora)
 
-**Versículo do Dia**:
-Um versículo bíblico curado pelo administrador via Supabase, exibido na página inicial. Quando nenhum versículo está agendado para o dia, a plataforma exibe um versículo estático de fallback. Disponível para Visitantes e Leitores.
-_Evitar_: verso do dia, devoción diária
+**Capítulo de Hoje**:
+Componente editorial da página inicial que exibe um capítulo narrativo curado da Jornada Narrativa de Permanência. Substitui definitivamente o Versículo do Dia. Composto exclusivamente por texto (título principal, texto introdutório, convite para leitura e botão de acesso à Referência). Sem imagens, criativos ou carrosséis. Publicado de forma programada via Supabase. Quando nenhum capítulo está agendado para o dia, exibe o capítulo publicado mais recentemente como fallback (nunca exibe vazio). Disponível para Visitantes e Leitores.
+_Evitar_: Versículo do Dia, verso do dia, devoção diária, devocional
+
+**Série**:
+Agrupamento editorial de capítulos do Capítulo de Hoje com tema narrativo comum (ex.: "Permanecer"). Cada capítulo pertence a exatamente uma Série e possui um número sequencial dentro dela. A Série é exibida no identificador discreto do componente (ex.: "Capítulo 1 · Permanecer"). "Jornada Narrativa de Permanência" é o nome filosófico do mecanismo como um todo — não é uma entidade de domínio.
+_Evitar_: tema, categoria, coleção, jornada (como entidade)
 
 ### Planos e Acessos
 
