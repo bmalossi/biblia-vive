@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Check, X, HelpCircle } from "lucide-react";
 import {
   Table,
@@ -96,13 +96,13 @@ export default function PricingComparison() {
       ],
     },
     {
-      name: "Exclusivo PRO",
+      name: "Recursos de Estudo",
       features: [
         {
           name: "Anotações em versículos",
           gratuito: { type: "check", text: "Sim (Local ou Nuvem)" },
-          pro: { type: "text", text: "Ilimitado (Salvas após cancelamento)" },
-          templo: { type: "text", text: "Ilimitado (Salvas após cancelamento)" },
+          pro: { type: "text", text: "Ilimitadas (Preservadas)" },
+          templo: { type: "text", text: "Ilimitadas (Preservadas)" },
         },
         {
           name: "Destaques coloridos",
@@ -111,25 +111,25 @@ export default function PricingComparison() {
           templo: { type: "check", text: "Sim" },
         },
         {
-          name: "Exportação em PDF",
+          name: "Preservação em PDF",
           gratuito: { type: "cross", text: "Não disponível" },
           pro: { type: "text", text: "Ilimitada" },
           templo: { type: "text", text: "Ilimitada" },
         },
         {
-          name: "Acervo Teológico / Comentários por versículo",
-          gratuito: { type: "text", text: "1 comentário grátis" },
-          pro: { type: "text", text: "Até 10 comentários por hora" },
-          templo: { type: "text", text: "Até 10 comentários por hora" },
+          name: "Comentários Teológicos por versículo",
+          gratuito: { type: "text", text: "1 consulta experimental" },
+          pro: { type: "text", text: "Até 10 consultas por hora" },
+          templo: { type: "text", text: "Até 10 consultas por hora" },
         },
         {
           name: "Comentários por capítulo completo",
           gratuito: { type: "cross", text: "Não disponível" },
-          pro: { type: "check", text: "Sim (Ilimitados)" },
-          templo: { type: "check", text: "Sim (Ilimitados)" },
+          pro: { type: "check", text: "Sim" },
+          templo: { type: "check", text: "Sim" },
         },
         {
-          name: "Narrações de áudio realista",
+          name: "Narrações em áudio",
           gratuito: { type: "check", text: "Sim" },
           pro: { type: "check", text: "Sim" },
           templo: { type: "check", text: "Sim" },
@@ -143,13 +143,13 @@ export default function PricingComparison() {
       ],
     },
     {
-      name: "Exclusivo Templo",
+      name: "Recursos para Igrejas",
       features: [
         {
-          name: "Modo Igreja / Ferramentas de projeção",
+          name: "Ferramentas de projeção",
           gratuito: { type: "cross", text: "Não disponível" },
           pro: { type: "cross", text: "Não disponível" },
-          templo: { type: "text", text: "Sim (Aba de projeção externa)" },
+          templo: { type: "text", text: "Sim (Modo Projeção)" },
         },
         {
           name: "Visuais adaptados para alto contraste",
@@ -190,10 +190,10 @@ export default function PricingComparison() {
         <div className="absolute top-0 right-0 p-8 w-48 h-48 bg-gold/5 rounded-full blur-[80px] pointer-events-none -mr-24 -mt-24" />
         
         <h2 className="text-xl md:text-2xl font-serif text-app-text mb-4 text-center md:text-left leading-relaxed">
-          A leitura da Bíblia é sempre gratuita. O <span className="text-gold font-bold">PRO</span> apoia a missão e desbloqueia ferramentas avançadas de estudo pessoal.
+          A essência da Bíblia Vive está disponível gratuitamente para todos.
         </h2>
-        <p className="text-sm text-app-text-muted text-center md:text-left">
-          Sem barreiras para ler a Palavra. Compare os planos abaixo para ver como as ferramentas avançadas auxiliam seu crescimento e apoiam a propagação do evangelho.
+        <p className="text-sm text-app-text-muted text-center md:text-left leading-relaxed">
+          Os planos abaixo apresentam apenas recursos adicionais que auxiliam o aprofundamento dos estudos e sustentam o desenvolvimento contínuo da plataforma.
         </p>
 
         {/* Desktop View Table */}
@@ -209,7 +209,7 @@ export default function PricingComparison() {
             </TableHeader>
             <TableBody>
               {categories.map((cat) => (
-                <optgroup key={cat.name} label={cat.name} className="contents">
+                <React.Fragment key={cat.name}>
                   <TableRow className="bg-app-raised/10 hover:bg-app-raised/10 border-b border-border/40">
                     <TableCell colSpan={4} className="font-sans font-bold text-xs uppercase tracking-wider text-gold/80 py-3 pl-6">
                       {cat.name}
@@ -223,7 +223,7 @@ export default function PricingComparison() {
                       <TableCell className="text-center py-4">{renderStatus(feature.templo)}</TableCell>
                     </TableRow>
                   ))}
-                </optgroup>
+                </React.Fragment>
               ))}
             </TableBody>
           </Table>
@@ -283,43 +283,43 @@ export default function PricingComparison() {
             <HelpCircle className="h-5 w-5 text-gold" />
             Perguntas Frequentes
           </h3>
-          <p className="text-app-text-muted text-sm mt-1">Dúvidas comuns sobre os planos e recursos</p>
+          <p className="text-app-text-muted text-sm mt-1">Dúvidas sobre o apoio e os recursos de estudo</p>
         </div>
 
         <Accordion type="single" collapsible className="w-full space-y-2">
           <AccordionItem value="faq-1" className="border border-border/50 rounded-xl bg-app-surface px-4 py-1">
             <AccordionTrigger className="text-sm font-medium text-app-text hover:no-underline text-left">
-              Minhas anotações são mantidas se eu cancelar o PRO?
+              Minhas anotações são mantidas se eu interromper o apoio ao PRO?
             </AccordionTrigger>
             <AccordionContent className="text-xs text-app-text-muted leading-relaxed pt-1 pb-3">
-              Sim. Suas anotações são salvas na nuvem e continuam vinculadas à sua conta. Se você cancelar o PRO, elas continuarão disponíveis para visualização e edição, mas você perderá o acesso à exportação em PDF e outros recursos exclusivos do PRO.
+              Sim. Suas anotações continuam vinculadas à sua conta. A leitura bíblica e todas as suas anotações pessoais permanecem permanentemente acessíveis.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="faq-2" className="border border-border/50 rounded-xl bg-app-surface px-4 py-1">
             <AccordionTrigger className="text-sm font-medium text-app-text hover:no-underline text-left">
-              As exportações em PDF têm limite?
+              Como funciona a preservação em PDF?
             </AccordionTrigger>
             <AccordionContent className="text-xs text-app-text-muted leading-relaxed pt-1 pb-3">
-              Não. A geração e exportação das suas anotações e destaques em formato PDF elegante é totalmente ilimitada para assinantes PRO e Templo.
+              A preservação de suas anotações e reflexões pessoais em formato PDF estruturado está disponível sem limitações para apoiadores dos planos PRO e Templo.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="faq-3" className="border border-border/50 rounded-xl bg-app-surface px-4 py-1">
             <AccordionTrigger className="text-sm font-medium text-app-text hover:no-underline text-left">
-              O PRO financia a missão do Bíblia Vive?
+              O Plano PRO apoia a missão da Bíblia Vive?
             </AccordionTrigger>
             <AccordionContent className="text-xs text-app-text-muted leading-relaxed pt-1 pb-3">
-              Sim. O Bíblia Vive PRO é o que viabiliza financeiramente o projeto, permitindo cobrir os custos de servidores, APIs e banco de dados, mantendo o acesso à leitura bíblica totalmente gratuito para milhares de pessoas ao redor do mundo.
+              Sim. O apoio voluntário viabiliza a manutenção da plataforma, o desenvolvimento de novas ferramentas de estudo e a permanência do acesso gratuito às Escrituras para milhares de leitores.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="faq-4" className="border border-border/50 rounded-xl bg-app-surface px-4 py-1">
             <AccordionTrigger className="text-sm font-medium text-app-text hover:no-underline text-left">
-              Quais funcionalidades estão planejadas para o futuro?
+              Como novas ferramentas são desenvolvidas?
             </AccordionTrigger>
             <AccordionContent className="text-xs text-app-text-muted leading-relaxed pt-1 pb-3">
-              Nosso roadmap inclui inteligência artificial para resumos devocionais personalizados, planos de leitura em grupo com compartilhamento de progresso e mais opções de customização visual para o leitor. Assinantes PRO terão acesso imediato a todas as novidades.
+              Trabalhamos continuamente em recursos para auxiliar a permanência nas Escrituras, mantendo a leitura simples e o estudo aprofundado.
             </AccordionContent>
           </AccordionItem>
         </Accordion>

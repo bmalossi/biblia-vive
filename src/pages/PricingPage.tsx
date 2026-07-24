@@ -11,8 +11,8 @@ import PricingComparison from "@/components/PricingComparison";
 
 export default function PricingPage() {
     usePageMeta({
-        title: "Bíblia Vive PRO — Planos de Assinatura",
-        description: "Assine o Bíblia Vive PRO ou Templo e desbloqueie anotações ilimitadas, áudio-comentários com IA, exportações em PDF e muito mais.",
+        title: "Apoie a Missão — Bíblia Vive PRO",
+        description: "A leitura da Palavra é gratuita. Ao apoiar a Bíblia Vive, você sustenta a missão e disponibiliza ferramentas avançadas para aprofundamento dos estudos.",
         canonical: "/pro",
     });
 
@@ -43,17 +43,17 @@ export default function PricingPage() {
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-sm font-semibold uppercase tracking-widest text-gold mb-3">
-                        Bíblia Vive Pro
+                        Bíblia Vive PRO
                     </h2>
                     <h1 className="font-serif text-4xl sm:text-5xl text-app-text mb-6">
-                        Apoie o Projeto e <br className="hidden sm:block" />
-                        <span className="italic text-gold">Espalhe a Palavra</span>
+                        Apoie a missão <br className="hidden sm:block" />
+                        <span className="italic text-gold">da Bíblia Vive</span>
                     </h1>
-                    <p className="text-lg text-app-text-muted">
-                        Sua assinatura ajuda a sustentar o Bíblia Vive, avançar com novas missões e espalhar a Palavra de Deus. Como agradecimento, você desbloqueia comentários teológicos profundos e ferramentas avançadas de estudo.
+                    <p className="text-lg text-app-text-muted leading-relaxed">
+                        A leitura da Palavra permanecerá gratuita. Ao apoiar a Bíblia Vive, você ajuda essa missão a permanecer e ainda desbloqueia ferramentas para aprofundar seus estudos.
                     </p>
                 </div>
-      
+
                 {/* Pricing Cards - Moved to Top */}
                 <div className="max-w-5xl mx-auto grid lg:grid-cols-3 md:grid-cols-1 gap-6 items-start mb-8">
                     {/* Card Gratuito */}
@@ -61,7 +61,7 @@ export default function PricingPage() {
                         <div className="absolute top-0 right-0 p-8 w-64 h-64 bg-slate-500/5 rounded-full blur-[100px] pointer-events-none -mr-32 -mt-32" />
 
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-2xl font-serif text-app-text">Plano Gratuito</h3>
+                            <h3 className="text-2xl font-serif text-app-text">Acesso Gratuito</h3>
                             <div className="relative flex items-center gap-2 px-3 pt-1.5 pb-1 bg-gradient-to-r from-[#2c2c2e] to-[#1c1c1e] border border-[#3a3a3c] rounded-md shadow-md">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#8e8e93] animate-pulse"></div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#d1d1d6]">
@@ -75,13 +75,13 @@ export default function PricingPage() {
                         </div>
 
                         <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
-                            Acesse a leitura diária, busque passagens e salve seu progresso básico e anotações pessoais gratuitamente mediante cadastro.
+                            Leia a Bíblia gratuitamente, acompanhe sua leitura, registre suas reflexões e cultive uma rotina diária com as Escrituras.
                         </p>
 
                         <ul className="space-y-4 mb-8">
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
-                                <span>Acesso a todos os livros e versículos</span>
+                                <span>Acesso completo a todos os livros e versículos</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
@@ -89,7 +89,7 @@ export default function PricingPage() {
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text text-app-text-muted">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-500/50 flex-shrink-0" />
-                                <span>Salvar progresso e caderno (requer cadastro)</span>
+                                <span>Acompanhamento de leitura e caderno pessoal</span>
                             </li>
                         </ul>
 
@@ -116,7 +116,7 @@ export default function PricingPage() {
                             <div className="relative flex items-center gap-2 px-3 pt-1.5 pb-1 bg-gradient-to-r from-[#443818] to-[#2c240f] border border-[#685623] rounded-md shadow-md">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#e5c158] animate-pulse"></div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#fbf0cd]">
-                                    Mensal
+                                    Apoio
                                 </span>
                             </div>
                         </div>
@@ -127,21 +127,21 @@ export default function PricingPage() {
                         </div>
 
                         <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
-                            Acesse ferramentas cristãs para o seu aprofundamento pessoal e devoção. Este valor ajudará nos custos envolvidos na busca e filtragem de comentários teológicos de 99% dos versículos da bíblia.
+                            Para quem deseja aprofundar seus estudos e, ao mesmo tempo, sustentar o desenvolvimento contínuo da Bíblia Vive.
                         </p>
 
                         <ul className="space-y-4 mb-8">
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Acesso a até 10 Comentários Teológicos por hora</span>
+                                <span>Consultas a Comentários Teológicos históricos</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Acesso a narrações em áudio realista</span>
+                                <span>Narrações em áudio para acompanhar a leitura</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-gold flex-shrink-0" />
-                                <span>Selo Pro no perfil</span>
+                                <span>Apoio direto à continuidade da missão</span>
                             </li>
                         </ul>
 
@@ -159,7 +159,7 @@ export default function PricingPage() {
                                 disabled={isCheckingOut !== null}
                                 className={`w-full h-14 bg-gold hover:bg-gold2 text-white font-bold transition-all shadow-lg hover:shadow-gold/20 rounded-xl px-2 ${isCheckingOut === 'pro' ? 'text-xs sm:text-sm whitespace-normal leading-tight' : 'text-base'}`}
                             >
-                                {isCheckingOut === 'pro' ? "Redirecionando de forma segura..." : "Assinar Plano PRO"}
+                                {isCheckingOut === 'pro' ? "Redirecionando de forma segura..." : "Apoiar com Plano PRO"}
                             </Button>
                         )}
                     </div>
@@ -173,7 +173,7 @@ export default function PricingPage() {
                             <div className="relative flex items-center gap-2 px-3 pt-1.5 pb-1 bg-gradient-to-r from-[#242254] to-[#1a1845] border border-[#3b387e] rounded-md shadow-md">
                                 <div className="w-1.5 h-1.5 rounded-full bg-[#837dfa] animate-pulse"></div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e0deff]">
-                                    Para Igrejas
+                                    Igrejas
                                 </span>
                             </div>
                         </div>
@@ -184,25 +184,25 @@ export default function PricingPage() {
                         </div>
 
                         <p className="text-sm text-app-text-muted mb-8 pb-8 border-b border-border/50">
-                            Tudo do Plano PRO + Ferramentas avançadas para projeção em cultos e reuniões.
+                            Desenvolvido para igrejas que desejam utilizar a Bíblia Vive em cultos, estudos e encontros.
                         </p>
 
                         <ul className="space-y-4 mb-8">
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
-                                <span>Tudo o que está incluso no Plano PRO</span>
+                                <span>Recursos do Plano PRO inclusos</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
-                                <span>Recurso de Projeção em Telão Padrão Igreja</span>
+                                <span>Ferramentas de projeção para cultos e reuniões</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
-                                <span>Visuais adaptados para alto contraste</span>
+                                <span>Visuais adaptados para telas de alto contraste</span>
                             </li>
                             <li className="flex items-start gap-3 text-sm text-app-text">
                                 <CheckCircle2 className="h-5 w-5 text-violet-400 flex-shrink-0" />
-                                <span>Selo EXCLUSIVO "Templo" no perfil</span>
+                                <span>Apoio comunitário ao desenvolvimento da plataforma</span>
                             </li>
                         </ul>
 
@@ -220,7 +220,7 @@ export default function PricingPage() {
                                 disabled={isCheckingOut !== null}
                                 className={`w-full h-14 bg-violet-600 hover:bg-violet-700 text-white font-bold transition-all shadow-lg hover:shadow-violet-500/20 rounded-xl px-2 ${isCheckingOut === 'templo' ? 'text-xs sm:text-sm whitespace-normal leading-tight' : 'text-base'}`}
                             >
-                                {isCheckingOut === 'templo' ? "Redirecionando de forma segura..." : "Assinar Plano Templo"}
+                                {isCheckingOut === 'templo' ? "Redirecionando de forma segura..." : "Apoiar com Plano Templo"}
                             </Button>
                         )}
                     </div>
@@ -228,7 +228,7 @@ export default function PricingPage() {
 
                 <div className="text-center mt-6 mb-12">
                     <p className="text-xs text-app-text-muted">
-                        Cancelamento fácil e a qualquer momento.
+                        Cancelamento simples a qualquer momento.
                     </p>
                 </div>
 
@@ -238,8 +238,8 @@ export default function PricingPage() {
                 {/* Features List - Moved to Bottom */}
                 <div className="mt-20 max-w-5xl mx-auto border-t border-border/50 pt-16">
                     <div className="text-center mb-12">
-                        <h2 className="font-serif text-3xl text-app-text">Recursos Inclusos</h2>
-                        <p className="text-app-text-muted mt-2">Visão detalhada de tudo o que sua assinatura oferece</p>
+                        <h2 className="font-serif text-3xl text-app-text">Recursos de Aprofundamento</h2>
+                        <p className="text-app-text-muted mt-2">Ferramentas criadas para favorecer o estudo e a permanência nas Escrituras</p>
                     </div>
                     <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
                         <div className="flex gap-4">
@@ -247,9 +247,9 @@ export default function PricingPage() {
                                 <AudioLines className="h-5 w-5 text-gold" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Áudio com Voz - Narração de Versículos</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Narrações em Áudio</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Ouça os capítulos narrados com precisão e emoção cristalina. Sem vozes robóticas, apenas uma narração profunda e natural.
+                                    Continue sua leitura mesmo quando não puder acompanhar o texto visualmente, ouvindo os capítulos com clareza.
                                 </p>
                             </div>
                         </div>
@@ -261,7 +261,7 @@ export default function PricingPage() {
                             <div>
                                 <h3 className="text-xl font-medium text-app-text mb-2">Comentários Teológicos</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Tenha acesso a até 10 comentários explicativos por hora, de comentaristas teológicos renomados e históricos (Spurgeon, Adam Clark, etc) para se aprofundar na Palavra.
+                                    Consulte interpretações históricas e comentários cristãos reconhecidos para compreender melhor o contexto das Escrituras durante seus estudos.
                                 </p>
                             </div>
                         </div>
@@ -271,9 +271,9 @@ export default function PricingPage() {
                                 <BookOpenCheck className="h-5 w-5 text-teal-400" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Planos de Leitura Avançados</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Planos de Leitura</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Acesse o catálogo completo de metodologias de leitura e crie cronogramas customizados moldados à sua rotina pessoal de devoção.
+                                    Organize uma rotina consistente de permanência na Palavra conforme sua realidade pessoal.
                                 </p>
                             </div>
                         </div>
@@ -283,9 +283,9 @@ export default function PricingPage() {
                                 <Download className="h-5 w-5 text-blue-400" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-medium text-app-text mb-2">Exportações em PDF</h3>
+                                <h3 className="text-xl font-medium text-app-text mb-2">Preservação em PDF</h3>
                                 <p className="text-app-text-muted text-sm leading-relaxed">
-                                    Exporte lindas brochuras em PDF com absolutamente todas as suas marcações, notas de rodapé e reflexões encadernadas digitalmente.
+                                    Preserve suas anotações, reflexões e estudos para consulta futura e registro pessoal.
                                 </p>
                             </div>
                         </div>
