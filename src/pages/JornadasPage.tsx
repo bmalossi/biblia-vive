@@ -12,9 +12,9 @@ import { Loader2, Sparkles, X, ArrowRight, BookOpen } from "lucide-react";
 
 export default function JornadasPage() {
   usePageMeta({
-    title: "Jornadas Narrativas — Bíblia Vive",
+    title: "Sua caminhada — Bíblia Vive",
     description:
-      "Explore a biblioteca de capítulos da Jornada Narrativa de Permanência. Leituras contemplativas organizadas por séries.",
+      "Explore a biblioteca de capítulos da sua caminhada de Permanência. Leituras contemplativas organizadas por séries.",
     canonical: "/jornadas",
   });
 
@@ -33,10 +33,10 @@ export default function JornadasPage() {
             Filosofia da Permanência
           </p>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-app-text mb-4">
-            Jornadas Narrativas
+            Sua caminhada
           </h1>
           <p className="mx-auto max-w-xl text-sm md:text-base text-app-text-muted leading-relaxed">
-            Caminhadas narrativas contínuas para preparar seu coração e conduzi-lo à leitura das Escrituras.
+            Caminhadas contínuas para preparar seu coração e conduzi-lo à leitura das Escrituras.
           </p>
         </div>
 

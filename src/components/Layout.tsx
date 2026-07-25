@@ -37,7 +37,7 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
             <div>
               <h3 className="text-gold font-serif text-xl mb-3">Bíblia Vive</h3>
               <p className="text-app-text-muted text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
-                A palavra de Deus em formato digital, focada em precisão, profundo estudo e acessibilidade tecnológica.
+                Cultivando a permanência diária nas Escrituras por meio de uma experiência de leitura, estudo e reflexão centrada na Palavra.
               </p>
             </div>
             <div>
