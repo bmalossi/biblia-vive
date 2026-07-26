@@ -1,3 +1,45 @@
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBYVEQZXP2X03L6tdNFaJSRIt5Ht-9lK24",
+  authDomain: "biblia-vive-web.firebaseapp.com",
+  projectId: "biblia-vive-web",
+  storageBucket: "biblia-vive-web.firebasestorage.app",
+  messagingSenderId: "764864746880",
+  appId: "1:764864746880:web:3b77dd4a51be649e2f5d65",
+});
+
+const fcmMessaging = firebase.messaging();
+
+fcmMessaging.onBackgroundMessage((payload) => {
+  const { title, body, icon } = payload.notification || {};
+  const data = payload.data || {};
+  self.registration.showNotification(title || "Bíblia Vive", {
+    body: body || "Novo conteúdo disponível.",
+    icon: icon || "/icons/icon-192.png",
+    data: { ...data, url: data?.url || payload.fcmOptions?.link || "" },
+  });
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url;
+  if (!url) return;
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url === url && "focus" in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
+});
+
 const STATIC_CACHE = "bv-static-v1";
 const BIBLE_CACHE = "bv-bible-v1";
 const PAGES_CACHE = "bv-pages-v1";
