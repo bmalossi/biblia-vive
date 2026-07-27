@@ -55,18 +55,30 @@ export default function AdminPage() {
             if (!session?.access_token) return;
 
             const response = await fetch("/api/notifications/stats", {
-                headers: { Authorization: `Bearer ${session.access_token}` },
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({}),
             });
 
             if (!response.ok) {
-                throw new Error("Não foi possível carregar métricas de notificações");
+                const body = await response.json().catch(() => ({}));
+                throw new Error(
+                    typeof body?.error === "string"
+                        ? body.error
+                        : "Não foi possível carregar métricas de notificações"
+                );
             }
 
             setNotificationStats(await response.json());
             setNotificationStatsError(null);
         } catch (err) {
             console.error("[AdminPage] fetchNotificationStats failed:", err);
-            setNotificationStatsError("Métricas indisponíveis");
+            setNotificationStatsError(
+                err instanceof Error ? err.message : "Métricas indisponíveis"
+            );
         } finally {
             setLoadingStats(false);
         }
