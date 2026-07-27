@@ -24,6 +24,12 @@
         "api/notifications/notify-publish.ts": {
             "maxDuration": 30
         },
+        "api/notifications/subscribe.ts": {
+            "maxDuration": 10
+        },
+        "api/notifications/unsubscribe.ts": {
+            "maxDuration": 10
+        },
         "api/notifications/stats.ts": {
             "maxDuration": 10
         }

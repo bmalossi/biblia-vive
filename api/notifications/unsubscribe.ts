@@ -1,10 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
-export default async function handler(req: Request) {
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
-  }
+const JSON_HEADERS = { "Content-Type": "application/json" };
 
+export async function POST(request: Request) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -12,19 +10,18 @@ export default async function handler(req: Request) {
     if (!supabaseUrl || !supabaseServiceKey) {
       return new Response(
         JSON.stringify({ error: "Server configuration error" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        { status: 500, headers: JSON_HEADERS }
       );
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const body = await req.json();
+    const body = await request.json();
     const { token } = body;
 
     if (!token || typeof token !== "string") {
       return new Response(
         JSON.stringify({ error: "Token is required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        { status: 400, headers: JSON_HEADERS }
       );
     }
 
@@ -37,19 +34,19 @@ export default async function handler(req: Request) {
       console.error("Unsubscribe error:", error);
       return new Response(
         JSON.stringify({ error: "Failed to remove token" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        { status: 500, headers: JSON_HEADERS }
       );
     }
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-  } catch (err: any) {
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: JSON_HEADERS,
+    });
+  } catch (err: unknown) {
     console.error("Unsubscribe handler error:", err);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: JSON_HEADERS,
+    });
   }
 }

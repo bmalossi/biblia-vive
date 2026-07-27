@@ -45,13 +45,9 @@ async function sumInvalidRemovals(since: string | null): Promise<number | null> 
   return (data ?? []).reduce((sum, row) => sum + (row.count ?? 0), 0);
 }
 
-export default async function handler(req: Request) {
-  if (req.method !== "GET") {
-    return new Response("Method Not Allowed", { status: 405 });
-  }
-
+export async function GET(request: Request) {
   try {
-    const authResult = await requireAdmin(req);
+    const authResult = await requireAdmin(request);
     if (authResult instanceof Response) return authResult;
 
     const [total, addedLast7Days, addedLast30Days, removedTotal, removedLast7Days, removedLast30Days] =

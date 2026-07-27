@@ -119,11 +119,15 @@ export default function NotificationSoftAsk() {
 
       const token = await getPushNotificationToken();
 
-      await fetch("/api/notifications/subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
+      const response = await fetch("/api/notifications/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
       });
+
+      if (!response.ok) {
+        throw new Error("Falha ao salvar inscrição");
+      }
 
       setFeedbackSuccess(true);
       sessionDismissed = true;
