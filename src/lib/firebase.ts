@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, isSupported } from "firebase/messaging";
+import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -36,5 +36,81 @@ export async function isMessagingSupported(): Promise<boolean> {
     return supported;
   } catch {
     return false;
+  }
+}
+
+const FCM_INDEXED_DB_NAMES = [
+  "firebase-messaging-database",
+  "firebase-installations-database",
+];
+
+export async function clearFirebaseMessagingIndexedDb(): Promise<void> {
+  if (typeof indexedDB === "undefined") return;
+
+  await Promise.all(
+    FCM_INDEXED_DB_NAMES.map(
+      (name) =>
+        new Promise<void>((resolve) => {
+          const request = indexedDB.deleteDatabase(name);
+          request.onsuccess = () => resolve();
+          request.onerror = () => resolve();
+          request.onblocked = () => resolve();
+        })
+    )
+  );
+}
+
+export async function getMessagingServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | null> {
+  if (!("serviceWorker" in navigator)) return null;
+
+  try {
+    const registration = await navigator.serviceWorker.register("/sw.js");
+    await registration.update().catch(() => undefined);
+    await navigator.serviceWorker.ready;
+    return registration;
+  } catch {
+    try {
+      return (await navigator.serviceWorker.getRegistration("/")) ?? null;
+    } catch {
+      return null;
+    }
+  }
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(message)), ms);
+    }),
+  ]);
+}
+
+export async function getPushNotificationToken(): Promise<string> {
+  const messaging = getFirebaseMessaging();
+  const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+
+  const fetchToken = async () => {
+    const registration = await getMessagingServiceWorkerRegistration();
+    return withTimeout(
+      getToken(messaging, {
+        vapidKey,
+        serviceWorkerRegistration: registration ?? undefined,
+      }),
+      15000,
+      "Tempo esgotado ao registrar notificações"
+    );
+  };
+
+  try {
+    const token = await fetchToken();
+    if (!token) throw new Error("Token FCM vazio");
+    return token;
+  } catch (firstError) {
+    // Recuperação: IndexedDB corrompido/desatualizado após upgrade do SDK (v10 → v12 no SW).
+    await clearFirebaseMessagingIndexedDb();
+    const token = await fetchToken();
+    if (!token) throw firstError;
+    return token;
   }
 }

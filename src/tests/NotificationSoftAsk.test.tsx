@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import NotificationSoftAsk, { resetNotificationSoftAskSession } from "@/components/NotificationSoftAsk";
-import { isMessagingSupported } from "@/lib/firebase";
+import { isMessagingSupported, getPushNotificationToken } from "@/lib/firebase";
 
 vi.mock("framer-motion", () => ({
   motion: {
@@ -21,11 +21,7 @@ vi.mock("framer-motion", () => ({
 
 vi.mock("@/lib/firebase", () => ({
   isMessagingSupported: vi.fn(),
-  getFirebaseMessaging: vi.fn(() => ({})),
-}));
-
-vi.mock("firebase/messaging", () => ({
-  getToken: vi.fn().mockResolvedValue("test-fcm-token"),
+  getPushNotificationToken: vi.fn().mockResolvedValue("test-fcm-token"),
 }));
 
 const requestPermissionMock = vi.fn();
@@ -169,6 +165,7 @@ describe("NotificationSoftAsk", () => {
     });
 
     expect(requestPermissionMock).toHaveBeenCalledOnce();
+    expect(getPushNotificationToken).toHaveBeenCalledOnce();
   });
 
   it("dispara exibição ao rolar ~80% da página", async () => {

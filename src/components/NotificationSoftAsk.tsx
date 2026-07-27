@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Bell, X, Check, Loader2 } from "lucide-react";
-import { getToken } from "firebase/messaging";
-import { getFirebaseMessaging, isMessagingSupported } from "@/lib/firebase";
+import { getPushNotificationToken, isMessagingSupported } from "@/lib/firebase";
 
 // Armazena em memória se o usuário dispensou a solicitação nesta sessão.
 // Não utiliza localStorage conforme requisitos.
@@ -118,29 +117,13 @@ export default function NotificationSoftAsk() {
         return;
       }
 
-      const registration = await (async () => {
-        try {
-          const reg = await navigator.serviceWorker.getRegistration("/");
-          if (reg) return reg;
-          return await navigator.serviceWorker.ready;
-        } catch {
-          return null;
-        }
-      })();
+      const token = await getPushNotificationToken();
 
-      const messaging = getFirebaseMessaging();
-      const token = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-        serviceWorkerRegistration: registration || undefined,
-      });
-
-      if (token) {
-        await fetch("/api/notifications/subscribe", {
+      await fetch("/api/notifications/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
-        });
-      }
+      });
 
       setFeedbackSuccess(true);
       sessionDismissed = true;
