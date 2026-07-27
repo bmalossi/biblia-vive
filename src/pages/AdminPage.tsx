@@ -5,13 +5,19 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
 import AdminNav from "@/components/AdminNav";
 import { Loader2, Sparkles, LogIn, XCircle, Bell, BarChart3 } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { getSession } from "@/lib/auth";
+
+function daysAgoIso(days: number): string {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString();
+}
 
 interface NotificationStats {
     total: number;
@@ -51,34 +57,64 @@ export default function AdminPage() {
     async function fetchNotificationStats() {
         setLoadingStats(true);
         try {
-            const session = await getSession();
-            if (!session?.access_token) return;
+            const [totalRes, last7Res, last30Res, removalsRes] = await Promise.all([
+                supabase.from("push_tokens").select("token", { count: "exact", head: true }),
+                supabase
+                    .from("push_tokens")
+                    .select("token", { count: "exact", head: true })
+                    .gte("created_at", daysAgoIso(7)),
+                supabase
+                    .from("push_tokens")
+                    .select("token", { count: "exact", head: true })
+                    .gte("created_at", daysAgoIso(30)),
+                supabase
+                    .from("push_token_removals")
+                    .select("count, removed_at")
+                    .eq("reason", "invalid_token"),
+            ]);
 
-            const response = await fetch("/api/notifications/stats", {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${session.access_token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({}),
-            });
+            if (totalRes.error) throw totalRes.error;
 
-            if (!response.ok) {
-                const body = await response.json().catch(() => ({}));
-                throw new Error(
-                    typeof body?.error === "string"
-                        ? body.error
-                        : "Não foi possível carregar métricas de notificações"
-                );
+            const sevenDaysAgo = daysAgoIso(7);
+            const thirtyDaysAgo = daysAgoIso(30);
+
+            let removedTotal: number | null = null;
+            let removedLast7Days: number | null = null;
+            let removedLast30Days: number | null = null;
+
+            if (!removalsRes.error && removalsRes.data) {
+                removedTotal = 0;
+                removedLast7Days = 0;
+                removedLast30Days = 0;
+                for (const row of removalsRes.data) {
+                    const count = row.count ?? 0;
+                    removedTotal += count;
+                    if (row.removed_at >= sevenDaysAgo) removedLast7Days += count;
+                    if (row.removed_at >= thirtyDaysAgo) removedLast30Days += count;
+                }
             }
 
-            setNotificationStats(await response.json());
+            setNotificationStats({
+                total: totalRes.count ?? 0,
+                addedLast7Days: last7Res.error ? 0 : (last7Res.count ?? 0),
+                addedLast30Days: last30Res.error ? 0 : (last30Res.count ?? 0),
+                removedByInvalidation: {
+                    total: removedTotal,
+                    last7Days: removedLast7Days,
+                    last30Days: removedLast30Days,
+                    tracked: removedTotal !== null,
+                },
+            });
             setNotificationStatsError(null);
         } catch (err) {
             console.error("[AdminPage] fetchNotificationStats failed:", err);
-            setNotificationStatsError(
-                err instanceof Error ? err.message : "Métricas indisponíveis"
-            );
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : typeof err === "object" && err !== null && "message" in err
+                      ? String((err as { message: unknown }).message)
+                      : "Métricas indisponíveis";
+            setNotificationStatsError(message);
         } finally {
             setLoadingStats(false);
         }

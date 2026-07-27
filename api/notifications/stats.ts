@@ -1,6 +1,10 @@
-import { requireAdmin, getServiceSupabase } from "./_admin";
+import { createClient, type User } from "@supabase/supabase-js";
 
-const JSON_HEADERS = { "Content-Type": "application/json" };
+function getSupabaseConfig() {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return { supabaseUrl, supabaseServiceKey };
+}
 
 function daysAgo(days: number): string {
   const date = new Date();
@@ -8,86 +12,125 @@ function daysAgo(days: number): string {
   return date.toISOString();
 }
 
-async function countTokensSince(since: string | null): Promise<number> {
-  const supabase = getServiceSupabase();
-  let query = supabase.from("push_tokens").select("token", { count: "exact", head: true });
-
-  if (since) {
-    query = query.gte("created_at", since);
+async function readJsonBody(req: { body?: unknown }): Promise<Record<string, unknown>> {
+  if (req.body && typeof req.body === "object") {
+    return req.body as Record<string, unknown>;
   }
-
-  const { count, error } = await query;
-  if (error) throw error;
-  return count ?? 0;
+  return {};
 }
 
-async function safeCountTokensSince(since: string | null): Promise<number> {
-  try {
-    return await countTokensSince(since);
-  } catch (err) {
-    console.warn("countTokensSince fallback:", since, err);
-    return 0;
+function getAuthToken(req: { headers?: Record<string, string | string[] | undefined>; body?: unknown }): string | null {
+  const header = req.headers?.authorization ?? req.headers?.Authorization;
+  if (typeof header === "string" && header.startsWith("Bearer ")) {
+    return header.replace("Bearer ", "");
   }
+  if (Array.isArray(header) && header[0]?.startsWith("Bearer ")) {
+    return header[0].replace("Bearer ", "");
+  }
+  return null;
 }
 
-async function sumInvalidRemovals(since: string | null): Promise<number | null> {
-  try {
-    const supabase = getServiceSupabase();
-    let query = supabase
-      .from("push_token_removals")
-      .select("count")
-      .eq("reason", "invalid_token");
+async function requireAdmin(req: { headers?: Record<string, string | string[] | undefined>; body?: unknown }) {
+  const { supabaseUrl, supabaseServiceKey } = getSupabaseConfig();
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return { status: 500 as const, body: { error: "Server configuration error" } };
+  }
 
-    if (since) {
-      query = query.gte("removed_at", since);
+  const token = getAuthToken(req);
+  if (!token) {
+    return { status: 401 as const, body: { error: "Unauthorized" } };
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { persistSession: false },
+  });
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser(token);
+
+  if (error || !user) {
+    return { status: 403 as const, body: { error: "Forbidden" } };
+  }
+
+  const appMeta = user.app_metadata as Record<string, unknown> | undefined;
+  const userMeta = user.user_metadata as Record<string, unknown> | undefined;
+  const isAdmin = appMeta?.role === "admin" || userMeta?.role === "admin";
+
+  if (!isAdmin) {
+    return { status: 403 as const, body: { error: "Forbidden" } };
+  }
+
+  return { status: 200 as const, user: user as User, supabase };
+}
+
+async function buildStats(supabase: ReturnType<typeof createClient>) {
+  const sevenDaysAgo = daysAgo(7);
+  const thirtyDaysAgo = daysAgo(30);
+
+  const [totalRes, last7Res, last30Res, removalsRes] = await Promise.all([
+    supabase.from("push_tokens").select("token", { count: "exact", head: true }),
+    supabase
+      .from("push_tokens")
+      .select("token", { count: "exact", head: true })
+      .gte("created_at", sevenDaysAgo),
+    supabase
+      .from("push_tokens")
+      .select("token", { count: "exact", head: true })
+      .gte("created_at", thirtyDaysAgo),
+    supabase.from("push_token_removals").select("count, removed_at").eq("reason", "invalid_token"),
+  ]);
+
+  if (totalRes.error) throw totalRes.error;
+
+  let removedTotal: number | null = null;
+  let removedLast7Days: number | null = null;
+  let removedLast30Days: number | null = null;
+
+  if (!removalsRes.error && removalsRes.data) {
+    removedTotal = 0;
+    removedLast7Days = 0;
+    removedLast30Days = 0;
+    for (const row of removalsRes.data) {
+      const count = row.count ?? 0;
+      removedTotal += count;
+      if (row.removed_at >= sevenDaysAgo) removedLast7Days += count;
+      if (row.removed_at >= thirtyDaysAgo) removedLast30Days += count;
+    }
+  }
+
+  return {
+    total: totalRes.count ?? 0,
+    addedLast7Days: last7Res.error ? 0 : (last7Res.count ?? 0),
+    addedLast30Days: last30Res.error ? 0 : (last30Res.count ?? 0),
+    addedAllTime: totalRes.count ?? 0,
+    removedByInvalidation: {
+      total: removedTotal,
+      last7Days: removedLast7Days,
+      last30Days: removedLast30Days,
+      tracked: removedTotal !== null,
+    },
+  };
+}
+
+/**
+ * Handler Node.js (req, res) — padrão estável no runtime Vercel deste projeto.
+ */
+export default async function handler(req: { method?: string; headers?: Record<string, string | string[] | undefined>; body?: unknown }, res: { status: (code: number) => { json: (body: unknown) => void } }) {
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  try {
+    await readJsonBody(req);
+    const auth = await requireAdmin(req);
+    if (auth.status !== 200) {
+      return res.status(auth.status).json(auth.body);
     }
 
-    const { data, error } = await query;
-    if (error) {
-      console.warn("sumInvalidRemovals unavailable:", error.code, error.message);
-      return null;
-    }
-
-    return (data ?? []).reduce((sum, row) => sum + (row.count ?? 0), 0);
-  } catch (err) {
-    console.warn("sumInvalidRemovals error:", err);
-    return null;
-  }
-}
-
-async function handleStats(request: Request): Promise<Response> {
-  try {
-    const authResult = await requireAdmin(request);
-    if (authResult instanceof Response) return authResult;
-
-    const total = await countTokensSince(null);
-    const [addedLast7Days, addedLast30Days, removedTotal, removedLast7Days, removedLast30Days] =
-      await Promise.all([
-        safeCountTokensSince(daysAgo(7)),
-        safeCountTokensSince(daysAgo(30)),
-        sumInvalidRemovals(null),
-        sumInvalidRemovals(daysAgo(7)),
-        sumInvalidRemovals(daysAgo(30)),
-      ]);
-
-    const removalsTracked =
-      removedTotal !== null || removedLast7Days !== null || removedLast30Days !== null;
-
-    return new Response(
-      JSON.stringify({
-        total,
-        addedLast7Days,
-        addedLast30Days,
-        addedAllTime: total,
-        removedByInvalidation: {
-          total: removedTotal,
-          last7Days: removedLast7Days,
-          last30Days: removedLast30Days,
-          tracked: removalsTracked,
-        },
-      }),
-      { status: 200, headers: JSON_HEADERS }
-    );
+    const stats = await buildStats(auth.supabase);
+    return res.status(200).json(stats);
   } catch (err: unknown) {
     console.error("Notification stats error:", err);
     const message =
@@ -96,17 +139,6 @@ async function handleStats(request: Request): Promise<Response> {
         : typeof err === "object" && err !== null && "message" in err
           ? String((err as { message: unknown }).message)
           : "Internal server error";
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: JSON_HEADERS,
-    });
+    return res.status(500).json({ error: message });
   }
-}
-
-export async function GET(request: Request) {
-  return handleStats(request);
-}
-
-export async function POST(request: Request) {
-  return handleStats(request);
 }
