@@ -46,6 +46,16 @@ export async function removeInvalidTokens(invalidTokens: string[]): Promise<void
 
   if (error) {
     console.error("Failed to remove invalid tokens:", error);
+    return;
+  }
+
+  const { error: auditError } = await supabase.from("push_token_removals").insert({
+    count: invalidTokens.length,
+    reason: "invalid_token",
+  });
+
+  if (auditError) {
+    console.error("Failed to log token removals:", auditError);
   }
 }
 

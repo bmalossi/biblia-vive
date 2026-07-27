@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NavLink } from "react-router-dom";
-import { Home, FileText, BookOpen, Users, User, Sparkles } from "lucide-react";
+import { BarChart3, FileText, BookOpen, Users, User, Sparkles } from "lucide-react";
 
 export default function AdminNav() {
     const linkCls = ({ isActive }: { isActive: boolean }) =>
@@ -16,8 +16,8 @@ export default function AdminNav() {
     return (
         <nav className="flex flex-wrap gap-2 border-b border-border pb-4">
             <NavLink to="/admin" end className={linkCls}>
-                <Home className="h-4 w-4" />
-                Versículos (Legado)
+                <BarChart3 className="h-4 w-4" />
+                Métricas
             </NavLink>
             <NavLink to="/admin/capitulos" className={linkCls}>
                 <Sparkles className="h-4 w-4" />

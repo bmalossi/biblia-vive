@@ -2,7 +2,6 @@ import LanguageSelector from "@/components/LanguageSelector";
 import ThemeToggle from "@/components/ThemeToggle";
 import VersionSelector from "@/components/VersionSelector";
 import AuthModal from "@/components/AuthModal";
-import NotificationBell from "@/components/NotificationBell";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Input } from "@/components/ui/input";
@@ -527,9 +526,6 @@ export default function Header() {
         </Link>
 
         <div className="flex flex-shrink-0 items-center gap-2">
-
-          {/* Notification Bell */}
-          <NotificationBell />
 
           {/* PRO badge or CTA — visible from md: */}
           {!proLoading && (

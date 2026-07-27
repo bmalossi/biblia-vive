@@ -23,6 +23,9 @@
         },
         "api/notifications/notify-publish.ts": {
             "maxDuration": 30
+        },
+        "api/notifications/stats.ts": {
+            "maxDuration": 10
         }
     },
     "headers": [
