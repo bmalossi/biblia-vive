@@ -113,30 +113,35 @@ export default function MemorialEntryModal({
         icon: typeof BookOpen;
         colorClasses: string;
         badgeClasses: string;
+        labelColor: string;
     }> = {
         reflection: {
             label: "Reflexão",
             icon: BookOpen,
-            colorClasses: "border-gold/50 text-gold",
-            badgeClasses: "bg-gold/15 text-gold border-gold/40",
+            colorClasses: "border-amber-500/50 text-amber-900 dark:text-gold",
+            badgeClasses: "bg-amber-100 text-amber-900 border-amber-300 dark:bg-gold/15 dark:text-gold dark:border-gold/40 font-semibold",
+            labelColor: "text-amber-900 dark:text-gold",
         },
         prayer: {
             label: "Oração",
             icon: Heart,
-            colorClasses: "border-blue-500/50 text-blue-400",
-            badgeClasses: "bg-blue-500/15 text-blue-400 border-blue-500/40",
+            colorClasses: "border-blue-500/50 text-blue-900 dark:text-blue-400",
+            badgeClasses: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/40 font-semibold",
+            labelColor: "text-blue-900 dark:text-blue-400",
         },
         testimony: {
             label: "Testemunho",
             icon: Sparkles,
-            colorClasses: "border-emerald-500/50 text-emerald-400",
-            badgeClasses: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40",
+            colorClasses: "border-emerald-500/50 text-emerald-900 dark:text-emerald-400",
+            badgeClasses: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/40 font-semibold",
+            labelColor: "text-emerald-900 dark:text-emerald-400",
         },
         fasting: {
             label: "Jejum / Propósito",
             icon: Mountain,
-            colorClasses: "border-slate-500/50 text-slate-300",
-            badgeClasses: "bg-slate-500/15 text-slate-300 border-slate-500/40",
+            colorClasses: "border-stone-400 text-stone-900 dark:text-slate-100 dark:border-slate-500/50",
+            badgeClasses: "bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 font-semibold",
+            labelColor: "text-stone-900 dark:text-slate-200",
         },
     };
 

@@ -4,7 +4,7 @@ import { useReadingPreferences } from "@/hooks/useReadingPreferences";
 import { useNotebookContext } from "@/contexts/NotebookContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
-import MemorialFAB from "@/components/MemorialFAB";
+import NotebookFloatingButton from "@/components/NotebookFloatingButton";
 import MemorialEntryModal from "@/components/MemorialEntryModal";
 import NotebookWorkspace from "@/components/NotebookWorkspace";
 import NotebookSheet from "@/components/NotebookSheet";
@@ -41,7 +41,7 @@ export default function GlobalNotebookContainer() {
     const { user } = useAuth();
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
-    // Estado do Modal de Registro do Memorial
+    // Estado do Modal de Registro do Memorial por Categoria
     const [entryModalOpen, setEntryModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<MemorialCategory>('reflection');
 
@@ -49,12 +49,20 @@ export default function GlobalNotebookContainer() {
     const isWidget = location.pathname.startsWith("/widget");
     const isChurchDisplay = location.pathname.startsWith("/church-display");
 
-    // O FAB deve ser exibido se tivermos um livro e capítulo ativos
+    // O botão flutuante deve ser exibido se tivermos um livro e capítulo ativos
     const showNotebook = !isWidget && !isChurchDisplay && bookId && chapter && version && bookName;
 
     if (!showNotebook) return null;
 
-    const handleSelectCategory = (cat: MemorialCategory) => {
+    const handleOpenNotebook = () => {
+        if (!user) {
+            setAuthModalOpen(true);
+            return;
+        }
+        setIsOpen(!isOpen);
+    };
+
+    const handleOpenCategoryModal = (cat: MemorialCategory) => {
         if (!user) {
             setAuthModalOpen(true);
             return;
@@ -63,18 +71,9 @@ export default function GlobalNotebookContainer() {
         setEntryModalOpen(true);
     };
 
-    const handleOpenMemorialList = () => {
-        if (!user) {
-            setAuthModalOpen(true);
-            return;
-        }
-        setIsOpen(!isOpen);
-    };
-
     const handleSaveMemorialEntry = async (entryData: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }) => {
         const store = createNoteStore(user?.id || null);
         await store.save(entryData);
-        // Atualizar lista se workspace estiver aberto
         await saveNotebook(entryData.content);
     };
 
@@ -88,11 +87,11 @@ export default function GlobalNotebookContainer() {
 
     return (
         <>
-            {/* FAB expansível do Meu Memorial */}
-            <MemorialFAB
-                entriesCount={notebooks.length}
-                onSelectCategory={handleSelectCategory}
-                onOpenMemorialList={handleOpenMemorialList}
+            {/* Botão flutuante tradicional que abre o caderno diretamente */}
+            <NotebookFloatingButton
+                notebooksCount={notebooks.length}
+                onClick={handleOpenNotebook}
+                isOpen={isOpen}
                 isFocusMode={preferences.focusMode}
             />
 
@@ -136,6 +135,7 @@ export default function GlobalNotebookContainer() {
                     setSelectedNotebook={setActiveNotebook}
                     isCreatingNew={isCreatingNew}
                     setIsCreatingNew={setIsCreatingNew}
+                    onOpenCategoryModal={handleOpenCategoryModal}
                 />
             )}
 
@@ -161,6 +161,7 @@ export default function GlobalNotebookContainer() {
                     setSelectedNotebook={setActiveNotebook}
                     isCreatingNew={isCreatingNew}
                     setIsCreatingNew={setIsCreatingNew}
+                    onOpenCategoryModal={handleOpenCategoryModal}
                 />
             )}
         </>

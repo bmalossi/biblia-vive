@@ -140,10 +140,10 @@ export default function MemorialPage() {
     };
 
     const categoryBadgeConfig: Record<MemorialCategory, { label: string; icon: typeof BookOpen; classes: string }> = {
-        reflection: { label: "Reflexão", icon: BookOpen, classes: "bg-gold/15 text-gold border-gold/40" },
-        prayer: { label: "Oração", icon: Heart, classes: "bg-blue-500/15 text-blue-400 border-blue-500/40" },
-        testimony: { label: "Testemunho", icon: Sparkles, classes: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40" },
-        fasting: { label: "Jejum", icon: Mountain, classes: "bg-slate-500/15 text-slate-300 border-slate-500/40" },
+        reflection: { label: "Reflexão", icon: BookOpen, classes: "bg-amber-100 text-amber-900 border-amber-300 dark:bg-gold/15 dark:text-gold dark:border-gold/40 font-semibold" },
+        prayer: { label: "Oração", icon: Heart, classes: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/40 font-semibold" },
+        testimony: { label: "Testemunho", icon: Sparkles, classes: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/40 font-semibold" },
+        fasting: { label: "Jejum / Propósito", icon: Mountain, classes: "bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 font-semibold" },
     };
 
     function formatDate(iso: string) {

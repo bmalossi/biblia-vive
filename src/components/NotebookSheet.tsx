@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
-import { BookText, Plus, Search, X, Download } from "lucide-react";
+import { BookText, Plus, Search, X, Download, BookOpen, Heart, Sparkles, Mountain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import NotebookEditor from "@/components/NotebookEditor";
@@ -23,6 +23,7 @@ import type { ChapterNotebook } from "@/lib/notebookStore";
 import type { SaveStatus } from "@/hooks/useNotebooks";
 import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
 import { ALL_BOOKS } from "@/lib/books";
+import type { MemorialCategory } from "@/lib/noteStore";
 
 const bookOrderMap = new Map(ALL_BOOKS.map((book, index) => [book.id.toLowerCase(), index]));
 
@@ -50,6 +51,7 @@ interface NotebookSheetProps {
     setSelectedNotebook: (nb: ChapterNotebook | null) => void;
     isCreatingNew: boolean;
     setIsCreatingNew: (val: boolean) => void;
+    onOpenCategoryModal?: (category: MemorialCategory) => void;
 }
 
 type TabId = "chapter" | "all";
@@ -124,6 +126,7 @@ export default function NotebookSheet({
     setSelectedNotebook,
     isCreatingNew,
     setIsCreatingNew,
+    onOpenCategoryModal,
 }: NotebookSheetProps) {
     const isEditing = isCreatingNew || selectedNotebook !== null;
     const sheetMode = isEditing ? "editor" : "list";
@@ -619,14 +622,66 @@ export default function NotebookSheet({
                                     )}
                                 </div>
 
-                                <div className="px-4 py-3 border-t border-border">
+                                <div className="px-4 py-3 border-t border-border space-y-2.5">
+                                    <div className="space-y-1.5">
+                                        <p className="text-[0.68rem] font-mono text-app-text-muted uppercase tracking-wider">
+                                            Registrar Memória da Caminhada:
+                                        </p>
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    onOpenChange(false);
+                                                    onOpenCategoryModal?.('reflection');
+                                                }}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-gold dark:border-gold/40 hover:opacity-90 active:scale-95"
+                                            >
+                                                <BookOpen className="h-3.5 w-3.5 shrink-0" />
+                                                <span>📖 Reflexão</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    onOpenChange(false);
+                                                    onOpenCategoryModal?.('prayer');
+                                                }}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40 hover:opacity-90 active:scale-95"
+                                            >
+                                                <Heart className="h-3.5 w-3.5 shrink-0" />
+                                                <span>🙏 Oração</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    onOpenChange(false);
+                                                    onOpenCategoryModal?.('testimony');
+                                                }}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40 hover:opacity-90 active:scale-95"
+                                            >
+                                                <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                                                <span>✨ Testemunho</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    onOpenChange(false);
+                                                    onOpenCategoryModal?.('fasting');
+                                                }}
+                                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 hover:opacity-90 active:scale-95"
+                                            >
+                                                <Mountain className="h-3.5 w-3.5 shrink-0" />
+                                                <span>⛰️ Jejum</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <Button
                                         type="button"
                                         onClick={handleCreateNew}
                                         className="w-full bg-gold text-black hover:bg-gold/90 font-medium gap-2"
                                     >
                                         <Plus className="h-4 w-4" />
-                                        Novo caderno
+                                        Novo caderno livre
                                     </Button>
                                 </div>
                             </div>
