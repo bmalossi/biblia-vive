@@ -524,34 +524,30 @@ export default function NotebookWorkspace({
                                     <button
                                         type="button"
                                         onClick={() => onOpenCategoryModal?.('reflection')}
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-gold dark:border-gold/40 hover:opacity-90"
+                                        className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-gold dark:border-gold/40 hover:opacity-90"
                                     >
-                                        <BookOpen className="h-3.5 w-3.5 shrink-0" />
-                                        <span>📖 Reflexão</span>
+                                        Reflexão
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => onOpenCategoryModal?.('prayer')}
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40 hover:opacity-90"
+                                        className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40 hover:opacity-90"
                                     >
-                                        <Heart className="h-3.5 w-3.5 shrink-0" />
-                                        <span>🙏 Oração</span>
+                                        Oração
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => onOpenCategoryModal?.('testimony')}
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40 hover:opacity-90"
+                                        className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40 hover:opacity-90"
                                     >
-                                        <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                                        <span>✨ Testemunho</span>
+                                        Testemunho
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => onOpenCategoryModal?.('fasting')}
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold transition-all bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 hover:opacity-90"
+                                        className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 hover:opacity-90"
                                     >
-                                        <Mountain className="h-3.5 w-3.5 shrink-0" />
-                                        <span>⛰️ Jejum</span>
+                                        Jejum / Propósito
                                     </button>
                                 </div>
                             </div>

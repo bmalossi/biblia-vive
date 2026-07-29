@@ -236,8 +236,7 @@ export default function MemorialEntryModal({
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-app-raised/40 shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[0.75rem] font-sans font-medium", currentConfig.badgeClasses)}>
-                            <Icon className="h-3.5 w-3.5" />
+                        <span className={cn("inline-flex items-center px-3 py-1 rounded-full border text-[0.75rem] font-sans font-semibold", currentConfig.badgeClasses)}>
                             {currentConfig.label}
                         </span>
                         <div className="flex flex-col">
@@ -262,7 +261,6 @@ export default function MemorialEntryModal({
                     <div className="flex rounded-xl bg-app-raised p-1 gap-1 border border-border/50">
                         {(['reflection', 'prayer', 'testimony', 'fasting'] as MemorialCategory[]).map(cat => {
                             const conf = categoryConfigs[cat];
-                            const CatIcon = conf.icon;
                             const isActive = selectedCategory === cat;
                             return (
                                 <button
@@ -270,14 +268,13 @@ export default function MemorialEntryModal({
                                     type="button"
                                     onClick={() => setSelectedCategory(cat)}
                                     className={cn(
-                                        "flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[0.72rem] font-medium transition-all",
+                                        "flex-1 flex items-center justify-center py-1.5 px-2 rounded-lg text-[0.72rem] font-semibold transition-all text-center",
                                         isActive
-                                            ? "bg-app-surface text-app-text shadow-sm border border-border/80"
+                                            ? "bg-app-surface text-app-text shadow-sm border border-border/80 font-bold"
                                             : "text-app-text-muted hover:text-app-text"
                                     )}
                                 >
-                                    <CatIcon className="h-3 w-3 shrink-0" />
-                                    <span className="hidden sm:inline">{conf.label.split(' ')[0]}</span>
+                                    <span>{conf.label.split(' ')[0]}</span>
                                 </button>
                             );
                         })}

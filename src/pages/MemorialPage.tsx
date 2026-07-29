@@ -345,8 +345,7 @@ export default function MemorialPage() {
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={cn("inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[0.7rem] font-medium", conf.classes)}>
-                                                <BadgeIcon className="h-3 w-3" />
+                                            <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.7rem] font-semibold", conf.classes)}>
                                                 {conf.label}
                                             </span>
                                             <Link
