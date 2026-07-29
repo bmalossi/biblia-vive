@@ -275,9 +275,9 @@ export default function HowToNotesTab() {
           <Button
             variant="outline"
             className="border-gold/30 text-gold hover:bg-gold/10 gap-2"
-            onClick={() => navigate("/minhas-notas")}
+            onClick={() => navigate("/memorial")}
           >
-            Ver Minhas Notas
+            Acessar Meu Memorial
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

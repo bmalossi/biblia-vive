@@ -38,9 +38,25 @@ _Evitar_: streak, sequência, dias consecutivos
 Cor aplicada por um Leitor a um versículo específico. Um versículo suporta no máximo um Destaque por Leitor.
 _Evitar_: marcação, sublinhado, coloração
 
-**Nota**:
-Texto livre escrito por um Leitor sobre um versículo específico. Uma Nota por versículo por Leitor. Independente do Destaque.
-_Evitar_: anotação, comentário, observação
+**Meu Memorial**:
+Espaço pessoal do Leitor (anteriormente denominado Caderno) onde são preservados os registros da sua caminhada espiritual com Deus ao longo do tempo. Acessível via rota `/memorial`.
+_Evitar_: caderno (na UI), bloco de notas, agenda, diário, notion
+
+**Registro do Memorial**:
+Unidade individual de memória espiritual vinculada a uma Referência (livro, capítulo e versículo opcional). Pertence a uma de 4 categorias: Reflexão, Oração, Testemunho ou Jejum/Propósito.
+_Evitar_: nota, anotação, post, card
+
+**Reflexão**:
+Categoria de Registro do Memorial focada no estudo e meditação da Palavra (modelo SOAP). Cor institucional: Dourado.
+
+**Oração**:
+Categoria de Registro do Memorial para registro de motivos, pedidos e entregas diante de Deus, podendo registrar posteriormente a Resposta. Cor institucional: Azul discreto.
+
+**Testemunho**:
+Categoria de Registro do Memorial para registro de fatos marcantes e como Deus sustentou o Leitor na caminhada. Cor institucional: Verde suave.
+
+**Jejum / Propósito**:
+Categoria de Registro do Memorial para acompanhamento de períodos dedicados de busca espiritual com data inicial, data prevista e status. Cor institucional: Cinza ardósia.
 
 ### Conteúdo Bíblico
 

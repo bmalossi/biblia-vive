@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ToastViewport } from "@/components/Toast";
@@ -18,6 +18,7 @@ const BookPage = lazy(() => import("./pages/BookPage"));
 const ReadingPage = lazy(() => import("./pages/ReadingPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+const MemorialPage = lazy(() => import("./pages/MemorialPage"));
 const MyNotesPage = lazy(() => import("./pages/MyNotesPage"));
 const ReadingPlansPage = lazy(() => import("./pages/ReadingPlansPage"));
 const SharePage = lazy(() => import("./pages/SharePage"));
@@ -85,7 +86,8 @@ const App = () => (
                   <Route path="/harpa/:hymnNumber" element={<HarpaReadingPage />} />
                   <Route path="/:version/:book" element={<BookPage />} />
                   <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
-                  <Route path="/minhas-notas" element={<MyNotesPage />} />
+                  <Route path="/memorial" element={<MemorialPage />} />
+                  <Route path="/minhas-notas" element={<Navigate to="/memorial" replace />} />
                   <Route path="/planos" element={<ReadingPlansPage />} />
                   <Route path="/jornadas" element={<JornadasPage />} />
                   <Route path="/compartilhar" element={<SharePage />} />

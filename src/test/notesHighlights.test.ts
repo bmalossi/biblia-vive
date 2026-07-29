@@ -7,6 +7,7 @@ import {
     removeHighlight,
     deleteNote,
     migrateLocalToSupabase,
+    createNoteStore,
 } from '../lib/notesHighlights';
 
 const mockChain = {
@@ -192,6 +193,68 @@ describe('Notes & Highlights Service (Dual-Mode)', () => {
             // 4. Verify localStorage was cleared for these keys
             expect(localStorage.getItem('bv_highlights')).toBeNull();
             expect(localStorage.getItem('bv_notes')).toBeNull();
+        });
+    });
+
+    describe('Memorial Entries (Sprint 26)', () => {
+        it('should save prayer entry and filter by category in local storage', async () => {
+            const store = createNoteStore(null);
+            await store.save({
+                type: 'prayer',
+                title: 'Oração pela família',
+                content: 'Senhor abençoe nossa casa',
+                bookId: 'PSA',
+                bookName: 'Salmos',
+                chapter: 23,
+                verse: null,
+                version: 'acf',
+                metadata: { motivo: 'Proteção', pedido: 'Paz' },
+            });
+
+            await store.save({
+                type: 'testimony',
+                title: 'Livramento na estrada',
+                content: 'Deus guardou nossa viagem',
+                bookId: 'PSA',
+                bookName: 'Salmos',
+                chapter: 23,
+                verse: 1,
+                version: 'acf',
+            });
+
+            const prayers = await store.getAll({ type: 'prayer' });
+            expect(prayers).toHaveLength(1);
+            expect(prayers[0].title).toBe('Oração pela família');
+            expect(prayers[0].metadata?.motivo).toBe('Proteção');
+
+            const testimonies = await store.getAll({ type: 'testimony' });
+            expect(testimonies).toHaveLength(1);
+            expect(testimonies[0].title).toBe('Livramento na estrada');
+        });
+
+        it('should toggle favorite and mark prayer as answered', async () => {
+            const store = createNoteStore(null);
+            await store.save({
+                type: 'prayer',
+                title: 'Oração por saúde',
+                content: 'Cura para o irmão João',
+                bookId: 'JHN',
+                bookName: 'João',
+                chapter: 11,
+                version: 'nvi',
+            });
+
+            const all = await store.getAll();
+            const id = all[0].id;
+
+            const isFav = await store.toggleFavorite!(id);
+            expect(isFav).toBe(true);
+
+            await store.markAnswered!(id, 'Ele foi curado no hospital!');
+            const updated = await store.getAll({ answeredOnly: true });
+            expect(updated).toHaveLength(1);
+            expect(updated[0].status).toBe('answered');
+            expect(updated[0].answeredNote).toBe('Ele foi curado no hospital!');
         });
     });
 });
