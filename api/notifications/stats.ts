@@ -1,4 +1,9 @@
-import { createClient, type User } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+
+type TokenRemovalRow = {
+  count: number | null;
+  removed_at: string;
+};
 
 function getSupabaseConfig() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -65,7 +70,7 @@ async function requireAdmin(req: { headers?: Record<string, string | string[] | 
   return { status: 200 as const, user: user as User, supabase };
 }
 
-async function buildStats(supabase: ReturnType<typeof createClient>) {
+async function buildStats(supabase: SupabaseClient) {
   const sevenDaysAgo = daysAgo(7);
   const thirtyDaysAgo = daysAgo(30);
 
@@ -92,7 +97,7 @@ async function buildStats(supabase: ReturnType<typeof createClient>) {
     removedTotal = 0;
     removedLast7Days = 0;
     removedLast30Days = 0;
-    for (const row of removalsRes.data) {
+    for (const row of removalsRes.data as TokenRemovalRow[]) {
       const count = row.count ?? 0;
       removedTotal += count;
       if (row.removed_at >= sevenDaysAgo) removedLast7Days += count;
