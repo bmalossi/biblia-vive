@@ -200,7 +200,7 @@ export default function AdminArtigosPage() {
 
             if (publish) {
                 try {
-                    await fetch("/api/notifications/notify-publish", {
+                    await fetch("/api/notifications/on-publish", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ title: form.title, slug: form.slug }),
