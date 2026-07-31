@@ -198,18 +198,6 @@ export default function AdminArtigosPage() {
         } else {
             setSuccessMsg(publish ? "Artigo publicado com sucesso!" : "Artigo salvo com sucesso!");
 
-            if (publish) {
-                try {
-                    await fetch("/api/notifications/on-publish", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ title: form.title, slug: form.slug }),
-                    });
-                } catch {
-                    // notification delivery is best-effort, don't block the user
-                }
-            }
-
             setView("list");
             setEditingId(null);
             setForm(EMPTY_FORM);

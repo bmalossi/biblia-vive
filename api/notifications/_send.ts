@@ -66,16 +66,21 @@ export async function sendPushNotification({
   title: string;
   body: string;
   link: string;
-}): Promise<{ sent: number; failed: number }> {
+}): Promise<{ sent: number; failed: number; successCount: number }> {
   const adminApp = getAdminApp();
   const messaging = getMessaging(adminApp);
   const tokens = await getPushTokens();
 
+  // [LOG 1] Quantidade de tokens encontrados na tabela push_tokens
+  console.log("[sendPushNotification] Tokens encontrados:", tokens.length);
+
   if (tokens.length === 0) {
-    return { sent: 0, failed: 0 };
+    console.log("[sendPushNotification] Nenhum token registrado — nenhuma notificação enviada.");
+    return { sent: 0, failed: 0, successCount: 0 };
   }
 
   const invalidTokens: string[] = [];
+  let totalSuccessCount = 0;
 
   for (let i = 0; i < tokens.length; i += 500) {
     const batch = tokens.slice(i, i + 500);
@@ -92,7 +97,39 @@ export async function sendPushNotification({
       tokens: batch,
     };
 
-    const response = await messaging.sendEachForMulticast(message);
+    // [LOG 2] Antes de chamar o Firebase
+    console.log(`[sendPushNotification] Enviando lote ${Math.floor(i / 500) + 1} — ${batch.length} tokens. title="${title}" link="${link}"`);
+
+    let response: Awaited<ReturnType<typeof messaging.sendEachForMulticast>>;
+    try {
+      response = await messaging.sendEachForMulticast(message);
+    } catch (firebaseErr: unknown) {
+      // [LOG 3] Erro ao chamar o Firebase
+      const errMsg = firebaseErr instanceof Error ? firebaseErr.message : String(firebaseErr);
+      const errStack = firebaseErr instanceof Error ? firebaseErr.stack : undefined;
+      console.error("[sendPushNotification] ERRO ao chamar sendEachForMulticast:", errMsg);
+      if (errStack) console.error("[sendPushNotification] Stack:", errStack);
+      throw firebaseErr; // propaga para o chamador poder logar e não marcar notification_sent_at
+    }
+
+    // [LOG 4] Resultado completo do Firebase após o envio
+    console.log(
+      `[sendPushNotification] Resultado lote ${Math.floor(i / 500) + 1}: successCount=${response.successCount} failureCount=${response.failureCount}`
+    );
+    console.log(
+      "[sendPushNotification] Respostas individuais:",
+      JSON.stringify(
+        response.responses.map((r, idx) => ({
+          idx,
+          success: r.success,
+          messageId: r.messageId,
+          errorCode: r.error?.code,
+          errorMessage: r.error?.message,
+        }))
+      )
+    );
+
+    totalSuccessCount += response.successCount;
 
     response.responses.forEach((resp, idx) => {
       if (!resp.success) {
@@ -111,11 +148,15 @@ export async function sendPushNotification({
     await removeInvalidTokens(invalidTokens);
   }
 
+  console.log(`[sendPushNotification] Resumo final: sent=${tokens.length - invalidTokens.length} failed=${invalidTokens.length} successCount=${totalSuccessCount}`);
+
   return {
     sent: tokens.length - invalidTokens.length,
     failed: invalidTokens.length,
+    successCount: totalSuccessCount,
   };
 }
+
 
 export async function sendArticleNotification(title: string, slug: string, appUrl: string): Promise<{ sent: number; failed: number }> {
   const articleUrl = `${appUrl}/artigos/${slug}`;

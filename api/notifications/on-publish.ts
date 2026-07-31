@@ -59,6 +59,8 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
   const payload: SupabaseWebhookPayload = await request.json();
   const { type, table, record, old_record } = payload;
 
+  console.log(`[on-publish] Webhook recebido: type=${type} table=${table} id=${record?.id ?? "?"} status=${record?.status ?? "?"} notification_sent_at=${record?.notification_sent_at ?? "null"}`);
+
   if (!record) {
     return new Response(
       JSON.stringify({ error: "Invalid payload: record is required" }),
@@ -130,8 +132,8 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
   // 5. Disparar notificação push via Firebase Cloud Messaging
   const result = await sendPushNotification({ title, body, link });
 
-  // 6. Atualizar notification_sent_at APÓS confirmação de envio no Firebase
-  if (record.id) {
+  // 6. Atualizar notification_sent_at APENAS se ao menos 1 entrega foi confirmada pelo Firebase
+  if (result.successCount > 0 && record.id) {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -143,10 +145,15 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
         .eq("id", record.id);
 
       if (updateError) {
-        console.warn(`Could not update notification_sent_at for ${table}:${record.id}:`, updateError.message);
+        console.warn(`[on-publish] Could not update notification_sent_at for ${table}:${record.id}:`, updateError.message);
+      } else {
+        console.log(`[on-publish] notification_sent_at marcado para ${table}:${record.id}`);
       }
     }
+  } else if (result.successCount === 0) {
+    console.warn(`[on-publish] successCount=0 — notification_sent_at NÃO atualizado para ${table}:${record.id}. Reprocessamento futuro permitido.`);
   }
+
 
   return new Response(
     JSON.stringify({
