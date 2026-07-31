@@ -19,6 +19,7 @@ const ReadingPage = lazy(() => import("./pages/ReadingPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const MemorialPage = lazy(() => import("./pages/MemorialPage"));
+const MemorialEntryPage = lazy(() => import("./pages/MemorialEntryPage"));
 const MyNotesPage = lazy(() => import("./pages/MyNotesPage"));
 const ReadingPlansPage = lazy(() => import("./pages/ReadingPlansPage"));
 const SharePage = lazy(() => import("./pages/SharePage"));
@@ -87,6 +88,7 @@ const App = () => (
                   <Route path="/:version/:book" element={<BookPage />} />
                   <Route path="/:version/:book/:chapter" element={<ReadingPage />} />
                   <Route path="/memorial" element={<MemorialPage />} />
+                  <Route path="/memorial/:id" element={<MemorialEntryPage />} />
                   <Route path="/minhas-notas" element={<Navigate to="/memorial" replace />} />
                   <Route path="/planos" element={<ReadingPlansPage />} />
                   <Route path="/jornadas" element={<JornadasPage />} />

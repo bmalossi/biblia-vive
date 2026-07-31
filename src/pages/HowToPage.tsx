@@ -1,16 +1,15 @@
 import { lazy, Suspense, useState } from "react";
-import { BookMarked, BookOpen, Loader2, Palette, PenLine, Quote, Share2, Notebook } from "lucide-react";
+import { BookMarked, BookOpen, Loader2, Palette, Quote, Scroll, Share2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const HowToStudyTab = lazy(() => import("./how-to/HowToStudyTab"));
-const HowToNotebookTab = lazy(() => import("./how-to/HowToNotebookTab"));
-const HowToNotesTab = lazy(() => import("./how-to/HowToNotesTab"));
+const HowToMemorialTab = lazy(() => import("./how-to/HowToMemorialTab"));
 const HowToHighlightsTab = lazy(() => import("./how-to/HowToHighlightsTab"));
 const HowToShareTab = lazy(() => import("./how-to/HowToShareTab"));
 const HowToPlansTab = lazy(() => import("./how-to/HowToPlansTab"));
 
-type TabId = "study" | "notebook" | "notes" | "highlights" | "share" | "plans";
+type TabId = "study" | "memorial" | "highlights" | "share" | "plans";
 
 interface TabDef {
   id: TabId;
@@ -29,17 +28,10 @@ const tabs: TabDef[] = [
     badge: "novo",
   },
   {
-    id: "notebook",
-    icon: <Notebook className="h-4 w-4" />,
-    label: "Caderno",
-    sublabel: "Estudo dos capítulos",
-    badge: "novo",
-  },
-  {
-    id: "notes",
-    icon: <PenLine className="h-4 w-4" />,
-    label: "Notas",
-    sublabel: "Anote versículos",
+    id: "memorial",
+    icon: <Scroll className="h-4 w-4" />,
+    label: "Memorial",
+    sublabel: "Sua caminhada com a Palavra",
   },
   {
     id: "highlights",
@@ -73,7 +65,7 @@ export default function HowToPage() {
   usePageMeta({
     title: "Como usar o Bíblia Vive — Guia de Estudo | Bíblia Vive",
     description:
-      "Aprenda a usar as ferramentas do Bíblia Vive: comentários teológicos históricos, notas em versículos, destaques coloridos, compartilhamento e planos de leitura.",
+      "Aprenda a usar as ferramentas do Bíblia Vive: comentários teológicos históricos, Memorial da caminhada com a Palavra, destaques coloridos, compartilhamento e planos de leitura.",
     canonical: "/como-usar",
     jsonLd: [
       {
@@ -219,8 +211,7 @@ export default function HowToPage() {
             aria-labelledby={`tab-${activeTab}`}
           >
             {activeTab === "study" && <HowToStudyTab />}
-            {activeTab === "notebook" && <HowToNotebookTab />}
-            {activeTab === "notes" && <HowToNotesTab />}
+            {activeTab === "memorial" && <HowToMemorialTab />}
             {activeTab === "highlights" && <HowToHighlightsTab />}
             {activeTab === "share" && <HowToShareTab />}
             {activeTab === "plans" && <HowToPlansTab />}

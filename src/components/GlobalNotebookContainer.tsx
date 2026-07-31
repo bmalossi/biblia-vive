@@ -74,7 +74,7 @@ export default function GlobalNotebookContainer() {
     const handleSaveMemorialEntry = async (entryData: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }) => {
         const store = createNoteStore(user?.id || null);
         await store.save(entryData);
-        await saveNotebook(entryData.content);
+        // NÃO chamar saveNotebook aqui — o Memorial usa user_notes, não chapter_notebooks
     };
 
     const handleNavigateToChapter = (bkId: string, ch: number, ver: string) => {

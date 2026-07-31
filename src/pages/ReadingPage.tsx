@@ -18,6 +18,7 @@ import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useNotesHighlights } from "@/hooks/useNotesHighlights";
+import { createNoteStore, type MemorialEntry } from "@/lib/noteStore";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Breadcrumb,
@@ -137,6 +138,82 @@ const writeCachedChapter = (version: string, bookId: string, chapter: number, da
     // ignore
   }
 };
+
+interface ChapterMemorialBlockProps {
+  bookId: string;
+  chapter: number;
+  userId: string | null;
+}
+
+function ChapterMemorialBlock({ bookId, chapter, userId }: ChapterMemorialBlockProps) {
+  const [entries, setEntries] = useState<MemorialEntry[]>([]);
+
+  useEffect(() => {
+    if (!userId || !bookId || !chapter) {
+      setEntries([]);
+      return;
+    }
+    const store = createNoteStore(userId);
+    store.getByChapter(bookId, chapter).then((data) => {
+      setEntries(data || []);
+    }).catch(() => {
+      setEntries([]);
+    });
+  }, [bookId, chapter, userId]);
+
+  if (!userId || entries.length === 0) return null;
+
+  const reflections = entries.filter((e) => e.type === 'reflection').length;
+  const prayers = entries.filter((e) => e.type === 'prayer').length;
+  const testimonies = entries.filter((e) => e.type === 'testimony').length;
+  const fastings = entries.filter((e) => e.type === 'fasting').length;
+
+  const formatCount = (count: number, singular: string, plural: string, isFeminine: boolean) => {
+    if (count === 1) return `${isFeminine ? 'Uma' : 'Um'} ${singular}`;
+    if (count === 2) return `${isFeminine ? 'Duas' : 'Dois'} ${plural}`;
+    if (count === 3) return `Três ${plural}`;
+    if (count === 4) return `Quatro ${plural}`;
+    if (count === 5) return `Cinco ${plural}`;
+    return `${count} ${plural}`;
+  };
+
+  const listItems: string[] = [];
+  if (reflections > 0) listItems.push(formatCount(reflections, 'reflexão', 'reflexões', true));
+  if (prayers > 0) listItems.push(formatCount(prayers, 'oração', 'orações', true));
+  if (testimonies > 0) listItems.push(formatCount(testimonies, 'testemunho', 'testemunhos', false));
+  if (fastings > 0) listItems.push(formatCount(fastings, 'propósito', 'propósitos', false));
+
+  return (
+    <section className="mt-12 pt-8 border-t border-border/50 space-y-4 animate-in fade-in duration-500">
+      <div className="space-y-1">
+        <h3 className="font-serif text-lg font-semibold text-app-text">
+          O que nasceu desta leitura
+        </h3>
+        <p className="text-xs text-app-text-muted">
+          Você registrou neste capítulo:
+        </p>
+      </div>
+
+      <ul className="space-y-1.5 text-sm text-app-text font-serif">
+        {listItems.map((txt) => (
+          <li key={txt} className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold shrink-0" />
+            <span>{txt}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="pt-2">
+        <Link
+          to={`/memorial?book=${bookId}&chapter=${chapter}`}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:underline"
+        >
+          Abrir Memorial →
+        </Link>
+      </div>
+    </section>
+  );
+}
 
 const saveLastRead = (version: string, bookSlug: string, chapter: number) => {
   try {
@@ -1675,6 +1752,15 @@ export default function ReadingPage() {
                   totalRefs={todayRefs?.length ?? 0}
                   completedRefs={todayReadRefs?.length ?? 0}
                   onMarkComplete={() => markRefRead(currentRef)}
+                />
+              )}
+
+              {/* Bloco "O que nasceu desta leitura" */}
+              {selectedBook && (
+                <ChapterMemorialBlock
+                  bookId={selectedBook.id}
+                  chapter={Number(chapterNumber)}
+                  userId={user?.id ?? null}
                 />
               )}
             </article>

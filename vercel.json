@@ -32,6 +32,9 @@
         },
         "api/notifications/stats.ts": {
             "maxDuration": 10
+        },
+        "api/notifications/on-publish.ts": {
+            "maxDuration": 30
         }
     },
     "headers": [

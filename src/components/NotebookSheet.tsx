@@ -634,7 +634,7 @@ export default function NotebookSheet({
                                                     onOpenChange(false);
                                                     onOpenCategoryModal?.('reflection');
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-gold dark:border-gold/40 hover:opacity-90 active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
                                             >
                                                 Reflexão
                                             </button>
@@ -644,7 +644,7 @@ export default function NotebookSheet({
                                                     onOpenChange(false);
                                                     onOpenCategoryModal?.('prayer');
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40 hover:opacity-90 active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
                                             >
                                                 Oração
                                             </button>
@@ -654,7 +654,7 @@ export default function NotebookSheet({
                                                     onOpenChange(false);
                                                     onOpenCategoryModal?.('testimony');
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40 hover:opacity-90 active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
                                             >
                                                 Testemunho
                                             </button>
@@ -664,7 +664,7 @@ export default function NotebookSheet({
                                                     onOpenChange(false);
                                                     onOpenCategoryModal?.('fasting');
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border text-[0.72rem] font-semibold text-center transition-all bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 hover:opacity-90 active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
                                             >
                                                 Jejum / Propósito
                                             </button>

@@ -35,6 +35,7 @@ import {
   Settings,
   User,
   Heart,
+  FileText,
 } from "lucide-react";
 import { useTranslation } from "@/i18n";
 import { Link, NavLink } from "react-router-dom";
@@ -48,7 +49,7 @@ const navItems = [
   { label: "Leitura", href: "/" },
   { label: "Jornadas", href: "/jornadas" },
   { label: "Planos", href: "/planos" },
-  { label: "Artigos", href: "/artigos" },
+  { label: "Memorial", href: "/memorial" },
   { label: "Harpa", href: "/harpa" },
 ];
 
@@ -723,6 +724,19 @@ export default function Header() {
                     {item.label}
                   </NavLink>
                 ))}
+                <NavLink
+                  to="/artigos"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                      ? "bg-app-raised text-app-text"
+                      : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                    }`
+                  }
+                >
+                  <FileText className="h-4 w-4 flex-shrink-0" />
+                  Artigos
+                </NavLink>
                 {/* Como usar — mobile drawer */}
                 <NavLink
                   to="/como-usar"

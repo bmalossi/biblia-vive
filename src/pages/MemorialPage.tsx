@@ -6,12 +6,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
     BookOpen,
-    Heart,
-    Sparkles,
-    Mountain,
     Search,
     Star,
     CheckCircle2,
@@ -31,15 +28,15 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import {
     createNoteStore,
-    exportNotesToTXT,
-    exportNotesToPDF,
     type MemorialCategory,
     type MemorialEntry
 } from '@/lib/noteStore';
+import { exportNotesToTXT, exportNotesToPDF } from '@/lib/notesExport';
 import { findBookGlobally } from '@/lib/books';
 import AuthModal from '@/components/AuthModal';
 import MemorialEntryModal from '@/components/MemorialEntryModal';
 import { cn } from '@/lib/utils';
+import { groupEntriesByTime } from '@/lib/memorialUtils';
 
 export default function MemorialPage() {
     usePageMeta({
@@ -48,8 +45,12 @@ export default function MemorialPage() {
     });
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { user, isAuthenticated, signOut } = useAuth();
     const { isPro } = useSubscription();
+
+    const urlBook = searchParams.get('book');
+    const urlChapter = searchParams.get('chapter');
 
     const [entries, setEntries] = useState<MemorialEntry[]>([]);
     const [loading, setLoading] = useState(true);
@@ -93,6 +94,18 @@ export default function MemorialPage() {
             if (activeFilter === 'answered' && !entry.answeredAt) return false;
             if (activeFilter === 'favorite' && !entry.favorite) return false;
 
+            // Filtro por parâmetros de URL (book e chapter)
+            if (urlBook && urlChapter) {
+                const bk = findBookGlobally(urlBook);
+                const targetBookId = bk ? bk.id.toLowerCase() : urlBook.toLowerCase();
+                const entryBookId = entry.bookId.toLowerCase();
+                const entryBookName = entry.bookName.toLowerCase();
+
+                const matchesBook = entryBookId === targetBookId || entryBookName === urlBook.toLowerCase();
+                const matchesChapter = String(entry.chapter) === String(urlChapter);
+                if (!matchesBook || !matchesChapter) return false;
+            }
+
             // Busca em tempo real
             if (searchQuery.trim()) {
                 const q = searchQuery.toLowerCase().trim();
@@ -106,7 +119,9 @@ export default function MemorialPage() {
 
             return true;
         });
-    }, [entries, activeFilter, searchQuery]);
+    }, [entries, activeFilter, searchQuery, urlBook, urlChapter]);
+
+    const groupedEntries = useMemo(() => groupEntriesByTime(filteredEntries), [filteredEntries]);
 
     const handleToggleFavorite = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -139,11 +154,11 @@ export default function MemorialPage() {
         }
     };
 
-    const categoryBadgeConfig: Record<MemorialCategory, { label: string; icon: typeof BookOpen; classes: string }> = {
-        reflection: { label: "Reflexão", icon: BookOpen, classes: "bg-amber-100 text-amber-900 border-amber-300 dark:bg-gold/15 dark:text-gold dark:border-gold/40 font-semibold" },
-        prayer: { label: "Oração", icon: Heart, classes: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/40 font-semibold" },
-        testimony: { label: "Testemunho", icon: Sparkles, classes: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/40 font-semibold" },
-        fasting: { label: "Jejum / Propósito", icon: Mountain, classes: "bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 font-semibold" },
+    const categoryBadgeConfig: Record<MemorialCategory, { label: string; classes: string }> = {
+        reflection: { label: "Reflexão", classes: "bg-gold/10 text-gold border-gold/30 font-medium" },
+        prayer: { label: "Oração", classes: "bg-app-raised text-app-text-muted border-border font-medium" },
+        testimony: { label: "Testemunho", classes: "bg-app-raised text-app-text-muted border-border font-medium" },
+        fasting: { label: "Jejum / Propósito", classes: "bg-app-raised text-app-text-muted border-border font-medium" },
     };
 
     function formatDate(iso: string) {
@@ -163,6 +178,51 @@ export default function MemorialPage() {
         const slug = bk ? bk.slug : entry.bookId.toLowerCase();
         const ver = entry.version || 'acf';
         return `/${ver}/${slug}/${entry.chapter}${entry.verse ? `#v${entry.verse}` : ''}`;
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <main className="min-h-screen bg-app-base px-4 py-16 max-w-xl mx-auto font-sans flex flex-col items-center justify-center text-center">
+                <h1 className="text-3xl md:text-4xl font-serif font-semibold text-app-text tracking-tight mb-4">
+                    Memorial
+                </h1>
+                <p className="text-lg font-serif text-app-text-muted italic mb-6">
+                    "Sua caminhada com a Palavra merece ser lembrada."
+                </p>
+                <div className="space-y-4 text-app-text-muted text-sm md:text-base leading-relaxed mb-8 max-w-lg">
+                    <p>
+                        Enquanto você lê, pode registrar orações, reflexões, testemunhos e propósitos.
+                    </p>
+                    <p>
+                        Com uma conta gratuita, esses momentos permanecem guardados para que você possa revisitá-los sempre que desejar.
+                    </p>
+                </div>
+                <div className="space-y-4 w-full max-w-xs">
+                    <button
+                        type="button"
+                        onClick={() => setAuthOpen(true)}
+                        className="w-full py-3 px-6 rounded-2xl bg-gold text-black font-semibold text-sm hover:bg-gold/90 transition-colors shadow-sm"
+                    >
+                        Criar conta gratuitamente
+                    </button>
+                    <div>
+                        <button
+                            type="button"
+                            onClick={() => setAuthOpen(true)}
+                            className="text-xs text-app-text-muted hover:text-gold transition-colors"
+                        >
+                            Já possui uma conta? <span className="underline font-medium">Entrar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <AuthModal
+                    isOpen={authOpen}
+                    onClose={() => setAuthOpen(false)}
+                    hint="Sua caminhada com a Palavra merece ser lembrada."
+                />
+            </main>
+        );
     }
 
     return (
@@ -189,43 +249,15 @@ export default function MemorialPage() {
                     </p>
                 </div>
 
-                {isAuthenticated ? (
-                    <button
-                        type="button"
-                        onClick={signOut}
-                        className="flex items-center gap-1.5 text-[0.78rem] text-app-text-muted hover:text-app-text px-3 py-1.5 rounded-xl hover:bg-app-raised transition-colors"
-                    >
-                        <LogOut className="h-3.5 w-3.5" />
-                        Sair
-                    </button>
-                ) : (
-                    <button
-                        type="button"
-                        onClick={() => setAuthOpen(true)}
-                        className="flex items-center gap-1.5 text-[0.78rem] text-gold hover:text-gold/80 px-3.5 py-1.5 rounded-xl border border-gold/30 hover:bg-gold/10 transition-colors shadow-sm"
-                    >
-                        <LogIn className="h-3.5 w-3.5" />
-                        Entrar
-                    </button>
-                )}
+                <button
+                    type="button"
+                    onClick={signOut}
+                    className="flex items-center gap-1.5 text-[0.78rem] text-app-text-muted hover:text-app-text px-3 py-1.5 rounded-xl hover:bg-app-raised transition-colors"
+                >
+                    <LogOut className="h-3.5 w-3.5" />
+                    Sair
+                </button>
             </div>
-
-            {/* Hint para Visitantes */}
-            {!isAuthenticated && entries.length > 0 && (
-                <div className="mb-6 rounded-2xl border border-gold/20 bg-gold/5 p-4 text-[0.8rem] text-app-text-muted flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                        <BookOpen className="h-4 w-4 text-gold shrink-0" />
-                        <span>Seus registros estão salvos neste navegador. Faça login para sincronizar na nuvem.</span>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => setAuthOpen(true)}
-                        className="shrink-0 text-gold font-medium hover:underline text-[0.78rem]"
-                    >
-                        Entrar agora →
-                    </button>
-                </div>
-            )}
 
             {/* Barra de Busca e Filtros */}
             <div className="space-y-4 mb-8">
@@ -245,12 +277,12 @@ export default function MemorialPage() {
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                     {[
                         { id: 'all', label: 'Todos' },
-                        { id: 'reflection', label: '📖 Reflexões' },
-                        { id: 'prayer', label: '🙏 Orações' },
-                        { id: 'testimony', label: '✨ Testemunhos' },
-                        { id: 'fasting', label: '⛰️ Jejuns' },
-                        { id: 'answered', label: '✅ Respondidas' },
-                        { id: 'favorite', label: '⭐ Favoritos' },
+                        { id: 'reflection', label: 'Reflexões' },
+                        { id: 'prayer', label: 'Orações' },
+                        { id: 'testimony', label: 'Testemunhos' },
+                        { id: 'fasting', label: 'Jejuns / Propósitos' },
+                        { id: 'answered', label: 'Respondidas' },
+                        { id: 'favorite', label: 'Favoritos' },
                     ].map(tab => {
                         const isActive = activeFilter === tab.id;
                         return (
@@ -272,8 +304,7 @@ export default function MemorialPage() {
                 </div>
 
                 {/* Ações de Exportação */}
-                <div className="flex items-center justify-between text-[0.75rem] text-app-text-muted pt-2">
-                    <span>{filteredEntries.length} {filteredEntries.length === 1 ? 'marca preservada' : 'marcas preservadas'}</span>
+                <div className="flex items-center justify-end text-[0.75rem] text-app-text-muted pt-2">
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
@@ -317,128 +348,131 @@ export default function MemorialPage() {
                     </p>
                 </div>
             ) : (
-                <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
-                    {filteredEntries.map(entry => {
-                        const conf = categoryBadgeConfig[entry.type] || categoryBadgeConfig.reflection;
-                        const BadgeIcon = conf.icon;
-                        const isPrayer = entry.type === 'prayer';
-                        const isAnswered = Boolean(entry.answeredAt);
-
-                        return (
-                            <div
-                                key={entry.id}
-                                onClick={() => {
-                                    setSelectedEntry(entry);
-                                    setIsEditModalOpen(true);
-                                }}
-                                className="relative rounded-2xl border border-border bg-app-surface p-5 space-y-3 shadow-sm hover:border-gold/40 transition-all duration-200 cursor-pointer group"
-                            >
-                                {/* Ponto na Linha do Tempo */}
-                                <span className={cn(
-                                    "absolute -left-[1.85rem] top-6 h-3.5 w-3.5 rounded-full border-2 border-app-base transition-transform group-hover:scale-125",
-                                    entry.type === 'reflection' ? "bg-gold" :
-                                    entry.type === 'prayer' ? "bg-blue-400" :
-                                    entry.type === 'testimony' ? "bg-emerald-400" : "bg-slate-400"
-                                )} />
-
-                                {/* Card Header */}
-                                <div className="flex items-start justify-between gap-3">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.7rem] font-semibold", conf.classes)}>
-                                                {conf.label}
-                                            </span>
-                                            <Link
-                                                to={getBibleLink(entry)}
-                                                onClick={e => e.stopPropagation()}
-                                                className="text-[0.78rem] font-mono text-gold font-medium hover:underline inline-flex items-center gap-1"
-                                            >
-                                                {entry.bookName} {entry.chapter}{entry.verse ? `:${entry.verse}` : ''}
-                                                <ExternalLink className="h-3 w-3 opacity-60" />
-                                            </Link>
-                                        </div>
-
-                                        {entry.title && (
-                                            <h3 className="text-[0.95rem] font-serif font-semibold text-app-text pt-0.5">
-                                                {entry.title}
-                                            </h3>
-                                        )}
-                                    </div>
-
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        {/* Botão Favoritar */}
-                                        <button
-                                            type="button"
-                                            onClick={e => handleToggleFavorite(entry.id, e)}
-                                            className="p-1.5 rounded-lg text-app-text-muted hover:text-gold transition-colors"
-                                            title="Favoritar registro"
-                                        >
-                                            <Star className={cn("h-4 w-4", entry.favorite ? "fill-gold text-gold" : "")} />
-                                        </button>
-
-                                        <span className="text-[0.7rem] text-app-text-muted/60">
-                                            {formatDate(entry.createdAt)}
-                                        </span>
-                                    </div>
+                <div className="space-y-8">
+                    {groupedEntries.map(group => (
+                        <div key={group.key} className="space-y-4">
+                            {group.yearHeader && (
+                                <div className="py-4 text-center font-serif text-base font-semibold text-gold/80 flex items-center justify-center gap-4">
+                                    <span className="h-px bg-border flex-1" />
+                                    <span>{group.yearHeader}</span>
+                                    <span className="h-px bg-border flex-1" />
                                 </div>
+                            )}
+                            <h2 className="text-[0.8rem] font-semibold text-app-text-muted uppercase tracking-wider pl-1">
+                                {group.label}
+                            </h2>
+                            <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60">
+                                {group.entries.map(entry => {
+                                    const conf = categoryBadgeConfig[entry.type] || categoryBadgeConfig.reflection;
+                                    const isPrayer = entry.type === 'prayer';
+                                    const isAnswered = Boolean(entry.answeredAt);
 
-                                {/* Versículo citado se houver */}
-                                {entry.verseText && (
-                                    <p className="text-[0.78rem] italic text-app-text-muted/80 pl-3 border-l-2 border-gold/30 line-clamp-2">
-                                        "{entry.verseText}"
-                                    </p>
-                                )}
+                                    return (
+                                        <div
+                                            key={entry.id}
+                                            onClick={() => navigate(`/memorial/${entry.id}`)}
+                                            className="relative rounded-2xl border border-border bg-app-surface p-5 space-y-3 shadow-sm hover:border-gold/40 transition-all duration-200 cursor-pointer group"
+                                        >
+                                            {/* Ponto na Linha do Tempo */}
+                                            <span className={cn(
+                                                "absolute -left-[1.85rem] top-6 h-3.5 w-3.5 rounded-full border-2 border-app-bg transition-transform group-hover:scale-125",
+                                                entry.type === 'reflection' ? "bg-gold" : "bg-app-text-muted"
+                                            )} />
 
-                                {/* Conteúdo */}
-                                <p className="text-[0.84rem] text-app-text leading-relaxed whitespace-pre-wrap line-clamp-4 font-sans">
-                                    {entry.content}
-                                </p>
+                                            {/* Card Header */}
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.7rem] font-semibold", conf.classes)}>
+                                                            {conf.label}
+                                                        </span>
+                                                        <span className="text-[0.78rem] font-medium text-app-text">
+                                                            {entry.bookName} {entry.chapter}{entry.verse ? `:${entry.verse}` : ''}
+                                                        </span>
+                                                    </div>
 
-                                {/* Seção de Oração Respondida */}
-                                {isAnswered && (
-                                    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 space-y-1 mt-2">
-                                        <div className="flex items-center gap-1.5 text-[0.75rem] font-medium text-emerald-400">
-                                            <CheckCircle2 className="h-4 w-4" />
-                                            <span>Oração Respondida ({formatDate(entry.answeredAt!)})</span>
-                                        </div>
-                                        {entry.answeredNote && (
-                                            <p className="text-[0.8rem] text-app-text italic">
-                                                "{entry.answeredNote}"
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
+                                                    {entry.title && (
+                                                        <h3 className="text-[0.95rem] font-serif font-semibold text-app-text pt-0.5">
+                                                            {entry.title}
+                                                        </h3>
+                                                    )}
+                                                </div>
 
-                                {/* Card Footer: Tags & Ações */}
-                                <div className="flex items-center justify-between pt-2 text-[0.72rem] text-app-text-muted border-t border-border/40">
-                                    <div className="flex items-center gap-1 flex-wrap">
-                                        {entry.tags && entry.tags.length > 0 && (
-                                            <>
-                                                <Tag className="h-3 w-3 text-app-text-muted/60" />
-                                                {entry.tags.map(t => (
-                                                    <span key={t} className="px-2 py-0.5 rounded-md bg-app-raised border border-border text-[0.68rem]">
-                                                        #{t}
+                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                    <button
+                                                        type="button"
+                                                        onClick={e => handleToggleFavorite(entry.id, e)}
+                                                        className="p-1.5 rounded-lg text-app-text-muted hover:text-gold transition-colors"
+                                                        title="Favoritar registro"
+                                                    >
+                                                        <Star className={cn("h-4 w-4", entry.favorite ? "fill-gold text-gold" : "")} />
+                                                    </button>
+                                                    <span className="text-[0.7rem] text-app-text-muted/60">
+                                                        {formatDate(entry.createdAt)}
                                                     </span>
-                                                ))}
-                                            </>
-                                        )}
-                                    </div>
+                                                </div>
+                                            </div>
 
-                                    {/* Botão Registrar Resposta para Orações pendentes */}
-                                    {isPrayer && !isAnswered && (
-                                        <button
-                                            type="button"
-                                            onClick={e => handleOpenAnswerModal(entry, e)}
-                                            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium px-2.5 py-1 rounded-lg border border-blue-500/30 hover:bg-blue-500/10 transition-colors"
-                                        >
-                                            <CheckCircle2 className="h-3.5 w-3.5" />
-                                            Registrar Resposta
-                                        </button>
-                                    )}
-                                </div>
+                                            {/* Versículo citado se houver */}
+                                            {entry.verseText && (
+                                                <p className="text-[0.78rem] italic text-app-text-muted/80 pl-3 border-l-2 border-gold/30 line-clamp-2">
+                                                    "{entry.verseText}"
+                                                </p>
+                                            )}
+
+                                            {/* Conteúdo */}
+                                            <p className="text-[0.84rem] text-app-text leading-relaxed whitespace-pre-wrap line-clamp-4 font-sans">
+                                                {entry.content}
+                                            </p>
+
+                                            {/* Seção de Oração Respondida */}
+                                            {isAnswered && (
+                                                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 space-y-1 mt-2">
+                                                    <div className="flex items-center gap-1.5 text-[0.75rem] font-medium text-emerald-400">
+                                                        <CheckCircle2 className="h-4 w-4" />
+                                                        <span>Oração Respondida ({formatDate(entry.answeredAt!)})</span>
+                                                    </div>
+                                                    {entry.answeredNote && (
+                                                        <p className="text-[0.8rem] text-app-text italic">
+                                                            "{entry.answeredNote}"
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Card Footer: Tags & Ações */}
+                                            <div className="flex items-center justify-between pt-2 text-[0.72rem] text-app-text-muted border-t border-border/40">
+                                                <div className="flex items-center gap-1 flex-wrap">
+                                                    {entry.tags && entry.tags.length > 0 && (
+                                                        <>
+                                                            <Tag className="h-3 w-3 text-app-text-muted/60" />
+                                                            {entry.tags.map(t => (
+                                                                <span key={t} className="px-2 py-0.5 rounded-md bg-app-raised border border-border text-[0.68rem]">
+                                                                    #{t}
+                                                                </span>
+                                                            ))}
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                {/* Botão Registrar Resposta para Orações pendentes */}
+                                                {isPrayer && !isAnswered && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={e => handleOpenAnswerModal(entry, e)}
+                                                        className="flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium px-2.5 py-1 rounded-lg border border-blue-500/30 hover:bg-blue-500/10 transition-colors"
+                                                    >
+                                                        <CheckCircle2 className="h-3.5 w-3.5" />
+                                                        Registrar Resposta
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
                 </div>
             )}
 

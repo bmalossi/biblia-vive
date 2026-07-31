@@ -36,6 +36,11 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
         <footer className="mt-auto border-t border-border bg-app-surface py-12 pb-28 md:pb-12 text-center md:text-left">
           <div className="mx-auto w-full max-w-6xl px-4 md:px-6 grid gap-8 md:grid-cols-3">
             <div>
+              <img
+                src="/logo_icon.png"
+                alt="Logo Bíblia Vive"
+                className="h-10 sm:h-12 w-auto object-contain mb-2 mx-auto md:mx-0"
+              />
               <h3 className="text-gold font-serif text-xl mb-3">Bíblia Vive</h3>
               <p className="text-app-text-muted text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
                 Cultivando a permanência diária nas Escrituras por meio de uma experiência de leitura, estudo e reflexão centrada na Palavra.

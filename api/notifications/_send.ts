@@ -59,15 +59,21 @@ export async function removeInvalidTokens(invalidTokens: string[]): Promise<void
   }
 }
 
-export async function sendArticleNotification(title: string, slug: string, appUrl: string): Promise<{ sent: number; failed: number }> {
+export async function sendPushNotification({
+  title,
+  body,
+  link,
+}: {
+  title: string;
+  body: string;
+  link: string;
+}): Promise<{ sent: number; failed: number }> {
   const adminApp = getAdminApp();
   const tokens = await getPushTokens();
 
   if (tokens.length === 0) {
     return { sent: 0, failed: 0 };
   }
-
-  const articleUrl = `${appUrl}/artigos/${slug}`;
 
   const invalidTokens: string[] = [];
 
@@ -76,12 +82,12 @@ export async function sendArticleNotification(title: string, slug: string, appUr
 
     const message = {
       notification: {
-        title: "Novo artigo no Bíblia Vive",
-        body: title,
+        title,
+        body,
         icon: "/icons/icon-192.png",
       },
       webpush: {
-        fcmOptions: { link: articleUrl },
+        fcmOptions: { link },
       },
       tokens: batch,
     };
@@ -109,4 +115,13 @@ export async function sendArticleNotification(title: string, slug: string, appUr
     sent: tokens.length - invalidTokens.length,
     failed: invalidTokens.length,
   };
+}
+
+export async function sendArticleNotification(title: string, slug: string, appUrl: string): Promise<{ sent: number; failed: number }> {
+  const articleUrl = `${appUrl}/artigos/${slug}`;
+  return sendPushNotification({
+    title: "Novo artigo no Bíblia Vive",
+    body: title,
+    link: articleUrl,
+  });
 }

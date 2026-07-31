@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useRef } from "react";
-import { X, Save, Trash2, BookOpen, Heart, Sparkles, Mountain, Calendar } from "lucide-react";
+import { X, Save, Trash2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
 
@@ -67,6 +67,9 @@ export default function MemorialEntryModal({
     const [dataInicio, setDataInicio] = useState("");
     const [dataPrevista, setDataPrevista] = useState("");
 
+    // Opção de desvincular apresentação de versículo/capítulo
+    const [includeReference, setIncludeReference] = useState<boolean>(true);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -78,6 +81,13 @@ export default function MemorialEntryModal({
             setTitle(existingEntry?.title || "");
             setContent(existingEntry?.content || "");
             setTags(existingEntry?.tags?.join(", ") || "");
+
+            // Define se deve exibir/vincular a referência bíblica
+            if (existingEntry) {
+                setIncludeReference(Boolean(existingEntry.verse || existingEntry.verseText));
+            } else {
+                setIncludeReference(true);
+            }
 
             const meta = existingEntry?.metadata || {};
 
@@ -110,47 +120,41 @@ export default function MemorialEntryModal({
 
     const categoryConfigs: Record<MemorialCategory, {
         label: string;
-        icon: typeof BookOpen;
         colorClasses: string;
         badgeClasses: string;
         labelColor: string;
     }> = {
         reflection: {
             label: "Reflexão",
-            icon: BookOpen,
-            colorClasses: "border-amber-500/50 text-amber-900 dark:text-gold",
-            badgeClasses: "bg-amber-100 text-amber-900 border-amber-300 dark:bg-gold/15 dark:text-gold dark:border-gold/40 font-semibold",
-            labelColor: "text-amber-900 dark:text-gold",
+            colorClasses: "border-gold/40 text-gold",
+            badgeClasses: "bg-gold/10 text-gold border-gold/30 font-medium",
+            labelColor: "text-gold",
         },
         prayer: {
             label: "Oração",
-            icon: Heart,
-            colorClasses: "border-blue-500/50 text-blue-900 dark:text-blue-400",
-            badgeClasses: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/15 dark:text-blue-400 dark:border-blue-500/40 font-semibold",
-            labelColor: "text-blue-900 dark:text-blue-400",
+            colorClasses: "border-border text-app-text",
+            badgeClasses: "bg-app-raised text-app-text border-border font-medium",
+            labelColor: "text-app-text",
         },
         testimony: {
             label: "Testemunho",
-            icon: Sparkles,
-            colorClasses: "border-emerald-500/50 text-emerald-900 dark:text-emerald-400",
-            badgeClasses: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/40 font-semibold",
-            labelColor: "text-emerald-900 dark:text-emerald-400",
+            colorClasses: "border-border text-app-text",
+            badgeClasses: "bg-app-raised text-app-text border-border font-medium",
+            labelColor: "text-app-text",
         },
         fasting: {
             label: "Jejum / Propósito",
-            icon: Mountain,
-            colorClasses: "border-stone-400 text-stone-900 dark:text-slate-100 dark:border-slate-500/50",
-            badgeClasses: "bg-stone-200 text-stone-900 border-stone-400 dark:bg-slate-700/60 dark:text-slate-100 dark:border-slate-500/50 font-semibold",
-            labelColor: "text-stone-900 dark:text-slate-200",
+            colorClasses: "border-border text-app-text",
+            badgeClasses: "bg-app-raised text-app-text border-border font-medium",
+            labelColor: "text-app-text",
         },
     };
 
     const currentConfig = categoryConfigs[selectedCategory];
-    const Icon = currentConfig.icon;
 
-    const referenceText = verse
-        ? `${bookName} ${chapter}:${verse}`
-        : `${bookName} ${chapter} (Capítulo)`;
+    const referenceText = includeReference
+        ? (verse ? `${bookName} ${chapter}:${verse}` : `${bookName} ${chapter}`)
+        : "Registro livre (sem versículo)";
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -162,7 +166,7 @@ export default function MemorialEntryModal({
 
             if (selectedCategory === 'reflection') {
                 metadataPayload.soap = {
-                    scripture: soapS,
+                    scripture: includeReference ? soapS : "",
                     observation: soapO,
                     application: soapA,
                     prayer: soapP,
@@ -213,9 +217,9 @@ export default function MemorialEntryModal({
                 bookId,
                 bookName,
                 chapter,
-                verse,
+                verse: includeReference ? verse : null,
                 version,
-                verseText: verseText || undefined,
+                verseText: includeReference ? (verseText || undefined) : undefined,
                 tags: parsedTags,
                 metadata: metadataPayload,
             });
@@ -278,6 +282,19 @@ export default function MemorialEntryModal({
                                 </button>
                             );
                         })}
+                    </div>
+
+                    {/* Opção de desvincular apresentação de versículo/capítulo */}
+                    <div className="flex items-center justify-between px-1 py-1 border-b border-border/40 pb-2">
+                        <label className="flex items-center gap-2 cursor-pointer text-[0.75rem] text-app-text-muted hover:text-app-text transition-colors select-none">
+                            <input
+                                type="checkbox"
+                                checked={includeReference}
+                                onChange={e => setIncludeReference(e.target.checked)}
+                                className="rounded border-border bg-app-surface text-gold focus:ring-gold/50 h-3.5 w-3.5 accent-gold"
+                            />
+                            <span>Vincular ao versículo/capítulo ({verse ? `${bookName} ${chapter}:${verse}` : `${bookName} ${chapter}`})</span>
+                        </label>
                     </div>
 
                     {/* Título do Registro */}
