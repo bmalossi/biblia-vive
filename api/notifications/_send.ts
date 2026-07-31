@@ -89,9 +89,11 @@ export async function sendPushNotification({
       notification: {
         title,
         body,
-        icon: "/icons/icon-192.png",
       },
       webpush: {
+        notification: {
+          icon: "/icons/icon-192.png",
+        },
         fcmOptions: { link },
       },
       tokens: batch,
