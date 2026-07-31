@@ -1,4 +1,4 @@
-import { sendArticleNotification } from "./_send";
+import { sendArticleNotification } from "./_send.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 

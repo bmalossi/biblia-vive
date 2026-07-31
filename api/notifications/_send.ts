@@ -1,21 +1,20 @@
-import admin from "firebase-admin";
+import { initializeApp, getApps, getApp, type App } from "firebase-admin/app";
+import { cert } from "firebase-admin/app";
+import { getMessaging } from "firebase-admin/messaging";
 import { createClient } from "@supabase/supabase-js";
 
-let adminInitialized = false;
-
-function getAdminApp() {
-  if (!adminInitialized) {
-    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-    if (!serviceAccountJson) {
-      throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not configured");
-    }
-    const serviceAccount = JSON.parse(serviceAccountJson);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-    adminInitialized = true;
+function getAdminApp(): App {
+  if (getApps().length > 0) {
+    return getApp();
   }
-  return admin;
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  if (!serviceAccountJson) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not configured");
+  }
+  const serviceAccount = JSON.parse(serviceAccountJson);
+  return initializeApp({
+    credential: cert(serviceAccount),
+  });
 }
 
 export async function getPushTokens(): Promise<string[]> {
@@ -69,6 +68,7 @@ export async function sendPushNotification({
   link: string;
 }): Promise<{ sent: number; failed: number }> {
   const adminApp = getAdminApp();
+  const messaging = getMessaging(adminApp);
   const tokens = await getPushTokens();
 
   if (tokens.length === 0) {
@@ -92,7 +92,7 @@ export async function sendPushNotification({
       tokens: batch,
     };
 
-    const response = await adminApp.messaging().sendEachForMulticast(message);
+    const response = await messaging.sendEachForMulticast(message);
 
     response.responses.forEach((resp, idx) => {
       if (!resp.success) {

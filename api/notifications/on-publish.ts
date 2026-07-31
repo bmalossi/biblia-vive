@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { sendPushNotification } from "./_send";
+import { sendPushNotification } from "./_send.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
