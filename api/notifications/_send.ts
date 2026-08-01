@@ -28,7 +28,14 @@ export async function getPushTokens(): Promise<string[]> {
   const { data, error } = await supabase.from("push_tokens").select("token");
 
   if (error) throw error;
-  return data.map((row: { token: string }) => row.token);
+  const tokens = data.map((row: { token: string }) => row.token);
+
+  // Log mascarado: mostra os primeiros e últimos 6 chars de cada token
+  // para identificar tokens duplicados sem expor o token completo.
+  const masked = tokens.map(t => `${t.slice(0, 6)}…${t.slice(-6)}`);
+  console.log(`[getPushTokens] ${tokens.length} token(s): [${masked.join(", ")}]`);
+
+  return tokens;
 }
 
 export async function removeInvalidTokens(invalidTokens: string[]): Promise<void> {

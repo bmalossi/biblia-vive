@@ -123,10 +123,9 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     body = record.series_name
       ? `${record.series_name}: ${record.title}`
       : record.title || "Um novo capítulo de jornada foi publicado!";
-    link =
-      record.book_slug && record.chapter
-        ? `${appUrl}/nvi/${record.book_slug.toLowerCase()}/${record.chapter}`
-        : `${appUrl}/jornadas`;
+    // Link aponta para /jornadas — os capítulos não têm URL própria,
+    // são abertos em modal dentro da página de jornadas.
+    link = `${appUrl}/jornadas`;
   }
 
   // 5. Disparar notificação push via Firebase Cloud Messaging
