@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_GUARDRAILS
+id: LOGOS-AI-GUARDRAILS
 title: AI_GUARDRAILS
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_GUARDRAILS.md
 relations: []

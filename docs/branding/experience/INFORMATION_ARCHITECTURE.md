@@ -5,7 +5,29 @@ type: CommGuidelineNode
 status: Draft
 version: 1.0.0
 source_file: /docs/branding/experience/INFORMATION_ARCHITECTURE.md
-relations: []
+relations:
+- type: referencia
+  target: LOGOS-FND-CHARTER
+- type: referencia
+  target: LOGOS-DOM-DOMAIN
+- type: referencia
+  target: LOGOS-DOM-DEUS
+- type: referencia
+  target: LOGOS-DOM-PALAVRA
+- type: referencia
+  target: LOGOS-DOM-LEITOR
+- type: referencia
+  target: LOGOS-DOM-REFLEXO
+- type: referencia
+  target: LOGOS-DOM-CADERNO
+- type: referencia
+  target: LOGOS-DOM-MEMRIA-ESPIRITUAL
+- type: referencia
+  target: LOGOS-DOM-CAMINHADA
+- type: referencia
+  target: LOGOS-FND-CONSTITUTION
+- type: referencia
+  target: LOGOS-FND-PHILOSOPHY
 ---
 ﻿---
 title: INFORMATION_ARCHITECTURE

@@ -1,11 +1,41 @@
 ---
-id: LOGOS-COMM-POSITIONING
+id: LOGOS-STR-POSITIONING
 title: POSITIONING
-type: CommGuidelineNode
-status: Draft
+type: StrategyNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/strategy/POSITIONING.md
-relations: []
+relations:
+- type: referencia
+  target: LOGOS-FND-CHARTER
+- type: referencia
+  target: LOGOS-DOM-DOMAIN
+- type: referencia
+  target: LOGOS-DOM-DEUS
+- type: referencia
+  target: LOGOS-DOM-ESCRITURAS
+- type: referencia
+  target: LOGOS-DOM-PALAVRA
+- type: referencia
+  target: LOGOS-DOM-LEITOR
+- type: referencia
+  target: LOGOS-DOM-ENCONTRO
+- type: referencia
+  target: LOGOS-DOM-MEMRIA-ESPIRITUAL
+- type: referencia
+  target: LOGOS-DOM-PERMANNCIA
+- type: referencia
+  target: LOGOS-DOM-TRANSFORMAO
+- type: referencia
+  target: LOGOS-DOM-CAMINHADA
+- type: referencia
+  target: LOGOS-DOM-COMUNHO
+- type: referencia
+  target: LOGOS-FND-CONSTITUTION
+- type: referencia
+  target: LOGOS-FND-PHILOSOPHY
+- type: referencia
+  target: LOGOS-COMM-PERFORMANCE
 ---
 ﻿---
 title: POSITIONING

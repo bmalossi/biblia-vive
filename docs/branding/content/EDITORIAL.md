@@ -5,15 +5,7 @@ type: EditorialGuidelineNode
 status: Approved
 version: 1.0.0
 source_file: /docs/branding/content/EDITORIAL.md
-relations:
-- type: depende_de
-  target: LOGOS-FND-CHARTER
-- type: depende_de
-  target: LOGOS-FND-PHILOSOPHY
-- type: depende_de
-  target: LOGOS-FND-CONSTITUTION
-- type: depende_de
-  target: LOGOS-DOM-DOMAIN
+relations: []
 ---
 # EDITORIAL
 

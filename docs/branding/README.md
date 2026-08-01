@@ -1,9 +1,9 @@
 ---
-id: LOGOS-COMM-README
+id: LOGOS-META-README
 title: README
-type: CommGuidelineNode
+type: MetaDocumentNode
 status: Approved
-version: 2.0.0
+version: 1.0.0
 source_file: /docs/branding/README.md
 relations: []
 ---

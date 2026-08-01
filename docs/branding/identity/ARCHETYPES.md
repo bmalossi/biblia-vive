@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-ARCHETYPES
+id: LOGOS-ID-ARCHETYPES
 title: ARCHETYPES
-type: CommGuidelineNode
-status: Draft
+type: IdentityNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/identity/ARCHETYPES.md
 relations: []

@@ -5,7 +5,27 @@ type: CommGuidelineNode
 status: Draft
 version: 1.0.0
 source_file: /docs/branding/experience/NAVIGATION.md
-relations: []
+relations:
+- type: referencia
+  target: LOGOS-FND-CHARTER
+- type: referencia
+  target: LOGOS-DOM-DOMAIN
+- type: referencia
+  target: LOGOS-DOM-DEUS
+- type: referencia
+  target: LOGOS-DOM-ESCRITURAS
+- type: referencia
+  target: LOGOS-DOM-PALAVRA
+- type: referencia
+  target: LOGOS-DOM-LEITOR
+- type: referencia
+  target: LOGOS-DOM-CADERNO
+- type: referencia
+  target: LOGOS-DOM-CAMINHADA
+- type: referencia
+  target: LOGOS-FND-CONSTITUTION
+- type: referencia
+  target: LOGOS-FND-PHILOSOPHY
 ---
 ﻿---
 title: NAVIGATION

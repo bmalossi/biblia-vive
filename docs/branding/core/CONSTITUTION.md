@@ -3,13 +3,9 @@ id: LOGOS-FND-CONSTITUTION
 title: CONSTITUTION
 type: FoundationNode
 status: Approved
-version: 1.1.0
+version: 1.0.0
 source_file: /docs/branding/core/CONSTITUTION.md
-relations:
-- type: depende_de
-  target: LOGOS-FND-CHARTER
-- type: depende_de
-  target: LOGOS-FND-PHILOSOPHY
+relations: []
 ---
 # CONSTITUTION
 

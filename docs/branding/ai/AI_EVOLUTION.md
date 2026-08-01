@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_EVOLUTION
+id: LOGOS-AI-EVOLUTION
 title: AI_EVOLUTION
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_EVOLUTION.md
 relations: []

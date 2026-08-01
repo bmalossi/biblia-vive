@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_ASSISTANT
+id: LOGOS-AI-ASSISTANT
 title: AI_ASSISTANT
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_ASSISTANT.md
 relations: []

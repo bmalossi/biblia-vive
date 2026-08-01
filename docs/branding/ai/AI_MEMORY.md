@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_MEMORY
+id: LOGOS-AI-MEMORY
 title: AI_MEMORY
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_MEMORY.md
 relations: []

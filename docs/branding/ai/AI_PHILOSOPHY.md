@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_PHILOSOPHY
+id: LOGOS-AI-PHILOSOPHY
 title: AI_PHILOSOPHY
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_PHILOSOPHY.md
 relations: []

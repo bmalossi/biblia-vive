@@ -2,496 +2,924 @@
   "nodes": [
     {
       "id": "LOGOS-FND-CHARTER",
+      "title": "00-CHARTER",
       "type": "FoundationNode",
       "status": "Approved",
-      "source_file": "/docs/branding/00-CHARTER.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/00-CHARTER.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DOM-DOMAIN",
+      "title": "DOMAIN",
       "type": "DomainEntityNode",
       "status": "Approved",
-      "source_file": "/docs/branding/DOMAIN.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": []
     },
     {
-      "id": "LOGOS-COMM-INDEX",
-      "type": "CommGuidelineNode",
+      "id": "LOGOS-DOM-DEUS",
+      "title": "Deus",
+      "type": "DomainEntityNode",
       "status": "Approved",
-      "source_file": "/docs/branding/INDEX.md"
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-README",
-      "type": "CommGuidelineNode",
+      "id": "LOGOS-DOM-REVELAO",
+      "title": "Revelação",
+      "type": "DomainEntityNode",
       "status": "Approved",
-      "source_file": "/docs/branding/README.md"
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_ASSISTANT",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_ASSISTANT.md"
+      "id": "LOGOS-DOM-ESCRITURAS",
+      "title": "Escrituras",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_ETHICS",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_ETHICS.md"
+      "id": "LOGOS-DOM-PALAVRA",
+      "title": "Palavra",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_EVOLUTION",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_EVOLUTION.md"
+      "id": "LOGOS-DOM-CRISTO",
+      "title": "Cristo",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_GUARDRAILS",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_GUARDRAILS.md"
+      "id": "LOGOS-DOM-LEITOR",
+      "title": "Leitor",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_MEMORY",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_MEMORY.md"
+      "id": "LOGOS-DOM-ENCONTRO",
+      "title": "Encontro",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_PHILOSOPHY",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_PHILOSOPHY.md"
+      "id": "LOGOS-DOM-REFLEXO",
+      "title": "Reflexão",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
     },
     {
-      "id": "LOGOS-COMM-AI_PROMPTING",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/ai/AI_PROMPTING.md"
+      "id": "LOGOS-DOM-CADERNO",
+      "title": "Caderno",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-MEMRIA-ESPIRITUAL",
+      "title": "Memória Espiritual",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-PERMANNCIA",
+      "title": "Permanência",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-TRANSFORMAO",
+      "title": "Transformação",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-CULTIVO",
+      "title": "Cultivo",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-CAMINHADA",
+      "title": "Caminhada",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-COMUNHO",
+      "title": "Comunhão",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-IGREJA",
+      "title": "Igreja",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-ADORAO",
+      "title": "Adoração",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-DOM-SERVIO",
+      "title": "Serviço",
+      "type": "DomainEntityNode",
+      "status": "Approved",
+      "source_file": "/docs/branding/DOMAIN.md",
+      "relations": [
+        {
+          "type": "especializa",
+          "target": "LOGOS-DOM-DOMAIN"
+        }
+      ]
+    },
+    {
+      "id": "LOGOS-META-INDEX",
+      "title": "INDEX",
+      "type": "MetaDocumentNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/INDEX.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-META-README",
+      "title": "README",
+      "type": "MetaDocumentNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/README.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-ASSISTANT",
+      "title": "AI_ASSISTANT",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_ASSISTANT.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-ETHICS",
+      "title": "AI_ETHICS",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_ETHICS.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-EVOLUTION",
+      "title": "AI_EVOLUTION",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_EVOLUTION.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-GUARDRAILS",
+      "title": "AI_GUARDRAILS",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_GUARDRAILS.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-MEMORY",
+      "title": "AI_MEMORY",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_MEMORY.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-PHILOSOPHY",
+      "title": "AI_PHILOSOPHY",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_PHILOSOPHY.md",
+      "relations": []
+    },
+    {
+      "id": "LOGOS-AI-PROMPTING",
+      "title": "AI_PROMPTING",
+      "type": "AIGovernanceNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/ai/AI_PROMPTING.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-COPYWRITING",
+      "title": "COPYWRITING",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/communication/COPYWRITING.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/communication/COPYWRITING.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-MESSAGING",
+      "title": "MESSAGING",
       "type": "CommGuidelineNode",
       "status": "Approved",
-      "source_file": "/docs/branding/communication/MESSAGING.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/communication/MESSAGING.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-STORYTELLING",
+      "title": "STORYTELLING",
       "type": "CommGuidelineNode",
       "status": "Approved",
-      "source_file": "/docs/branding/communication/STORYTELLING.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/communication/STORYTELLING.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-TERMINOLOGY",
+      "title": "TERMINOLOGY",
       "type": "CommGuidelineNode",
       "status": "Approved",
-      "source_file": "/docs/branding/communication/TERMINOLOGY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/communication/TERMINOLOGY.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-AI_CONTENT",
+      "title": "AI_CONTENT",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/content/AI_CONTENT.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/AI_CONTENT.md",
+      "relations": []
     },
     {
       "id": "LOGOS-EDT-BIBLESTUDIES",
+      "title": "BIBLE_STUDIES",
       "type": "EditorialGuidelineNode",
       "status": "Approved",
-      "source_file": "/docs/branding/content/BIBLE_STUDIES.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/BIBLE_STUDIES.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-CONTENT_STRATEGY",
+      "title": "CONTENT_STRATEGY",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/content/CONTENT_STRATEGY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/CONTENT_STRATEGY.md",
+      "relations": []
     },
     {
       "id": "LOGOS-EDT-EDITORIAL",
+      "title": "EDITORIAL",
       "type": "EditorialGuidelineNode",
       "status": "Approved",
-      "source_file": "/docs/branding/content/EDITORIAL.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/EDITORIAL.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-LEGACY_CONTENT",
+      "title": "LEGACY_CONTENT",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/content/LEGACY_CONTENT.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/LEGACY_CONTENT.md",
+      "relations": []
     },
     {
       "id": "LOGOS-EDT-ARCHITECTURE",
+      "title": "ARQUITETURA-EDITORIAL-BIBLICA-VIVE",
       "type": "EditorialGuidelineNode",
       "status": "Approved",
-      "source_file": "/docs/branding/content/arquitetura-editorial-biblica-vive.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/arquitetura-editorial-biblica-vive.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-HANDOFF_BIBLIA_VIVE_EDITORIAL",
+      "title": "HANDOFF_BIBLIA_VIVE_EDITORIAL",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/content/series/handoff_biblia_vive_editorial.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/series/handoff_biblia_vive_editorial.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-SERIE-04-ESCUTA-DESENVOLVIMENTO",
+      "title": "SERIE-04-ESCUTA-DESENVOLVIMENTO",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/content/series/serie-04-escuta-desenvolvimento.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/series/serie-04-escuta-desenvolvimento.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-SERIE-04-ESCUTA",
+      "title": "SERIE-04-ESCUTA",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/content/series/serie-04-escuta.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/content/series/serie-04-escuta.md",
+      "relations": []
     },
     {
       "id": "LOGOS-FND-CONSTITUTION",
+      "title": "CONSTITUTION",
       "type": "FoundationNode",
       "status": "Approved",
-      "source_file": "/docs/branding/core/CONSTITUTION.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/core/CONSTITUTION.md",
+      "relations": []
     },
     {
       "id": "LOGOS-FND-PHILOSOPHY",
+      "title": "PHILOSOPHY",
       "type": "FoundationNode",
       "status": "Approved",
-      "source_file": "/docs/branding/core/PHILOSOPHY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/core/PHILOSOPHY.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-APPLICATION",
+      "title": "BRAND_APPLICATION",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/design/BRAND_APPLICATION.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/design/BRAND_APPLICATION.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-SYSTEM",
+      "title": "DESIGN_SYSTEM",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/design/DESIGN_SYSTEM.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/design/DESIGN_SYSTEM.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-ICONOGRAPHY",
+      "title": "ICONOGRAPHY",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/design/ICONOGRAPHY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/design/ICONOGRAPHY.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-IMAGERY",
+      "title": "IMAGERY",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/design/IMAGERY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/design/IMAGERY.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-MOTION",
+      "title": "MOTION",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/design/MOTION.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/design/MOTION.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-VISUALIDENTITY",
+      "title": "VISUAL_IDENTITY",
       "type": "VisualElementNode",
       "status": "Draft",
-      "source_file": "/docs/branding/design/VISUAL_IDENTITY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/design/VISUAL_IDENTITY.md",
+      "relations": [],
+      "data_status": "missing"
     },
     {
       "id": "LOGOS-DSGN-ACCESSIBILITY",
+      "title": "ACCESSIBILITY",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/experience/ACCESSIBILITY.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/ACCESSIBILITY.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-AI_EXPERIENCE",
+      "title": "AI_EXPERIENCE",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/AI_EXPERIENCE.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/AI_EXPERIENCE.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-INFORMATION_ARCHITECTURE",
+      "title": "INFORMATION_ARCHITECTURE",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/INFORMATION_ARCHITECTURE.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/INFORMATION_ARCHITECTURE.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-INTERACTION",
+      "title": "INTERACTION",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/INTERACTION.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/INTERACTION.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-NAVIGATION",
+      "title": "NAVIGATION",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/NAVIGATION.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/NAVIGATION.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-NOTEBOOK_EXPERIENCE",
+      "title": "NOTEBOOK_EXPERIENCE",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/NOTEBOOK_EXPERIENCE.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/NOTEBOOK_EXPERIENCE.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-PERFORMANCE",
+      "title": "PERFORMANCE",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/PERFORMANCE.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/PERFORMANCE.md",
+      "relations": []
     },
     {
       "id": "LOGOS-DSGN-EXPERIENCEPRINCIPLES",
+      "title": "PRINCIPLES",
       "type": "VisualElementNode",
       "status": "Approved",
-      "source_file": "/docs/branding/experience/PRINCIPLES.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/PRINCIPLES.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-READING_EXPERIENCE",
+      "title": "READING_EXPERIENCE",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/READING_EXPERIENCE.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/READING_EXPERIENCE.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-UX_PRINCIPLES",
+      "title": "UX_PRINCIPLES",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/experience/UX_PRINCIPLES.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/experience/UX_PRINCIPLES.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-CHANGE_MANAGEMENT",
+      "title": "CHANGE_MANAGEMENT",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/governance/CHANGE_MANAGEMENT.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/CHANGE_MANAGEMENT.md",
+      "relations": []
     },
     {
       "id": "LOGOS-COMM-CONTRIBUTION",
+      "title": "CONTRIBUTION",
       "type": "CommGuidelineNode",
       "status": "Draft",
-      "source_file": "/docs/branding/governance/CONTRIBUTION.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/CONTRIBUTION.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-LIFECYCLE",
+      "title": "DOCUMENT_LIFECYCLE",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/DOCUMENT_LIFECYCLE.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/DOCUMENT_LIFECYCLE.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-REVIEW",
+      "title": "REVIEW_PROCESS",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/REVIEW_PROCESS.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/REVIEW_PROCESS.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0001",
+      "title": "BDR-0001",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0001.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0001.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0002",
+      "title": "BDR-0002",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0002.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0002.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0003",
+      "title": "BDR-0003",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0003.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0003.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0004",
+      "title": "BDR-0004",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0004.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0004.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0005",
+      "title": "BDR-0005",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0005.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0005.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0006",
+      "title": "BDR-0006",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0006.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0006.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0007",
+      "title": "BDR-0007",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0007.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0007.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0008",
+      "title": "BDR-0008",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0008.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0008.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0009",
+      "title": "BDR-0009",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0009.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0009.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0010",
+      "title": "BDR-0010",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0010.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0010.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0011",
+      "title": "BDR-0011",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0011.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0011.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0012",
+      "title": "BDR-0012",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0012.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0012.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0013",
+      "title": "BDR-0013",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0013.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0013.md",
+      "relations": []
     },
     {
       "id": "LOGOS-GOV-BDR0014",
+      "title": "BDR-0014",
       "type": "GovernanceNode",
       "status": "Approved",
-      "source_file": "/docs/branding/governance/bdr/BDR-0014.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/governance/bdr/BDR-0014.md",
+      "relations": []
     },
     {
-      "id": "LOGOS-COMM-ARCHETYPES",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/identity/ARCHETYPES.md"
+      "id": "LOGOS-ID-ARCHETYPES",
+      "title": "ARCHETYPES",
+      "type": "IdentityNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/identity/ARCHETYPES.md",
+      "relations": []
     },
     {
-      "id": "LOGOS-COMM-VOICE",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/identity/VOICE.md"
+      "id": "LOGOS-ID-VOICE",
+      "title": "VOICE",
+      "type": "IdentityNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/identity/VOICE.md",
+      "relations": []
     },
     {
-      "id": "LOGOS-COMM-ECOSYSTEM",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/strategy/ECOSYSTEM.md"
+      "id": "LOGOS-STR-ECOSYSTEM",
+      "title": "ECOSYSTEM",
+      "type": "StrategyNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/strategy/ECOSYSTEM.md",
+      "relations": []
     },
     {
-      "id": "LOGOS-COMM-JOURNEY",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/strategy/JOURNEY.md"
+      "id": "LOGOS-STR-JOURNEY",
+      "title": "JOURNEY",
+      "type": "StrategyNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/strategy/JOURNEY.md",
+      "relations": []
     },
     {
-      "id": "LOGOS-COMM-POSITIONING",
-      "type": "CommGuidelineNode",
-      "status": "Draft",
-      "source_file": "/docs/branding/strategy/POSITIONING.md"
+      "id": "LOGOS-STR-POSITIONING",
+      "title": "POSITIONING",
+      "type": "StrategyNode",
+      "status": "Approved",
+      "version": "1.0.0",
+      "source_file": "/docs/branding/strategy/POSITIONING.md",
+      "relations": []
     },
     {
       "id": "LOGOS-PSN-PERSONAS",
+      "title": "PERSONAS",
       "type": "PersonaNode",
       "status": "Approved",
-      "source_file": "/docs/branding/strategy/audience/PERSONAS.md"
+      "version": "1.0.0",
+      "source_file": "/docs/branding/strategy/audience/PERSONAS.md",
+      "relations": []
     }
   ],
   "relationships": [
     {
-      "source": "LOGOS-COMM-INDEX",
-      "type": "depende_de",
-      "target": "LOGOS-COMM-README"
-    },
-    {
-      "source": "LOGOS-COMM-INDEX",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CHARTER"
-    },
-    {
-      "source": "LOGOS-EDT-EDITORIAL",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CHARTER"
-    },
-    {
-      "source": "LOGOS-EDT-EDITORIAL",
-      "type": "depende_de",
-      "target": "LOGOS-FND-PHILOSOPHY"
-    },
-    {
-      "source": "LOGOS-EDT-EDITORIAL",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CONSTITUTION"
-    },
-    {
-      "source": "LOGOS-EDT-EDITORIAL",
-      "type": "depende_de",
+      "source": "LOGOS-DOM-DEUS",
+      "type": "especializa",
       "target": "LOGOS-DOM-DOMAIN"
     },
     {
-      "source": "LOGOS-FND-CONSTITUTION",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CHARTER"
-    },
-    {
-      "source": "LOGOS-FND-CONSTITUTION",
-      "type": "depende_de",
-      "target": "LOGOS-FND-PHILOSOPHY"
-    },
-    {
-      "source": "LOGOS-FND-PHILOSOPHY",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CHARTER"
-    },
-    {
-      "source": "LOGOS-DSGN-IMAGERY",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CHARTER"
-    },
-    {
-      "source": "LOGOS-DSGN-IMAGERY",
-      "type": "depende_de",
-      "target": "LOGOS-FND-PHILOSOPHY"
-    },
-    {
-      "source": "LOGOS-DSGN-IMAGERY",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CONSTITUTION"
-    },
-    {
-      "source": "LOGOS-DSGN-IMAGERY",
-      "type": "depende_de",
+      "source": "LOGOS-DOM-REVELAO",
+      "type": "especializa",
       "target": "LOGOS-DOM-DOMAIN"
     },
     {
-      "source": "LOGOS-GOV-BDR0013",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CONSTITUTION"
-    },
-    {
-      "source": "LOGOS-GOV-BDR0013",
-      "type": "depende_de",
+      "source": "LOGOS-DOM-ESCRITURAS",
+      "type": "especializa",
       "target": "LOGOS-DOM-DOMAIN"
     },
     {
-      "source": "LOGOS-GOV-BDR0014",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CHARTER"
+      "source": "LOGOS-DOM-PALAVRA",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
     },
     {
-      "source": "LOGOS-GOV-BDR0014",
-      "type": "depende_de",
-      "target": "LOGOS-FND-PHILOSOPHY"
+      "source": "LOGOS-DOM-CRISTO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
     },
     {
-      "source": "LOGOS-GOV-BDR0014",
-      "type": "depende_de",
-      "target": "LOGOS-FND-CONSTITUTION"
+      "source": "LOGOS-DOM-LEITOR",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
     },
     {
-      "source": "LOGOS-GOV-BDR0014",
-      "type": "depende_de",
-      "target": "LOGOS-EDT-EDITORIAL"
+      "source": "LOGOS-DOM-ENCONTRO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-REFLEXO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-CADERNO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-MEMRIA-ESPIRITUAL",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-PERMANNCIA",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-TRANSFORMAO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-CULTIVO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-CAMINHADA",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-COMUNHO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-IGREJA",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-ADORAO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
+    },
+    {
+      "source": "LOGOS-DOM-SERVIO",
+      "type": "especializa",
+      "target": "LOGOS-DOM-DOMAIN"
     }
   ]
 }

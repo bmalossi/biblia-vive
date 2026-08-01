@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-VOICE
+id: LOGOS-ID-VOICE
 title: VOICE
-type: CommGuidelineNode
-status: Draft
+type: IdentityNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/identity/VOICE.md
 relations: []

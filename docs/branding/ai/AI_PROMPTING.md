@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_PROMPTING
+id: LOGOS-AI-PROMPTING
 title: AI_PROMPTING
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_PROMPTING.md
 relations: []

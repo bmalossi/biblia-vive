@@ -3,7 +3,7 @@ id: LOGOS-FND-CHARTER
 title: 00-CHARTER
 type: FoundationNode
 status: Approved
-version: 1.1.0
+version: 1.0.0
 source_file: /docs/branding/00-CHARTER.md
 relations: []
 ---

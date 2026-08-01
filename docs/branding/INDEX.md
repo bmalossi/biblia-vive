@@ -1,15 +1,11 @@
 ---
-id: LOGOS-COMM-INDEX
+id: LOGOS-META-INDEX
 title: INDEX
-type: CommGuidelineNode
+type: MetaDocumentNode
 status: Approved
-version: 2.0.0
+version: 1.0.0
 source_file: /docs/branding/INDEX.md
-relations:
-- type: depende_de
-  target: LOGOS-COMM-README
-- type: depende_de
-  target: LOGOS-FND-CHARTER
+relations: []
 ---
 # INDEX
 

@@ -1,8 +1,8 @@
 ---
-id: LOGOS-COMM-AI_ETHICS
+id: LOGOS-AI-ETHICS
 title: AI_ETHICS
-type: CommGuidelineNode
-status: Draft
+type: AIGovernanceNode
+status: Approved
 version: 1.0.0
 source_file: /docs/branding/ai/AI_ETHICS.md
 relations: []

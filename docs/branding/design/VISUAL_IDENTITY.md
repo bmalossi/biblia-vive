@@ -5,6 +5,6 @@ type: VisualElementNode
 status: Draft
 version: 1.0.0
 source_file: /docs/branding/design/VISUAL_IDENTITY.md
-data_status: missing
 relations: []
+data_status: missing
 ---

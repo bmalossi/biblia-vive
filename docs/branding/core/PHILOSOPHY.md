@@ -3,11 +3,9 @@ id: LOGOS-FND-PHILOSOPHY
 title: PHILOSOPHY
 type: FoundationNode
 status: Approved
-version: 1.1.0
+version: 1.0.0
 source_file: /docs/branding/core/PHILOSOPHY.md
-relations:
-- type: depende_de
-  target: LOGOS-FND-CHARTER
+relations: []
 ---
 # PHILOSOPHY
 
