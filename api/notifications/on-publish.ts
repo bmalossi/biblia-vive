@@ -133,19 +133,26 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
   const result = await sendPushNotification({ title, body, link });
 
   // 6. Atualizar notification_sent_at APENAS se ao menos 1 entrega foi confirmada pelo Firebase
+  //    Usa UPDATE condicional (IS NULL) como "claim atômico" para evitar duplo envio
+  //    em caso de webhooks concorrentes (race condition).
   if (result.successCount > 0 && record.id) {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (supabaseUrl && supabaseServiceKey) {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      const { error: updateError } = await supabase
+      const { count, error: updateError } = await supabase
         .from(table)
         .update({ notification_sent_at: new Date().toISOString() })
-        .eq("id", record.id);
+        .eq("id", record.id)
+        .is("notification_sent_at", null)   // <-- só atualiza se ainda for null
+        .select("id", { count: "exact", head: true });
 
       if (updateError) {
         console.warn(`[on-publish] Could not update notification_sent_at for ${table}:${record.id}:`, updateError.message);
+      } else if ((count ?? 0) === 0) {
+        // Outra instância do webhook já marcou antes — descartamos silenciosamente
+        console.warn(`[on-publish] notification_sent_at já marcado por outra instância — descartando para ${table}:${record.id}`);
       } else {
         console.log(`[on-publish] notification_sent_at marcado para ${table}:${record.id}`);
       }
@@ -153,6 +160,7 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
   } else if (result.successCount === 0) {
     console.warn(`[on-publish] successCount=0 — notification_sent_at NÃO atualizado para ${table}:${record.id}. Reprocessamento futuro permitido.`);
   }
+
 
 
   return new Response(
