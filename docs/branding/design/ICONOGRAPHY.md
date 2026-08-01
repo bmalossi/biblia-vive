@@ -1,3 +1,12 @@
+---
+id: LOGOS-DSGN-ICONOGRAPHY
+title: ICONOGRAPHY
+type: VisualElementNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/design/ICONOGRAPHY.md
+relations: []
+---
 ﻿---
 title: ICONOGRAPHY
 subtitle: Princípios da Linguagem Iconográfica da Bíblia Vive

@@ -1,3 +1,12 @@
+---
+id: LOGOS-GOV-LIFECYCLE
+title: DOCUMENT_LIFECYCLE
+type: GovernanceNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/governance/DOCUMENT_LIFECYCLE.md
+relations: []
+---
 ﻿---
 title: DOCUMENT_LIFECYCLE
 subtitle: Ciclo de Vida dos Documentos do Projeto Logos

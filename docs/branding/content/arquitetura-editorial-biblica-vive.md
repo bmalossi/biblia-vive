@@ -1,3 +1,12 @@
+---
+id: LOGOS-EDT-ARCHITECTURE
+title: ARQUITETURA-EDITORIAL-BIBLICA-VIVE
+type: EditorialGuidelineNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/content/arquitetura-editorial-biblica-vive.md
+relations: []
+---
 # Arquitetura Editorial — Bíblia Vive
 ### Ciclos de Permanência: Proposta de Estrutura de Longo Prazo
 

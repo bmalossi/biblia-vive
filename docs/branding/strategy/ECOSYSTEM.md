@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-ECOSYSTEM
+title: ECOSYSTEM
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/strategy/ECOSYSTEM.md
+relations: []
+---
 ﻿---
 title: ECOSYSTEM
 subtitle: Ecossistema da Bíblia Vive

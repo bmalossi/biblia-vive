@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-SERIE-04-ESCUTA
+title: SERIE-04-ESCUTA
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/content/series/serie-04-escuta.md
+relations: []
+---
 # Projeto de Série — Série 4 · Escuta
 ### Ciclo 2 (Encontro) — Arquitetura Editorial Bíblia Vive v2.0
 

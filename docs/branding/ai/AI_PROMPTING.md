@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_PROMPTING
+title: AI_PROMPTING
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_PROMPTING.md
+relations: []
+---
 ﻿---
 title: AI_PROMPTING
 subtitle: Princípios para Construção de Prompts da Bíblia Vive

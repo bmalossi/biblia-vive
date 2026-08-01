@@ -1,29 +1,14 @@
 ---
-title: Philosophy
-subtitle: Filosofia Institucional da Bíblia Vive
-version: 1.1.0
+id: LOGOS-FND-PHILOSOPHY
+title: PHILOSOPHY
+type: FoundationNode
 status: Approved
-classification: Foundation
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-20
-updated: 2026-07-21
-
-authority-level: 2
-
-depends-on:
-  - ../00-CHARTER.md
-
-related:
-  - CONSTITUTION.md
-  - ../DOMAIN.md
+version: 1.1.0
+source_file: /docs/branding/core/PHILOSOPHY.md
+relations:
+- type: depende_de
+  target: LOGOS-FND-CHARTER
 ---
-
 # PHILOSOPHY
 
 > A Bíblia Vive existe para preservar os encontros diários entre o Leitor e a Palavra de Deus.

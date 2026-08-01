@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-STORYTELLING
+title: STORYTELLING
+type: CommGuidelineNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/communication/STORYTELLING.md
+relations: []
+---
 ﻿---
 title: STORYTELLING
 subtitle: Narrativa Institucional da Bíblia Vive

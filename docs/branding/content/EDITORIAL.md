@@ -1,29 +1,20 @@
 ---
+id: LOGOS-EDT-EDITORIAL
 title: EDITORIAL
-subtitle: Política Editorial da Bíblia Vive
-version: 1.0.0
+type: EditorialGuidelineNode
 status: Approved
-classification: Content
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-21
-updated: 2026-07-21
-
-authority-level: 9
-
-depends-on:
-  - ../00-CHARTER.md
-  - ../core/PHILOSOPHY.md
-  - ../core/CONSTITUTION.md
-  - ../DOMAIN.md
+version: 1.0.0
+source_file: /docs/branding/content/EDITORIAL.md
+relations:
+- type: depende_de
+  target: LOGOS-FND-CHARTER
+- type: depende_de
+  target: LOGOS-FND-PHILOSOPHY
+- type: depende_de
+  target: LOGOS-FND-CONSTITUTION
+- type: depende_de
+  target: LOGOS-DOM-DOMAIN
 ---
-
-
 # EDITORIAL
 
 > A confiança do Leitor é construída palavra por palavra.
@@ -381,4 +372,4 @@ Cada texto, estudo, explicação, material educativo ou recurso produzido pela m
 Por isso, toda decisão editorial deverá refletir o mesmo propósito que orienta a Bíblia Vive desde sua origem:
 
 Servir à Palavra de Deus, fortalecendo a permanência, a Memória Espiritual e a caminhada de cada Leitor.
-
+

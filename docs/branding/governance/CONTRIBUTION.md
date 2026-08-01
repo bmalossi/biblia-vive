@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-CONTRIBUTION
+title: CONTRIBUTION
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/governance/CONTRIBUTION.md
+relations: []
+---
 ﻿---
 title: CONTRIBUTION
 subtitle: Política de Contribuição do Projeto Logos

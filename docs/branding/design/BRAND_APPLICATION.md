@@ -1,3 +1,12 @@
+---
+id: LOGOS-DSGN-APPLICATION
+title: BRAND_APPLICATION
+type: VisualElementNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/design/BRAND_APPLICATION.md
+relations: []
+---
 ﻿---
 title: BRAND_APPLICATION
 subtitle: Princípios para Aplicação da Marca Bíblia Vive

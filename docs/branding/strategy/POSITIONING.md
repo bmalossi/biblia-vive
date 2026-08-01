@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-POSITIONING
+title: POSITIONING
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/strategy/POSITIONING.md
+relations: []
+---
 ﻿---
 title: POSITIONING
 subtitle: Posicionamento Estratégico da Bíblia Vive

@@ -1,3 +1,12 @@
+---
+id: LOGOS-EDT-BIBLESTUDIES
+title: BIBLE_STUDIES
+type: EditorialGuidelineNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/content/BIBLE_STUDIES.md
+relations: []
+---
 ﻿---
 title: BIBLE_STUDIES
 subtitle: Princípios para Estudos Bíblicos da Bíblia Vive

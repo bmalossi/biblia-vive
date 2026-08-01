@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-READING_EXPERIENCE
+title: READING_EXPERIENCE
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/READING_EXPERIENCE.md
+relations: []
+---
 ﻿---
 title: READING_EXPERIENCE
 subtitle: A Experiência de Leitura da Bíblia Vive

@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-CHANGE_MANAGEMENT
+title: CHANGE_MANAGEMENT
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/governance/CHANGE_MANAGEMENT.md
+relations: []
+---
 ﻿---
 title: CHANGE_MANAGEMENT
 subtitle: Gestão de Mudanças do Projeto Logos

@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-NOTEBOOK_EXPERIENCE
+title: NOTEBOOK_EXPERIENCE
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/NOTEBOOK_EXPERIENCE.md
+relations: []
+---
 ﻿---
 title: NOTEBOOK_EXPERIENCE
 subtitle: A Experiência do Caderno da Bíblia Vive

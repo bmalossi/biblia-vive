@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_ASSISTANT
+title: AI_ASSISTANT
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_ASSISTANT.md
+relations: []
+---
 ﻿---
 title: AI_ASSISTANT
 subtitle: O Assistente da Bíblia Vive

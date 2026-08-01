@@ -1,3 +1,12 @@
+---
+id: LOGOS-PSN-PERSONAS
+title: PERSONAS
+type: PersonaNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/strategy/audience/PERSONAS.md
+relations: []
+---
 ﻿---
 title: PERSONAS
 subtitle: Personas da Bíblia Vive

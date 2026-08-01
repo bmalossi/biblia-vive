@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-LEGACY_CONTENT
+title: LEGACY_CONTENT
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/content/LEGACY_CONTENT.md
+relations: []
+---
 ﻿---
 title: LEGACY_CONTENT
 subtitle: Conteúdo de Legado da Bíblia Vive

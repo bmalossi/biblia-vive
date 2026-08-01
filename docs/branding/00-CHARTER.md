@@ -1,37 +1,12 @@
 ---
-title: Projeto Logos Charter
-subtitle: Carta de Fundação da Documentação Institucional da Bíblia Vive
-version: 1.1.0
+id: LOGOS-FND-CHARTER
+title: 00-CHARTER
+type: FoundationNode
 status: Approved
-classification: Foundation
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-20
-updated: 2026-07-21
-
-authority-level: 1
-
-depends-on: []
-
-related:
-  - README.md
-  - INDEX.md
-  - DOMAIN.md
-  - core/PHILOSOPHY.md
-  - core/CONSTITUTION.md
-
-bdrs:
-  - BDR-0001
-  - BDR-0002
-  - BDR-0003
-  - BDR-0013
+version: 1.1.0
+source_file: /docs/branding/00-CHARTER.md
+relations: []
 ---
-
 # Projeto Logos
 
 > Carta de Fundação da documentação institucional da Bíblia Vive.

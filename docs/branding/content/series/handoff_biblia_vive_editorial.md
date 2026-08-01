@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-HANDOFF_BIBLIA_VIVE_EDITORIAL
+title: HANDOFF_BIBLIA_VIVE_EDITORIAL
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/content/series/handoff_biblia_vive_editorial.md
+relations: []
+---
 # Documento de Handoff — Bíblia Vive (Diretoria Editorial)
 
 **Data:** 23 de Julho de 2026  

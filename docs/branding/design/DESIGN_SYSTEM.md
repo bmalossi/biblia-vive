@@ -1,3 +1,12 @@
+---
+id: LOGOS-DSGN-SYSTEM
+title: DESIGN_SYSTEM
+type: VisualElementNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/design/DESIGN_SYSTEM.md
+relations: []
+---
 ﻿---
 title: DESIGN_SYSTEM
 subtitle: Sistema de Design da Bíblia Vive

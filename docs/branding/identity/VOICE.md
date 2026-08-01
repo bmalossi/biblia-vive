@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-VOICE
+title: VOICE
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/identity/VOICE.md
+relations: []
+---
 ﻿---
 title: VOICE
 subtitle: Voz e Linguagem da Bíblia Vive

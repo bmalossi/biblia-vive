@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-ARCHETYPES
+title: ARCHETYPES
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/identity/ARCHETYPES.md
+relations: []
+---
 ﻿---
 title: ARCHETYPES
 subtitle: Arquétipos e Temperamento da Bíblia Vive

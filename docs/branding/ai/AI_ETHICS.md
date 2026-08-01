@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_ETHICS
+title: AI_ETHICS
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_ETHICS.md
+relations: []
+---
 ﻿---
 title: AI_ETHICS
 subtitle: Princípios Éticos para a Inteligência Artificial da Bíblia Vive

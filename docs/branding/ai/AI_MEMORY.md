@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_MEMORY
+title: AI_MEMORY
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_MEMORY.md
+relations: []
+---
 ﻿---
 title: AI_MEMORY
 subtitle: A Inteligência Artificial como Guardiã da Memória Espiritual

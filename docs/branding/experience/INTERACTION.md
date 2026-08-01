@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-INTERACTION
+title: INTERACTION
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/INTERACTION.md
+relations: []
+---
 ﻿---
 title: INTERACTION
 subtitle: Princípios de Interação da Bíblia Vive

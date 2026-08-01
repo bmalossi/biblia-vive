@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-TERMINOLOGY
+title: TERMINOLOGY
+type: CommGuidelineNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/communication/TERMINOLOGY.md
+relations: []
+---
 ﻿---
 title: TERMINOLOGY
 subtitle: Vocabulário Oficial da Bíblia Vive

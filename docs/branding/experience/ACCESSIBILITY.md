@@ -1,3 +1,12 @@
+---
+id: LOGOS-DSGN-ACCESSIBILITY
+title: ACCESSIBILITY
+type: VisualElementNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/experience/ACCESSIBILITY.md
+relations: []
+---
 ﻿---
 title: ACCESSIBILITY
 subtitle: Acessibilidade da Bíblia Vive

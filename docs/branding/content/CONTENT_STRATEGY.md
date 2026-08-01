@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-CONTENT_STRATEGY
+title: CONTENT_STRATEGY
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/content/CONTENT_STRATEGY.md
+relations: []
+---
 ﻿---
 title: CONTENT_STRATEGY
 subtitle: Estratégia de Conteúdo da Bíblia Vive

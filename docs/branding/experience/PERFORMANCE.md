@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-PERFORMANCE
+title: PERFORMANCE
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/PERFORMANCE.md
+relations: []
+---
 ﻿---
 title: PERFORMANCE
 subtitle: Performance da Bíblia Vive

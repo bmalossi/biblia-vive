@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-JOURNEY
+title: JOURNEY
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/strategy/JOURNEY.md
+relations: []
+---
 ﻿---
 title: JOURNEY
 subtitle: Jornada do Leitor na Bíblia Vive

@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-INFORMATION_ARCHITECTURE
+title: INFORMATION_ARCHITECTURE
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/INFORMATION_ARCHITECTURE.md
+relations: []
+---
 ﻿---
 title: INFORMATION_ARCHITECTURE
 subtitle: Arquitetura da Informação da Bíblia Vive

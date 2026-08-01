@@ -1,27 +1,12 @@
 ---
-title: Projeto Logos
-subtitle: Documentação Institucional da Bíblia Vive
-version: 2.0.0
+id: LOGOS-COMM-README
+title: README
+type: CommGuidelineNode
 status: Approved
-classification: Foundation
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-20
-updated: 2026-07-21
-
-depends-on: []
-
-related:
-  - 00-CHARTER.md
-  - DOMAIN.md
-  - INDEX.md
+version: 2.0.0
+source_file: /docs/branding/README.md
+relations: []
 ---
-
 # Projeto Logos
 
 Bem-vindo à documentação institucional da **Bíblia Vive**.

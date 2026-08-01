@@ -1,3 +1,12 @@
+---
+id: LOGOS-DSGN-EXPERIENCEPRINCIPLES
+title: PRINCIPLES
+type: VisualElementNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/experience/PRINCIPLES.md
+relations: []
+---
 ﻿---
 title: PRINCIPLES
 subtitle: Princípios da Experiência da Bíblia Vive

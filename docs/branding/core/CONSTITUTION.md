@@ -1,31 +1,16 @@
 ---
-title: Constitution
-subtitle: Constituição Institucional da Bíblia Vive
-version: 1.1.0
+id: LOGOS-FND-CONSTITUTION
+title: CONSTITUTION
+type: FoundationNode
 status: Approved
-classification: Foundation
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-20
-updated: 2026-07-21
-
-authority-level: 3
-
-depends-on:
-  - ../00-CHARTER.md
-  - PHILOSOPHY.md
-
-related:
-  - ../DOMAIN.md
-  - ../ai/AI_ETHICS.md
-  - ../experience/PRINCIPLES.md
+version: 1.1.0
+source_file: /docs/branding/core/CONSTITUTION.md
+relations:
+- type: depende_de
+  target: LOGOS-FND-CHARTER
+- type: depende_de
+  target: LOGOS-FND-PHILOSOPHY
 ---
-
 # CONSTITUTION
 
 > A Constituição estabelece os compromissos permanentes da Bíblia Vive.

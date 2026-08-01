@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-MESSAGING
+title: MESSAGING
+type: CommGuidelineNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/communication/MESSAGING.md
+relations: []
+---
 ﻿---
 title: MESSAGING
 subtitle: Arquitetura de Comunicação da Bíblia Vive

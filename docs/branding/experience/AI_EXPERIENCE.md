@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_EXPERIENCE
+title: AI_EXPERIENCE
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/AI_EXPERIENCE.md
+relations: []
+---
 ﻿---
 title: AI_EXPERIENCE
 subtitle: A Experiência da Inteligência Artificial na Bíblia Vive

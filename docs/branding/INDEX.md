@@ -1,27 +1,16 @@
 ---
-title: Index
-subtitle: Mapa da Documentação Institucional da Bíblia Vive
-version: 2.0.0
+id: LOGOS-COMM-INDEX
+title: INDEX
+type: CommGuidelineNode
 status: Approved
-classification: Foundation
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-20
-updated: 2026-07-21
-
-depends-on:
-  - README.md
-  - 00-CHARTER.md
-
-related:
-  - DOMAIN.md
+version: 2.0.0
+source_file: /docs/branding/INDEX.md
+relations:
+- type: depende_de
+  target: LOGOS-COMM-README
+- type: depende_de
+  target: LOGOS-FND-CHARTER
 ---
-
 # INDEX
 
 > Mapa oficial da documentação institucional da Bíblia Vive.

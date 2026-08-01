@@ -1,3 +1,12 @@
+---
+id: LOGOS-DOM-DOMAIN
+title: DOMAIN
+type: DomainEntityNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/DOMAIN.md
+relations: []
+---
 ﻿---
 title: DOMAIN
 subtitle: Linguagem Ubíqua e Ontologia Institucional da Bíblia Vive

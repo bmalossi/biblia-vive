@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_GUARDRAILS
+title: AI_GUARDRAILS
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_GUARDRAILS.md
+relations: []
+---
 ﻿---
 title: AI_GUARDRAILS
 subtitle: Limites Institucionais da Inteligência Artificial

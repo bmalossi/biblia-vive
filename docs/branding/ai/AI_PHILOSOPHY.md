@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_PHILOSOPHY
+title: AI_PHILOSOPHY
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_PHILOSOPHY.md
+relations: []
+---
 ﻿---
 title: AI_PHILOSOPHY
 subtitle: Filosofia da Inteligência Artificial da Bíblia Vive

@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-NAVIGATION
+title: NAVIGATION
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/NAVIGATION.md
+relations: []
+---
 ﻿---
 title: NAVIGATION
 subtitle: Navegação da Bíblia Vive

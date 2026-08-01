@@ -1,29 +1,20 @@
 ---
+id: LOGOS-DSGN-IMAGERY
 title: IMAGERY
-subtitle: Princípios para Uso de Imagens da Bíblia Vive
-version: 1.0.0
+type: VisualElementNode
 status: Approved
-classification: Design
-
-owner: Founder
-
-authors:
-  - Founder
-  - Chief Brand Architect
-
-created: 2026-07-21
-updated: 2026-07-21
-
-authority-level: 10
-
-depends-on:
-  - ../00-CHARTER.md
-  - ../core/PHILOSOPHY.md
-  - ../core/CONSTITUTION.md
-  - ../DOMAIN.md
+version: 1.0.0
+source_file: /docs/branding/design/IMAGERY.md
+relations:
+- type: depende_de
+  target: LOGOS-FND-CHARTER
+- type: depende_de
+  target: LOGOS-FND-PHILOSOPHY
+- type: depende_de
+  target: LOGOS-FND-CONSTITUTION
+- type: depende_de
+  target: LOGOS-DOM-DOMAIN
 ---
-
-
 # IMAGERY
 
 > Toda imagem utilizada pela Bíblia Vive deve servir à experiência do Leitor.

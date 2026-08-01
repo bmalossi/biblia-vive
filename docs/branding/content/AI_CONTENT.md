@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_CONTENT
+title: AI_CONTENT
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/content/AI_CONTENT.md
+relations: []
+---
 ﻿---
 title: AI_CONTENT
 subtitle: Conteúdo Assistido por Inteligência Artificial

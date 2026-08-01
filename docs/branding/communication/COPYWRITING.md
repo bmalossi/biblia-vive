@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-COPYWRITING
+title: COPYWRITING
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/communication/COPYWRITING.md
+relations: []
+---
 ﻿---
 title: COPYWRITING
 subtitle: Princípios de Redação da Bíblia Vive

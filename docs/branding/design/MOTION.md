@@ -1,3 +1,12 @@
+---
+id: LOGOS-DSGN-MOTION
+title: MOTION
+type: VisualElementNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/design/MOTION.md
+relations: []
+---
 ﻿---
 title: MOTION
 subtitle: Princípios de Movimento da Bíblia Vive

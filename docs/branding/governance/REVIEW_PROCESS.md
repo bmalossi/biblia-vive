@@ -1,3 +1,12 @@
+---
+id: LOGOS-GOV-REVIEW
+title: REVIEW_PROCESS
+type: GovernanceNode
+status: Approved
+version: 1.0.0
+source_file: /docs/branding/governance/REVIEW_PROCESS.md
+relations: []
+---
 ﻿---
 title: REVIEW_PROCESS
 subtitle: Processo de Revisão do Projeto Logos

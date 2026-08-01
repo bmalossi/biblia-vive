@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-AI_EVOLUTION
+title: AI_EVOLUTION
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/ai/AI_EVOLUTION.md
+relations: []
+---
 ﻿---
 title: AI_EVOLUTION
 subtitle: Evolução da Inteligência Artificial da Bíblia Vive

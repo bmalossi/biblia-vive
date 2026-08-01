@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-SERIE-04-ESCUTA-DESENVOLVIMENTO
+title: SERIE-04-ESCUTA-DESENVOLVIMENTO
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/content/series/serie-04-escuta-desenvolvimento.md
+relations: []
+---
 ﻿# Desenvolvimento de Conteúdo — Série 4 · Escuta
 ### Material Completo para Redes Sociais e Website (Versão Refinada - Formato Limpo)
 > Arquitetura Editorial Bíblia Vive v2.0 | Registrado em: 2026-07-30

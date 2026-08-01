@@ -1,3 +1,12 @@
+---
+id: LOGOS-COMM-UX_PRINCIPLES
+title: UX_PRINCIPLES
+type: CommGuidelineNode
+status: Draft
+version: 1.0.0
+source_file: /docs/branding/experience/UX_PRINCIPLES.md
+relations: []
+---
 ﻿---
 title: UX_PRINCIPLES
 subtitle: Princípios de UX da Bíblia Vive
