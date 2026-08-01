@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useEditorialJornadas } from "@/hooks/useEditorialJornadas";
 import {
@@ -22,6 +22,23 @@ export default function JornadasPage() {
   const [selectedChapter, setSelectedChapter] = useState<EditorialChapter | null>(
     null
   );
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Deep link: abre o modal do capítulo automaticamente quando ?capitulo=ID
+  // está presente na URL (ex: chegando via notificação push).
+  useEffect(() => {
+    if (loading) return;
+    const capituloId = searchParams.get("capitulo");
+    if (!capituloId) return;
+
+    const allChapters = seriesGroups.flatMap((g) => g.chapters);
+    const found = allChapters.find((c) => c.id === capituloId);
+    if (found) {
+      setSelectedChapter(found);
+      // Limpa o param da URL sem reload para não re-abrir ao navegar
+      setSearchParams({}, { replace: true });
+    }
+  }, [loading, seriesGroups, searchParams]);
 
   return (
     <Layout>
