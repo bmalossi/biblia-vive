@@ -119,6 +119,23 @@ export default function NotificationSoftAsk() {
 
       const token = await getPushNotificationToken();
 
+      // Token rotation: se este browser já tinha um token anterior diferente,
+      // revoga-o antes de registrar o novo para evitar notificações duplicadas
+      // causadas por re-registros do service worker (limpeza de cache, atualizações, etc.).
+      const STORAGE_KEY = "bv_push_token";
+      const previousToken = localStorage.getItem(STORAGE_KEY);
+      if (previousToken && previousToken !== token) {
+        try {
+          await fetch("/api/notifications/unsubscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: previousToken }),
+          });
+        } catch {
+          // Revogação é best-effort — falhar aqui não bloqueia o registro do novo token
+        }
+      }
+
       const response = await fetch("/api/notifications/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -128,6 +145,9 @@ export default function NotificationSoftAsk() {
       if (!response.ok) {
         throw new Error("Falha ao salvar inscrição");
       }
+
+      // Persiste o token ativo deste browser para permitir rotação futura
+      localStorage.setItem(STORAGE_KEY, token);
 
       setFeedbackSuccess(true);
       sessionDismissed = true;
@@ -142,6 +162,7 @@ export default function NotificationSoftAsk() {
       setIsSubmitting(false);
     }
   };
+
 
   const enterTransition = { duration: 0.4, ease: "easeOut" as const };
   const exitTransition = { duration: 0.35, ease: "easeOut" as const };
