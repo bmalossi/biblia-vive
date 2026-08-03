@@ -97,6 +97,10 @@ export async function sendPushNotification({
         title,
         body,
       },
+      data: {
+        url: link,
+        link: link,
+      },
       webpush: {
         notification: {
           icon: "/icons/icon-192.png",

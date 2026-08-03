@@ -12,14 +12,22 @@ firebase.initializeApp({
 
 const fcmMessaging = firebase.messaging();
 
+// O navegador exibe notificações com o objeto `notification` automaticamente.
+// Devemos chamar `showNotification` apenas se for uma mensagem puramente de dados (`data-only`).
 fcmMessaging.onBackgroundMessage((payload) => {
-  const { title, body, icon } = payload.notification || {};
+  if (payload.notification) {
+    // Notificação exibida automaticamente pelo navegador via payload.notification
+    return;
+  }
+
   const data = payload.data || {};
-  self.registration.showNotification(title || "Bíblia Vive", {
-    body: body || "Novo conteúdo disponível.",
-    icon: icon || "/icons/icon-192.png",
-    data: { ...data, url: data?.url || payload.fcmOptions?.link || "" },
-  });
+  if (data.title || data.body) {
+    self.registration.showNotification(data.title || "Bíblia Vive", {
+      body: data.body || "Novo conteúdo disponível.",
+      icon: data.icon || "/icons/icon-192.png",
+      data: { ...data, url: data.url || data.link || "" },
+    });
+  }
 });
 
 self.addEventListener("notificationclick", (event) => {
