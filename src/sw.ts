@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
-import { registerRoute, NavigationRoute } from "workbox-routing";
-import { CacheFirst, StaleWhileRevalidate, NetworkOnly } from "workbox-strategies";
+import { registerRoute, NavigationRoute, setCatchHandler } from "workbox-routing";
+import { CacheFirst, StaleWhileRevalidate, NetworkOnly, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
 declare let self: ServiceWorkerGlobalScope;
@@ -119,18 +119,40 @@ registerRoute(
   })
 );
 
-// ─── 7. Navigation Fallback: serve offline.html when network fails ──────────
+// ─── 7. SPA Navigation: NetworkFirst cacheia o shell em cada visita online ────
+// Padrão correto para SPAs com React Router quando index.html não está no
+// precache manifest (gerado por Vite com hash dinâmico):
+//   - Online: busca index.html da rede, armazena no cache bv-shell-v1
+//   - Offline: serve do cache bv-shell-v1 (populado na última visita online)
+//   - Timeout de 3s: se rede lenta, serve cache imediatamente
 registerRoute(
-  new NavigationRoute(async (params) => {
-    try {
-      return await new NetworkOnly().handle(params);
-    } catch {
-      const offlineResponse = await caches.match("/offline.html");
-      if (offlineResponse) return offlineResponse;
-      return Response.error();
+  new NavigationRoute(
+    new NetworkFirst({
+      cacheName: "bv-shell-v1",
+      networkTimeoutSeconds: 3,
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 1,          // Só o index.html importa
+          maxAgeSeconds: 24 * 60 * 60, // 24h — renovado a cada visita online
+        }),
+      ],
+    }),
+    {
+      // Exclui rotas que não são do SPA React
+      denylist: [/^\/offline\.html$/, /^\/api\//],
     }
-  })
+  )
 );
+
+// ─── 8. Fallback global: último recurso se shell cache também estiver vazio ──
+// Ocorre somente na primeira visita offline (sem nenhuma visita online anterior)
+setCatchHandler(async ({ request }) => {
+  if (request.destination === "document") {
+    const cached = await caches.match("/offline.html");
+    return cached || Response.error();
+  }
+  return Response.error();
+});
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
