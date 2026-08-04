@@ -71,15 +71,18 @@ registerRoute(
   new NetworkOnly()
 );
 
-// ─── 4. Runtime Cache: Other Bible Versions (NVI, ARC, KJA, Grego, Hebraico) ───
+// ─── 4. Runtime Cache: Bible Versions (Local JSONs & GitHub Raw for NVI, ARC, KJA, etc.) ─
+// Intercepta rotas locais (/bible/**) e externas do GitHub Raw (MaatheusGois/bible)
 registerRoute(
-  ({ url }) => url.pathname.startsWith("/bible/"),
+  ({ url }) =>
+    url.pathname.startsWith("/bible/") ||
+    (url.hostname === "raw.githubusercontent.com" && url.pathname.includes("/MaatheusGois/bible/")),
   new CacheFirst({
     cacheName: "bv-bible-runtime-v1",
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 200,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 dias
+        maxEntries: 500, // Espaço suficiente para múltiplos livros de várias versões
+        maxAgeSeconds: 60 * 24 * 60 * 60, // 60 dias
       }),
     ],
   })
@@ -119,12 +122,7 @@ registerRoute(
   })
 );
 
-// ─── 7. SPA Navigation: NetworkFirst cacheia o shell em cada visita online ────
-// Padrão correto para SPAs com React Router quando index.html não está no
-// precache manifest (gerado por Vite com hash dinâmico):
-//   - Online: busca index.html da rede, armazena no cache bv-shell-v1
-//   - Offline: serve do cache bv-shell-v1 (populado na última visita online)
-//   - Timeout de 3s: se rede lenta, serve cache imediatamente
+// ─── 7. SPA Navigation: NetworkFirst com fallback robusto ────────────────────
 registerRoute(
   new NavigationRoute(
     new NetworkFirst({
@@ -132,24 +130,27 @@ registerRoute(
       networkTimeoutSeconds: 3,
       plugins: [
         new ExpirationPlugin({
-          maxEntries: 1,          // Só o index.html importa
-          maxAgeSeconds: 24 * 60 * 60, // 24h — renovado a cada visita online
+          maxEntries: 5,
+          maxAgeSeconds: 30 * 24 * 60 * 60,
         }),
       ],
     }),
     {
-      // Exclui rotas que não são do SPA React
       denylist: [/^\/offline\.html$/, /^\/api\//],
     }
   )
 );
 
-// ─── 8. Fallback global: último recurso se shell cache também estiver vazio ──
-// Ocorre somente na primeira visita offline (sem nenhuma visita online anterior)
+// ─── 8. Fallback global: quando a rede falha em navegacoes ───────────────────
 setCatchHandler(async ({ request }) => {
   if (request.destination === "document") {
-    const cached = await caches.match("/offline.html");
-    return cached || Response.error();
+    // 1. Tenta index.html do shell cache ou precache
+    const cachedShell = (await caches.match("/index.html")) || (await caches.match("/"));
+    if (cachedShell) return cachedShell;
+
+    // 2. Tenta offline.html se tudo falhar
+    const offlinePage = await caches.match("/offline.html");
+    if (offlinePage) return offlinePage;
   }
   return Response.error();
 });

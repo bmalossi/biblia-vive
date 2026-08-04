@@ -1,22 +1,18 @@
 /**
  * bibleWarmup.ts — Bíblia Vive
  *
- * Warmup proativo do cache offline para os 66 livros da versão ACF.
+ * Warmup proativo do cache offline para a versão selecionada da Bíblia (ACF, NVI, ARC, etc.).
  *
  * Fluxo:
- *  1. Chamado de main.tsx após o SW estar ativo
- *  2. Usa requestIdleCallback para não bloquear a UI
- *  3. Cada fetch passa pelo SW → rota CacheFirst → salvo em bv-bible-runtime-v1
- *  4. Falhas individuais são ignoradas silenciosamente
- *  5. Livros já cacheados são pulados (sem refetch desnecessário)
- *
- * Um arquivo JSON por livro já contém TODOS os capítulos:
- *   /bible/pt-br/acf/gn/gn.json  →  Genesis inteiro (50 caps)
- *   /bible/pt-br/acf/ps/ps.json  →  Salmos inteiro (150 caps)
+ *  1. Identifica a versão atual do leitor (ex: ACF ou NVI)
+ *  2. Para a versão ACF (local), baixa os 66 JSONs locais em background.
+ *  3. Para versões remotas (NVI, ARC, KJA), busca o índice do GitHub Raw e pré-carrega os 66 livros em background.
+ *  4. Cada fetch é interceptado pelo Service Worker (CacheFirst) e fica salvo em `bv-bible-runtime-v1`.
  */
 
-// Mapeamento de todos os 66 localIds da versão ACF
-// (nomes de diretório em public/bible/pt-br/acf/)
+import { getVersion } from "@/lib/themes";
+import { GITHUB_VERSION_SLUGS, GITHUB_LANG_PATHS } from "@/lib/bookResolver";
+
 const ACF_LOCAL_IDS: readonly string[] = [
   "1ch", "1co", "1jo", "1kgs", "1pe", "1sm", "1tm", "1ts",
   "2ch", "2co", "2jo", "2kgs", "2pe", "2sm", "2tm", "2ts",
@@ -29,6 +25,7 @@ const ACF_LOCAL_IDS: readonly string[] = [
   "zc",  "zp",
 ];
 
+const GITHUB_BASE = "https://raw.githubusercontent.com/MaatheusGois/bible/main";
 const BIBLE_CACHE_NAME = "bv-bible-runtime-v1";
 
 function scheduleIdleTask(fn: () => void): void {
@@ -51,13 +48,10 @@ async function isCached(url: string): Promise<boolean> {
 }
 
 /**
- * Pré-cacheia todos os 66 livros da ACF em background, após a página carregar.
- * Cada fetch passa pelo Service Worker (CacheFirst) que armazena automaticamente.
+ * Pré-cacheia os 66 livros da versão bíblica selecionada (ACF, NVI, ARC...) em background.
  */
 export function warmupAcfBibleCache(): void {
-  // Só executa se houver um SW controlando a página
   if (!navigator.serviceWorker?.controller) {
-    // SW ainda não ativo — tenta novamente quando controlar
     navigator.serviceWorker?.ready.then(() => {
       scheduleIdleTask(() => void runWarmup());
     });
@@ -68,42 +62,73 @@ export function warmupAcfBibleCache(): void {
 }
 
 async function runWarmup(): Promise<void> {
-  const uncachedBooks: string[] = [];
+  const currentVersion = getVersion() || "acf";
 
-  // Identifica quais livros ainda não estão em cache
+  if (currentVersion === "acf") {
+    await warmupLocalVersion("acf", "pt-br");
+  } else {
+    await warmupGithubVersion(currentVersion);
+  }
+}
+
+async function warmupLocalVersion(version: string, langPath: string): Promise<void> {
+  const uncachedUrls: string[] = [];
+
   for (const localId of ACF_LOCAL_IDS) {
-    const url = `/bible/pt-br/acf/${localId}/${localId}.json`;
-    const alreadyCached = await isCached(url);
-    if (!alreadyCached) {
-      uncachedBooks.push(localId);
+    const url = `/bible/${langPath}/${version}/${localId}/${localId}.json`;
+    if (!(await isCached(url))) {
+      uncachedUrls.push(url);
     }
   }
 
-  if (uncachedBooks.length === 0) return;
+  if (uncachedUrls.length === 0) return;
 
-  console.info(
-    `[BibleWarmup] Cacheando ${uncachedBooks.length} livros offline em background...`
-  );
+  console.info(`[BibleWarmup] Cacheando ${uncachedUrls.length} livros de ${version.toUpperCase()} (Local)...`);
+  await fetchInBatches(uncachedUrls);
+}
 
-  // Baixa em lotes de 4 para não saturar a rede
+async function warmupGithubVersion(version: string): Promise<void> {
+  const vSlug = GITHUB_VERSION_SLUGS[version] ?? version;
+  const lang = GITHUB_LANG_PATHS[version] ?? "pt-br";
+  const indexUrl = `${GITHUB_BASE}/versions/${lang}/${vSlug}.json`;
+
+  try {
+    const res = await fetch(indexUrl);
+    if (!res.ok) return;
+    const books = (await res.json()) as { id: string }[];
+    if (!Array.isArray(books)) return;
+
+    const uncachedUrls: string[] = [];
+    for (const book of books) {
+      const url = `${GITHUB_BASE}/versions/${lang}/${vSlug}/${book.id}/${book.id}.json`;
+      if (!(await isCached(url))) {
+        uncachedUrls.push(url);
+      }
+    }
+
+    if (uncachedUrls.length === 0) return;
+
+    console.info(`[BibleWarmup] Cacheando ${uncachedUrls.length} livros de ${version.toUpperCase()} (GitHub)...`);
+    await fetchInBatches(uncachedUrls);
+  } catch (err) {
+    console.warn(`[BibleWarmup] Falha ao listar versão ${version} no GitHub:`, err);
+  }
+}
+
+async function fetchInBatches(urls: string[]): Promise<void> {
   const BATCH_SIZE = 4;
-  for (let i = 0; i < uncachedBooks.length; i += BATCH_SIZE) {
-    const batch = uncachedBooks.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < urls.length; i += BATCH_SIZE) {
+    const batch = urls.slice(i, i + BATCH_SIZE);
     await Promise.all(
-      batch.map(async (localId) => {
-        const url = `/bible/pt-br/acf/${localId}/${localId}.json`;
+      batch.map(async (url) => {
         try {
-          // O fetch passa pelo SW → CacheFirst → armazena em bv-bible-runtime-v1
-          const res = await fetch(url, { credentials: "same-origin" });
-          if (!res.ok) {
-            console.warn(`[BibleWarmup] Falha HTTP ${res.status} para ${localId}`);
-          }
+          await fetch(url, { credentials: "same-origin" });
         } catch {
-          // Falha de rede: será tentado novamente na próxima sessão online
+          // Ignora falhas pontuais de rede
         }
       })
     );
   }
-
-  console.info("[BibleWarmup] ✓ Warmup concluído. Bíblia disponível offline.");
+  console.info("[BibleWarmup] ✓ Warmup concluído com sucesso.");
 }
+

@@ -45,6 +45,11 @@ export default function VersionSelector() {
     setCurrentVersion(version);
     setVersion(version);
 
+    // Aciona warmup proativo da nova versão em background
+    import("@/utils/bibleWarmup").then(({ warmupAcfBibleCache }) => {
+      warmupAcfBibleCache();
+    });
+
     if (isBibleVersion(pathSegments[0])) {
       const nextPath = [version, ...pathSegments.slice(1)].join("/");
       navigate(`/${nextPath}${location.search}`);

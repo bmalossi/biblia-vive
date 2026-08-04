@@ -677,6 +677,20 @@ export default function Header() {
                 </Link>
               </div>
 
+              {/* ── Quick Version & Theme Selector (Top of drawer) ── */}
+              <div className="px-4 py-3 border-b border-border bg-app-surface/50">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted mb-2">
+                  Versão & Tema
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <VersionSelector />
+                  <div className="flex items-center gap-1.5">
+                    <LanguageSelector />
+                    <ThemeToggle />
+                  </div>
+                </div>
+              </div>
+
               {/* ── PRO CTA or status (top of drawer) ── */}
               {!proLoading && (
                 <div className="px-4 pt-4 pb-2">
@@ -834,18 +848,8 @@ export default function Header() {
                 )}
               </div>
 
-              {/* ── Settings ── */}
-              <div className="px-3 py-2 border-t border-border mt-auto">
-                <p className="px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
-                  <Settings className="inline h-3 w-3 mr-1 -mt-0.5" />
-                  Configurações
-                </p>
-                <div className="flex flex-wrap items-center gap-3 px-3 py-3 pb-6">
-                  <LanguageSelector />
-                  <VersionSelector />
-                  <ThemeToggle />
-                </div>
-              </div>
+              {/* ── Padding bottom for clean scroll end ── */}
+              <div className="pb-8" />
             </SheetContent>
           </Sheet>
         </div>
