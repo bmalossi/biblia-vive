@@ -262,8 +262,15 @@ _Evitar_: glossário de uso, sinônimos, lista de ocorrências
 Componente de expansão "Ver mais ▾" no card da aba Língua que revela os campos de enriquecimento (Raiz, Família Lexical, Tags de Uso, Resumo BDB). Inicia fechado por padrão para preservar a experiência de leitura rápida.
 _Evitar_: detalhes expandidos, painel avançado, modo especialista
 
+## PWA e Cache Offline
+
+**Operação Rocha Offline**:
+Estratégia de disponibilidade offline e gestão de cache em PWA baseada em Workbox Cache-First. Precacheia os 66 livros da versão ACF (Rocha) e o App Shell no download inicial, utiliza CacheFirst e StaleWhileRevalidate com ExpirationPlugin para dados dinâmicos e isola mídias de áudio (Pass-Through) para impedir inchaço de armazenamento.
+_Evitar_: offline genérico, cache total, PWA sem controle
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.
 - "Bíblia Vive Leitura" aparece no nome do repositório por razão histórica; o nome canônico do produto é **Bíblia Vive**.
 - "léxico hebraico" pode referir-se ao `strongs_hebrew.json` original (Strong's) ou ao novo `strongs_hebrew_os.json` (OpenScriptures). Usar **Léxico de Enriquecimento** para o novo e **Léxico Strong's** para o original.
+

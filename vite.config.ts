@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,15 +12,38 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
     watch: {
-      ignored: ['**/public/bible/**']
-    }
+      ignored: ["**/public/bible/**"],
+    },
   },
   build: {
-    // public/bible has 250k+ files — we copy them separately after build
-    // to avoid Vite hanging for 20+ minutes during the copy phase.
+    // public/bible tem 250k+ arquivos — copiamos separadamente após build
     copyPublicDir: false,
   },
-  plugins: [react()].filter(Boolean),
+  plugins: [
+    react(),
+    VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
+      registerType: "autoUpdate",
+      injectRegister: "auto",
+      manifest: false, // Utiliza public/manifest.json existente
+      injectManifest: {
+        globDirectory: "public",
+        globPatterns: [
+          "*.{html,ico,png,svg,webp}",
+          "red_letters_verses.json",
+          "bible/book-contexts.json",
+          "bible/reading-plans.json",
+          "bible/pt-br/acf/*/*.json",
+        ],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+      },
+      devOptions: {
+        enabled: false,
+      },
+    }),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

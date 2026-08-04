@@ -18,6 +18,8 @@ Sentry.init({
 
 initTheme();
 
+import "@/utils/cacheInspector";
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     void navigator.serviceWorker.register("/sw.js");
