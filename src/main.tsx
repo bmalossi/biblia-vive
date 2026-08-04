@@ -19,10 +19,14 @@ Sentry.init({
 initTheme();
 
 import "@/utils/cacheInspector";
+import { warmupAcfBibleCache } from "@/utils/bibleWarmup";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/sw.js");
+    void navigator.serviceWorker.register("/sw.js").then(() => {
+      // Após SW registrado, ativa o warmup proativo dos 66 livros ACF
+      warmupAcfBibleCache();
+    });
   });
 }
 

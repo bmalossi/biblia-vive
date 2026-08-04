@@ -4,32 +4,16 @@ import path from "path";
 import { VitePWA } from "vite-plugin-pwa";
 import type { ManifestEntry } from "workbox-build";
 
-// 66 livros da Bíblia ACF adicionados ao precache manualmente porque
-// o copy-public.mjs só cria dist/bible/ APÓS o vite build, então o
-// globDirectory padrão (dist/) não os veria em tempo de build.
-const ACF_BOOKS = [
-  "1ch","1co","1jo","1kgs","1pe","1sm","1tm","1ts",
-  "2ch","2co","2jo","2kgs","2pe","2sm","2tm","2ts",
-  "3jo","act","am","cl","dn","dt","ec","eph","et",
-  "ex","ez","ezr","gl","gn","hb","hg","hk","ho",
-  "is","jd","jl","jm","jn","jo","job","jr","js",
-  "jud","lk","lm","lv","mi","mk","ml","mt","na",
-  "ne","nm","ob","ph","phm","prv","ps","re","rm",
-  "rt","so","tt","zc","zp",
-] as const;
-
-const biblePrecacheEntries: ManifestEntry[] = [
-  // App essentials from public/
+// Arquivos críticos de public/ que precisam estar no precache imediatamente.
+// Os 66 livros ACF são tratados via warmup proativo em src/utils/bibleWarmup.ts
+// (mais confiável que precache, pois não depende de timing de build).
+const essentialPublicEntries: ManifestEntry[] = [
   { url: "/offline.html", revision: null },
   { url: "/red_letters_verses.json", revision: null },
   { url: "/bible/book-contexts.json", revision: null },
   { url: "/bible/reading-plans.json", revision: null },
-  // 66 livros ACF — a Rocha
-  ...ACF_BOOKS.map((book) => ({
-    url: `/bible/pt-br/acf/${book}/${book}.json`,
-    revision: null,
-  })),
 ];
+
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -64,7 +48,7 @@ export default defineConfig(({ mode }) => ({
           "*.{ico,png,svg,webp}",
         ],
         globIgnores: ["**/node_modules/**"],
-        additionalManifestEntries: biblePrecacheEntries,
+        additionalManifestEntries: essentialPublicEntries,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
       },
       devOptions: {
