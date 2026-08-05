@@ -1257,6 +1257,16 @@ export default function ReadingPage() {
         {!preferences.focusMode && (
           <>
             <section className={`mx-auto w-full max-w-6xl px-4 md:px-6`}>
+              {chapterData?.fallbackNotice && (
+                <Alert className="mb-4 border-gold/40 bg-gold-bg/20 text-app-text">
+                  <AlertTitle className="font-medium text-gold flex items-center gap-2">
+                    <span>📡 Modo OfflineAtivo</span>
+                  </AlertTitle>
+                  <AlertDescription className="text-xs text-app-text-muted">
+                    {chapterData.fallbackNotice}
+                  </AlertDescription>
+                </Alert>
+              )}
               {churchMode.isActive && (
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gold/30 bg-gold-bg/10 px-4 py-2">
                   <div className="flex items-center gap-2">

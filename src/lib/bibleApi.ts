@@ -76,21 +76,21 @@ export async function fetchChapter(
   const slug = book ? book.slug : bookId.toLowerCase();
   const chain = selectChain(version);
 
-  // 1. Tenta a versão pedida
+  // 1. Tenta carregar a versão solicitada na cadeia de adapters
   for (const adapter of chain) {
-    let result: Chapter | null = null;
     try {
-      result = await adapter.fetch(slug, version, chapter);
+      const result = await adapter.fetch(slug, version, chapter);
+      if (result !== null) {
+        return { ...result, source: adapter.name === "original-language" ? "local" : adapter.name as any };
+      }
     } catch {
-      // Transient failure on this adapter — try next
+      // Falha transiente ou erro de rede (offline) no adapter — tenta o próximo
       continue;
-    }
-    if (result !== null) {
-      return { ...result, source: adapter.name === "original-language" ? "local" : adapter.name as any };
     }
   }
 
-  // 2. Se falhar (ex: sem internet e NVI/ARC sem cache), faz fallback gracioso para a versão ACF local
+  // 2. Se a versão solicitada falhou (ex: sem internet e versão não cacheada),
+  // faz o fallback obrigatório para a versão ACF local (a Rocha offline)
   if (version !== "acf" && version !== "org") {
     try {
       const acfChapter = await localAdapter.fetch(slug, "acf", chapter);
@@ -98,16 +98,16 @@ export async function fetchChapter(
         return {
           ...acfChapter,
           source: "local",
-          fallbackNotice: `Você está offline. A versão "${version.toUpperCase()}" não está em cache local — exibindo na versão ACF.`,
+          fallbackNotice: `Você está offline. A versão "${version.toUpperCase()}" não está armazenada offline — exibindo na versão ACF.`,
         };
       }
-    } catch {
-      // ignora erro do fallback ACF
+    } catch (e) {
+      console.warn("[bibleApi] Falha no fallback ACF local:", e);
     }
   }
 
   throw {
-    message: "Could not load this chapter from any available source.",
+    message: "Não foi possível carregar este capítulo. Verifique sua conexão ou tente a versão ACF.",
   };
 }
 
