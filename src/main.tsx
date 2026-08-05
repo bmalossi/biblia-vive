@@ -30,10 +30,12 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Stale deployment recovery: recarrega quando chunk não é encontrado após novo deploy
+// Stale deployment recovery: recarrega quando chunk não é encontrado após novo deploy (apenas se online)
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault()
-  window.location.reload()
+  if (navigator.onLine) {
+    window.location.reload()
+  }
 })
 
 createRoot(document.getElementById("root")!).render(

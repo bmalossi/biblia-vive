@@ -1530,6 +1530,16 @@ export default function ReadingPage() {
               style={{ maxWidth: compareEnabled ? "1120px" : "var(--column-width)" }}
             >
               <h1 className="mb-4 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
+              {chapterData?.fallbackNotice && (
+                <Alert className="mb-4 border-gold/40 bg-gold/10 text-gold-dark dark:text-gold-light">
+                  <AlertTitle className="flex items-center gap-2 font-semibold text-sm">
+                    ⚡ Modo Offline — Bíblia em Cache
+                  </AlertTitle>
+                  <AlertDescription className="text-xs opacity-90">
+                    {chapterData.fallbackNotice}
+                  </AlertDescription>
+                </Alert>
+              )}
               <WorshipCard bookId={selectedBook?.id} chapter={chapterNumber} />
               <div className={compareEnabled ? "grid gap-6 lg:grid-cols-2" : "block"}>
                 <section>

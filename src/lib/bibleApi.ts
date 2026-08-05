@@ -37,6 +37,7 @@ export interface Chapter {
   reference: string;
   verses: Verse[];
   source?: "local" | "api" | "github";
+  fallbackNotice?: string;
 }
 
 // ─── API version IDs (only used for searchVerses — scripture.api.bible) ───────
@@ -62,6 +63,9 @@ function selectChain(version: string): ChapterSourceAdapter[] {
  * Fetch a chapter using the fallback chain defined in ADR-0004.
  * Chain for "org": [originalLanguage]
  * Chain for all other versions: [local → api → github]
+ *
+ * Se estiver offline e a versão solicitada (ex: NVI/ARC) não estiver em cache,
+ * faz o fallback automático para a versão ACF (a Rocha local) e anexa um fallbackNotice.
  */
 export async function fetchChapter(
   version: string,
@@ -72,6 +76,7 @@ export async function fetchChapter(
   const slug = book ? book.slug : bookId.toLowerCase();
   const chain = selectChain(version);
 
+  // 1. Tenta a versão pedida
   for (const adapter of chain) {
     let result: Chapter | null = null;
     try {
@@ -82,6 +87,22 @@ export async function fetchChapter(
     }
     if (result !== null) {
       return { ...result, source: adapter.name === "original-language" ? "local" : adapter.name as any };
+    }
+  }
+
+  // 2. Se falhar (ex: sem internet e NVI/ARC sem cache), faz fallback gracioso para a versão ACF local
+  if (version !== "acf" && version !== "org") {
+    try {
+      const acfChapter = await localAdapter.fetch(slug, "acf", chapter);
+      if (acfChapter !== null) {
+        return {
+          ...acfChapter,
+          source: "local",
+          fallbackNotice: `Você está offline. A versão "${version.toUpperCase()}" não está em cache local — exibindo na versão ACF.`,
+        };
+      }
+    } catch {
+      // ignora erro do fallback ACF
     }
   }
 

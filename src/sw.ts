@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
+import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL, matchPrecache } from "workbox-precaching";
 import { registerRoute, NavigationRoute, setCatchHandler } from "workbox-routing";
 import { CacheFirst, StaleWhileRevalidate, NetworkOnly, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
@@ -122,35 +122,73 @@ registerRoute(
   })
 );
 
-// ─── 7. SPA Navigation: NetworkFirst com fallback robusto ────────────────────
+// ─── 7. SPA Navigation: Retorna index.html precacheado (0ms instantâneo) ──────
+// Para SPAs com React Router, qualquer URL de documento (/ , /nvi/gn/1, etc.)
+// DEVE servir o index.html do precache. O React Router assume a rota no cliente.
+let getPrecachedAppShell: any;
+try {
+  getPrecachedAppShell = createHandlerBoundToURL("/index.html");
+} catch {
+  try {
+    getPrecachedAppShell = createHandlerBoundToURL("index.html");
+  } catch {
+    getPrecachedAppShell = null;
+  }
+}
+
 registerRoute(
   new NavigationRoute(
-    new NetworkFirst({
-      cacheName: "bv-shell-v1",
-      networkTimeoutSeconds: 3,
-      plugins: [
-        new ExpirationPlugin({
-          maxEntries: 5,
-          maxAgeSeconds: 30 * 24 * 60 * 60,
-        }),
-      ],
-    }),
+    async (options) => {
+      // 1. Tenta o handler oficial do Workbox bound para /index.html
+      if (getPrecachedAppShell) {
+        try {
+          return await getPrecachedAppShell(options);
+        } catch {
+          // ignora e tenta fallbacks
+        }
+      }
+
+      // 2. Tenta buscar no precache via matchPrecache do Workbox
+      const precachedHtml =
+        (await matchPrecache("/index.html")) ||
+        (await matchPrecache("index.html"));
+      if (precachedHtml) return precachedHtml;
+
+      // 3. Se online, tenta buscar a versão da rede
+      if (navigator.onLine) {
+        try {
+          return await new NetworkFirst().handle(options);
+        } catch {
+          // ignora
+        }
+      }
+
+      // 4. Fallback de cache geral
+      const cached =
+        (await caches.match("/index.html", { ignoreSearch: true })) ||
+        (await caches.match("/", { ignoreSearch: true }));
+      if (cached) return cached;
+
+      // 5. Último recurso: offline.html
+      const offlinePage = await caches.match("/offline.html");
+      if (offlinePage) return offlinePage;
+
+      return Response.error();
+    },
     {
       denylist: [/^\/offline\.html$/, /^\/api\//],
     }
   )
 );
 
-// ─── 8. Fallback global: quando a rede falha em navegacoes ───────────────────
+// ─── 8. Fallback global para outros recursos ─────────────────────────────────
 setCatchHandler(async ({ request }) => {
   if (request.destination === "document") {
-    // 1. Tenta index.html do shell cache ou precache
-    const cachedShell = (await caches.match("/index.html")) || (await caches.match("/"));
-    if (cachedShell) return cachedShell;
-
-    // 2. Tenta offline.html se tudo falhar
-    const offlinePage = await caches.match("/offline.html");
-    if (offlinePage) return offlinePage;
+    const cachedShell =
+      (await matchPrecache("/index.html")) ||
+      (await caches.match("/index.html", { ignoreSearch: true })) ||
+      (await caches.match("/offline.html"));
+    return cachedShell || Response.error();
   }
   return Response.error();
 });
