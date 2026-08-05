@@ -23,8 +23,11 @@ import { warmupAcfBibleCache } from "@/utils/bibleWarmup";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/sw.js").then(() => {
-      // Após SW registrado, ativa o warmup proativo dos 66 livros ACF
+    void navigator.serviceWorker.register("/sw.js").then((reg) => {
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+      void reg.update();
       warmupAcfBibleCache();
     });
   });

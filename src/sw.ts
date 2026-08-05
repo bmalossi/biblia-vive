@@ -1,10 +1,22 @@
-/// <reference lib="webworker" />
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL, matchPrecache } from "workbox-precaching";
 import { registerRoute, NavigationRoute, setCatchHandler } from "workbox-routing";
 import { CacheFirst, StaleWhileRevalidate, NetworkOnly, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
+import { clientsClaim } from "workbox-core";
 
 declare let self: ServiceWorkerGlobalScope;
+
+// Ativa imediatamente o novo Service Worker e assume controle de todas as abas/clientes
+self.skipWaiting();
+clientsClaim();
+
+self.addEventListener("install", () => {
+  void self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(self.clients.claim());
+});
 
 // ─── 1. Firebase Cloud Messaging (Push Notifications) ────────────────────────
 importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js");
