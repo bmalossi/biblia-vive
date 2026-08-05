@@ -64,10 +64,19 @@ export function warmupAcfBibleCache(): void {
 async function runWarmup(): Promise<void> {
   const currentVersion = getVersion() || "acf";
 
-  if (currentVersion === "acf") {
-    await warmupLocalVersion("acf", "pt-br");
-  } else {
-    await warmupGithubVersion(currentVersion);
+  // ACF é sempre a "Rocha" — base do fallback offline.
+  // Deve ser baixada independentemente da versão atual do usuário.
+  await warmupLocalVersion("acf", "pt-br");
+
+  // Se o usuário está usando uma versão diferente da ACF, baixa ela também.
+  if (currentVersion !== "acf") {
+    // Versões locais (existem em public/bible/pt-br/)
+    const localVersions = ["arc", "nvi", "aa", "kja"];
+    if (localVersions.includes(currentVersion)) {
+      await warmupLocalVersion(currentVersion, "pt-br");
+    } else {
+      await warmupGithubVersion(currentVersion);
+    }
   }
 }
 

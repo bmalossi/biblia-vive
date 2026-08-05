@@ -1,6 +1,6 @@
-import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL, matchPrecache } from "workbox-precaching";
+import { precacheAndRoute, cleanupOutdatedCaches, matchPrecache } from "workbox-precaching";
 import { registerRoute, NavigationRoute, setCatchHandler } from "workbox-routing";
-import { CacheFirst, StaleWhileRevalidate, NetworkOnly, NetworkFirst } from "workbox-strategies";
+import { CacheFirst, StaleWhileRevalidate, NetworkOnly } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 import { clientsClaim } from "workbox-core";
 
@@ -19,35 +19,42 @@ self.addEventListener("activate", (event) => {
 });
 
 // ─── 1. Firebase Cloud Messaging (Push Notifications) ────────────────────────
-importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-messaging-compat.js");
-
+// Firebase Cloud Messaging: carregado com try/catch para não travar o SW offline.
+// Se o CDN do Google estiver inacessível (sem internet), o SW continua funcionando.
 declare const firebase: any;
 
-if (typeof firebase !== "undefined") {
-  firebase.initializeApp({
-    apiKey: "AIzaSyBYVEQZXP2X03L6tdNFaJSRIt5Ht-9lK24",
-    authDomain: "biblia-vive-web.firebaseapp.com",
-    projectId: "biblia-vive-web",
-    storageBucket: "biblia-vive-web.firebasestorage.app",
-    messagingSenderId: "764864746880",
-    appId: "1:764864746880:web:3b77dd4a51be649e2f5d65",
-  });
+try {
+  importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js");
+  importScripts("https://www.gstatic.com/firebasejs/12.16.0/firebase-messaging-compat.js");
 
-  const fcmMessaging = firebase.messaging();
+  if (typeof firebase !== "undefined") {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBYVEQZXP2X03L6tdNFaJSRIt5Ht-9lK24",
+      authDomain: "biblia-vive-web.firebaseapp.com",
+      projectId: "biblia-vive-web",
+      storageBucket: "biblia-vive-web.firebasestorage.app",
+      messagingSenderId: "764864746880",
+      appId: "1:764864746880:web:3b77dd4a51be649e2f5d65",
+    });
 
-  fcmMessaging.onBackgroundMessage((payload: any) => {
-    if (payload.notification) return;
+    const fcmMessaging = firebase.messaging();
 
-    const data = payload.data || {};
-    if (data.title || data.body) {
-      self.registration.showNotification(data.title || "Bíblia Vive", {
-        body: data.body || "Novo conteúdo disponível.",
-        icon: data.icon || "/icons/icon-192.png",
-        data: { ...data, url: data.url || data.link || "" },
-      });
-    }
-  });
+    fcmMessaging.onBackgroundMessage((payload: any) => {
+      if (payload.notification) return;
+
+      const data = payload.data || {};
+      if (data.title || data.body) {
+        self.registration.showNotification(data.title || "Bíblia Vive", {
+          body: data.body || "Novo conteúdo disponível.",
+          icon: data.icon || "/icons/icon-192.png",
+          data: { ...data, url: data.url || data.link || "" },
+        });
+      }
+    });
+  }
+} catch (e) {
+  // Firebase indisponível (offline ou CDN bloqueado) — o SW opera normalmente sem FCM.
+  console.warn("[SW] Firebase não pôde ser carregado:", e);
 }
 
 self.addEventListener("notificationclick", (event: any) => {
@@ -134,58 +141,34 @@ registerRoute(
   })
 );
 
-// ─── 7. SPA Navigation: Retorna index.html precacheado (0ms instantâneo) ──────
-// Para SPAs com React Router, qualquer URL de documento (/ , /nvi/gn/1, etc.)
-// DEVE servir o index.html do precache. O React Router assume a rota no cliente.
-let getPrecachedAppShell: any;
-try {
-  getPrecachedAppShell = createHandlerBoundToURL("/index.html");
-} catch {
-  try {
-    getPrecachedAppShell = createHandlerBoundToURL("index.html");
-  } catch {
-    getPrecachedAppShell = null;
-  }
-}
-
+// ─── 7. SPA Navigation: Retorna index.html precacheado ───────────────────────
+// Qualquer URL de documento (/, /nvi/gn/1, /acf/gn, etc.) recebe o index.html
+// do precache. O React Router assume o roteamento no cliente.
+// Estratégia: caches.match primeiro (mais rápido e mais confiável que matchPrecache).
 registerRoute(
   new NavigationRoute(
     async (options) => {
-      // 1. Tenta o handler oficial do Workbox bound para /index.html
-      if (getPrecachedAppShell) {
-        try {
-          return await getPrecachedAppShell(options);
-        } catch {
-          // ignora e tenta fallbacks
-        }
-      }
-
-      // 2. Tenta buscar no precache via matchPrecache do Workbox
-      const precachedHtml =
+      // 1. Busca direta em todos os caches pelo index.html (mais rápido)
+      const fromCache =
+        (await caches.match("/index.html")) ||
+        (await caches.match(new Request("/index.html"))) ||
         (await matchPrecache("/index.html")) ||
         (await matchPrecache("index.html"));
-      if (precachedHtml) return precachedHtml;
 
-      // 3. Se online, tenta buscar a versão da rede
+      if (fromCache) return fromCache;
+
+      // 2. Se online, busca da rede
       if (navigator.onLine) {
         try {
-          return await new NetworkFirst().handle(options);
+          const netResponse = await fetch("/index.html");
+          if (netResponse.ok) return netResponse;
         } catch {
           // ignora
         }
       }
 
-      // 4. Fallback de cache geral
-      const cached =
-        (await caches.match("/index.html", { ignoreSearch: true })) ||
-        (await caches.match("/", { ignoreSearch: true }));
-      if (cached) return cached;
-
-      // 5. Último recurso: offline.html
-      const offlinePage = await caches.match("/offline.html");
-      if (offlinePage) return offlinePage;
-
-      return Response.error();
+      // 3. Último recurso: offline.html
+      return (await caches.match("/offline.html")) || Response.error();
     },
     {
       denylist: [/^\/offline\.html$/, /^\/api\//],
