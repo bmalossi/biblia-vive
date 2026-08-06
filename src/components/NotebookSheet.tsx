@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
-import { BookText, Plus, Search, X, Download, BookOpen, Heart, Sparkles, Mountain } from "lucide-react";
+import { BookText, Plus, Search, X, Download, BookOpen, Heart, Sparkles, Mountain, Scroll } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import NotebookEditor from "@/components/NotebookEditor";
@@ -23,7 +23,9 @@ import type { ChapterNotebook } from "@/lib/notebookStore";
 import type { SaveStatus } from "@/hooks/useNotebooks";
 import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
 import { ALL_BOOKS } from "@/lib/books";
-import type { MemorialCategory } from "@/lib/noteStore";
+import { createNoteStore, type MemorialCategory, type MemorialEntry } from "@/lib/noteStore";
+import { useAuth } from "@/hooks/useAuth";
+import MemorialInlineEditor from "@/components/MemorialInlineEditor";
 
 const bookOrderMap = new Map(ALL_BOOKS.map((book, index) => [book.id.toLowerCase(), index]));
 
@@ -128,12 +130,55 @@ export default function NotebookSheet({
     setIsCreatingNew,
     onOpenCategoryModal,
 }: NotebookSheetProps) {
+    const { user } = useAuth();
+    const noteStore = useMemo(() => createNoteStore(user?.id), [user?.id]);
+
+    const [mainSection, setMainSection] = useState<"notebooks" | "memorial">("notebooks");
     const isEditing = isCreatingNew || selectedNotebook !== null;
     const sheetMode = isEditing ? "editor" : "list";
     const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.95);
     const [activeTab, setActiveTab] = useState<TabId>("chapter");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState<"recent" | "biblical-asc" | "biblical-desc">("recent");
+
+    // Estados do Memorial inline
+    const [memorialScope, setMemorialScope] = useState<"chapter" | "all">("chapter");
+    const [memorialCategoryFilter, setMemorialCategoryFilter] = useState<string>("all");
+    const [memorialEntries, setMemorialEntries] = useState<MemorialEntry[]>([]);
+    const [selectedMemorialEntry, setSelectedMemorialEntry] = useState<MemorialEntry | null>(null);
+    const [isCreatingMemorial, setIsCreatingMemorial] = useState<boolean>(false);
+    const [memorialCategoryForNew, setMemorialCategoryForNew] = useState<MemorialCategory>("reflection");
+
+    const loadMemorialEntries = useCallback(async () => {
+        try {
+            const list = memorialScope === "chapter"
+                ? await noteStore.getByChapter(bookId, chapter)
+                : await noteStore.getAll();
+            setMemorialEntries(list);
+        } catch {
+            // ignore
+        }
+    }, [noteStore, memorialScope, bookId, chapter]);
+
+    useEffect(() => {
+        if (open) {
+            loadMemorialEntries();
+        }
+    }, [open, loadMemorialEntries]);
+
+    const handleSaveMemorialInline = useCallback(async (data: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }) => {
+        await noteStore.save(data);
+        await loadMemorialEntries();
+        setIsCreatingMemorial(false);
+        setSelectedMemorialEntry(null);
+    }, [noteStore, loadMemorialEntries]);
+
+    const handleDeleteMemorialInline = useCallback(async (id: string) => {
+        await noteStore.delete(id);
+        await loadMemorialEntries();
+        setIsCreatingMemorial(false);
+        setSelectedMemorialEntry(null);
+    }, [noteStore, loadMemorialEntries]);
 
     // Sincronizar o activeSnapPoint para abrir totalmente ao abrir o drawer
     useEffect(() => {
@@ -449,8 +494,209 @@ export default function NotebookSheet({
                         )}
                     </div>
 
+                    {/* Abas Principais Superiores */}
+                    {sheetMode !== "editor" && !selectedMemorialEntry && !isCreatingMemorial && (
+                        <div className="grid grid-cols-2 shrink-0 border-b border-border bg-app-surface/40">
+                            <button
+                                type="button"
+                                onClick={() => { setMainSection("notebooks"); }}
+                                className={cn(
+                                    "flex items-center justify-center gap-1.5 py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                    mainSection === "notebooks"
+                                        ? "border-gold text-gold font-semibold bg-gold/5"
+                                        : "border-transparent text-app-text-muted hover:text-app-text"
+                                )}
+                            >
+                                <BookText className="h-3.5 w-3.5" />
+                                <span>Caderno de Estudo</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setMainSection("memorial"); }}
+                                className={cn(
+                                    "flex items-center justify-center gap-1.5 py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                    mainSection === "memorial"
+                                        ? "border-gold text-gold font-semibold bg-gold/5"
+                                        : "border-transparent text-app-text-muted hover:text-app-text"
+                                )}
+                            >
+                                <Scroll className="h-3.5 w-3.5" />
+                                <span>Memorial</span>
+                            </button>
+                        </div>
+                    )}
+
                     {/* Conteúdo do sheet */}
-                    {sheetMode === "editor" ? (
+                    {mainSection === "memorial" ? (
+                        isCreatingMemorial || selectedMemorialEntry !== null ? (
+                            <div className="flex-1 min-h-0 overflow-y-auto">
+                                <MemorialInlineEditor
+                                    category={memorialCategoryForNew}
+                                    bookId={selectedMemorialEntry?.bookId ?? bookId}
+                                    bookName={selectedMemorialEntry?.bookName ?? bookName}
+                                    chapter={selectedMemorialEntry?.chapter ?? chapter}
+                                    verse={selectedMemorialEntry?.verse}
+                                    version={selectedMemorialEntry?.version ?? version}
+                                    verseText={selectedMemorialEntry?.verseText}
+                                    existingEntry={selectedMemorialEntry}
+                                    onSave={handleSaveMemorialInline}
+                                    onDelete={handleDeleteMemorialInline}
+                                    onBack={() => {
+                                        setSelectedMemorialEntry(null);
+                                        setIsCreatingMemorial(false);
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col flex-1 min-h-0">
+                                {/* Scope Tabs (Neste Capítulo / Toda a Bíblia) */}
+                                <div className="grid grid-cols-2 shrink-0 border-b border-border">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMemorialScope("chapter")}
+                                        className={cn(
+                                            "py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                            memorialScope === "chapter"
+                                                ? "border-gold text-gold font-semibold"
+                                                : "border-transparent text-app-text-muted hover:text-app-text"
+                                        )}
+                                    >
+                                        Neste Capítulo
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMemorialScope("all")}
+                                        className={cn(
+                                            "py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                            memorialScope === "all"
+                                                ? "border-gold text-gold font-semibold"
+                                                : "border-transparent text-app-text-muted hover:text-app-text"
+                                        )}
+                                    >
+                                        Toda a Bíblia
+                                    </button>
+                                </div>
+
+                                {/* Filtro por Categoria */}
+                                <div className="px-3 pt-2.5 pb-1 flex gap-1 overflow-x-auto scrollbar-none shrink-0 border-b border-border/40">
+                                    {[
+                                        { id: "all", label: "Todos" },
+                                        { id: "reflection", label: "Reflexões" },
+                                        { id: "prayer", label: "Orações" },
+                                        { id: "testimony", label: "Testemunhos" },
+                                        { id: "fasting", label: "Propósitos" },
+                                    ].map((cat) => (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            onClick={() => setMemorialCategoryFilter(cat.id)}
+                                            className={cn(
+                                                "px-2.5 py-1 rounded-full text-[0.65rem] font-medium whitespace-nowrap transition-all border",
+                                                memorialCategoryFilter === cat.id
+                                                    ? "bg-gold/15 border-gold/40 text-gold font-semibold"
+                                                    : "border-border/60 bg-app-surface text-app-text-muted hover:text-app-text"
+                                            )}
+                                        >
+                                            {cat.label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Lista de Registros do Memorial */}
+                                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-2">
+                                    {(() => {
+                                        const items = memorialCategoryFilter === "all"
+                                            ? memorialEntries
+                                            : memorialEntries.filter((e) => e.type === memorialCategoryFilter);
+
+                                        if (items.length === 0) {
+                                            return (
+                                                <div className="text-center py-10 space-y-1.5">
+                                                    <p className="text-[0.82rem] text-app-text-muted">Nenhum registro encontrado.</p>
+                                                    <p className="text-[0.72rem] text-app-text-muted/60">
+                                                        Clique no botão abaixo para criar uma memória.
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+
+                                        const typeLabels: Record<string, { label: string; badge: string }> = {
+                                            reflection: { label: "Reflexão", badge: "border-gold/40 text-gold bg-gold/10" },
+                                            prayer: { label: "Oração", badge: "border-border text-app-text-muted bg-app-surface" },
+                                            testimony: { label: "Testemunho", badge: "border-border text-app-text-muted bg-app-surface" },
+                                            fasting: { label: "Jejum / Propósito", badge: "border-border text-app-text-muted bg-app-surface" },
+                                        };
+
+                                        return items.map((entry) => {
+                                            const typeInfo = typeLabels[entry.type] || { label: "Registro", badge: "border-border text-app-text" };
+                                            return (
+                                                <button
+                                                    key={entry.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedMemorialEntry(entry);
+                                                        setMemorialCategoryForNew(entry.type);
+                                                        setIsCreatingMemorial(false);
+                                                    }}
+                                                    className="w-full text-left rounded-xl border border-border bg-app-surface p-3 space-y-1.5 hover:border-gold/40 transition-colors shadow-sm"
+                                                >
+                                                    <div className="flex items-center justify-between text-[0.62rem]">
+                                                        <span className={cn("px-2 py-0.5 rounded-full border font-medium", typeInfo.badge)}>
+                                                            {typeInfo.label}
+                                                        </span>
+                                                        <span className="text-app-text-muted/60">
+                                                            {formatDate(entry.createdAt)}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[0.65rem] font-mono text-gold/80 font-medium">
+                                                        {entry.bookName} {entry.chapter}{entry.verse ? `:${entry.verse}` : ""}
+                                                    </p>
+                                                    {entry.title && (
+                                                        <p className="text-[0.8rem] font-semibold text-app-text line-clamp-1">
+                                                            {entry.title}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-[0.72rem] text-app-text-muted line-clamp-2 italic">
+                                                        "{entry.content}"
+                                                    </p>
+                                                </button>
+                                            );
+                                        });
+                                    })()}
+                                </div>
+
+                                {/* Footer botão Criar Nova Memória */}
+                                <div className="p-3 border-t border-border shrink-0 space-y-2">
+                                    <p className="text-[0.65rem] font-mono text-app-text-muted uppercase tracking-wider">
+                                        Criar nova memória:
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {(
+                                            [
+                                                { cat: "reflection", label: "Reflexão" },
+                                                { cat: "prayer", label: "Oração" },
+                                                { cat: "testimony", label: "Testemunho" },
+                                                { cat: "fasting", label: "Propósito" },
+                                            ] as const
+                                        ).map((item) => (
+                                            <button
+                                                key={item.cat}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedMemorialEntry(null);
+                                                    setMemorialCategoryForNew(item.cat);
+                                                    setIsCreatingMemorial(true);
+                                                }}
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                            >
+                                                + {item.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    ) : sheetMode === "editor" ? (
                         <div className="flex-1 min-h-0 overflow-y-auto">
                             <NotebookEditor
                                 notebook={isCreatingNew
@@ -631,40 +877,48 @@ export default function NotebookSheet({
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenChange(false);
-                                                    onOpenCategoryModal?.('reflection');
+                                                    setMainSection("memorial");
+                                                    setMemorialCategoryForNew("reflection");
+                                                    setSelectedMemorialEntry(null);
+                                                    setIsCreatingMemorial(true);
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
                                             >
                                                 Reflexão
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenChange(false);
-                                                    onOpenCategoryModal?.('prayer');
+                                                    setMainSection("memorial");
+                                                    setMemorialCategoryForNew("prayer");
+                                                    setSelectedMemorialEntry(null);
+                                                    setIsCreatingMemorial(true);
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
                                             >
                                                 Oração
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenChange(false);
-                                                    onOpenCategoryModal?.('testimony');
+                                                    setMainSection("memorial");
+                                                    setMemorialCategoryForNew("testimony");
+                                                    setSelectedMemorialEntry(null);
+                                                    setIsCreatingMemorial(true);
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
                                             >
                                                 Testemunho
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    onOpenChange(false);
-                                                    onOpenCategoryModal?.('fasting');
+                                                    setMainSection("memorial");
+                                                    setMemorialCategoryForNew("fasting");
+                                                    setSelectedMemorialEntry(null);
+                                                    setIsCreatingMemorial(true);
                                                 }}
-                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors active:scale-95"
+                                                className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
                                             >
                                                 Jejum / Propósito
                                             </button>

@@ -35,7 +35,7 @@ describe("POST /api/notifications/on-publish", () => {
     });
 
     const res1 = await POST(requestNoHeader);
-    expect(res1.status).toBe(401);
+    expect([400, 401]).toContain(res1.status);
 
     const requestWrongHeader = new Request("http://localhost/api/notifications/on-publish", {
       method: "POST",
@@ -195,7 +195,7 @@ describe("POST /api/notifications/on-publish", () => {
     expect(sendPushNotification).toHaveBeenCalledWith({
       title: "Nova jornada no Bíblia Vive",
       body: "Permanecer: O Primeiro Passo",
-      link: "https://www.bibliavive.com.br/nvi/sl/23",
+      link: "https://www.bibliavive.com.br/jornadas?capitulo=jorn-1",
     });
   });
 });

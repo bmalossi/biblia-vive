@@ -355,6 +355,51 @@ A Bíblia Vive deixa de atuar como professora e assume seu verdadeiro papel inst
 
 ---
 
+# 20. A Tecnologia Nunca é o Protagonista
+
+## Regra
+
+O Bíblia Vive nunca comunica funcionalidades como produto principal.
+
+Toda comunicação deve partir da ação da Palavra e somente depois mostrar como o Bíblia Vive auxilia o Leitor.
+
+Fluxo obrigatório:
+
+Palavra → Transformação → Ferramenta
+
+Nunca:
+
+Ferramenta → Benefício → Palavra
+
+O Memorial nunca deve ser apresentado como:
+
+- aplicativo de notas;
+- ferramenta de produtividade;
+- diário digital;
+- recurso para organizar informações.
+
+O Memorial deve ser apresentado como:
+
+- preservação da caminhada;
+- registro dos frutos produzidos pela Palavra;
+- lugar para não esquecer aquilo que Deus ensinou por meio das Escrituras.
+
+Sempre responder primeiro:
+
+"Por que isso existe?"
+
+Somente depois:
+
+"Como o Bíblia Vive ajuda nisso."
+
+Exemplo:
+
+Errado - O Bíblia Vive possui um Memorial onde você registra orações.
+
+Correto - Ao longo da caminhada com as Escrituras surgem orações que não deveriam ser esquecidas. O Memorial existe para preservar esses momentos.
+
+---
+
 # Declaração Final
 
 A Bíblia Vive acredita que publicar conteúdo é assumir responsabilidade.

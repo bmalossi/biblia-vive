@@ -374,7 +374,7 @@ export default function MemorialEntryModal({
                     {selectedCategory === 'prayer' && (
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-blue-400 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     Motivo da Oração
                                 </label>
                                 <input
@@ -382,11 +382,11 @@ export default function MemorialEntryModal({
                                     value={motivo}
                                     onChange={e => setMotivo(e.target.value)}
                                     placeholder="Ex: Busca de sabedoria em decisão profissional"
-                                    className="w-full rounded-xl border border-border bg-app-surface px-3.5 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                                    className="w-full rounded-xl border border-border bg-app-surface px-3.5 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-blue-400 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     Seu Pedido Diante de Deus
                                 </label>
                                 <textarea
@@ -394,11 +394,11 @@ export default function MemorialEntryModal({
                                     onChange={e => setPedido(e.target.value)}
                                     placeholder="O que você está pedindo a Ele..."
                                     rows={3}
-                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-blue-400 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     Entrega / Surrender
                                 </label>
                                 <textarea
@@ -406,7 +406,7 @@ export default function MemorialEntryModal({
                                     onChange={e => setEntrega(e.target.value)}
                                     placeholder="Coloco nas Tuas mãos a minha ansiedade..."
                                     rows={2}
-                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                         </div>
@@ -415,7 +415,7 @@ export default function MemorialEntryModal({
                     {selectedCategory === 'testimony' && (
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-emerald-400 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     O que aconteceu?
                                 </label>
                                 <textarea
@@ -423,11 +423,11 @@ export default function MemorialEntryModal({
                                     onChange={e => setOQueAconteceu(e.target.value)}
                                     placeholder="Relate a bênção ou feito de Deus..."
                                     rows={3}
-                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/40"
+                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-emerald-400 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     Como Deus sustentou essa caminhada?
                                 </label>
                                 <textarea
@@ -435,18 +435,18 @@ export default function MemorialEntryModal({
                                     onChange={e => setComoDeusSustentou(e.target.value)}
                                     placeholder="Sua percepção da presença dEle..."
                                     rows={2}
-                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-emerald-500/40"
+                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-emerald-400 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     Data do Acontecimento
                                 </label>
                                 <input
                                     type="date"
                                     value={dataFato}
                                     onChange={e => setDataFato(e.target.value)}
-                                    className="rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-emerald-500/40"
+                                    className="rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                         </div>
@@ -455,7 +455,7 @@ export default function MemorialEntryModal({
                     {selectedCategory === 'fasting' && (
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[0.72rem] font-sans text-slate-300 font-medium mb-1">
+                                <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                     Objetivo do Jejum / Propósito
                                 </label>
                                 <textarea
@@ -463,30 +463,30 @@ export default function MemorialEntryModal({
                                     onChange={e => setObjetivo(e.target.value)}
                                     placeholder="Qual a intenção e consagração deste tempo..."
                                     rows={3}
-                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-slate-500/40"
+                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3 py-2 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-[0.72rem] font-sans text-slate-300 font-medium mb-1">
+                                    <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                         Data de Início
                                     </label>
                                     <input
                                         type="date"
                                         value={dataInicio}
                                         onChange={e => setDataInicio(e.target.value)}
-                                        className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-slate-500/40"
+                                        className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-gold/40"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[0.72rem] font-sans text-slate-300 font-medium mb-1">
+                                    <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
                                         Data Prevista
                                     </label>
                                     <input
                                         type="date"
                                         value={dataPrevista}
                                         onChange={e => setDataPrevista(e.target.value)}
-                                        className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-slate-500/40"
+                                        className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-gold/40"
                                     />
                                 </div>
                             </div>

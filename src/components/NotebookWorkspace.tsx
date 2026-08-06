@@ -1,13 +1,5 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// NotebookWorkspace.tsx — Bíblia Vive
-//
-// Painel lateral de cadernos para Desktop (lado esquerdo).
-// Em telas muito largas (≥1400px), empurra o conteúdo bíblico.
-// Em telas intermediárias (768–1400px), atua como overlay com backdrop.
-// ─────────────────────────────────────────────────────────────────────────────
-
-import { useCallback, useMemo, useState } from "react";
-import { BookText, Plus, Search, X, Download, BookOpen, Heart, Sparkles, Mountain } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { BookText, Plus, Search, X, Download, BookOpen, Heart, Sparkles, Mountain, Scroll } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import NotebookEditor from "@/components/NotebookEditor";
@@ -21,7 +13,9 @@ import type { ChapterNotebook } from "@/lib/notebookStore";
 import type { SaveStatus } from "@/hooks/useNotebooks";
 import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
 import { ALL_BOOKS } from "@/lib/books";
-import type { MemorialCategory } from "@/lib/noteStore";
+import { createNoteStore, type MemorialCategory, type MemorialEntry } from "@/lib/noteStore";
+import { useAuth } from "@/hooks/useAuth";
+import MemorialInlineEditor from "@/components/MemorialInlineEditor";
 
 const bookOrderMap = new Map(ALL_BOOKS.map((book, index) => [book.id.toLowerCase(), index]));
 
@@ -75,11 +69,9 @@ function normalize(str: string) {
 function Highlight({ text, query }: { text: string; query: string }) {
     if (!query.trim()) return <>{text}</>;
     const normQuery = normalize(query);
-    // Percorre o texto caractere a caractere para encontrar matches insensíveis a acento
     const result: React.ReactNode[] = [];
     let i = 0;
     while (i < text.length) {
-        // Janela de comparação: fatiamos um trecho do tamanho da query e normalizamos
         const slice = text.slice(i, i + query.length);
         if (normalize(slice) === normQuery) {
             result.push(
@@ -89,7 +81,6 @@ function Highlight({ text, query }: { text: string; query: string }) {
             );
             i += query.length;
         } else {
-            // Acumula caracteres sem match
             const last = result[result.length - 1];
             if (typeof last === "string") {
                 result[result.length - 1] = last + text[i];
@@ -123,9 +114,50 @@ export default function NotebookWorkspace({
     setIsCreatingNew,
     onOpenCategoryModal,
 }: NotebookWorkspaceProps) {
+    const { user } = useAuth();
+    const noteStore = useMemo(() => createNoteStore(user?.id), [user?.id]);
+
+    const [mainSection, setMainSection] = useState<"notebooks" | "memorial">("notebooks");
     const [activeTab, setActiveTab] = useState<TabId>("chapter");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState<"recent" | "biblical-asc" | "biblical-desc">("recent");
+
+    // Estados do Memorial inline
+    const [memorialScope, setMemorialScope] = useState<"chapter" | "all">("chapter");
+    const [memorialCategoryFilter, setMemorialCategoryFilter] = useState<string>("all");
+    const [memorialEntries, setMemorialEntries] = useState<MemorialEntry[]>([]);
+    const [selectedMemorialEntry, setSelectedMemorialEntry] = useState<MemorialEntry | null>(null);
+    const [isCreatingMemorial, setIsCreatingMemorial] = useState<boolean>(false);
+    const [memorialCategoryForNew, setMemorialCategoryForNew] = useState<MemorialCategory>("reflection");
+
+    const loadMemorialEntries = useCallback(async () => {
+        try {
+            const list = memorialScope === "chapter"
+                ? await noteStore.getByChapter(bookId, chapter)
+                : await noteStore.getAll();
+            setMemorialEntries(list);
+        } catch {
+            // ignore
+        }
+    }, [noteStore, memorialScope, bookId, chapter]);
+
+    useEffect(() => {
+        loadMemorialEntries();
+    }, [loadMemorialEntries]);
+
+    const handleSaveMemorialInline = useCallback(async (data: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }) => {
+        await noteStore.save(data);
+        await loadMemorialEntries();
+        setIsCreatingMemorial(false);
+        setSelectedMemorialEntry(null);
+    }, [noteStore, loadMemorialEntries]);
+
+    const handleDeleteMemorialInline = useCallback(async (id: string) => {
+        await noteStore.delete(id);
+        await loadMemorialEntries();
+        setIsCreatingMemorial(false);
+        setSelectedMemorialEntry(null);
+    }, [noteStore, loadMemorialEntries]);
 
     const contextLabel = `${bookName} ${chapter} — ${version.toUpperCase()}`;
 
@@ -280,11 +312,11 @@ export default function NotebookWorkspace({
                     <div className="flex items-center gap-2">
                         <BookText className="h-4 w-4 text-gold" />
                         <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-app-text-muted">
-                            Meu Caderno
+                            {mainSection === "notebooks" ? "Meu Caderno" : "Memorial da Caminhada"}
                         </p>
                     </div>
                     <div className="flex items-center gap-1">
-                        {!isEditing && allNotebooks.length > 0 && (
+                        {!isEditing && mainSection === "notebooks" && allNotebooks.length > 0 && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button
@@ -346,222 +378,445 @@ export default function NotebookWorkspace({
                     </div>
                 </div>
 
-                {isEditing ? (
-                    // ── Modo edição ──
-                    <div className="flex-1 min-h-0 overflow-y-auto">
-                        <NotebookEditor
-                            notebook={isCreatingNew
-                                ? null
-                                : (() => {
-                                    const initial = getInitialContent(selectedNotebook);
-                                    return selectedNotebook ? { ...selectedNotebook, ...initial } : null;
-                                })()
-                            }
-                            contextLabel={editorContextLabel}
-                            saveStatus={saveStatus}
-                            syncError={syncError}
-                            onSave={handleSave}
-                            onDelete={onDelete}
-                            onBack={handleBack}
-                            onNavigateToChapter={
-                                isFromAnotherChapter && onNavigateToChapter && selectedNotebook
-                                    ? () => onNavigateToChapter(
-                                        selectedNotebook.bookId,
-                                        selectedNotebook.chapter,
-                                        selectedNotebook.version || version
-                                    )
-                                    : undefined
-                            }
-                            bookId={selectedNotebook?.bookId ?? bookId}
-                            chapter={selectedNotebook?.chapter ?? chapter}
-                            version={selectedNotebook?.version ?? version}
-                        />
+                {/* Abas Principais Superiores */}
+                {!isEditing && !selectedMemorialEntry && !isCreatingMemorial && (
+                    <div className="grid grid-cols-2 shrink-0 border-b border-border bg-app-surface/40">
+                        <button
+                            type="button"
+                            onClick={() => { setMainSection("notebooks"); }}
+                            className={cn(
+                                "flex items-center justify-center gap-1.5 py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                mainSection === "notebooks"
+                                    ? "border-gold text-gold font-semibold bg-gold/5"
+                                    : "border-transparent text-app-text-muted hover:text-app-text"
+                            )}
+                        >
+                            <BookText className="h-3.5 w-3.5" />
+                            <span>Caderno de Estudo</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setMainSection("memorial"); }}
+                            className={cn(
+                                "flex items-center justify-center gap-1.5 py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                mainSection === "memorial"
+                                    ? "border-gold text-gold font-semibold bg-gold/5"
+                                    : "border-transparent text-app-text-muted hover:text-app-text"
+                            )}
+                        >
+                            <Scroll className="h-3.5 w-3.5" />
+                            <span>Memorial</span>
+                        </button>
                     </div>
-                ) : (
-                    // ── Modo listagem ──
-                    <>
-                        {/* Tabs */}
-                        <div className="grid grid-cols-2 shrink-0 border-b border-border">
-                            {(["chapter", "all"] as TabId[]).map((tab) => (
+                )}
+
+                {mainSection === "memorial" ? (
+                    isCreatingMemorial || selectedMemorialEntry !== null ? (
+                        <div className="flex-1 min-h-0 overflow-y-auto">
+                            <MemorialInlineEditor
+                                category={memorialCategoryForNew}
+                                bookId={selectedMemorialEntry?.bookId ?? bookId}
+                                bookName={selectedMemorialEntry?.bookName ?? bookName}
+                                chapter={selectedMemorialEntry?.chapter ?? chapter}
+                                verse={selectedMemorialEntry?.verse}
+                                version={selectedMemorialEntry?.version ?? version}
+                                verseText={selectedMemorialEntry?.verseText}
+                                existingEntry={selectedMemorialEntry}
+                                onSave={handleSaveMemorialInline}
+                                onDelete={handleDeleteMemorialInline}
+                                onBack={() => {
+                                    setSelectedMemorialEntry(null);
+                                    setIsCreatingMemorial(false);
+                                }}
+                            />
+                        </div>
+                    ) : (
+                        <>
+                            {/* Scope Tabs (Neste Capítulo / Toda a Bíblia) */}
+                            <div className="grid grid-cols-2 shrink-0 border-b border-border">
                                 <button
-                                    key={tab}
                                     type="button"
-                                    onClick={() => { setActiveTab(tab); setSearchQuery(""); }}
+                                    onClick={() => setMemorialScope("chapter")}
                                     className={cn(
                                         "py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
-                                        activeTab === tab
-                                            ? "border-gold text-gold"
+                                        memorialScope === "chapter"
+                                            ? "border-gold text-gold font-semibold"
                                             : "border-transparent text-app-text-muted hover:text-app-text"
                                     )}
                                 >
-                                    {tab === "chapter" ? "Neste Capítulo" : "Todos os Cadernos"}
+                                    Neste Capítulo
                                 </button>
-                            ))}
-                        </div>
-
-                        {/* Campo de busca */}
-                        <div className="px-4 pt-3 pb-1 shrink-0">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-app-text-muted pointer-events-none" />
-                                <input
-                                    type="search"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder={activeTab === "chapter" ? "Buscar neste capítulo…" : "Buscar em todos os cadernos…"}
-                                    className="w-full h-8 pl-8 pr-3 rounded-lg bg-app-surface border border-border text-[0.78rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:border-gold/50 transition-colors"
-                                    aria-label="Buscar cadernos"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setSearchQuery("")}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text"
-                                        aria-label="Limpar busca"
-                                    >
-                                        <X className="h-3 w-3" />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Ordenação */}
-                        {activeTab === "all" && allNotebooks.length > 0 && (
-                            <div className="px-4 py-1.5 flex items-center justify-between shrink-0 border-b border-border/30 bg-app-surface/20">
-                                <span className="text-[0.65rem] text-app-text-muted font-medium">Ordenar:</span>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setSortBy("recent")}
-                                        className={cn(
-                                            "text-[0.65rem] transition-colors hover:text-gold",
-                                            sortBy === "recent" ? "text-gold font-semibold" : "text-app-text-muted"
-                                        )}
-                                    >
-                                        Recentes
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setSortBy("biblical-asc")}
-                                        className={cn(
-                                            "text-[0.65rem] transition-colors hover:text-gold",
-                                            sortBy === "biblical-asc" ? "text-gold font-semibold" : "text-app-text-muted"
-                                        )}
-                                    >
-                                        Livro ↑
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setSortBy("biblical-desc")}
-                                        className={cn(
-                                            "text-[0.65rem] transition-colors hover:text-gold",
-                                            sortBy === "biblical-desc" ? "text-gold font-semibold" : "text-app-text-muted"
-                                        )}
-                                    >
-                                        Livro ↓
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Lista de cadernos */}
-                        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 py-2 space-y-2">
-                            {filtered.length === 0 ? (
-                                <div className="text-center py-10 space-y-2">
-                                    {searchQuery ? (
-                                        <>
-                                            <p className="text-[0.82rem] text-app-text-muted">Nenhum resultado para "{searchQuery}".</p>
-                                            <button
-                                                type="button"
-                                                onClick={() => setSearchQuery("")}
-                                                className="text-[0.72rem] text-gold underline"
-                                            >
-                                                Limpar busca
-                                            </button>
-                                        </>
-                                    ) : activeTab === "chapter" ? (
-                                        <>
-                                            <p className="text-[0.82rem] text-app-text-muted">Nenhum caderno neste capítulo.</p>
-                                            <p className="text-[0.72rem] text-app-text-muted/60">Clique em "Novo caderno" para começar.</p>
-                                        </>
-                                    ) : (
-                                        <p className="text-[0.82rem] text-app-text-muted">Você ainda não tem cadernos.</p>
+                                <button
+                                    type="button"
+                                    onClick={() => setMemorialScope("all")}
+                                    className={cn(
+                                        "py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                        memorialScope === "all"
+                                            ? "border-gold text-gold font-semibold"
+                                            : "border-transparent text-app-text-muted hover:text-app-text"
                                     )}
-                                </div>
-                            ) : (
-                                filtered.map((nb) => (
-                                    <button
-                                        key={nb.id}
-                                        type="button"
-                                        onClick={() => handleSelectNotebook(nb)}
-                                        className="w-full text-left rounded-xl border border-border bg-app-surface p-3 space-y-1 hover:border-gold/40 transition-colors"
-                                    >
-                                        <p className="text-[0.82rem] font-medium text-app-text line-clamp-1">
-                                            <Highlight text={getNotebookFallbackTitle(nb)} query={searchQuery} />
-                                        </p>
-                                        {activeTab === "all" && (
-                                            <p className="text-[0.65rem] text-gold font-mono uppercase tracking-wide">
-                                                {nb.bookId} {nb.chapter} — {(nb.version || version).toUpperCase()}
-                                            </p>
-                                        )}
-                                        <p className="text-[0.72rem] text-app-text-muted line-clamp-2">
-                                            <Highlight text={nb.content} query={searchQuery} />
-                                        </p>
-                                        <p className="text-[0.65rem] text-app-text-muted/60">
-                                            {formatDate(nb.updatedAt)}
-                                        </p>
-                                    </button>
-                                ))
-                            )}
-                        </div>
+                                >
+                                    Toda a Bíblia
+                                </button>
+                            </div>
 
-                        {/* Botão Novo caderno e Etiquetas de Categoria */}
-                        <div className="px-4 py-3 border-t border-border shrink-0 space-y-2.5">
-                            <div className="space-y-1.5">
-                                <p className="text-[0.68rem] font-mono text-app-text-muted uppercase tracking-wider">
-                                    Registrar Memória da Caminhada:
+                            {/* Filtro por Categoria */}
+                            <div className="px-3 pt-2.5 pb-1 flex gap-1 overflow-x-auto scrollbar-none shrink-0 border-b border-border/40">
+                                {[
+                                    { id: "all", label: "Todos" },
+                                    { id: "reflection", label: "Reflexões" },
+                                    { id: "prayer", label: "Orações" },
+                                    { id: "testimony", label: "Testemunhos" },
+                                    { id: "fasting", label: "Propósitos" },
+                                ].map((cat) => (
+                                    <button
+                                        key={cat.id}
+                                        type="button"
+                                        onClick={() => setMemorialCategoryFilter(cat.id)}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded-full text-[0.65rem] font-medium whitespace-nowrap transition-all border",
+                                            memorialCategoryFilter === cat.id
+                                                ? "bg-gold/15 border-gold/40 text-gold font-semibold"
+                                                : "border-border/60 bg-app-surface text-app-text-muted hover:text-app-text"
+                                        )}
+                                    >
+                                        {cat.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Lista de Registros do Memorial */}
+                            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-2">
+                                {(() => {
+                                    const items = memorialCategoryFilter === "all"
+                                        ? memorialEntries
+                                        : memorialEntries.filter((e) => e.type === memorialCategoryFilter);
+
+                                    if (items.length === 0) {
+                                        return (
+                                            <div className="text-center py-10 space-y-1.5">
+                                                <p className="text-[0.82rem] text-app-text-muted">Nenhum registro encontrado.</p>
+                                                <p className="text-[0.72rem] text-app-text-muted/60">
+                                                    Clique no botão abaixo para criar uma memória.
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+
+                                    const typeLabels: Record<string, { label: string; badge: string }> = {
+                                        reflection: { label: "Reflexão", badge: "border-gold/40 text-gold bg-gold/10" },
+                                        prayer: { label: "Oração", badge: "border-border text-app-text-muted bg-app-surface" },
+                                        testimony: { label: "Testemunho", badge: "border-border text-app-text-muted bg-app-surface" },
+                                        fasting: { label: "Jejum / Propósito", badge: "border-border text-app-text-muted bg-app-surface" },
+                                    };
+
+                                    return items.map((entry) => {
+                                        const typeInfo = typeLabels[entry.type] || { label: "Registro", badge: "border-border text-app-text" };
+                                        return (
+                                            <button
+                                                key={entry.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedMemorialEntry(entry);
+                                                    setMemorialCategoryForNew(entry.type);
+                                                    setIsCreatingMemorial(false);
+                                                }}
+                                                className="w-full text-left rounded-xl border border-border bg-app-surface p-3 space-y-1.5 hover:border-gold/40 transition-colors shadow-sm"
+                                            >
+                                                <div className="flex items-center justify-between text-[0.62rem]">
+                                                    <span className={cn("px-2 py-0.5 rounded-full border font-medium", typeInfo.badge)}>
+                                                        {typeInfo.label}
+                                                    </span>
+                                                    <span className="text-app-text-muted/60">
+                                                        {formatDate(entry.createdAt)}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[0.65rem] font-mono text-gold/80 font-medium">
+                                                    {entry.bookName} {entry.chapter}{entry.verse ? `:${entry.verse}` : ""}
+                                                </p>
+                                                {entry.title && (
+                                                    <p className="text-[0.8rem] font-semibold text-app-text line-clamp-1">
+                                                        {entry.title}
+                                                    </p>
+                                                )}
+                                                <p className="text-[0.72rem] text-app-text-muted line-clamp-2 italic">
+                                                    "{entry.content}"
+                                                </p>
+                                            </button>
+                                        );
+                                    });
+                                })()}
+                            </div>
+
+                            {/* Footer botão Criar Nova Memória */}
+                            <div className="p-3 border-t border-border shrink-0 space-y-2">
+                                <p className="text-[0.65rem] font-mono text-app-text-muted uppercase tracking-wider">
+                                    Criar nova memória:
                                 </p>
                                 <div className="grid grid-cols-2 gap-1.5">
+                                    {(
+                                        [
+                                            { cat: "reflection", label: "Reflexão" },
+                                            { cat: "prayer", label: "Oração" },
+                                            { cat: "testimony", label: "Testemunho" },
+                                            { cat: "fasting", label: "Propósito" },
+                                        ] as const
+                                    ).map((item) => (
+                                        <button
+                                            key={item.cat}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedMemorialEntry(null);
+                                                setMemorialCategoryForNew(item.cat);
+                                                setIsCreatingMemorial(true);
+                                            }}
+                                            className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                        >
+                                            + {item.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                    )
+                ) : (
+                    isEditing ? (
+                        // ── Modo edição de Caderno ──
+                        <div className="flex-1 min-h-0 overflow-y-auto">
+                            <NotebookEditor
+                                notebook={isCreatingNew
+                                    ? null
+                                    : (() => {
+                                        const initial = getInitialContent(selectedNotebook);
+                                        return selectedNotebook ? { ...selectedNotebook, ...initial } : null;
+                                    })()
+                                }
+                                contextLabel={editorContextLabel}
+                                saveStatus={saveStatus}
+                                syncError={syncError}
+                                onSave={handleSave}
+                                onDelete={onDelete}
+                                onBack={handleBack}
+                                onNavigateToChapter={
+                                    isFromAnotherChapter && onNavigateToChapter && selectedNotebook
+                                        ? () => onNavigateToChapter(
+                                            selectedNotebook.bookId,
+                                            selectedNotebook.chapter,
+                                            selectedNotebook.version || version
+                                        )
+                                        : undefined
+                                }
+                                bookId={selectedNotebook?.bookId ?? bookId}
+                                chapter={selectedNotebook?.chapter ?? chapter}
+                                version={selectedNotebook?.version ?? version}
+                            />
+                        </div>
+                    ) : (
+                        // ── Modo listagem de Caderno ──
+                        <>
+                            {/* Tabs */}
+                            <div className="grid grid-cols-2 shrink-0 border-b border-border">
+                                {(["chapter", "all"] as TabId[]).map((tab) => (
                                     <button
+                                        key={tab}
                                         type="button"
-                                        onClick={() => onOpenCategoryModal?.('reflection')}
-                                        className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                        onClick={() => { setActiveTab(tab); setSearchQuery(""); }}
+                                        className={cn(
+                                            "py-2.5 text-[0.72rem] font-medium transition-colors border-b-2",
+                                            activeTab === tab
+                                                ? "border-gold text-gold"
+                                                : "border-transparent text-app-text-muted hover:text-app-text"
+                                        )}
                                     >
-                                        Reflexão
+                                        {tab === "chapter" ? "Neste Capítulo" : "Todos os Cadernos"}
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onOpenCategoryModal?.('prayer')}
-                                        className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
-                                    >
-                                        Oração
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onOpenCategoryModal?.('testimony')}
-                                        className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
-                                    >
-                                        Testemunho
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onOpenCategoryModal?.('fasting')}
-                                        className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
-                                    >
-                                        Jejum / Propósito
-                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Campo de busca */}
+                            <div className="px-4 pt-3 pb-1 shrink-0">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-app-text-muted pointer-events-none" />
+                                    <input
+                                        type="search"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder={activeTab === "chapter" ? "Buscar neste capítulo…" : "Buscar em todos os cadernos…"}
+                                        className="w-full h-8 pl-8 pr-3 rounded-lg bg-app-surface border border-border text-[0.78rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:border-gold/50 transition-colors"
+                                        aria-label="Buscar cadernos"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchQuery("")}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text"
+                                            aria-label="Limpar busca"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 
-                            <Button
-                                type="button"
-                                onClick={handleCreateNew}
-                                className="w-full bg-gold text-black hover:bg-gold/90 font-medium gap-2"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Novo caderno livre
-                            </Button>
-                        </div>
-                    </>
+                            {/* Ordenação */}
+                            {activeTab === "all" && allNotebooks.length > 0 && (
+                                <div className="px-4 py-1.5 flex items-center justify-between shrink-0 border-b border-border/30 bg-app-surface/20">
+                                    <span className="text-[0.65rem] text-app-text-muted font-medium">Ordenar:</span>
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSortBy("recent")}
+                                            className={cn(
+                                                "text-[0.65rem] transition-colors hover:text-gold",
+                                                sortBy === "recent" ? "text-gold font-semibold" : "text-app-text-muted"
+                                            )}
+                                        >
+                                            Recentes
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSortBy("biblical-asc")}
+                                            className={cn(
+                                                "text-[0.65rem] transition-colors hover:text-gold",
+                                                sortBy === "biblical-asc" ? "text-gold font-semibold" : "text-app-text-muted"
+                                            )}
+                                        >
+                                            Livro ↑
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSortBy("biblical-desc")}
+                                            className={cn(
+                                                "text-[0.65rem] transition-colors hover:text-gold",
+                                                sortBy === "biblical-desc" ? "text-gold font-semibold" : "text-app-text-muted"
+                                            )}
+                                        >
+                                            Livro ↓
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Lista de cadernos */}
+                            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 py-2 space-y-2">
+                                {filtered.length === 0 ? (
+                                    <div className="text-center py-10 space-y-2">
+                                        {searchQuery ? (
+                                            <>
+                                                <p className="text-[0.82rem] text-app-text-muted">Nenhum resultado para "{searchQuery}".</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSearchQuery("")}
+                                                    className="text-[0.72rem] text-gold underline"
+                                                >
+                                                    Limpar busca
+                                                </button>
+                                            </>
+                                        ) : activeTab === "chapter" ? (
+                                            <>
+                                                <p className="text-[0.82rem] text-app-text-muted">Nenhum caderno neste capítulo.</p>
+                                                <p className="text-[0.72rem] text-app-text-muted/60">Clique em "Novo caderno" para começar.</p>
+                                            </>
+                                        ) : (
+                                            <p className="text-[0.82rem] text-app-text-muted">Você ainda não tem cadernos.</p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    filtered.map((nb) => (
+                                        <button
+                                            key={nb.id}
+                                            type="button"
+                                            onClick={() => handleSelectNotebook(nb)}
+                                            className="w-full text-left rounded-xl border border-border bg-app-surface p-3 space-y-1 hover:border-gold/40 transition-colors"
+                                        >
+                                            <p className="text-[0.82rem] font-medium text-app-text line-clamp-1">
+                                                <Highlight text={getNotebookFallbackTitle(nb)} query={searchQuery} />
+                                            </p>
+                                            {activeTab === "all" && (
+                                                <p className="text-[0.65rem] text-gold font-mono uppercase tracking-wide">
+                                                    {nb.bookId} {nb.chapter} — {(nb.version || version).toUpperCase()}
+                                                </p>
+                                            )}
+                                            <p className="text-[0.72rem] text-app-text-muted line-clamp-2">
+                                                <Highlight text={nb.content} query={searchQuery} />
+                                            </p>
+                                            <p className="text-[0.65rem] text-app-text-muted/60">
+                                                {formatDate(nb.updatedAt)}
+                                            </p>
+                                        </button>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Botão Novo caderno e Etiquetas de Categoria */}
+                            <div className="px-4 py-3 border-t border-border shrink-0 space-y-2.5">
+                                <div className="space-y-1.5">
+                                    <p className="text-[0.68rem] font-mono text-app-text-muted uppercase tracking-wider">
+                                        Registrar Memória da Caminhada:
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMainSection("memorial");
+                                                setMemorialCategoryForNew("reflection");
+                                                setSelectedMemorialEntry(null);
+                                                setIsCreatingMemorial(true);
+                                            }}
+                                            className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                        >
+                                            Reflexão
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMainSection("memorial");
+                                                setMemorialCategoryForNew("prayer");
+                                                setSelectedMemorialEntry(null);
+                                                setIsCreatingMemorial(true);
+                                            }}
+                                            className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                        >
+                                            Oração
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMainSection("memorial");
+                                                setMemorialCategoryForNew("testimony");
+                                                setSelectedMemorialEntry(null);
+                                                setIsCreatingMemorial(true);
+                                            }}
+                                            className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                        >
+                                            Testemunho
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMainSection("memorial");
+                                                setMemorialCategoryForNew("fasting");
+                                                setSelectedMemorialEntry(null);
+                                                setIsCreatingMemorial(true);
+                                            }}
+                                            className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
+                                        >
+                                            Jejum / Propósito
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <Button
+                                    type="button"
+                                    onClick={handleCreateNew}
+                                    className="w-full bg-gold text-black hover:bg-gold/90 font-medium gap-2"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Novo caderno livre
+                                </Button>
+                            </div>
+                        </>
+                    )
                 )}
             </aside>
         </>
