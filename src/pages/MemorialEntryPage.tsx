@@ -247,6 +247,7 @@ export default function MemorialEntryPage() {
                 </div>
 
                 {/* Detalhes do SOAP se for Reflexão */}
+                {/* Detalhes do SOAP se for Reflexão */}
                 {entry.type === "reflection" && soap && (soap.scripture || soap.observation || soap.application || soap.prayer) && (
                     <div className="rounded-2xl border border-border bg-app-surface p-6 space-y-4 text-sm font-sans">
                         {soap.scripture && (
@@ -290,6 +291,73 @@ export default function MemorialEntryPage() {
                         )}
                     </div>
                 )}
+
+                {/* Selo do Reencontro & Atualizações da Caminhada (eco_updates) */}
+                <div className="pt-6 border-t border-border/40 space-y-6">
+                    <div className="p-4 rounded-2xl bg-gold-bg/40 border border-gold/25 text-xs text-app-text-muted font-serif italic flex items-start gap-3">
+                        <span className="text-gold font-sans font-bold text-base leading-none">✦</span>
+                        <div>
+                            <p className="text-app-text font-medium not-italic mb-1">
+                                Esta pedra foi colocada em {formatDateLong(entry.createdAt)}.
+                            </p>
+                            <p>Como Deus tem falado com você sobre isso hoje?</p>
+                        </div>
+                    </div>
+
+                    {/* Histórico Vertical de Respostas/Atualizações */}
+                    {Array.isArray(entry.metadata?.eco_updates) && entry.metadata.eco_updates.length > 0 && (
+                        <div className="space-y-4">
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-app-text-muted font-sans">
+                                Atualizações da Caminhada ({entry.metadata.eco_updates.length})
+                            </h4>
+                            <div className="space-y-3 relative pl-4 border-l border-gold/30">
+                                {entry.metadata.eco_updates.map((update: { text: string; date: string }, idx: number) => (
+                                    <div key={idx} className="relative space-y-1">
+                                        <div className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-gold ring-4 ring-app-base" />
+                                        <span className="text-[0.7rem] text-app-text-muted font-sans">
+                                            {formatDateLong(update.date)}
+                                        </span>
+                                        <p className="text-sm text-app-text font-serif leading-relaxed bg-app-surface p-3.5 rounded-xl border border-border/60">
+                                            {update.text}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Formulário para Adicionar Nova Atualização */}
+                    <div className="pt-2">
+                        <form
+                            onSubmit={async (e) => {
+                                e.preventDefault();
+                                const form = e.currentTarget;
+                                const input = form.elements.namedItem("updateText") as HTMLInputElement;
+                                const val = input?.value.trim();
+                                if (!val) return;
+                                if (store.addEcoUpdate) {
+                                    await store.addEcoUpdate(entry.id, val);
+                                    await fetchEntry();
+                                    form.reset();
+                                }
+                            }}
+                            className="space-y-3"
+                        >
+                            <textarea
+                                name="updateText"
+                                rows={3}
+                                placeholder="Registre como Deus respondeu ou sustentou você desde então..."
+                                className="w-full rounded-xl border border-border bg-app-surface p-3 text-sm font-serif text-app-text placeholder:text-app-text-muted focus:outline-none focus:ring-1 focus:ring-gold/50"
+                            />
+                            <button
+                                type="submit"
+                                className="py-2 px-4 rounded-xl bg-gold/15 text-gold border border-gold/30 font-medium text-xs hover:bg-gold/25 transition-colors"
+                            >
+                                Registrar Atualização
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </article>
 
             {/* Outros momentos desta leitura */}

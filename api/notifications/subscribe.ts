@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const body = await request.json();
-    const { token } = body;
+    const { token, userId } = body;
 
     if (!token || typeof token !== "string") {
       return new Response(
@@ -25,9 +25,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const payload: { token: string; user_id?: string | null } = { token };
+    if (userId && typeof userId === "string") {
+      payload.user_id = userId;
+    }
+
     const { error } = await supabase
       .from("push_tokens")
-      .upsert({ token }, { onConflict: "token" });
+      .upsert(payload, { onConflict: "token" });
 
     if (error) {
       console.error("Subscribe error:", error);

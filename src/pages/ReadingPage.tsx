@@ -19,6 +19,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useNotesHighlights } from "@/hooks/useNotesHighlights";
 import { createNoteStore, type MemorialEntry } from "@/lib/noteStore";
+import EchoBanner from "@/components/EchoBanner";
+import EchoModal from "@/components/EchoModal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Breadcrumb,
@@ -108,11 +110,10 @@ const getVerseNumber = (reference: string) => Number(reference.match(/:(\d+)/)?.
 const getVerseHighlightClass = ({ isSelected, isTTSCurrent, isHashHighlighted, isHovered }: VerseHighlightState) => {
   const classes: string[] = [];
 
-  if (isSelected) classes.push("bg-gold-bg/80 ring-2 ring-gold/55");
-  else if (isTTSCurrent) classes.push("bg-gold-bg/90 ring-2 ring-gold/60");
-  else if (isHashHighlighted) classes.push("bg-gold-bg/75 ring-1 ring-gold/35");
-
-  if (isHovered) classes.push("bg-gold-bg/85 ring-2 ring-gold/65");
+  if (isSelected) classes.push("bg-gold-bg ring-2 ring-gold/55");
+  else if (isTTSCurrent) classes.push("bg-gold-bg ring-2 ring-gold/60");
+  else if (isHashHighlighted) classes.push("bg-gold-bg ring-1 ring-gold/35");
+  else if (isHovered) classes.push("bg-app-raised ring-1 ring-border");
 
   return classes.join(" ");
 };
@@ -215,7 +216,7 @@ function ChapterMemorialBlock({ bookId, chapter, userId }: ChapterMemorialBlockP
   );
 }
 
-const saveLastRead = (version: string, bookSlug: string, chapter: number) => {
+const saveLastRead = (version: string, bookSlug: string, chapter: number, userId?: string | null) => {
   try {
     localStorage.setItem(
       LAST_READ_KEY,
@@ -226,6 +227,22 @@ const saveLastRead = (version: string, bookSlug: string, chapter: number) => {
         timestamp: Date.now(),
       }),
     );
+
+    if (userId) {
+      supabase
+        .from("profiles")
+        .update({
+          last_read_book_id: bookSlug,
+          last_read_chapter: chapter,
+          last_read_at: new Date().toISOString(),
+        })
+        .eq("id", userId)
+        .then(({ error }) => {
+          if (error) {
+            console.warn("[saveLastRead] Failed to sync reading context:", error.message);
+          }
+        });
+    }
   } catch {
     // ignore
   }
@@ -275,6 +292,9 @@ export default function ReadingPage() {
   const { remaining: freeChapterCommentaryCount, canUse: hasFreeChapterCommentary, consume: consumeFreeChapterCommentary, setRemaining: setRemainingFreeChapterCommentary } = useCommentaryQuota('chapter');
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
+  // Estados do Eco do Memorial
+  const [echoEntry, setEchoEntry] = useState<MemorialEntry | null>(null);
+  const [isEchoModalOpen, setIsEchoModalOpen] = useState(false);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
   const chapterGridRef = useRef<HTMLDivElement>(null);
@@ -716,17 +736,37 @@ export default function ReadingPage() {
 
   useEffect(() => {
     if (!selectedBook) return;
-    saveLastRead(selectedVersion, selectedBook.slug, chapterNumber);
-  }, [chapterNumber, selectedBook, selectedVersion]);
+    saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
+  }, [chapterNumber, selectedBook, selectedVersion, user?.id]);
+
+  // Store estável para o Eco do Memorial (evita recriar a cada render)
+  const echoStore = useMemo(() => createNoteStore(user?.id ?? null), [user?.id]);
+
+  // Efeito para carregar o Eco do Memorial no capítulo atual
+  const refreshEcho = useCallback(async () => {
+    if (!selectedBook) return;
+    try {
+      if (echoStore.getMatchingEcho) {
+        const found = await echoStore.getMatchingEcho(selectedBook.id, chapterNumber);
+        setEchoEntry(found);
+      }
+    } catch {
+      setEchoEntry(null);
+    }
+  }, [echoStore, selectedBook, chapterNumber]);
+
+  useEffect(() => {
+    refreshEcho();
+  }, [refreshEcho]);
 
   useEffect(() => {
     if (!selectedBook) return;
     const interval = window.setInterval(() => {
-      saveLastRead(selectedVersion, selectedBook.slug, chapterNumber);
+      saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
     }, 30000);
 
     return () => window.clearInterval(interval);
-  }, [chapterNumber, selectedBook, selectedVersion]);
+  }, [chapterNumber, selectedBook, selectedVersion, user?.id]);
 
   useEffect(() => {
     if (!selectedBook) return;
@@ -735,7 +775,7 @@ export default function ReadingPage() {
     const onScroll = () => {
       if (timeoutId) return;
       timeoutId = window.setTimeout(() => {
-        saveLastRead(selectedVersion, selectedBook.slug, chapterNumber);
+        saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
         timeoutId = null;
       }, 400);
     };
@@ -1551,6 +1591,15 @@ export default function ReadingPage() {
                 </Alert>
               )}
               <WorshipCard bookId={selectedBook?.id} chapter={chapterNumber} />
+
+              {/* Eco do Memorial — banner sóbrio mostrado quando o leitor já possui uma memória neste capítulo */}
+              {!loading && !error && echoEntry && (
+                <EchoBanner
+                  entry={echoEntry}
+                  onOpenModal={() => setIsEchoModalOpen(true)}
+                />
+              )}
+
               <div className={compareEnabled ? "grid gap-6 lg:grid-cols-2" : "block"}>
                 <section>
                   {!preferences.focusMode && (
@@ -1845,23 +1894,20 @@ export default function ReadingPage() {
                           disabled={isChapterCommentaryLoading}
                           type="button"
                           className={cn(
-                            "w-full h-auto py-3.5 flex-col gap-2 text-center rounded-xl transition-all shadow-sm",
+                            "w-full h-auto py-3 px-4 text-center rounded-xl transition-all shadow-xs border-0",
                             isChapterCommentaryLoading
-                              ? "bg-app-raised/50 border border-border cursor-not-allowed"
-                              : "bg-gold-bg/20 text-gold hover:bg-gold-bg/40 border-gold/30 border hover:border-gold/50"
+                              ? "bg-app-raised border border-border cursor-not-allowed text-app-text-muted"
+                              : "bg-gold text-black font-semibold hover:bg-gold/90"
                           )}
-                          variant="outline"
                         >
-                          {isChapterCommentaryLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-app-text-muted" />
-                          ) : (
-                            <FileText className="h-5 w-5" />
+                          {isChapterCommentaryLoading && (
+                            <Loader2 className="h-4 w-4 animate-spin text-app-text-muted mr-2 inline-block" />
                           )}
                           <span className={cn(
-                            "text-[0.68rem] uppercase tracking-wide leading-tight",
+                            "text-[0.72rem] font-medium tracking-wide leading-tight",
                             isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
                           )}>
-                            {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentário" : "Comentar Capítulo"}
+                            {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentários" : "Comentários do Capítulo"}
                           </span>
                         </Button>
                         {!isPro && !cachedChapterCommentary && (
@@ -2065,6 +2111,17 @@ export default function ReadingPage() {
             isOpen={isCardModalOpen}
             onClose={() => { setIsCardModalOpen(false); setCardModalData(null); }}
             data={cardModalData}
+          />
+        )}
+
+        {/* Eco do Memorial — modal de reencontro espiritual */}
+        {echoEntry && (
+          <EchoModal
+            isOpen={isEchoModalOpen}
+            onClose={() => setIsEchoModalOpen(false)}
+            entry={echoEntry}
+            store={echoStore}
+            onRefresh={refreshEcho}
           />
         )}
 

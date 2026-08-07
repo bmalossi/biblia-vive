@@ -11,7 +11,10 @@ export function resetNotificationSoftAskSession() {
   sessionDismissed = false;
 }
 
+import { useAuth } from "@/hooks/useAuth";
+
 export default function NotificationSoftAsk() {
+  const { user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
@@ -47,6 +50,20 @@ export default function NotificationSoftAsk() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isVisible, handleDismiss]);
+
+  // Sincronizar token existente com o user_id caso o usuário faça login após aceitar notificações
+  useEffect(() => {
+    if (!user?.id) return;
+    const STORAGE_KEY = "bv_push_token";
+    const existingToken = localStorage.getItem(STORAGE_KEY);
+    if (existingToken) {
+      fetch("/api/notifications/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: existingToken, userId: user.id }),
+      }).catch(() => {});
+    }
+  }, [user?.id]);
 
   // Foco automático quando o card aparece (sem travar a navegação da página)
   useEffect(() => {
@@ -139,7 +156,7 @@ export default function NotificationSoftAsk() {
       const response = await fetch("/api/notifications/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, userId: user?.id ?? null }),
       });
 
       if (!response.ok) {

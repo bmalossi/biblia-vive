@@ -24,6 +24,10 @@ vi.mock("@/lib/firebase", () => ({
   getPushNotificationToken: vi.fn().mockResolvedValue("test-fcm-token"),
 }));
 
+vi.mock("@/hooks/useAuth", () => ({
+  useAuth: () => ({ user: { id: "test-user-id" } }),
+}));
+
 const requestPermissionMock = vi.fn();
 
 function mockNotificationPermission(permission: NotificationPermission) {

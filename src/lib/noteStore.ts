@@ -51,6 +51,7 @@ export interface MemorialEntry {
     favorite?: boolean;
     answeredAt?: string | null;
     answeredNote?: string | null;
+    lastEchoAt?: string | null;
     tags?: string[];
     metadata?: MemorialMetadata;
     createdAt: string;
@@ -74,6 +75,8 @@ export interface NoteStore {
     delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void>;
     toggleFavorite?(id: string): Promise<boolean>;
     markAnswered?(id: string, answeredNote?: string): Promise<void>;
+    getMatchingEcho?(bookId?: string, chapter?: number): Promise<MemorialEntry | null>;
+    addEcoUpdate?(id: string, text: string): Promise<void>;
 }
 
 // ─── Row mapper ───────────────────────────────────────────────────────────────
@@ -95,6 +98,7 @@ function mapRow(row: any): MemorialEntry {
         favorite: Boolean(row.favorite),
         answeredAt: row.answered_at ?? row.answeredAt ?? null,
         answeredNote: row.answered_note ?? row.answeredNote ?? null,
+        lastEchoAt: row.last_echo_at ?? row.lastEchoAt ?? null,
         tags: Array.isArray(row.tags) ? row.tags : [],
         metadata: row.metadata ?? {},
         createdAt: row.created_at ?? row.createdAt ?? new Date().toISOString(),
@@ -264,6 +268,120 @@ export class SupabaseNoteStore implements NoteStore {
 
         if (error) throw new Error(error.message);
     }
+
+    async getMatchingEcho(bookId?: string, chapter?: number): Promise<MemorialEntry | null> {
+        const all = await this.getAll();
+        return selectBestEcho(all, bookId, chapter);
+    }
+
+    async addEcoUpdate(id: string, text: string): Promise<void> {
+        const { data: existing } = await supabase
+            .from("user_notes")
+            .select("metadata")
+            .eq("id", id)
+            .eq("user_id", this.userId)
+            .maybeSingle();
+
+        const currentMetadata = existing?.metadata || {};
+        const currentUpdates = Array.isArray(currentMetadata.eco_updates) ? currentMetadata.eco_updates : [];
+        const newUpdate = { text, date: new Date().toISOString() };
+        const updatedMetadata = {
+            ...currentMetadata,
+            eco_updates: [...currentUpdates, newUpdate],
+        };
+
+        const { error } = await supabase
+            .from("user_notes")
+            .update({
+                metadata: updatedMetadata,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", id)
+            .eq("user_id", this.userId);
+
+        if (error) throw new Error(error.message);
+    }
+}
+
+// ─── Utility: Motor de Seleção do Eco ─────────────────────────────────────────
+
+const CATEGORY_PRIORITY: Record<MemorialCategory, number> = {
+    prayer: 1,      // Orações (especialmente em acompanhamento/não respondidas)
+    testimony: 2,   // Testemunhos
+    reflection: 3,  // Reflexões
+    fasting: 4,     // Propósito / Jejum
+};
+
+export function selectBestEcho(
+    entries: MemorialEntry[],
+    currentBookId?: string,
+    currentChapter?: number
+): MemorialEntry | null {
+    if (!entries || entries.length === 0) return null;
+
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    // Filtrar trava de 7 dias anti-repetição
+    const eligible = entries.filter((e) => {
+        if (!e.lastEchoAt) return true;
+        return new Date(e.lastEchoAt) < sevenDaysAgo;
+    });
+
+    if (eligible.length === 0) return null;
+
+    const rankEntry = (a: MemorialEntry, b: MemorialEntry): number => {
+        // Priorizar Orações em acompanhamento (status != 'answered')
+        const aIsUnansweredPrayer = a.type === 'prayer' && a.status !== 'answered';
+        const bIsUnansweredPrayer = b.type === 'prayer' && b.status !== 'answered';
+        if (aIsUnansweredPrayer && !bIsUnansweredPrayer) return -1;
+        if (!aIsUnansweredPrayer && bIsUnansweredPrayer) return 1;
+
+        // Desempate por tipo
+        const prioA = CATEGORY_PRIORITY[a.type] ?? 99;
+        const prioB = CATEGORY_PRIORITY[b.type] ?? 99;
+        if (prioA !== prioB) return prioA - prioB;
+
+        // Distância temporal (mais antigos primeiro)
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    };
+
+    // 1. Prioridade Máxima: Contexto de Leitura Atual
+    if (currentBookId && currentChapter) {
+        const chapterEntries = eligible.filter(
+            (e) => e.bookId.toLowerCase() === currentBookId.toLowerCase() && Number(e.chapter) === Number(currentChapter)
+        );
+        if (chapterEntries.length > 0) {
+            chapterEntries.sort(rankEntry);
+            return chapterEntries[0];
+        }
+    }
+
+    // 2. Marcos Temporais (1 sem, 1 mês, 3 meses, 6 meses, 1 ano)
+    const now = Date.now();
+    const DAY = 24 * 60 * 60 * 1000;
+    const TIME_WINDOWS = [
+        { name: '1w', target: 7 * DAY, tolerance: 3 * DAY },
+        { name: '1m', target: 30 * DAY, tolerance: 7 * DAY },
+        { name: '3m', target: 90 * DAY, tolerance: 15 * DAY },
+        { name: '6m', target: 180 * DAY, tolerance: 20 * DAY },
+        { name: '1y', target: 365 * DAY, tolerance: 30 * DAY },
+    ];
+
+    for (const window of TIME_WINDOWS) {
+        const matchingWindow = eligible.filter((e) => {
+            const age = now - new Date(e.createdAt).getTime();
+            return Math.abs(age - window.target) <= window.tolerance;
+        });
+
+        if (matchingWindow.length > 0) {
+            matchingWindow.sort(rankEntry);
+            return matchingWindow[0];
+        }
+    }
+
+    // 3. Fallback Geral: qualquer registro antigo elegível ordenado por relevância
+    const sorted = [...eligible].sort(rankEntry);
+    return sorted[0] ?? null;
 }
 
 // ─── LocalNoteStore ───────────────────────────────────────────────────────────
@@ -403,6 +521,26 @@ export class LocalNoteStore implements NoteStore {
         notes[idx].status = 'answered';
         notes[idx].answeredAt = new Date().toISOString();
         notes[idx].answeredNote = answeredNote || null;
+        notes[idx].updatedAt = new Date().toISOString();
+        writeLocal(notes);
+    }
+
+    async getMatchingEcho(bookId?: string, chapter?: number): Promise<MemorialEntry | null> {
+        const all = await this.getAll();
+        return selectBestEcho(all, bookId, chapter);
+    }
+
+    async addEcoUpdate(id: string, text: string): Promise<void> {
+        const notes = readLocal();
+        const idx = notes.findIndex(n => n.id === id);
+        if (idx < 0) return;
+        const currentMetadata = notes[idx].metadata || {};
+        const currentUpdates = Array.isArray(currentMetadata.eco_updates) ? currentMetadata.eco_updates : [];
+        const newUpdate = { text, date: new Date().toISOString() };
+        notes[idx].metadata = {
+            ...currentMetadata,
+            eco_updates: [...currentUpdates, newUpdate],
+        };
         notes[idx].updatedAt = new Date().toISOString();
         writeLocal(notes);
     }

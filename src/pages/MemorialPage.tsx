@@ -38,6 +38,8 @@ import MemorialEntryModal from '@/components/MemorialEntryModal';
 import { cn } from '@/lib/utils';
 import { groupEntriesByTime } from '@/lib/memorialUtils';
 
+import Layout from '@/components/Layout';
+
 export default function MemorialPage() {
     usePageMeta({
         title: "Meu Memorial — Bíblia Vive",
@@ -182,51 +184,54 @@ export default function MemorialPage() {
 
     if (!isAuthenticated) {
         return (
-            <main className="min-h-screen bg-app-base px-4 py-16 max-w-xl mx-auto font-sans flex flex-col items-center justify-center text-center">
-                <h1 className="text-3xl md:text-4xl font-serif font-semibold text-app-text tracking-tight mb-4">
-                    Memorial
-                </h1>
-                <p className="text-lg font-serif text-app-text-muted italic mb-6">
-                    "Sua caminhada com a Palavra merece ser lembrada."
-                </p>
-                <div className="space-y-4 text-app-text-muted text-sm md:text-base leading-relaxed mb-8 max-w-lg">
-                    <p>
-                        Enquanto você lê, pode registrar orações, reflexões, testemunhos e propósitos.
+            <Layout>
+                <main className="min-h-screen bg-app-base px-4 py-16 max-w-xl mx-auto font-sans flex flex-col items-center justify-center text-center">
+                    <h1 className="text-3xl md:text-4xl font-serif font-semibold text-app-text tracking-tight mb-4">
+                        Memorial
+                    </h1>
+                    <p className="text-lg font-serif text-app-text-muted italic mb-6">
+                        "Sua caminhada com a Palavra merece ser lembrada."
                     </p>
-                    <p>
-                        Com uma conta gratuita, esses momentos permanecem guardados para que você possa revisitá-los sempre que desejar.
-                    </p>
-                </div>
-                <div className="space-y-4 w-full max-w-xs">
-                    <button
-                        type="button"
-                        onClick={() => setAuthOpen(true)}
-                        className="w-full py-3 px-6 rounded-2xl bg-gold text-black font-semibold text-sm hover:bg-gold/90 transition-colors shadow-sm"
-                    >
-                        Criar conta gratuitamente
-                    </button>
-                    <div>
+                    <div className="space-y-4 text-app-text-muted text-sm md:text-base leading-relaxed mb-8 max-w-lg">
+                        <p>
+                            Enquanto você lê, pode registrar orações, reflexões, testemunhos e propósitos.
+                        </p>
+                        <p>
+                            Com uma conta gratuita, esses momentos permanecem guardados para que você possa revisitá-los sempre que desejar.
+                        </p>
+                    </div>
+                    <div className="space-y-4 w-full max-w-xs">
                         <button
                             type="button"
                             onClick={() => setAuthOpen(true)}
-                            className="text-xs text-app-text-muted hover:text-gold transition-colors"
+                            className="w-full py-3 px-6 rounded-2xl bg-gold text-black font-semibold text-sm hover:bg-gold/90 transition-colors shadow-sm"
                         >
-                            Já possui uma conta? <span className="underline font-medium">Entrar</span>
+                            Criar conta gratuitamente
                         </button>
+                        <div>
+                            <button
+                                type="button"
+                                onClick={() => setAuthOpen(true)}
+                                className="text-xs text-app-text-muted hover:text-gold transition-colors"
+                            >
+                                Já possui uma conta? <span className="underline font-medium">Entrar</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <AuthModal
-                    isOpen={authOpen}
-                    onClose={() => setAuthOpen(false)}
-                    hint="Sua caminhada com a Palavra merece ser lembrada."
-                />
-            </main>
+                    <AuthModal
+                        isOpen={authOpen}
+                        onClose={() => setAuthOpen(false)}
+                        hint="Sua caminhada com a Palavra merece ser lembrada."
+                    />
+                </main>
+            </Layout>
         );
     }
 
     return (
-        <main className="min-h-screen bg-app-base px-4 py-8 max-w-3xl mx-auto font-sans">
+        <Layout>
+            <main className="min-h-screen bg-app-base px-4 py-8 max-w-3xl mx-auto font-sans">
             {/* Header */}
             <div className="flex items-start justify-between mb-8 pb-6 border-b border-border/60">
                 <div className="space-y-1">
@@ -248,15 +253,6 @@ export default function MemorialPage() {
                         "Aqui permanecem registradas as marcas da sua caminhada."
                     </p>
                 </div>
-
-                <button
-                    type="button"
-                    onClick={signOut}
-                    className="flex items-center gap-1.5 text-[0.78rem] text-app-text-muted hover:text-app-text px-3 py-1.5 rounded-xl hover:bg-app-raised transition-colors"
-                >
-                    <LogOut className="h-3.5 w-3.5" />
-                    Sair
-                </button>
             </div>
 
             {/* Barra de Busca e Filtros */}
@@ -556,5 +552,6 @@ export default function MemorialPage() {
                 hint="Entre com sua conta da Bíblia Vive para sincronizar suas memórias na nuvem."
             />
         </main>
+        </Layout>
     );
 }
