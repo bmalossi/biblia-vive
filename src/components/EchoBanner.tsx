@@ -2,19 +2,23 @@
 // EchoBanner.tsx — Bíblia Vive · Eco do Memorial
 //
 // Banner contextual discreto e sóbrio no topo da página de leitura bíblica.
-// Aparece quando o Leitor já possui uma memória registrada naquele livro/capítulo.
+// Exibe selos de contexto diferenciados conforme a origem do Eco:
+//   - 'direct'      → "Nascido neste capítulo"
+//   - 'anniversary' → aniversário histórico (6m/1a)
+//   - 'orphan'      → "Uma lembrança da sua caminhada geral"
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { type MemorialEntry } from "@/lib/noteStore";
+import { type MemorialEntry, type EchoContext } from "@/lib/noteStore";
 import { ArrowRight } from "lucide-react";
 import StoneIcon from "@/components/StoneIcon";
 
 interface EchoBannerProps {
     entry: MemorialEntry;
+    echoContext: EchoContext;
     onOpenModal: () => void;
 }
 
-export default function EchoBanner({ entry, onOpenModal }: EchoBannerProps) {
+export default function EchoBanner({ entry, echoContext, onOpenModal }: EchoBannerProps) {
     function getAgeText(isoDate: string): string {
         try {
             const created = new Date(isoDate).getTime();
@@ -41,6 +45,21 @@ export default function EchoBanner({ entry, onOpenModal }: EchoBannerProps) {
     const categoryText = categoryLabels[entry.type] || "uma pedra";
     const ageText = getAgeText(entry.createdAt);
 
+    // Linha principal varia conforme o contexto do Eco
+    const contextLine: Record<EchoContext, string> = {
+        direct:      `Neste capítulo ${ageText}, você colocou ${categoryText}.`,
+        anniversary: `Há exatamente ${ageText}, você deixou ${categoryText}.`,
+        orphan:      `Uma lembrança da sua caminhada geral.`,
+    };
+
+    // Selo visual discreto para contexto não-direto
+    const contextBadge: Partial<Record<EchoContext, string>> = {
+        orphan:      "Caminhada geral",
+        anniversary: "Marco histórico",
+    };
+
+    const badge = contextBadge[echoContext];
+
     return (
         <div className="mb-6 rounded-2xl bg-app-surface border border-gold/40 p-4 shadow-sm transition-all animate-fade-in flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
@@ -48,8 +67,13 @@ export default function EchoBanner({ entry, onOpenModal }: EchoBannerProps) {
                     <StoneIcon className="h-5 w-5 text-gold" />
                 </div>
                 <div className="space-y-0.5">
+                    {badge && (
+                        <span className="inline-block mb-1 text-[0.6rem] uppercase tracking-widest font-sans font-semibold text-app-text-muted border border-border px-1.5 py-0.5 rounded-md">
+                            {badge}
+                        </span>
+                    )}
                     <p className="text-xs font-serif font-medium text-app-text">
-                        Neste capítulo {ageText}, você colocou {categoryText}.
+                        {contextLine[echoContext]}
                     </p>
                     <p className="text-xs font-serif text-app-text-muted italic line-clamp-1">
                         "{entry.title || entry.content}"

@@ -75,7 +75,7 @@ export interface NoteStore {
     delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void>;
     toggleFavorite?(id: string): Promise<boolean>;
     markAnswered?(id: string, answeredNote?: string): Promise<void>;
-    getMatchingEcho?(bookId?: string, chapter?: number): Promise<MemorialEntry | null>;
+    getMatchingEcho?(bookId?: string, chapter?: number): Promise<EchoResult | null>;
     addEcoUpdate?(id: string, text: string): Promise<void>;
 }
 
@@ -269,9 +269,9 @@ export class SupabaseNoteStore implements NoteStore {
         if (error) throw new Error(error.message);
     }
 
-    async getMatchingEcho(bookId?: string, chapter?: number): Promise<MemorialEntry | null> {
+    async getMatchingEcho(bookId?: string, chapter?: number): Promise<EchoResult | null> {
         const all = await this.getAll();
-        return selectBestEcho(all, bookId, chapter);
+        return selectBestEchoWithContext(all, bookId, chapter);
     }
 
     async addEcoUpdate(id: string, text: string): Promise<void> {
@@ -304,85 +304,125 @@ export class SupabaseNoteStore implements NoteStore {
 }
 
 // ─── Utility: Motor de Seleção do Eco ─────────────────────────────────────────
+//
+// Hierarquia rígida de seleção (prioridade decrescente):
+//   1. Vínculo Direto      — registro nascido neste exato livro+capítulo
+//   2. Vínculo Histórico   — aniversário (6 meses ou 1 ano) de qualquer registro
+//   3. Silêncio (default)  — não exibe nada, EXCETO sorteio de 20% para órfãos
+//
+// Cool-down: um registro apresentado no Eco não pode ser selecionado novamente
+// pelos próximos 10 dias (controlado por `lastEchoAt` na entrada).
+//
+// Testemunhos sem referência direta ao capítulo atual NUNCA aparecem como
+// "nascidos neste capítulo". A sinalização de contexto é responsabilidade do
+// componente EchoBanner via prop `echoContext`.
+// ─────────────────────────────────────────────────────────────────────────────
 
 const CATEGORY_PRIORITY: Record<MemorialCategory, number> = {
-    prayer: 1,      // Orações (especialmente em acompanhamento/não respondidas)
-    testimony: 2,   // Testemunhos
-    reflection: 3,  // Reflexões
-    fasting: 4,     // Propósito / Jejum
+    prayer: 1,      // Orações em andamento têm máxima prioridade
+    testimony: 2,
+    reflection: 3,
+    fasting: 4,
 };
+
+export type EchoContext = 'direct' | 'anniversary' | 'orphan';
+
+export interface EchoResult {
+    entry: MemorialEntry;
+    context: EchoContext;
+}
+
+/** Cool-down: 10 dias em ms */
+const COOLDOWN_MS = 10 * 24 * 60 * 60 * 1000;
+
+function isOnCooldown(e: MemorialEntry): boolean {
+    if (!e.lastEchoAt) return false;
+    return Date.now() - new Date(e.lastEchoAt).getTime() < COOLDOWN_MS;
+}
+
+function rankEntry(a: MemorialEntry, b: MemorialEntry): number {
+    // Orações não-respondidas têm topo absoluto
+    const aUp = a.type === 'prayer' && a.status !== 'answered';
+    const bUp = b.type === 'prayer' && b.status !== 'answered';
+    if (aUp && !bUp) return -1;
+    if (!aUp && bUp) return 1;
+    // Desempate por categoria
+    const pa = CATEGORY_PRIORITY[a.type] ?? 99;
+    const pb = CATEGORY_PRIORITY[b.type] ?? 99;
+    if (pa !== pb) return pa - pb;
+    // Mais antigos primeiro (maior distância temporal = mais relevante para reencontro)
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+}
 
 export function selectBestEcho(
     entries: MemorialEntry[],
     currentBookId?: string,
     currentChapter?: number
 ): MemorialEntry | null {
+    return selectBestEchoWithContext(entries, currentBookId, currentChapter)?.entry ?? null;
+}
+
+export function selectBestEchoWithContext(
+    entries: MemorialEntry[],
+    currentBookId?: string,
+    currentChapter?: number
+): EchoResult | null {
     if (!entries || entries.length === 0) return null;
 
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-    // Filtrar trava de 7 dias anti-repetição
-    const eligible = entries.filter((e) => {
-        if (!e.lastEchoAt) return true;
-        return new Date(e.lastEchoAt) < sevenDaysAgo;
-    });
-
+    // Pool elegível: excluir entradas em cool-down
+    const eligible = entries.filter(e => !isOnCooldown(e));
     if (eligible.length === 0) return null;
 
-    const rankEntry = (a: MemorialEntry, b: MemorialEntry): number => {
-        // Priorizar Orações em acompanhamento (status != 'answered')
-        const aIsUnansweredPrayer = a.type === 'prayer' && a.status !== 'answered';
-        const bIsUnansweredPrayer = b.type === 'prayer' && b.status !== 'answered';
-        if (aIsUnansweredPrayer && !bIsUnansweredPrayer) return -1;
-        if (!aIsUnansweredPrayer && bIsUnansweredPrayer) return 1;
-
-        // Desempate por tipo
-        const prioA = CATEGORY_PRIORITY[a.type] ?? 99;
-        const prioB = CATEGORY_PRIORITY[b.type] ?? 99;
-        if (prioA !== prioB) return prioA - prioB;
-
-        // Distância temporal (mais antigos primeiro)
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    };
-
-    // 1. Prioridade Máxima: Contexto de Leitura Atual
-    if (currentBookId && currentChapter) {
-        const chapterEntries = eligible.filter(
-            (e) => e.bookId.toLowerCase() === currentBookId.toLowerCase() && Number(e.chapter) === Number(currentChapter)
+    // ── Prioridade 1: Vínculo Direto ─────────────────────────────────────────
+    // Apenas registros com vínculo literal ao livro+capítulo atual.
+    // Nunca promove registros de outros capítulos como se fossem "daqui".
+    if (currentBookId && currentChapter !== undefined) {
+        const direct = eligible.filter(
+            e =>
+                e.bookId.toLowerCase() === currentBookId.toLowerCase() &&
+                Number(e.chapter) === Number(currentChapter)
         );
-        if (chapterEntries.length > 0) {
-            chapterEntries.sort(rankEntry);
-            return chapterEntries[0];
+        if (direct.length > 0) {
+            direct.sort(rankEntry);
+            return { entry: direct[0], context: 'direct' };
         }
     }
 
-    // 2. Marcos Temporais (1 sem, 1 mês, 3 meses, 6 meses, 1 ano)
+    // ── Prioridade 2: Aniversário Histórico ───────────────────────────────────
+    // Exibe registros cujo aniversário de 6 meses ou 1 ano caia dentro de
+    // uma janela de tolerância ao redor de hoje. Independente do capítulo atual.
     const now = Date.now();
     const DAY = 24 * 60 * 60 * 1000;
-    const TIME_WINDOWS = [
-        { name: '1w', target: 7 * DAY, tolerance: 3 * DAY },
-        { name: '1m', target: 30 * DAY, tolerance: 7 * DAY },
-        { name: '3m', target: 90 * DAY, tolerance: 15 * DAY },
-        { name: '6m', target: 180 * DAY, tolerance: 20 * DAY },
-        { name: '1y', target: 365 * DAY, tolerance: 30 * DAY },
+    const ANNIVERSARY_WINDOWS = [
+        { label: '1y', target: 365 * DAY, tolerance: 7 * DAY },
+        { label: '6m', target: 180 * DAY, tolerance: 5 * DAY },
     ];
 
-    for (const window of TIME_WINDOWS) {
-        const matchingWindow = eligible.filter((e) => {
+    for (const win of ANNIVERSARY_WINDOWS) {
+        const matches = eligible.filter(e => {
             const age = now - new Date(e.createdAt).getTime();
-            return Math.abs(age - window.target) <= window.tolerance;
+            return Math.abs(age - win.target) <= win.tolerance;
         });
-
-        if (matchingWindow.length > 0) {
-            matchingWindow.sort(rankEntry);
-            return matchingWindow[0];
+        if (matches.length > 0) {
+            matches.sort(rankEntry);
+            return { entry: matches[0], context: 'anniversary' };
         }
     }
 
-    // 3. Fallback Geral: qualquer registro antigo elegível ordenado por relevância
-    const sorted = [...eligible].sort(rankEntry);
-    return sorted[0] ?? null;
+    // ── Prioridade 3: Silêncio (default) ─────────────────────────────────────
+    // Não há vínculo nem aniversário. O silêncio é a resposta padrão.
+    // Apenas com probabilidade de 20% sorteamos um "registro órfão" global.
+    // Testemunhos são excluídos deste sorteio: sua natureza narrativa não deve
+    // ser descontextualizada para capítulos aos quais não pertencem.
+    if (Math.random() > 0.20) return null;
+
+    const orphanPool = eligible.filter(e => e.type !== 'testimony');
+    if (orphanPool.length === 0) return null;
+
+    orphanPool.sort(rankEntry);
+    return { entry: orphanPool[0], context: 'orphan' };
 }
+
 
 // ─── LocalNoteStore ───────────────────────────────────────────────────────────
 
@@ -525,9 +565,9 @@ export class LocalNoteStore implements NoteStore {
         writeLocal(notes);
     }
 
-    async getMatchingEcho(bookId?: string, chapter?: number): Promise<MemorialEntry | null> {
+    async getMatchingEcho(bookId?: string, chapter?: number): Promise<EchoResult | null> {
         const all = await this.getAll();
-        return selectBestEcho(all, bookId, chapter);
+        return selectBestEchoWithContext(all, bookId, chapter);
     }
 
     async addEcoUpdate(id: string, text: string): Promise<void> {

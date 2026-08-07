@@ -18,7 +18,7 @@ import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useNotesHighlights } from "@/hooks/useNotesHighlights";
-import { createNoteStore, type MemorialEntry } from "@/lib/noteStore";
+import { createNoteStore, type MemorialEntry, type EchoResult } from "@/lib/noteStore";
 import EchoBanner from "@/components/EchoBanner";
 import EchoModal from "@/components/EchoModal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -293,7 +293,9 @@ export default function ReadingPage() {
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
   // Estados do Eco do Memorial
-  const [echoEntry, setEchoEntry] = useState<MemorialEntry | null>(null);
+  const [echoResult, setEchoResult] = useState<EchoResult | null>(null);
+  const echoEntry = echoResult?.entry ?? null;
+  const echoContext = echoResult?.context ?? 'direct';
   const [isEchoModalOpen, setIsEchoModalOpen] = useState(false);
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
@@ -748,10 +750,10 @@ export default function ReadingPage() {
     try {
       if (echoStore.getMatchingEcho) {
         const found = await echoStore.getMatchingEcho(selectedBook.id, chapterNumber);
-        setEchoEntry(found);
+        setEchoResult(found);
       }
     } catch {
-      setEchoEntry(null);
+      setEchoResult(null);
     }
   }, [echoStore, selectedBook, chapterNumber]);
 
@@ -1596,6 +1598,7 @@ export default function ReadingPage() {
               {!loading && !error && echoEntry && (
                 <EchoBanner
                   entry={echoEntry}
+                  echoContext={echoContext}
                   onOpenModal={() => setIsEchoModalOpen(true)}
                 />
               )}
