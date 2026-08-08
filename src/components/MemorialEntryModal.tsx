@@ -2,7 +2,7 @@
 // MemorialEntryModal.tsx — Bíblia Vive · Sprint 26
 //
 // Modal para criação e edição rápida dos 4 tipos de registros do Memorial:
-// Reflexão (SOAP), Oração, Testemunho e Jejum / Propósito.
+// Reflexão (SOAP), Oração, Testemunho e Propósito.
 // Preenchimento rápido em menos de 15 segundos sem interromper a leitura.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ export default function MemorialEntryModal({
     const [comoDeusSustentou, setComoDeusSustentou] = useState("");
     const [dataFato, setDataFato] = useState("");
 
-    // Campos de Jejum / Propósito
+    // Campos de Propósito
     const [objetivo, setObjetivo] = useState("");
     const [dataInicio, setDataInicio] = useState("");
     const [dataPrevista, setDataPrevista] = useState("");
@@ -107,7 +107,7 @@ export default function MemorialEntryModal({
             setComoDeusSustentou(meta.comoDeusSustentou || "");
             setDataFato(meta.dataFato || new Date().toISOString().split('T')[0]);
 
-            // Jejum
+            // Propósito
             setObjetivo(meta.objetivo || "");
             setDataInicio(meta.dataInicio || new Date().toISOString().split('T')[0]);
             setDataPrevista(meta.dataPrevista || "");
@@ -143,7 +143,7 @@ export default function MemorialEntryModal({
             labelColor: "text-app-text",
         },
         fasting: {
-            label: "Jejum / Propósito",
+            label: "Propósito",
             colorClasses: "border-border text-app-text",
             badgeClasses: "bg-app-raised text-app-text border-border font-medium",
             labelColor: "text-app-text",
@@ -310,7 +310,7 @@ export default function MemorialEntryModal({
                             placeholder={
                                 selectedCategory === 'prayer' ? "Ex: Oração pela saúde da família" :
                                 selectedCategory === 'testimony' ? "Ex: Livramento no trânsito" :
-                                selectedCategory === 'fasting' ? "Ex: Jejum de 7 dias por clareza" :
+                                selectedCategory === 'fasting' ? "Ex: Propósito/Jejum de 7 dias por clareza" :
                                 "Ex: Meditação no Salmo 23"
                             }
                             className="w-full rounded-xl border border-border bg-app-surface px-3.5 py-2 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
@@ -456,7 +456,7 @@ export default function MemorialEntryModal({
                         <div className="space-y-3">
                             <div>
                                 <label className="block text-[0.72rem] font-sans text-gold font-medium mb-1">
-                                    Objetivo do Jejum / Propósito
+                                    Objetivo do Propósito / Jejum
                                 </label>
                                 <textarea
                                     value={objetivo}

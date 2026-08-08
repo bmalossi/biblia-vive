@@ -2,7 +2,7 @@
 // MemorialFAB.tsx — Bíblia Vive · Sprint 26
 //
 // Floating Action Button expansível para o Meu Memorial.
-// Permite ao leitor registrar Reflexões, Orações, Testemunhos e Jejuns/Propósitos
+// Permite ao leitor registrar Reflexões, Orações, Testemunhos e Propósitos
 // em menos de 15 segundos sem sair do capítulo bíblico.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -68,7 +68,7 @@ export default function MemorialFAB({
         },
         {
             id: 'fasting',
-            label: 'Jejum / Propósito',
+            label: 'Propósito',
             icon: Mountain,
             colorClasses: 'bg-app-surface text-slate-300 border-slate-500/40 hover:bg-slate-600 hover:text-white',
         },

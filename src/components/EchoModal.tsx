@@ -43,7 +43,7 @@ export default function EchoModal({ isOpen, onClose, entry, store, onRefresh }: 
         reflection: "Reflexão",
         prayer: "Oração",
         testimony: "Testemunho",
-        fasting: "Jejum / Propósito",
+        fasting: "Propósito",
     };
 
     const handleAddUpdate = async (e: React.FormEvent) => {

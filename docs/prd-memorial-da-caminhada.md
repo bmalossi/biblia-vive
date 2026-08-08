@@ -29,7 +29,7 @@ Por meio de um Floating Action Button (FAB) expansível integrado diretamente à
 6. As a Leitor, I want to record a Testemunho with a title, description of what happened, and how God sustained me, so that I can preserve major milestones of grace in my life.
 7. As a Leitor, I want to register a Jejum / Propósito with a goal, start date, target end date, and progress notes, so that I can track dedicated periods of spiritual seeking.
 8. As a Leitor, I want to access `/memorial` ("Meu Memorial") and see a continuous timeline of all my spiritual records ordered chronologically, so that I can see the history of what God has built in my life.
-9. As a Leitor on `/memorial`, I want to filter records by category (Todos, Reflexões, Orações, Testemunhos, Jejuns, Respondidas, Favoritos), so that I can easily focus on specific areas of my journey.
+9. As a Leitor on `/memorial`, I want to filter records by category (Todos, Reflexões, Orações, Testemunhos, Propósitos, Respondidas, Favoritos), so that I can easily focus on specific areas of my journey.
 10. As a Leitor on `/memorial`, I want to search through my records by typing text, titles, book names, chapter numbers, or tags, so that I can instantly find past entries from years ago.
 11. As a Leitor clicking a timeline entry, I want to view its full details and click its biblical reference link, so that I am taken directly to that chapter in the Bible reader.
 12. As a Leitor with existing legacy notes, I want all my past notes to be preserved and automatically migrated as Reflexões in Meu Memorial, so that none of my historical records are lost.

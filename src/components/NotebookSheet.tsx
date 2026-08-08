@@ -358,8 +358,8 @@ export default function NotebookSheet({
                 <DrawerPrimitive.Content
                     aria-label="Caderno do capítulo"
                     className={cn(
-                        "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-2xl border-t border-border bg-app-bg h-[96dvh]",
-                        "pb-[env(safe-area-inset-bottom,0.5rem)]"
+                        "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-2xl border-t border-border bg-app-bg h-[calc(100dvh-2rem)] max-h-[92dvh]",
+                        "pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
                     )}
                 >
                     {/* Handle de arraste */}
@@ -624,7 +624,7 @@ export default function NotebookSheet({
                                             reflection: { label: "Reflexão", badge: "border-gold/40 text-gold bg-gold/10" },
                                             prayer: { label: "Oração", badge: "border-border text-app-text-muted bg-app-surface" },
                                             testimony: { label: "Testemunho", badge: "border-border text-app-text-muted bg-app-surface" },
-                                            fasting: { label: "Jejum / Propósito", badge: "border-border text-app-text-muted bg-app-surface" },
+                                            fasting: { label: "Propósito", badge: "border-border text-app-text-muted bg-app-surface" },
                                         };
 
                                         return items.map((entry) => {
@@ -666,7 +666,7 @@ export default function NotebookSheet({
                                 </div>
 
                                 {/* Footer botão Criar Nova Memória */}
-                                <div className="p-3 border-t border-border shrink-0 space-y-2">
+                                <div className="p-3 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] border-t border-border shrink-0 space-y-2 bg-app-bg">
                                     <p className="text-[0.65rem] font-mono text-app-text-muted uppercase tracking-wider">
                                         Criar nova memória:
                                     </p>
@@ -920,7 +920,7 @@ export default function NotebookSheet({
                                                 }}
                                                 className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
                                             >
-                                                Jejum / Propósito
+                                                Propósito
                                             </button>
                                         </div>
                                     </div>

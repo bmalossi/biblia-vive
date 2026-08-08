@@ -5,7 +5,7 @@
 // Exibe selos de contexto diferenciados conforme a origem do Eco:
 //   - 'direct'      → "Nascido neste capítulo"
 //   - 'anniversary' → aniversário histórico (6m/1a)
-//   - 'orphan'      → "Uma lembrança da sua caminhada geral"
+//   - 'orphan'      → "Uma lembrança da sua caminhada"
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { type MemorialEntry, type EchoContext } from "@/lib/noteStore";
@@ -49,12 +49,12 @@ export default function EchoBanner({ entry, echoContext, onOpenModal }: EchoBann
     const contextLine: Record<EchoContext, string> = {
         direct:      `Neste capítulo ${ageText}, você colocou ${categoryText}.`,
         anniversary: `Há exatamente ${ageText}, você deixou ${categoryText}.`,
-        orphan:      `Uma lembrança da sua caminhada geral.`,
+        orphan:      `Uma lembrança da sua caminhada.`,
     };
 
     // Selo visual discreto para contexto não-direto
     const contextBadge: Partial<Record<EchoContext, string>> = {
-        orphan:      "Caminhada geral",
+        orphan:      "Caminhada",
         anniversary: "Marco histórico",
     };
 

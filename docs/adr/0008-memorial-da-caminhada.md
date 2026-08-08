@@ -17,7 +17,7 @@ O objetivo é transformar o registro bíblico em um lugar onde o leitor preserva
    - Migrar registros existentes com `type = 'reflection'`.
 
 2. **Extensibilidade via `metadata` (JSONB):**
-   - Armazenar os campos estruturados de cada template (ex: campos SOAP para Reflexões; Motivo, Pedido e Entrega para Orações; O que aconteceu e Como Deus sustentou para Testemunhos; Objetivo e Datas para Jejuns) dentro do campo `metadata` JSONB.
+   - Armazenar os campos estruturados de cada template (ex: campos SOAP para Reflexões; Motivo, Pedido e Entrega para Orações; O que aconteceu e Como Deus sustentou para Testemunhos; Objetivo e Datas para Propósitos) dentro do campo `metadata` JSONB.
    - Preservar busca rápida e indexação pelas colunas principais (`type`, `title`, `content`, `tags`, `book_id`, `chapter`).
 
 3. **UX de Leitura Não-Interruptiva (FAB Expansível):**

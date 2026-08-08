@@ -2,7 +2,7 @@
 // MemorialInlineEditor.tsx — Bíblia Vive
 //
 // Formulário inline para criação e edição dos 4 tipos de registros do Memorial
-// (Reflexão SOAP, Oração, Testemunho, Jejum / Propósito) no painel lateral do Caderno.
+// (Reflexão SOAP, Oração, Testemunho, Propósito) no painel lateral do Caderno.
 // Permite ler a Bíblia e digitar no painel lateral ao mesmo tempo.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -60,7 +60,7 @@ export default function MemorialInlineEditor({
     const [comoDeusSustentou, setComoDeusSustentou] = useState("");
     const [dataFato, setDataFato] = useState("");
 
-    // Campos de Jejum / Propósito
+    // Campos de Propósito
     const [objetivo, setObjetivo] = useState("");
     const [dataInicio, setDataInicio] = useState("");
     const [dataPrevista, setDataPrevista] = useState("");
@@ -103,7 +103,7 @@ export default function MemorialInlineEditor({
         setComoDeusSustentou(meta.comoDeusSustentou || "");
         setDataFato(meta.dataFato || new Date().toISOString().split("T")[0]);
 
-        // Jejum
+        // Propósito
         setObjetivo(meta.objetivo || "");
         setDataInicio(meta.dataInicio || new Date().toISOString().split("T")[0]);
         setDataPrevista(meta.dataPrevista || "");
@@ -125,7 +125,7 @@ export default function MemorialInlineEditor({
             badgeClasses: "bg-app-raised text-app-text border-border font-medium",
         },
         fasting: {
-            label: "Jejum / Propósito",
+            label: "Propósito",
             badgeClasses: "bg-app-raised text-app-text border-border font-medium",
         },
     };
@@ -316,7 +316,7 @@ export default function MemorialInlineEditor({
                                 : selectedCategory === "testimony"
                                 ? "Ex: Livramento no trânsito"
                                 : selectedCategory === "fasting"
-                                ? "Ex: Jejum de 7 dias por clareza"
+                                ? "Ex: Propósito/Jejum de 7 dias por clareza"
                                 : "Ex: Meditação no capítulo"
                         }
                         className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
@@ -464,7 +464,7 @@ export default function MemorialInlineEditor({
                     <div className="space-y-2.5">
                         <div>
                             <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                Objetivo do Jejum / Propósito
+                                Objetivo do Propósito / Jejum
                             </label>
                             <textarea
                                 value={objetivo}

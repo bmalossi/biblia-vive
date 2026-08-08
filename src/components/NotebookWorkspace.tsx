@@ -507,7 +507,7 @@ export default function NotebookWorkspace({
                                         reflection: { label: "Reflexão", badge: "border-gold/40 text-gold bg-gold/10" },
                                         prayer: { label: "Oração", badge: "border-border text-app-text-muted bg-app-surface" },
                                         testimony: { label: "Testemunho", badge: "border-border text-app-text-muted bg-app-surface" },
-                                        fasting: { label: "Jejum / Propósito", badge: "border-border text-app-text-muted bg-app-surface" },
+                                        fasting: { label: "Propósito", badge: "border-border text-app-text-muted bg-app-surface" },
                                     };
 
                                     return items.map((entry) => {
@@ -801,7 +801,7 @@ export default function NotebookWorkspace({
                                             }}
                                             className="px-2.5 py-1.5 rounded-lg border border-border bg-app-surface text-app-text-muted hover:text-gold hover:border-gold/40 text-[0.72rem] font-medium text-center transition-colors"
                                         >
-                                            Jejum / Propósito
+                                            Propósito
                                         </button>
                                     </div>
                                 </div>

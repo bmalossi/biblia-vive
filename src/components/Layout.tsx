@@ -3,7 +3,7 @@ import NotificationSoftAsk from "@/components/NotificationSoftAsk";
 import { getVersion } from "@/lib/themes";
 import { Link, useLocation } from "react-router-dom";
 import { ReactNode } from "react";
-import { Home, BookOpen, Search, Library, Share2 } from "lucide-react";
+import { Home, Search, Bookmark } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,10 +13,8 @@ interface LayoutProps {
 
 const mobileNav = [
   { icon: Home, label: "Início", to: "/" },
-  { icon: BookOpen, label: "Ler", to: (version: string) => `/${version}/gn` },
   { icon: Search, label: "Buscar", to: "/busca" },
-  { icon: Library, label: "Jornadas", to: "/jornadas" },
-  { icon: Share2, label: "Compartilhar", to: "/compartilhar" },
+  { icon: Bookmark, label: "Memorial", to: "/memorial" },
 ];
 
 export default function Layout({ children, hideHeader = false, hideMobileNav = false }: LayoutProps) {
@@ -74,7 +72,7 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
         className={`fixed inset-x-0 bottom-0 z-50 border-t border-border bg-app-surface transition-opacity duration-200 md:hidden pt-2 pb-[env(safe-area-inset-bottom,0.5rem)] ${hideMobileNav ? "pointer-events-none opacity-0" : "opacity-100"
           }`}
       >
-        <ul className="grid grid-cols-5 gap-1">
+        <ul className="grid grid-cols-3 gap-1">
           {mobileNav.map((item) => {
             const target = typeof item.to === "function" ? item.to(version) : item.to;
             const isActive = target === "/" ? location.pathname === "/" : location.pathname.startsWith(target);
