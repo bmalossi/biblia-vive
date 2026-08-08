@@ -20,6 +20,7 @@ import {
   Clock,
   Sparkles,
   LogIn,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePageMeta } from "@/hooks/usePageMeta";
@@ -69,9 +70,37 @@ export default function AdminCapitulosPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ChapterForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [isTriggeringNotifications, setIsTriggeringNotifications] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  const handleTriggerNotifications = async () => {
+    setIsTriggeringNotifications(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      const res = await fetch("/api/notifications/trigger-scheduled", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Falha ao disparar notificações agendadas");
+      }
+
+      setSuccessMsg(data.message || "Verificação de notificações concluída!");
+      await loadChapters();
+    } catch (err: unknown) {
+      console.error("Erro ao disparar notificações:", err);
+      const msg = err instanceof Error ? err.message : "Erro ao disparar notificações";
+      setError(msg);
+    } finally {
+      setIsTriggeringNotifications(false);
+    }
+  };
 
   // Checagem de role de admin
   useEffect(() => {
@@ -264,17 +293,32 @@ export default function AdminCapitulosPage() {
               Gerencie a sequência de capítulos narrativos exibidos na página inicial.
             </p>
           </div>
-          {editingId && (
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => {
-                setEditingId(null);
-                setForm(EMPTY_FORM);
-              }}
+              disabled={isTriggeringNotifications}
+              onClick={handleTriggerNotifications}
+              className="border-gold/40 text-gold hover:bg-gold/10 flex items-center gap-1.5 text-xs md:text-sm"
             >
-              Cancelar Edição
+              {isTriggeringNotifications ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Bell className="h-4 w-4" />
+              )}
+              Disparar Notificações Pendentes
             </Button>
-          )}
+            {editingId && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditingId(null);
+                  setForm(EMPTY_FORM);
+                }}
+              >
+                Cancelar Edição
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Notificações */}

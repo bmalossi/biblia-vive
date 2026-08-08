@@ -32,6 +32,9 @@
         },
         "api/notifications/on-publish.ts": {
             "maxDuration": 30
+        },
+        "api/notifications/trigger-scheduled.ts": {
+            "maxDuration": 30
         }
     },
     "headers": [
