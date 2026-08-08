@@ -12,25 +12,103 @@ interface SupabaseWebhookPayload {
 }
 
 // ─── Modo Manual (chamado pelo Admin sem webhook secret) ───────────────────────
-// Payload: { title: string, slug: string }
-// Compatível com o fluxo legado de AdminArtigosPage → notify-publish
+// Dispara notificações para todos os itens agendados/publicados até o dia de hoje
+// que ainda estejam com notification_sent_at = NULL
 async function handleManualNotify(request: Request): Promise<Response> {
   try {
-    const body = await request.json();
-    const { title, slug } = body;
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!title || !slug) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       return new Response(
-        JSON.stringify({ error: "title and slug are required" }),
-        { status: 400, headers: JSON_HEADERS }
+        JSON.stringify({ error: "Configuração do Supabase ausente" }),
+        { status: 500, headers: JSON_HEADERS }
       );
     }
 
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const todayStr = new Date().toISOString().split("T")[0];
     const appUrl = process.env.VITE_APP_URL || "https://www.bibliavive.com.br";
-    const result = await sendArticleNotification(title, slug, appUrl);
+
+    let totalProcessed = 0;
+    let totalSent = 0;
+    let totalFailed = 0;
+
+    // 1. Capítulos de jornadas agendados/publicados até hoje e sem notificação
+    const { data: chapters, error: chapterErr } = await supabase
+      .from("editorial_chapters")
+      .select("*")
+      .eq("status", "publicado")
+      .lte("publish_date", todayStr)
+      .is("notification_sent_at", null);
+
+    if (chapterErr) {
+      console.error("[manual-notify] Erro ao buscar capítulos:", chapterErr);
+    } else if (chapters && chapters.length > 0) {
+      for (const ch of chapters) {
+        totalProcessed++;
+        const title = "Nova jornada no Bíblia Vive";
+        const body = ch.series_name
+          ? `${ch.series_name}: ${ch.title}`
+          : ch.title || "Um novo capítulo de jornada foi publicado!";
+        const link = `${appUrl}/jornadas?capitulo=${ch.id}`;
+
+        const result = await sendPushNotification({ title, body, link });
+
+        if (result.successCount > 0) {
+          totalSent += result.sent;
+          totalFailed += result.failed;
+
+          await supabase
+            .from("editorial_chapters")
+            .update({ notification_sent_at: new Date().toISOString() })
+            .eq("id", ch.id)
+            .is("notification_sent_at", null);
+        }
+      }
+    }
+
+    // 2. Artigos agendados/publicados sem notificação
+    const { data: articles, error: articleErr } = await supabase
+      .from("articles")
+      .select("*")
+      .eq("status", "publicado")
+      .is("notification_sent_at", null);
+
+    if (articleErr) {
+      console.error("[manual-notify] Erro ao buscar artigos:", articleErr);
+    } else if (articles && articles.length > 0) {
+      for (const art of articles) {
+        totalProcessed++;
+        const title = "Novo artigo no Bíblia Vive";
+        const body = art.title || "Um novo artigo foi publicado!";
+        const link = `${appUrl}/artigos/${art.slug}`;
+
+        const result = await sendPushNotification({ title, body, link });
+
+        if (result.successCount > 0) {
+          totalSent += result.sent;
+          totalFailed += result.failed;
+
+          await supabase
+            .from("articles")
+            .update({ notification_sent_at: new Date().toISOString() })
+            .eq("id", art.id)
+            .is("notification_sent_at", null);
+        }
+      }
+    }
 
     return new Response(
-      JSON.stringify({ success: true, sent: result.sent, failed: result.failed }),
+      JSON.stringify({
+        success: true,
+        processed: totalProcessed,
+        sent: totalSent,
+        failed: totalFailed,
+        message: totalProcessed === 0
+          ? "Nenhuma notificação pendente encontrada para hoje."
+          : `Processados ${totalProcessed} item(ns). Enviados: ${totalSent}.`,
+      }),
       { status: 200, headers: JSON_HEADERS }
     );
   } catch (err: unknown) {

@@ -81,7 +81,7 @@ export default function AdminCapitulosPage() {
     setSuccessMsg(null);
 
     try {
-      const res = await fetch("/api/notifications/trigger-scheduled", {
+      const res = await fetch("/api/notifications/on-publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
