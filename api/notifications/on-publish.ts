@@ -144,8 +144,7 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
         .from(table)
         .update({ notification_sent_at: new Date().toISOString() })
         .eq("id", record.id)
-        .is("notification_sent_at", null)   // <-- só atualiza se ainda for null
-        .select("id", { count: "exact", head: true });
+        .select("id", { count: "exact" });
 
       if (updateError) {
         console.warn(`[on-publish] Could not update notification_sent_at for ${table}:${record.id}:`, updateError.message);
