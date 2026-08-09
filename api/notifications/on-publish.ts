@@ -166,6 +166,23 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     );
   }
 
+  // 3b. Para capítulos de jornada: só notificar se publish_date for hoje ou no passado.
+  //     Agendamentos futuros devem ser notificados pelo Cron Job, não imediatamente.
+  if (table === "editorial_chapters" && record.publish_date) {
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (record.publish_date > todayStr) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          skipped: true,
+          reason: `publish_date (${record.publish_date}) is in the future — notification deferred to Cron Job`,
+        }),
+        { status: 200, headers: JSON_HEADERS }
+      );
+    }
+  }
+
+
   if (type === "UPDATE") {
     // Para UPDATE: notificar apenas se o status anterior NÃO era "publicado" E notification_sent_at for nulo
     if (old_record && old_record.status === "publicado") {
