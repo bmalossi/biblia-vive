@@ -12,7 +12,7 @@ export interface UseInactivityReturn {
 }
 
 export function useInactivity({
-  timeoutMs = 30000,
+  timeoutMs = 15000,
   disabled = false,
   mouseThreshold = 10,
 }: UseInactivityOptions = {}): UseInactivityReturn {

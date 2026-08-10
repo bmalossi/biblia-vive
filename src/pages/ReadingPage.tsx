@@ -468,7 +468,7 @@ export default function ReadingPage() {
     tts.isPlaying;
 
   const { isInactive: isClausuraActive } = useInactivity({
-    timeoutMs: 30000,
+    timeoutMs: 15000,
     disabled: isClausuraDisabled,
     mouseThreshold: 10,
   });
@@ -1863,8 +1863,9 @@ export default function ReadingPage() {
             {/* Sticky Chapter Sidebar on Desktop */}
             {!compareEnabled && selectedBook && (
               <aside className={cn(
-                "hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 transition-[width] duration-500",
-                cachedChapterCommentary ? "w-[320px] xl:w-[380px] 2xl:w-[420px]" : "w-[140px] xl:w-[180px] 2xl:w-[220px]"
+                "hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 transition-all duration-500",
+                cachedChapterCommentary ? "w-[320px] xl:w-[380px] 2xl:w-[420px]" : "w-[140px] xl:w-[180px] 2xl:w-[220px]",
+                isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
               )}>
                 <div className="flex flex-col items-center pb-8 pt-2 w-full">
                   {!preferences.focusMode && (
