@@ -57,6 +57,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { useReadingPreferences } from "@/hooks/useReadingPreferences";
 import { useTTS } from "@/hooks/useTTS";
+import { useInactivity } from "@/hooks/useInactivity";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "@/hooks/useToast";
 import { useVerseActions } from "@/hooks/useVerseActions";
@@ -450,6 +451,26 @@ export default function ReadingPage() {
   }, [selectedBook?.id, chapterNumber]);
 
   const tts = useTTS(preferences.ttsRate);
+  const [isAudioPlayerPlaying, setIsAudioPlayerPlaying] = useState(false);
+
+  const isClausuraDisabled =
+    isStudyPanelOpen ||
+    isNoteModalOpen ||
+    isAuthModalOpen ||
+    isCardModalOpen ||
+    isEchoModalOpen ||
+    isSettingsOpen ||
+    isChapterPickerOpen ||
+    rateLimitStatus.open ||
+    !!selectedVerse ||
+    isAudioPlayerPlaying ||
+    tts.isPlaying;
+
+  const { isInactive: isClausuraActive } = useInactivity({
+    timeoutMs: 30000,
+    disabled: isClausuraDisabled,
+    mouseThreshold: 10,
+  });
 
   const setVerseRef = useCallback(
     (key: string) => (element: HTMLDivElement | null) => {
@@ -1286,7 +1307,7 @@ export default function ReadingPage() {
   }
 
   return (
-    <Layout hideHeader={false} hideMobileNav={preferences.focusMode}>
+    <Layout hideHeader={false} hideMobileNav={preferences.focusMode} isClausuraActive={isClausuraActive}>
       <div
         className={cn(
           "relative transition-[padding-left] duration-300",
@@ -1298,7 +1319,7 @@ export default function ReadingPage() {
 
         {!preferences.focusMode && (
           <>
-            <section className={`mx-auto w-full max-w-6xl px-4 md:px-6`}>
+            <section className={cn("mx-auto w-full max-w-6xl px-4 md:px-6 transition-opacity", isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0")}>
               {chapterData?.fallbackNotice && (
                 <Alert className="mb-4 border-gold/40 bg-gold-bg/20 text-app-text">
                   <AlertTitle className="font-medium text-gold flex items-center gap-2">
@@ -1455,6 +1476,7 @@ export default function ReadingPage() {
                     bookId={selectedBook?.id}
                     chapter={chapterNumber}
                     version={selectedVersion}
+                    onPlayStateChange={setIsAudioPlayerPlaying}
                   />
 
                   <Button
@@ -2046,7 +2068,13 @@ export default function ReadingPage() {
 
 
         {selectedBook && !preferences.focusMode && (
-          <footer className="mx-auto mt-6 mb-12 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-8 md:px-6" role="contentinfo">
+          <footer
+            className={cn(
+              "mx-auto mt-6 mb-12 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-8 md:px-6 transition-opacity",
+              isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
+            )}
+            role="contentinfo"
+          >
             <div className="flex w-full items-center justify-center gap-3">
               {prevChapterInfo && (
                 <Button
@@ -2083,7 +2111,12 @@ export default function ReadingPage() {
         )}
 
         {selectedBook && preferences.focusMode && (
-          <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
+          <div
+            className={cn(
+              "fixed bottom-4 right-4 z-50 flex items-center gap-2 transition-opacity",
+              isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
+            )}
+          >
             <Button className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised" onClick={() => updatePreference("focusMode", false)} type="button" variant="outline">
               {t("reading.exitFocus")}
             </Button>

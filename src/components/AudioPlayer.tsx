@@ -13,11 +13,17 @@ interface AudioPlayerProps {
     onEnded?: () => void;
     /** Called after autoPlay is consumed so the parent can reset the flag. */
     onAutoPlayConsumed?: () => void;
+    /** Called when audio play state changes. */
+    onPlayStateChange?: (isPlaying: boolean) => void;
 }
 
-export default function AudioPlayer({ bookId, chapter, version, autoPlay, onEnded, onAutoPlayConsumed }: AudioPlayerProps) {
+export default function AudioPlayer({ bookId, chapter, version, autoPlay, onEnded, onAutoPlayConsumed, onPlayStateChange }: AudioPlayerProps) {
     const [isPlaying, setIsPlaying]     = useState(false);
     const [runtimeError, setRuntimeError] = useState(false);
+
+    useEffect(() => {
+        onPlayStateChange?.(isPlaying);
+    }, [isPlaying, onPlayStateChange]);
     const [loopMode, setLoopMode]         = useState(false);
     const [autoAdvance, setAutoAdvance]   = useState(false);
 

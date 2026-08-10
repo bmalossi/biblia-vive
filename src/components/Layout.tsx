@@ -4,11 +4,13 @@ import { getVersion } from "@/lib/themes";
 import { Link, useLocation } from "react-router-dom";
 import { ReactNode } from "react";
 import { Home, Search, Bookmark } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: ReactNode;
   hideHeader?: boolean;
   hideMobileNav?: boolean;
+  isClausuraActive?: boolean;
 }
 
 const mobileNav = [
@@ -17,13 +19,22 @@ const mobileNav = [
   { icon: Bookmark, label: "Memorial", to: "/memorial" },
 ];
 
-export default function Layout({ children, hideHeader = false, hideMobileNav = false }: LayoutProps) {
+export default function Layout({ children, hideHeader = false, hideMobileNav = false, isClausuraActive = false }: LayoutProps) {
   const location = useLocation();
   const version = getVersion();
 
   return (
     <div className="min-h-screen bg-app-bg text-app-text">
-      <div className={`transition-opacity duration-200 ${hideHeader ? "pointer-events-none opacity-0" : "opacity-100"}`}>
+      <div
+        className={cn(
+          "transition-opacity",
+          isClausuraActive
+            ? "pointer-events-none opacity-0 duration-1000"
+            : hideHeader
+              ? "pointer-events-none opacity-0 duration-150"
+              : "opacity-100 duration-0"
+        )}
+      >
         <Header />
       </div>
       <main className={`mx-auto w-full max-w-6xl px-4 md:px-6 md:pb-10 flex-grow ${hideHeader ? "pb-12 pt-3" : "pb-24 pt-[68px]"}`} id="main-content">
@@ -31,7 +42,14 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
       </main>
 
       {!hideHeader && !hideMobileNav && (
-        <footer className="mt-auto border-t border-border bg-app-surface py-12 pb-28 md:pb-12 text-center md:text-left">
+        <footer
+          className={cn(
+            "mt-auto border-t border-border bg-app-surface py-12 pb-28 md:pb-12 text-center md:text-left transition-opacity",
+            isClausuraActive
+              ? "pointer-events-none opacity-0 duration-1000"
+              : "opacity-100 duration-0"
+          )}
+        >
           <div className="mx-auto w-full max-w-6xl px-4 md:px-6 grid gap-8 md:grid-cols-3">
             <div>
               <img
@@ -69,8 +87,14 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
 
       <nav
         aria-label="Navegação móvel"
-        className={`fixed inset-x-0 bottom-0 z-50 border-t border-border bg-app-surface transition-opacity duration-200 md:hidden pt-2 pb-[env(safe-area-inset-bottom,0.5rem)] ${hideMobileNav ? "pointer-events-none opacity-0" : "opacity-100"
-          }`}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-50 border-t border-border bg-app-surface transition-opacity md:hidden pt-2 pb-[env(safe-area-inset-bottom,0.5rem)]",
+          isClausuraActive
+            ? "pointer-events-none opacity-0 duration-1000"
+            : hideMobileNav
+              ? "pointer-events-none opacity-0 duration-150"
+              : "opacity-100 duration-0"
+        )}
       >
         <ul className="grid grid-cols-3 gap-1">
           {mobileNav.map((item) => {
