@@ -98,6 +98,14 @@ describe("useInactivity", () => {
 
     // Should still be inactive because displacement was <= 10px
     expect(result.current.isInactive).toBe(true);
+
+    // Another small move (5px dx, 5px dy from 105,105 -> 110,110; distance from previous ~7.07px <= 10px)
+    act(() => {
+      window.dispatchEvent(new MouseEvent("mousemove", { clientX: 110, clientY: 110 }));
+    });
+
+    // Should remain inactive because each step was <= 10px relative to previous position
+    expect(result.current.isInactive).toBe(true);
   });
 
   it("should reset timer on mousemove with displacement > 10px", () => {

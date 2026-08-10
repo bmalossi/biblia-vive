@@ -454,6 +454,7 @@ export default function ReadingPage() {
   const [isAudioPlayerPlaying, setIsAudioPlayerPlaying] = useState(false);
 
   const isClausuraDisabled =
+    isNotebookOpen ||
     isStudyPanelOpen ||
     isNoteModalOpen ||
     isAuthModalOpen ||

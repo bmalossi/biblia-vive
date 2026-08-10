@@ -71,16 +71,21 @@ export function useInactivity({
       const dy = e.clientY - lastMousePosRef.current.y;
       const dist = Math.hypot(dx, dy);
 
+      // Sempre atualiza o ponto de referência para evitar que micro-movimentos
+      // acumulados em relação a uma posição antiga ultrapassem a tolerância
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+
       if (dist > mouseThreshold) {
-        lastMousePosRef.current = { x: e.clientX, y: e.clientY };
         resetTimer();
       }
     };
 
-    window.addEventListener("mousedown", handlePointerInteraction);
-    window.addEventListener("touchstart", handlePointerInteraction);
-    window.addEventListener("keydown", handlePointerInteraction);
-    window.addEventListener("mousemove", handleMouseMove);
+    const listenerOptions = { passive: true };
+
+    window.addEventListener("mousedown", handlePointerInteraction, listenerOptions);
+    window.addEventListener("touchstart", handlePointerInteraction, listenerOptions);
+    window.addEventListener("keydown", handlePointerInteraction, listenerOptions);
+    window.addEventListener("mousemove", handleMouseMove, listenerOptions);
 
     return () => {
       window.removeEventListener("mousedown", handlePointerInteraction);
