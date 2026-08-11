@@ -32,7 +32,7 @@ const BIBLE_BASE   = path.resolve(PROJECT_ROOT, 'public/bible');
 const CANONICAL_ORIGIN = 'https://www.bibliavive.com.br';
 
 // ─── Env ──────────────────────────────────────────────────────────────────────
-const SUPABASE_URL        = process.env.SUPABASE_URL;
+const SUPABASE_URL        = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const FB_APP_ID           = process.env.VITE_FB_APP_ID || '1035985160869680';
 
@@ -1105,6 +1105,58 @@ function harpaMetaTags() {
   };
 }
 
+function sobreMetaTags() {
+  const title = 'Sobre o Bíblia Vive — Missão e Propósito | Bíblia Vive';
+  const desc  = 'Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.';
+  const url   = `${CANONICAL_ORIGIN}/sobre`;
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Sobre o Bíblia Vive</h1>` +
+    `<p>${desc}</p>` +
+    `<h2>Nossa Missão</h2>` +
+    `<p>Levar a palavra de Deus com ferramentas modernas sem perder a essência milenar. O Bíblia Vive foi construído para potencializar o estudo devocional individual e em igreja, unindo tecnologia de ponta e reverência.</p>` +
+    `<h2>Traduções e Fidedignidade</h2>` +
+    `<p>Utilizamos consagradas versões da Bíblia (ACF, ARC, NVI, KJV), prezando pela integridade técnica e fidedignidade textual.</p>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'AboutPage', seoContent });
+}
+
+function proMetaTags() {
+  const title = 'Bíblia Vive PRO — Recursos Avançados de Estudo | Bíblia Vive';
+  const desc  = 'Conheça os recursos adicionais do Bíblia Vive PRO: comentários teológicos expandidos, cadernos ilimitados no Memorial e suporte ao projeto.';
+  const url   = `${CANONICAL_ORIGIN}/pro`;
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Bíblia Vive PRO</h1>` +
+    `<p>${desc}</p>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
+function apoiarMetaTags() {
+  const title = 'Apoiar o Projeto | Bíblia Vive';
+  const desc  = 'Saiba como apoiar o desenvolvimento independente da plataforma Bíblia Vive através de doações voluntárias via PIX.';
+  const url   = `${CANONICAL_ORIGIN}/apoiar`;
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Apoiar o Projeto Bíblia Vive</h1>` +
+    `<p>${desc}</p>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
+function termosMetaTags() {
+  const title = 'Termos de Uso e Privacidade | Bíblia Vive';
+  const desc  = 'Termos de uso, políticas de privacidade e propriedade intelectual das traduções bíblicas da plataforma Bíblia Vive.';
+  const url   = `${CANONICAL_ORIGIN}/termos-de-uso`;
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Termos de Uso e Privacidade</h1>` +
+    `<p>${desc}</p>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
 /**
  * Shared builder for simple static pages.
  */
@@ -1349,6 +1401,34 @@ async function prerender() {
   await fs.mkdir(jornadasDir, { recursive: true });
   await fs.writeFile(path.join(jornadasDir, 'index.html'), jornadasHtml, 'utf-8');
   console.log('[prerender]   ✓ dist/jornadas/index.html');
+
+  // /sobre
+  const sobreHtml = replacePlaceholders(template, sobreMetaTags());
+  const sobreDir  = path.join(DIST_DIR, 'sobre');
+  await fs.mkdir(sobreDir, { recursive: true });
+  await fs.writeFile(path.join(sobreDir, 'index.html'), sobreHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/sobre/index.html');
+
+  // /pro
+  const proHtml = replacePlaceholders(template, proMetaTags());
+  const proDir  = path.join(DIST_DIR, 'pro');
+  await fs.mkdir(proDir, { recursive: true });
+  await fs.writeFile(path.join(proDir, 'index.html'), proHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/pro/index.html');
+
+  // /apoiar
+  const apoiarHtml = replacePlaceholders(template, apoiarMetaTags());
+  const apoiarDir  = path.join(DIST_DIR, 'apoiar');
+  await fs.mkdir(apoiarDir, { recursive: true });
+  await fs.writeFile(path.join(apoiarDir, 'index.html'), apoiarHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/apoiar/index.html');
+
+  // /termos-de-uso
+  const termosHtml = replacePlaceholders(template, termosMetaTags());
+  const termosDir  = path.join(DIST_DIR, 'termos-de-uso');
+  await fs.mkdir(termosDir, { recursive: true });
+  await fs.writeFile(path.join(termosDir, 'index.html'), termosHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/termos-de-uso/index.html');
 
 // ─── IndexNow Protocol ────────────────────────────────────────────────────────
 const INDEXNOW_KEY = '4f9b8c2e7a1d3f5b8e9a0c1d2e3f4a5b';

@@ -38,12 +38,12 @@ const removeMeta = (name: string, property = false) => {
   }
 };
 
+const CANONICAL_ORIGIN = "https://www.bibliavive.com.br";
+
 function resolveAbsoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const origin = typeof window !== "undefined"
-    ? window.location.origin
-    : "https://www.bibliavive.com.br";
-  return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${CANONICAL_ORIGIN}${cleanPath}`;
 }
 
 export function usePageMeta({
