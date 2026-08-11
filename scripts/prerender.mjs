@@ -547,6 +547,8 @@ function generateArticleMetaTags(article) {
       }
     : { '@type': 'Organization', name: 'Bíblia Vive', url: CANONICAL_ORIGIN };
 
+  const ytId = article.youtube_id || article.youtubeId || (article.video_url?.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/)?.[1]);
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -568,6 +570,17 @@ function generateArticleMetaTags(article) {
       ]
     },
     inLanguage: 'pt-BR',
+    ...(ytId ? {
+      video: {
+        '@type': 'VideoObject',
+        name: article.video_title || article.title,
+        description: article.video_description || description,
+        thumbnailUrl: article.cover_image_url || `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`,
+        contentUrl: `https://www.youtube.com/watch?v=${ytId}`,
+        embedUrl: `https://www.youtube.com/embed/${ytId}`,
+        uploadDate: article.published_at || article.created_at
+      }
+    } : {})
   };
 
   return {
@@ -605,7 +618,48 @@ function homeMetaTags() {
     `<li><a href="/planos">Planos de Leitura</a></li>` +
     `</ul></nav>` +
     `</main>`;
-  return buildStaticMeta({ title, desc, url, type: 'WebSite', seoContent, inLanguage: 'pt-BR' });
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Bíblia Vive',
+      url,
+      description: desc,
+      inLanguage: 'pt-BR',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${CANONICAL_ORIGIN}/busca?q={search_term_string}`,
+        'query-input': 'required name=search_term_string'
+      }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Bíblia Vive',
+      url: CANONICAL_ORIGIN,
+      logo: `${CANONICAL_ORIGIN}/og/home.png`,
+      sameAs: [
+        'https://www.instagram.com/biblia.vive/',
+        'https://www.facebook.com/bibliavive/'
+      ]
+    }
+  ];
+
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
+    OG_TYPE:          `<meta property="og:type" content="website" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
 }
 
 function planosMetaTags() {
@@ -1082,6 +1136,29 @@ async function prerender() {
   await fs.writeFile(path.join(harpaDir, 'index.html'), harpaHtml, 'utf-8');
   console.log('[prerender]   ✓ dist/harpa/index.html');
 
+// ─── IndexNow Protocol ────────────────────────────────────────────────────────
+const INDEXNOW_KEY = '4f9b8c2e7a1d3f5b8e9a0c1d2e3f4a5b';
+
+async function submitIndexNow(urlList) {
+  if (!urlList || urlList.length === 0) return;
+  console.log(`[indexnow] Submitting ${urlList.length} URLs to IndexNow (Bing / ChatGPT Search)...`);
+  try {
+    const res = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: 'www.bibliavive.com.br',
+        key: INDEXNOW_KEY,
+        keyLocation: `${CANONICAL_ORIGIN}/${INDEXNOW_KEY}.txt`,
+        urlList: urlList.slice(0, 10000), // Max 10,000 URLs per payload
+      }),
+    });
+    console.log(`[indexnow] Response status: ${res.status} (${res.statusText})`);
+  } catch (err) {
+    console.warn(`[indexnow] ⚠ Could not submit to IndexNow: ${err.message}`);
+  }
+}
+
   // ── Sitemap — static pages ──
   const STATIC_URLS = [
     { loc: `${CANONICAL_ORIGIN}/`,              changefreq: 'daily',   priority: '1.0' },
@@ -1102,8 +1179,22 @@ async function prerender() {
   // Write sitemap
   await fs.writeFile(path.join(DIST_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
 
-  // Count sitemap URLs for reporting
-  const urlCount = (sitemapXml.match(/<url>/g) || []).length;
+  // Also copy IndexNow key file to DIST_DIR if needed
+  try {
+    await fs.copyFile(
+      path.join(PROJECT_ROOT, 'public', `${INDEXNOW_KEY}.txt`),
+      path.join(DIST_DIR, `${INDEXNOW_KEY}.txt`)
+    );
+  } catch {
+    // Ignore if copy fails
+  }
+
+  // Count sitemap URLs & extract URL list for IndexNow
+  const urlMatches = sitemapXml.match(/<loc>(.*?)<\/loc>/g) || [];
+  const allUrls = urlMatches.map(m => m.replace(/<\/?loc>/g, ''));
+
+  // Submit to IndexNow
+  await submitIndexNow(allUrls);
 
   // ── Summary ──
   console.log('\n════════════════════════════════════════════════');
@@ -1111,7 +1202,7 @@ async function prerender() {
   console.log(`  Bible chapters : ${totalChapters}`);
   console.log(`  Articles       : ${totalArticles}`);
   console.log(`  Authors        : ${totalAuthors}`);
-  console.log(`  Sitemap URLs   : ${urlCount}`);
+  console.log(`  Sitemap URLs   : ${allUrls.length}`);
   console.log('════════════════════════════════════════════════\n');
 }
 

@@ -40,6 +40,11 @@ interface Article {
     author_id?: string | null;
     reviewed_by?: string | null;
     author?: Author | null;
+    youtube_id?: string | null;
+    youtubeId?: string | null;
+    video_url?: string | null;
+    video_title?: string | null;
+    video_description?: string | null;
 }
 
 export default function ArtigoPage() {
@@ -97,6 +102,9 @@ export default function ArtigoPage() {
         robots = "index, follow";
         description = description.substring(0, 160);
         canonical = `/artigos/${article.slug}`;
+
+        const ytId = article.youtube_id || article.youtubeId || (article.video_url?.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/)?.[1]);
+
         jsonLd = {
             "@context": "https://schema.org",
             "@type": "Article",
@@ -129,6 +137,17 @@ export default function ArtigoPage() {
                 ],
             },
             "inLanguage": "pt-BR",
+            ...(ytId ? {
+                "video": {
+                    "@type": "VideoObject",
+                    "name": article.video_title || article.title,
+                    "description": article.video_description || description,
+                    "thumbnailUrl": article.cover_image_url || `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`,
+                    "contentUrl": `https://www.youtube.com/watch?v=${ytId}`,
+                    "embedUrl": `https://www.youtube.com/embed/${ytId}`,
+                    "uploadDate": article.published_at || article.created_at
+                }
+            } : {})
         };
     }
 

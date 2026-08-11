@@ -77,22 +77,32 @@ export default function HomePage() {
     canonical: "/",
     description: t("home.description"),
     ogImage: "/og-default.png",
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: t("app.name"),
-      url: `${window.location.origin}/`,
-      description: t("home.description"),
-      inLanguage: locale,
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${window.location.origin}/busca?q={search_term_string}`,
+    jsonLd: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: t("app.name"),
+        url: `${window.location.origin}/`,
+        description: t("home.description"),
+        inLanguage: locale,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${window.location.origin}/busca?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
         },
-        "query-input": "required name=search_term_string",
       },
-    },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: t("app.name"),
+        url: window.location.origin,
+        logo: `${window.location.origin}/og/home.png`,
+        sameAs: [
+          "https://www.instagram.com/biblia.vive/",
+          "https://www.facebook.com/bibliavive/"
+        ],
+      },
+    ],
     title: "Bíblia Vive — Leia, Estude e Compartilhe a Bíblia",
     ogType: "website",
   });
