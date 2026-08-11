@@ -409,32 +409,70 @@ function generateBookMetaTags(bookName, folder, routeSlug, version, versionLabel
 /**
  * Generates all <head> meta tags + SEO_CONTENT for a Bible chapter.
  */
-function generateChapterMetaTags(bookName, localId, chapterNum, verses, version, versionLabel) {
+/**
+ * Generates all <head> meta tags + SEO_CONTENT for a Bible chapter.
+ */
+function generateChapterMetaTags(bookName, localId, chapterNum, verses, version, versionLabel, bookCtx = null) {
   const routeSlug  = toRouteSlug(localId);
   const url        = `${CANONICAL_ORIGIN}/${version}/${routeSlug}/${chapterNum}`;
   const title      = `${bookName} ${chapterNum} — ${versionLabel} — Bíblia Vive`;
   const descText   = verses.slice(0, 3).join(' ').substring(0, 160);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Chapter',
-    name: title,
-    position: chapterNum,
-    isPartOf: {
-      '@type': 'Book',
-      name: `${bookName} — ${versionLabel}`,
-      url: `${CANONICAL_ORIGIN}/${version}/${routeSlug}`,
-    },
-    text: descText,
-    inLanguage: version === 'kjv' ? 'en' : 'pt-BR',
-  };
+  const faqAnswerText = bookCtx?.summary
+    ? `${bookName} capítulo ${chapterNum} aborda o contexto de ${bookCtx.theme || bookName}. ${bookCtx.summary}`
+    : `O capítulo ${chapterNum} de ${bookName} (${versionLabel}) apresenta passagens fundamentais para estudo teológico e reflexão espiritual na plataforma Bíblia Vive.`;
 
-  // Build the visible SEO block: h1 + all verses as <p>
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Início', item: CANONICAL_ORIGIN },
+        { '@type': 'ListItem', position: 2, name: bookName, item: `${CANONICAL_ORIGIN}/${version}/${routeSlug}` },
+        { '@type': 'ListItem', position: 3, name: `Capítulo ${chapterNum}`, item: url },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Chapter',
+      name: title,
+      position: chapterNum,
+      isPartOf: {
+        '@type': 'Book',
+        name: `${bookName} — ${versionLabel}`,
+        url: `${CANONICAL_ORIGIN}/${version}/${routeSlug}`,
+      },
+      text: verses.map((v, i) => `${i + 1} ${v}`).join(' '),
+      inLanguage: version === 'kjv' ? 'en' : 'pt-BR',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: `Qual o contexto e significado de ${bookName} capítulo ${chapterNum}?`,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faqAnswerText,
+          },
+        },
+      ],
+    },
+  ];
+
+  // Build the visible SEO block: h1 + context + all verses as <p>
+  const contextBlock = bookCtx?.theme
+    ? `<section><h2>Contexto do Livro (${bookName})</h2><p>${bookCtx.theme}</p></section>`
+    : '';
+
   const seoContent =
     `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>${bookName} — Capítulo ${chapterNum} (${versionLabel})</h1>` +
+    contextBlock +
+    `<section><h2>Texto Bíblico</h2>` +
     verses.map((v, i) => `<p><sup>${i + 1}</sup> ${v}</p>`).join('') +
-    `</article>`;
+    `</section></article>`;
 
   return {
     META_TITLE:       `<title>${title}</title>`,
@@ -502,6 +540,7 @@ function generateArticleMetaTags(article) {
     ? {
         '@type': 'Person',
         name: article.author.name,
+        url: `${CANONICAL_ORIGIN}/autor/${article.author.slug}`,
         ...(article.author.role ? { jobTitle: article.author.role } : {}),
         ...(article.author.church ? { worksFor: { '@type': 'Organization', name: article.author.church } } : {}),
         ...(article.author.avatar_url ? { image: article.author.avatar_url } : {}),
@@ -518,7 +557,16 @@ function generateArticleMetaTags(article) {
     author: authorPerson,
     ...(article.published_at ? { datePublished: article.published_at } : {}),
     ...(article.updated_at   ? { dateModified:  article.updated_at   } : {}),
-    publisher: { '@type': 'Organization', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Bíblia Vive',
+      url: CANONICAL_ORIGIN,
+      logo: { '@type': 'ImageObject', url: `${CANONICAL_ORIGIN}/og/home.png` },
+      sameAs: [
+        'https://www.instagram.com/biblia.vive/',
+        'https://www.facebook.com/bibliavive/'
+      ]
+    },
     inLanguage: 'pt-BR',
   };
 
@@ -569,9 +617,9 @@ function planosMetaTags() {
     `<h1>Planos de Leitura Bíblica</h1>` +
     `<p>${desc}</p>` +
     `<ul>` +
-    `<li>Plano de 30 dias — leitura intensiva</li>` +
-    `<li>Plano de 90 dias — leitura trimestral</li>` +
-    `<li>Plano de 365 dias — leitura anual completa</li>` +
+    `<li>Plano de 30 dias — Quatro Evangelhos</li>` +
+    `<li>Plano de 90 dias — Novo Testamento</li>` +
+    `<li>Plano de 365 dias — Bíblia inteira</li>` +
     `</ul>` +
     `<a href="/">Voltar para a página inicial</a>` +
     `</main>`;
@@ -596,7 +644,7 @@ function artigosIndexMetaTags(articles) {
 
 /**
  * Generates all <head> meta tags + SEO_CONTENT for /como-usar.
- * Exposes the full tutorial content (Estudar, Caderno, Notas, Destaques,
+ * Exposes the full tutorial content (Estudar, Memorial, Destaques,
  * Compartilhar, Planos) as semantic static HTML so crawlers and AI agents
  * that don't execute JavaScript can read it.
  *
@@ -608,13 +656,14 @@ function artigosIndexMetaTags(articles) {
  */
 function comoUsarMetaTags() {
   const title = 'Como usar o Bíblia Vive — Guia de Estudo | Bíblia Vive';
-  const desc  = 'Aprenda a usar as ferramentas do Bíblia Vive: comentários teológicos históricos, caderno de estudos, notas em versículos, destaques coloridos, compartilhamento de cards e planos de leitura.';
+  const desc  = 'Aprenda a usar as ferramentas do Bíblia Vive: comentários teológicos históricos, Memorial da caminhada com a Palavra, destaques coloridos, compartilhamento e planos de leitura.';
   const url   = `${CANONICAL_ORIGIN}/como-usar`;
+
 
   const seoContent =
 `<main class="bv-seo-only" style="font-family:Georgia,'Times New Roman',serif;max-width:780px;margin:0 auto;padding:1rem;line-height:1.65;color:#1a1a1a">
   <h1>Como usar o Bíblia Vive — Guia de Estudo</h1>
-  <p>O Bíblia Vive é uma aplicação web progressiva para leitura e estudo da Bíblia em português. Esta página descreve, em texto, todas as ferramentas disponíveis na plataforma: análise de versículos com comentários teológicos históricos, caderno de estudos por capítulo, notas pessoais por versículo, destaques coloridos, compartilhamento de cards para redes sociais e planos de leitura diários.</p>
+  <p>O Bíblia Vive é uma aplicação web progressiva para leitura e estudo da Bíblia em português. Esta página descreve, em texto, todas as ferramentas disponíveis na plataforma: análise de versículos com comentários teológicos históricos, Memorial da caminhada com a Palavra, destaques coloridos, compartilhamento de cards para redes sociais e planos de leitura diários.</p>
 
   <h2>Estudar com Comentários Teológicos</h2>
   <p>O recurso de Comentários do Bíblia Vive conecta você ao pensamento de teólogos históricos como <strong>Matthew Henry</strong>, <strong>Albert Barnes</strong> e <strong>John Gill</strong> sobre qualquer versículo da Bíblia. O sistema utiliza IA com RAG (Recuperação Aumentada por Geração) para localizar os trechos mais relevantes de cada comentarista, traduzir e adaptar os fragmentos e organizá-los por teólogo. O processo leva de 60 a 90 segundos.</p>
@@ -622,34 +671,24 @@ function comoUsarMetaTags() {
   <ol>
     <li>Abra um capítulo da Bíblia (por exemplo, João 3).</li>
     <li>Clique no versículo que deseja estudar (por exemplo, João 3:16).</li>
-    <li>Na barra de ações que aparece, clique no botão “Estudar” — o Painel de Estudo abre na tela.</li>
-    <li>No Painel de Estudo, selecione a aba “Comentários” — o painel tem quatro abas: Contexto, Referências, Idioma Original e Comentários.</li>
-    <li>Clique em “Buscar Comentários” para acionar a busca nos comentários históricos.</li>
+    <li>Na barra de ações que aparece, clique no botão "Estudar" — o Painel de Estudo abre na tela.</li>
+    <li>No Painel de Estudo, selecione a aba "Comentários" — o painel tem quatro abas: Contexto, Referências, Idioma Original e Comentários.</li>
+    <li>Clique em "Buscar Comentários" para acionar a busca nos comentários históricos.</li>
     <li>Leia os comentários exibidos por teólogo, reflita e, se desejar, crie uma Nota no versículo com os seus insights.</li>
   </ol>
   <p>O Painel de Estudo também disponibiliza, nas demais abas, informações de contexto histórico e literário do livro (aba <strong>Contexto</strong>), referências cruzadas em outras passagens (aba <strong>Referências</strong>) e análise do idioma original com Strong, transliteração e dados morfológicos (aba <strong>Idioma Original</strong>).</p>
 
-  <h2>Caderno de Estudos da Bíblia</h2>
-  <p>O <em>Caderno de Estudos</em> é um diário espiritual completo integrado à sua leitura. Diferente das Notas (que ficam restritas a um único versículo), o Caderno permite escrever estudos abrangentes sobre capítulos inteiros, formular reflexões teológicas globais, buscar textos e exportar seus estudos prontos em PDF ou Word.</p>
-  <p>Como usar o Caderno:</p>
+  <h2>Memorial — Sua Caminhada com a Palavra</h2>
+  <p>O <em>Memorial</em> é um diário espiritual integrado à leitura que preserva os momentos mais significativos da sua jornada com a Palavra. Ao ler um capítulo, você pode abrir o Caderno e registrar quatro tipos de memória vinculados àquele trecho: <strong>Reflexão</strong>, <strong>Oração</strong>, <strong>Testemunho</strong> e <strong>Jejum / Propósito</strong>. Também é possível criar cadernos livres para estudos mais abrangentes sobre um capítulo inteiro.</p>
+  <p>Como usar o Memorial:</p>
   <ol>
-    <li>Em qualquer página de leitura, clique no botão flutuante do caderno no canto inferior esquerdo. O número dourado indica quantos estudos você já salvou no capítulo atual.</li>
-    <li>Clique em “+ Novo caderno” para abrir o editor. Digite um título opcional e escreva suas reflexões teológicas sobre o capítulo. O editor tem salvamento automático, mas você também pode clicar em “Salvar” para concluir.</li>
-    <li>Acesse a aba “Todos os Cadernos” para localizar todas as suas reflexões. Use a caixa de busca em tempo real para filtrar cadernos por título, conteúdo ou nome do livro — a busca ignora acentuação. Ordene a lista por “Recentes”, “Livro ↑” (ordem da Bíblia) ou “Livro ↓”.</li>
-    <li>Exporte seus estudos em PDF ou Word (.doc). Você pode exportar um único caderno (pelo ícone de Download no topo do editor) ou exportar em lote, com a lista filtrada atual ou o acervo completo, pelo ícone de Download no cabeçalho da listagem.</li>
+    <li>Abra a Bíblia e leia normalmente. Quando algo tocar seu coração, clique no botão flutuante do Caderno no canto inferior esquerdo da tela.</li>
+    <li>No painel que abre, escolha o tipo de registro: Reflexão, Oração, Testemunho ou Jejum / Propósito — ou crie um "Novo caderno livre" para um estudo mais extenso.</li>
+    <li>Escreva sua reflexão, oração ou testemunho. O registro ficará vinculado ao capítulo onde aquele momento aconteceu.</li>
+    <li>Acesse "Todos os Cadernos" para rever toda a sua caminhada em uma linha do tempo. Use a busca em tempo real para filtrar por título, conteúdo ou livro.</li>
+    <li>Abra o Memorial pelo menu da conta a qualquer momento para reencontrar sua história com a Palavra organizada cronologicamente.</li>
   </ol>
-
-  <h2>Notas — Anotar Versículos</h2>
-  <p>Anotar é um dos hábitos mais poderosos no estudo bíblico: quando você escreve, a memória se consolida, as conexões se aprofundam e o Espírito Santo tem mais espaço para falar. O Bíblia Vive permite criar <strong>uma nota pessoal por versículo</strong>, sincronizada em todos os seus dispositivos via Supabase.</p>
-  <p>Como criar uma nota:</p>
-  <ol>
-    <li>Abra um capítulo da Bíblia e clique em um versículo para selecioná-lo.</li>
-    <li>Na barra de ações, clique no botão “Nota” (ícone de lápis). O modal de edição abre diretamente na tela.</li>
-    <li>Escreva sua reflexão — observações, perguntas, insights, orações ou conexões com outros versículos. Não existe formato certo ou errado.</li>
-    <li>Clique em “Salvar”. A nota é sincronizada com sua conta na nuvem e fica disponível em qualquer dispositivo. O versículo passará a exibir um ícone de lápis dourado indicando que há uma nota.</li>
-    <li>Acesse “Minhas Notas” pelo menu da conta para rever, editar ou excluir todas as suas anotações em ordem cronológica.</li>
-  </ol>
-  <p>Dica: combine notas com Destaques coloridos para criar um sistema visual de estudo. Use uma cor para promessas, outra para mandamentos, outra para profecias, e anote a reflexão de cada versículo marcado.</p>
+  <p>Cada novo capítulo pode se tornar uma nova lembrança. A Palavra permanece — o Memorial ajuda você a preservá-la.</p>
 
   <h2>Destaques — Cores e Marcações</h2>
   <p>Os <strong>Destaques</strong> transformam sua Bíblia em um mapa visual do estudo. Ao colorir versículos, você cria camadas de significado que facilitam a revisão e o aprendizado. São 5 cores disponíveis, cada uma podendo representar uma categoria na sua metodologia pessoal.</p>
@@ -663,10 +702,10 @@ function comoUsarMetaTags() {
   </ul>
   <p>Como destacar um versículo:</p>
   <ol>
-    <li>Clique no versículo que deseja destacar. Você pode combinar Destaque e Nota no mesmo versículo — são recursos independentes.</li>
-    <li>Na barra de ações, clique no botão “Destaque”. Aparecerá um seletor com as 5 cores.</li>
+    <li>Clique no versículo que deseja destacar. Você pode combinar Destaque e Memorial no mesmo versículo — são recursos independentes.</li>
+    <li>Na barra de ações, clique no botão "Destaque". Aparecerá um seletor com as 5 cores.</li>
     <li>Clique na cor desejada e o versículo é destacado instantaneamente com um fundo translúcido que funciona tanto no modo claro quanto no escuro.</li>
-    <li>Para remover um destaque, clique novamente em “Destaque” e selecione a mesma cor ativa.</li>
+    <li>Para remover um destaque, clique novamente em "Destaque" e selecione a mesma cor ativa.</li>
     <li>Crie seu próprio sistema de cores pessoal. O importante é ser consistente para que, ao revisitar um capítulo, as cores já contem a história do seu estudo anterior.</li>
   </ol>
 
@@ -682,14 +721,14 @@ function comoUsarMetaTags() {
   <p>Como compartilhar um versículo:</p>
   <ol>
     <li>Clique no versículo que deseja compartilhar. Versículos curtos e impactantes como Filipenses 4:13, João 3:16 ou Salmos 23:1 funcionam muito bem.</li>
-    <li>Na barra de ações, clique em “Compartilhar”. O gerador de cards abre com uma pré-visualização em tempo real.</li>
+    <li>Na barra de ações, clique em "Compartilhar". O gerador de cards abre com uma pré-visualização em tempo real.</li>
     <li>Escolha um dos 5 templates e veja instantaneamente como o versículo ficará.</li>
-    <li>Clique em “Compartilhar Imagem” e escolha a plataforma (WhatsApp, Facebook, Twitter/X, Telegram, Instagram). O sistema copia a imagem para a área de transferência e abre a plataforma escolhida. No Instagram e TikTok, a imagem é baixada para você postar manualmente.</li>
-    <li>Alternativamente, você pode usar o botão “Copiar Texto” para copiar o versículo no formato “texto” — Livro Capítulo:Versículo (Versão) | Bíblia Vive, ideal para mensagens e e-mails sem precisar de imagem.</li>
+    <li>Clique em "Compartilhar Imagem" e escolha a plataforma (WhatsApp, Facebook, Twitter/X, Telegram, Instagram). O sistema copia a imagem para a área de transferência e abre a plataforma escolhida. No Instagram e TikTok, a imagem é baixada para você postar manualmente.</li>
+    <li>Alternativamente, use "Copiar Texto" para copiar o versículo no formato "Livro Capítulo:Versículo (Versão) | Bíblia Vive", ideal para mensagens e e-mails sem imagem.</li>
   </ol>
 
   <h2>Planos de Leitura Bíblica</h2>
-  <p>Os <strong>Planos de Leitura</strong> auxiliam você a manter a constância diária de leitura, dividindo as Escrituras em metas realistas e estruturadas. Escolha um plano, acompanhe seu progresso, mantenha o hábito com o contador de ofensiva (streak) e crie intimidade diária com a Palavra.</p>
+  <p>Os <strong>Planos de Leitura</strong> auxiliam você a manter a constância diária de leitura, dividindo as Escrituras em metas realistas e estruturadas. Escolha um plano, acompanhe seu progresso com o contador de ofensiva (streak) e crie intimidade diária com a Palavra.</p>
   <p>Planos disponíveis:</p>
   <ul>
     <li><strong>Quatro Evangelhos em 30 dias</strong> — Mateus, Marcos, Lucas e João, para conhecer a fundo a vida e os ensinamentos de Jesus.</li>
@@ -700,13 +739,12 @@ function comoUsarMetaTags() {
   <ol>
     <li>Navegue até a aba de Planos e selecione o plano ideal para você.</li>
     <li>Acompanhe suas estatísticas de leitura no dashboard: percentual concluído do plano e ofensiva (dias seguidos com leitura registrada).</li>
-    <li>Abra a leitura do dia — a seção “Leitura de Hoje” lista os capítulos reservados para o dia atual. Clique em qualquer um para ir à tela de leitura.</li>
-    <li>Marque o capítulo como lido (diretamente na tela de leitura ou pelo botão “Marcar como lido” no painel). O capítulo ficará riscado e o progresso do dia subirá.</li>
-    <li>Após concluir todas as leituras programadas do dia, use o botão “Avançar para o próximo dia” para atualizar o calendário do seu plano.</li>
+    <li>Abra a leitura do dia — a seção "Leitura de Hoje" lista os capítulos reservados para o dia atual. Clique em qualquer um para ir à tela de leitura.</li>
+    <li>Marque o capítulo como lido (diretamente na tela de leitura ou pelo botão "Marcar como lido" no painel). O capítulo ficará riscado e o progresso do dia subirá.</li>
+    <li>Após concluir todas as leituras programadas do dia, use o botão "Avançar para o próximo dia" para atualizar o calendário do seu plano.</li>
   </ol>
   <p>Dica: escolha um horário fixo no seu dia (logo de manhã ou antes de dormir) para realizar a leitura programada. A constância de poucos minutos todos os dias é muito mais transformadora do que ler muitas horas de uma só vez.</p>
 
-  <h2>Painel de Estudo — Abas Contexto, Referências, Idioma Original e Comentários</h2>
   <p>O <strong>Painel de Estudo</strong> é a central de análise teológica de qualquer versículo, aberto pelo botão “Estudar” na barra de ações de um versículo selecionado. Ele contém quatro abas:</p>
   <ul>
     <li><strong>Contexto</strong> — informações de contexto histórico e literário do livro bíblico: autor, período, público, gênero, temas-chave, pessoas-chave e lugares-chave.</li>
@@ -729,8 +767,7 @@ function comoUsarMetaTags() {
     isPartOf: { '@type': 'WebSite', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
     step: [
       { '@type': 'HowToSection', name: 'Estudar com Comentários Teológicos', text: 'Abra um capítulo, selecione um versículo, clique em Estudar, vá à aba Comentários e clique em Buscar Comentários para acessar Matthew Henry, Albert Barnes e John Gill via IA.' },
-      { '@type': 'HowToSection', name: 'Caderno de Estudos', text: 'Clique no botão flutuante do caderno no canto inferior esquerdo, crie um novo caderno, escreva suas reflexões sobre o capítulo e exporte em PDF ou Word.' },
-      { '@type': 'HowToSection', name: 'Notas em Versículos', text: 'Selecione um versículo, clique em Nota, escreva sua reflexão e salve — a nota é sincronizada em todos os seus dispositivos.' },
+      { '@type': 'HowToSection', name: 'Memorial — Sua Caminhada com a Palavra', text: 'Clique no botão flutuante do Caderno no canto inferior esquerdo, escolha o tipo de registro (Reflexão, Oração, Testemunho ou Jejum/Propósito) e preserve os momentos da sua jornada com a Palavra vinculados ao capítulo lido.' },
       { '@type': 'HowToSection', name: 'Destaques Coloridos', text: 'Selecione um versículo, clique em Destaque e escolha uma das 5 cores para criar seu sistema visual de estudo.' },
       { '@type': 'HowToSection', name: 'Compartilhar Cards de Versículos', text: 'Selecione um versículo, clique em Compartilhar, escolha um dos 5 templates e compartilhe a imagem em redes sociais ou copie o texto.' },
       { '@type': 'HowToSection', name: 'Planos de Leitura', text: 'Escolha um plano (Evangelhos em 30 dias, NT em 90 dias, Bíblia em 365 dias), acompanhe o progresso e mantenha a ofensiva diária.' },
@@ -926,7 +963,7 @@ async function prerender() {
         const verses = book.chapters[chapNum - 1];
 
         const metaTags = generateChapterMetaTags(
-          book.name, book.folder, chapNum, verses, version, label
+          book.name, book.folder, chapNum, verses, version, label, bookCtx
         );
         const html = replacePlaceholders(template, metaTags);
 

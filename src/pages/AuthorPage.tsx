@@ -102,13 +102,22 @@ export default function AuthorPage() {
             "@context": "https://schema.org",
             "@type": "Person",
             "name": author.name,
+            "url": `${window.location.origin}/autor/${author.slug}`,
             "description": author.bio,
             "image": author.avatar_url || undefined,
             "jobTitle": author.role || undefined,
             "worksFor": author.church ? {
                 "@type": "Organization",
-                "name": author.church
-            } : undefined
+                "name": author.church,
+                "sameAs": [
+                    "https://www.instagram.com/biblia.vive/",
+                    "https://www.facebook.com/bibliavive/"
+                ],
+            } : undefined,
+            // sameAs expandível: adicionar URLs de perfis externos do autor quando disponíveis
+            "sameAs": [
+                `${window.location.origin}/autor/${author.slug}`
+            ],
         };
     }
 

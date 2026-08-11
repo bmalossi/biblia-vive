@@ -18,6 +18,10 @@ export default function AboutPage() {
                 "url": window.location.origin,
                 "logo": `${window.location.origin}/og/home.png`,
                 "description": "Uma plataforma dedicada ao estudo das escrituras sagradas mantendo fidelidade às traduções clássicas da Bíblia.",
+                "sameAs": [
+                    "https://www.instagram.com/biblia.vive/",
+                    "https://www.facebook.com/bibliavive/"
+                ],
             },
             {
                 "@context": "https://schema.org",

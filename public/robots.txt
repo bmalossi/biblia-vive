@@ -1,3 +1,20 @@
+# Agentes de IA — acesso explícito liberado para rastreamento e indexação
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+# Regra geral para todos os outros crawlers
 User-agent: *
 Allow: /
 

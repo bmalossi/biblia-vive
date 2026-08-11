@@ -103,6 +103,9 @@ export default function ArtigoPage() {
             "headline": article.title,
             "description": description,
             "url": `https://www.bibliavive.com.br/artigos/${article.slug}`,
+            "image": article.cover_image_url || "https://www.bibliavive.com.br/og-default.png",
+            "datePublished": article.published_at || article.created_at || undefined,
+            "dateModified": article.published_at || article.created_at || undefined,
             "author": {
                 "@type": "Person",
                 "name": article.author ? article.author.name : "Bíblia Vive",
@@ -111,7 +114,21 @@ export default function ArtigoPage() {
                     "@type": "Organization",
                     "name": article.author.church
                 } : undefined
-            }
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "Bíblia Vive",
+                "url": "https://www.bibliavive.com.br",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://www.bibliavive.com.br/og/home.png"
+                },
+                "sameAs": [
+                    "https://www.instagram.com/biblia.vive/",
+                    "https://www.facebook.com/bibliavive/"
+                ],
+            },
+            "inLanguage": "pt-BR",
         };
     }
 

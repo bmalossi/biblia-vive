@@ -110,9 +110,9 @@ export default function BookPage() {
             {/* Tema Central */}
             {bookCtx.theme && (
               <div>
-                <p className="mb-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
+                <h3 className="mb-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
                   Tema Central
-                </p>
+                </h3>
                 <p className="font-sans text-sm leading-relaxed text-app-text">
                   {bookCtx.theme}
                 </p>
@@ -122,9 +122,9 @@ export default function BookPage() {
             {/* Contexto Histórico */}
             {bookCtx.summary && (
               <div>
-                <p className="mb-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
+                <h3 className="mb-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
                   Contexto Histórico
-                </p>
+                </h3>
                 <p className="font-sans text-sm leading-relaxed text-app-text-muted">
                   {bookCtx.summary}
                 </p>
@@ -190,9 +190,9 @@ export default function BookPage() {
             {/* Temas-chave */}
             {bookCtx.key_themes && bookCtx.key_themes.length > 0 && (
               <div>
-                <p className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
+                <h3 className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
                   Temas-chave
-                </p>
+                </h3>
                 <div className="flex flex-wrap gap-2" role="list" aria-label="Temas-chave">
                   {(bookCtx.key_themes as string[]).map((tema) => (
                     <span
@@ -212,9 +212,9 @@ export default function BookPage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {bookCtx.key_people?.length > 0 && (
                   <div>
-                    <p className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
+                    <h3 className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
                       Pessoas-chave
-                    </p>
+                    </h3>
                     <ul className="space-y-0.5">
                       {(bookCtx.key_people as string[]).map((pessoa) => (
                         <li
@@ -229,9 +229,9 @@ export default function BookPage() {
                 )}
                 {bookCtx.key_places?.length > 0 && (
                   <div>
-                    <p className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
+                    <h3 className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-gold">
                       Lugares-chave
-                    </p>
+                    </h3>
                     <ul className="space-y-0.5">
                       {(bookCtx.key_places as string[]).map((lugar) => (
                         <li
