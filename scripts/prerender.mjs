@@ -287,6 +287,45 @@ async function fetchPublishedAuthors() {
   }
 }
 
+async function fetchPublishedJornadas() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return [];
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/editorial_chapters?status=eq.publicado&publish_date=lte.${todayStr}&order=series_order.asc,chapter_number.asc`,
+      {
+        headers: {
+          apikey: SUPABASE_SERVICE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+        },
+      },
+    );
+    if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
+    const data = await res.json();
+
+    const groupsMap = new Map();
+    data.forEach((ch) => {
+      const existing = groupsMap.get(ch.series_name) || {
+        seriesOrder: ch.series_order ?? 1,
+        chapters: [],
+      };
+      existing.chapters.push(ch);
+      groupsMap.set(ch.series_name, existing);
+    });
+
+    return Array.from(groupsMap.entries())
+      .map(([seriesName, value]) => ({
+        seriesName,
+        seriesOrder: value.seriesOrder,
+        chapters: value.chapters.sort((a, b) => a.chapter_number - b.chapter_number),
+      }))
+      .sort((a, b) => a.seriesOrder - b.seriesOrder);
+  } catch (err) {
+    console.warn('[prerender] ⚠ Could not fetch jornadas:', err.message);
+    return [];
+  }
+}
+
 // ─── Meta tag generators ──────────────────────────────────────────────────────
 
 /**
@@ -435,12 +474,20 @@ function generateChapterMetaTags(bookName, localId, chapterNum, verses, version,
     {
       '@context': 'https://schema.org',
       '@type': 'Chapter',
+      '@id': `${url}#chapter`,
       name: title,
       position: chapterNum,
       isPartOf: {
         '@type': 'Book',
+        '@id': `${CANONICAL_ORIGIN}/${version}/${routeSlug}#book`,
         name: `${bookName} — ${versionLabel}`,
         url: `${CANONICAL_ORIGIN}/${version}/${routeSlug}`,
+        publisher: {
+          '@type': 'Organization',
+          '@id': `${CANONICAL_ORIGIN}#organization`,
+          name: 'Bíblia Vive',
+          url: CANONICAL_ORIGIN,
+        },
       },
       text: verses.map((v, i) => `${i + 1} ${v}`).join(' '),
       inLanguage: version === 'kjv' ? 'en' : 'pt-BR',
@@ -461,7 +508,21 @@ function generateChapterMetaTags(bookName, localId, chapterNum, verses, version,
     },
   ];
 
-  // Build the visible SEO block: h1 + context + all verses as <p>
+  // GEO summary capsule (40-80 words) for AI RAG extraction
+  // T5: include named entity (book author, historical period) for factual density
+  const namedEntity = bookCtx?.author
+    ? `Atribuído a ${bookCtx.author}` 
+    : bookCtx?.period
+    ? `Escrito ca. ${bookCtx.period}`
+    : bookCtx?.testament
+    ? `Parte do ${bookCtx.testament}`
+    : `Tradução ${versionLabel} (Português)`;
+  const geoSummaryText = bookCtx?.theme
+    ? `${bookName} ${chapterNum} (${versionLabel}): ${bookCtx.theme}${bookCtx.summary ? ' ' + bookCtx.summary.substring(0, 120) : ''}. ${namedEntity}. Versículo de abertura: “${verses[0] || ''}”.`
+    : `${bookName} capítulo ${chapterNum} na versão ${versionLabel}. ${namedEntity}. Parte das Escrituras Sagradas na Bíblia Vive — com comentários teológicos, análise léxica grego-hebraica (Dicionário de Strong) e ferramentas de estudo.`;
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">${geoSummaryText.substring(0, 480)}</section>`;
+
+  // Build the visible SEO block: h1 + geo-summary + context + all verses as <p>
   const contextBlock = bookCtx?.theme
     ? `<section><h2>Contexto do Livro (${bookName})</h2><p>${bookCtx.theme}</p></section>`
     : '';
@@ -469,6 +530,7 @@ function generateChapterMetaTags(bookName, localId, chapterNum, verses, version,
   const seoContent =
     `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>${bookName} — Capítulo ${chapterNum} (${versionLabel})</h1>` +
+    geoSummary +
     contextBlock +
     `<section><h2>Texto Bíblico</h2>` +
     verses.map((v, i) => `<p><sup>${i + 1}</sup> ${v}</p>`).join('') +
@@ -527,11 +589,27 @@ function generateArticleMetaTags(article) {
     ? `<p style="font-size:1.125rem;color:#555;margin-bottom:1rem"><em>${article.subtitle}</em></p>`
     : '';
 
+  // GEO summary capsule for articles (40-80 words for RAG extraction)
+  const geoSummaryText = description.length > 60
+    ? description
+    : `${article.title}. ${description} — Artigo teológico publicado na Bíblia Vive.`;
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">${geoSummaryText}</section>`;
+
+  // T6: datePublished/dateUpdated metadata visible in static HTML
+  const dateMicrodata = (article.published_at || article.updated_at)
+    ? `<div style="display:none" itemscope itemtype="https://schema.org/Article">` +
+      (article.published_at ? `<meta itemprop="datePublished" content="${article.published_at}" />` : '') +
+      (article.updated_at   ? `<meta itemprop="dateModified"  content="${article.updated_at}" />`  : '') +
+      `<meta itemprop="publisher" content="Bíblia Vive" /></div>`
+    : '';
+
   const seoContent =
     `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>${article.title}</h1>` +
+    geoSummary +
     subtitleBlock +
     pubDateBlock +
+    dateMicrodata +
     coverBlock +
     bodyHtml +
     `</article>`;
@@ -539,19 +617,36 @@ function generateArticleMetaTags(article) {
   const authorPerson = article.author
     ? {
         '@type': 'Person',
+        '@id': `${CANONICAL_ORIGIN}/autor/${article.author.slug}#person`,
         name: article.author.name,
         url: `${CANONICAL_ORIGIN}/autor/${article.author.slug}`,
         ...(article.author.role ? { jobTitle: article.author.role } : {}),
         ...(article.author.church ? { worksFor: { '@type': 'Organization', name: article.author.church } } : {}),
-        ...(article.author.avatar_url ? { image: article.author.avatar_url } : {}),
+        // image: priorize avatar_url, fallback para og default para garantir identidade visual completa em IAs multimodais
+        image: article.author.avatar_url || `${CANONICAL_ORIGIN}/og/home.png`,
+        // T1: sameAs dinâmico - consolida perfil na plataforma e links externos verificados se disponíveis
+        sameAs: [
+          `${CANONICAL_ORIGIN}/autor/${article.author.slug}`,
+          ...(article.author.linkedin_url  ? [article.author.linkedin_url]  : []),
+          ...(article.author.orcid_url     ? [article.author.orcid_url]     : []),
+          ...(article.author.wikidata_url  ? [article.author.wikidata_url]  : []),
+          ...(article.author.twitter_url   ? [article.author.twitter_url]   : []),
+          ...(article.author.instagram_url ? [article.author.instagram_url] : []),
+        ],
       }
-    : { '@type': 'Organization', name: 'Bíblia Vive', url: CANONICAL_ORIGIN };
+    : {
+        '@type': 'Organization',
+        '@id': `${CANONICAL_ORIGIN}#organization`,
+        name: 'Bíblia Vive',
+        url: CANONICAL_ORIGIN,
+      };
 
   const ytId = article.youtube_id || article.youtubeId || (article.video_url?.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/)?.[1]);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
+    '@id': `${url}#article`,
     headline: article.title,
     description,
     url,
@@ -559,8 +654,15 @@ function generateArticleMetaTags(article) {
     author: authorPerson,
     ...(article.published_at ? { datePublished: article.published_at } : {}),
     ...(article.updated_at   ? { dateModified:  article.updated_at   } : {}),
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': `${CANONICAL_ORIGIN}#website`,
+      name: 'Bíblia Vive',
+      url: CANONICAL_ORIGIN,
+    },
     publisher: {
       '@type': 'Organization',
+      '@id': `${CANONICAL_ORIGIN}#organization`,
       name: 'Bíblia Vive',
       url: CANONICAL_ORIGIN,
       logo: { '@type': 'ImageObject', url: `${CANONICAL_ORIGIN}/og/home.png` },
@@ -573,12 +675,18 @@ function generateArticleMetaTags(article) {
     ...(ytId ? {
       video: {
         '@type': 'VideoObject',
+        '@id': `${url}#video`,
         name: article.video_title || article.title,
         description: article.video_description || description,
         thumbnailUrl: article.cover_image_url || `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`,
         contentUrl: `https://www.youtube.com/watch?v=${ytId}`,
         embedUrl: `https://www.youtube.com/embed/${ytId}`,
-        uploadDate: article.published_at || article.created_at
+        uploadDate: article.published_at || article.created_at,
+        // T3: mainEntityOfPage vincula o vídeo ao Article, maximizando coerência para AI Overviews
+        mainEntityOfPage: {
+          '@type': 'Article',
+          '@id': `${url}#article`,
+        },
       }
     } : {})
   };
@@ -623,6 +731,7 @@ function homeMetaTags() {
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
+      '@id': `${CANONICAL_ORIGIN}#website`,
       name: 'Bíblia Vive',
       url,
       description: desc,
@@ -636,6 +745,7 @@ function homeMetaTags() {
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
+      '@id': `${CANONICAL_ORIGIN}#organization`,
       name: 'Bíblia Vive',
       url: CANONICAL_ORIGIN,
       logo: `${CANONICAL_ORIGIN}/og/home.png`,
@@ -678,6 +788,101 @@ function planosMetaTags() {
     `<a href="/">Voltar para a página inicial</a>` +
     `</main>`;
   return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
+function jornadasMetaTags(seriesGroups = []) {
+  const title = 'Sua caminhada — Leituras Contemplativas | Bíblia Vive';
+  const desc  = 'Explore a biblioteca de capítulos da sua caminhada de Permanência. Leituras contemplativas organizadas por séries.';
+  const url   = `${CANONICAL_ORIGIN}/jornadas`;
+
+  const esc = (s) => String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  const getRefText = (ch) => {
+    const base = `${ch.book_name} ${ch.chapter}`;
+    if (ch.verse_start && ch.verse_end) return `${base}:${ch.verse_start}-${ch.verse_end}`;
+    if (ch.verse_start) return `${base}:${ch.verse_start}`;
+    return base;
+  };
+
+  const getRefLink = (ch) => {
+    const slug = (ch.book_slug || '').toLowerCase();
+    const base = `${CANONICAL_ORIGIN}/nvi/${slug}/${ch.chapter}`;
+    return ch.verse_start ? `${base}#v${ch.verse_start}` : base;
+  };
+
+  let seriesHtml = '';
+  if (seriesGroups.length > 0) {
+    seriesHtml = seriesGroups.map(group => {
+      const chaptersList = group.chapters.map(ch => {
+        const refText = esc(getRefText(ch));
+        const refLink = getRefLink(ch);
+        const introText = esc((ch.intro_text || '').replace(/\n+/g, ' '));
+        return (
+          `<article style="border:1px solid #e5e5e5;border-radius:12px;padding:1rem;margin-bottom:1rem">` +
+          `<p style="font-size:0.75rem;color:#d4af37;text-transform:uppercase;margin:0 0 0.5rem">Capítulo ${ch.chapter_number}</p>` +
+          `<h3 style="font-size:1.125rem;margin:0 0 0.5rem">${esc(ch.title)}</h3>` +
+          `<p style="font-size:0.875rem;color:#555;margin:0 0 1rem;line-height:1.6">${introText}</p>` +
+          `<p style="font-size:0.875rem;margin:0">Leitura de hoje: <a href="${refLink}" style="color:#d4af37;font-weight:bold">${refText}</a></p>` +
+          `</article>`
+        );
+      }).join('');
+
+      return (
+        `<section style="margin-bottom:2.5rem">` +
+        `<h2 style="font-size:1.35rem;border-bottom:1px solid #e5e5e5;padding-bottom:0.5rem;margin-bottom:1rem">` +
+        `Série ${group.seriesOrder} · ${esc(group.seriesName)}` +
+        `</h2>` +
+        chaptersList +
+        `</section>`
+      );
+    }).join('');
+  } else {
+    seriesHtml = `<p>Caminhadas contínuas e séries de leituras contemplativas são publicadas diariamente. Acesse a Bíblia Vive para acompanhar a Filosofia da Permanência.</p>`;
+  }
+
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Sua caminhada — Leituras Contemplativas</h1>` +
+    `<p style="font-size:1rem;color:#666;margin-bottom:2rem">` +
+    `Caminhadas contínuas para preparar seu coração e conduzi-lo à leitura das Escrituras na Filosofia da Permanência.` +
+    `</p>` +
+    seriesHtml +
+    `</main>`;
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Sua caminhada — Leituras Contemplativas',
+      url,
+      description: desc,
+      isPartOf: { '@type': 'WebSite', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Início', item: CANONICAL_ORIGIN },
+        { '@type': 'ListItem', position: 2, name: 'Sua caminhada', item: url },
+      ],
+    },
+  ];
+
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
+    OG_TYPE:          `<meta property="og:type" content="website" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
 }
 
 function artigosIndexMetaTags(articles) {
@@ -968,11 +1173,13 @@ async function prerender() {
     process.exit(1);
   }
 
-  // ── Fetch articles & authors ──
+  // ── Fetch articles, authors & jornadas ──
   const articles = await fetchPublishedArticles();
   console.log(`[prerender] Found ${articles.length} published articles.\n`);
   const authors = await fetchPublishedAuthors();
   console.log(`[prerender] Found ${authors.length} authors.\n`);
+  const jornadasSeries = await fetchPublishedJornadas();
+  console.log(`[prerender] Found ${jornadasSeries.length} published jornadas series.\n`);
 
   let totalChapters = 0;
   let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
@@ -1136,6 +1343,13 @@ async function prerender() {
   await fs.writeFile(path.join(harpaDir, 'index.html'), harpaHtml, 'utf-8');
   console.log('[prerender]   ✓ dist/harpa/index.html');
 
+  // /jornadas — Sua caminhada, leituras contemplativas & séries diárias
+  const jornadasHtml = replacePlaceholders(template, jornadasMetaTags(jornadasSeries));
+  const jornadasDir  = path.join(DIST_DIR, 'jornadas');
+  await fs.mkdir(jornadasDir, { recursive: true });
+  await fs.writeFile(path.join(jornadasDir, 'index.html'), jornadasHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/jornadas/index.html');
+
 // ─── IndexNow Protocol ────────────────────────────────────────────────────────
 const INDEXNOW_KEY = '4f9b8c2e7a1d3f5b8e9a0c1d2e3f4a5b';
 
@@ -1162,6 +1376,7 @@ async function submitIndexNow(urlList) {
   // ── Sitemap — static pages ──
   const STATIC_URLS = [
     { loc: `${CANONICAL_ORIGIN}/`,              changefreq: 'daily',   priority: '1.0' },
+    { loc: `${CANONICAL_ORIGIN}/jornadas`,      changefreq: 'daily',   priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/harpa`,         changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/planos`,        changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/artigos`,       changefreq: 'weekly',  priority: '0.8' },

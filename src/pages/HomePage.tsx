@@ -81,6 +81,7 @@ export default function HomePage() {
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
+        "@id": `${window.location.origin}#website`,
         name: t("app.name"),
         url: `${window.location.origin}/`,
         description: t("home.description"),
@@ -94,6 +95,7 @@ export default function HomePage() {
       {
         "@context": "https://schema.org",
         "@type": "Organization",
+        "@id": `${window.location.origin}#organization`,
         name: t("app.name"),
         url: window.location.origin,
         logo: `${window.location.origin}/og/home.png`,

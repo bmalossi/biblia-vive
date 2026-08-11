@@ -139,6 +139,20 @@
   <!--TWITTER_CARD-->
   <!--CANONICAL_URL-->
   <!--JSON_LD-->
+  <script type="speculationrules">
+  {
+    "prerender": [{
+      "source": "document",
+      "where": {
+        "and": [
+          {"href_matches": "/*"},
+          {"not": {"href_matches": ["/api/*", "/pro/*"]}}
+        ]
+      },
+      "eagerness": "moderate"
+    }]
+  }
+  </script>
 </head>
 
 <body>

@@ -12,10 +12,33 @@ import { Loader2, Sparkles, X, ArrowRight, BookOpen } from "lucide-react";
 
 export default function JornadasPage() {
   usePageMeta({
-    title: "Sua caminhada — Bíblia Vive",
+    title: "Sua caminhada — Leituras Contemplativas | Bíblia Vive",
     description:
       "Explore a biblioteca de capítulos da sua caminhada de Permanência. Leituras contemplativas organizadas por séries.",
     canonical: "/jornadas",
+    jsonLd: [
+      {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Sua caminhada — Leituras Contemplativas",
+        url: `${window.location.origin}/jornadas`,
+        description:
+          "Explore a biblioteca de capítulos da sua caminhada de Permanência. Leituras contemplativas organizadas por séries.",
+        isPartOf: {
+          "@type": "WebSite",
+          name: "Bíblia Vive",
+          url: window.location.origin,
+        },
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: window.location.origin },
+          { "@type": "ListItem", position: 2, name: "Sua caminhada", item: `${window.location.origin}/jornadas` },
+        ],
+      },
+    ],
   });
 
   const { seriesGroups, loading } = useEditorialJornadas();

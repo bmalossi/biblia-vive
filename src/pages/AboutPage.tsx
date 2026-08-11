@@ -14,6 +14,7 @@ export default function AboutPage() {
             {
                 "@context": "https://schema.org",
                 "@type": "Organization",
+                "@id": `${window.location.origin}#organization`,
                 "name": t("app.name"),
                 "url": window.location.origin,
                 "logo": `${window.location.origin}/og/home.png`,
@@ -22,6 +23,23 @@ export default function AboutPage() {
                     "https://www.instagram.com/biblia.vive/",
                     "https://www.facebook.com/bibliavive/"
                 ],
+            },
+            {
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "@id": `${window.location.origin}/sobre#webpage`,
+                "url": `${window.location.origin}/sobre`,
+                "name": "Sobre o Bíblia Vive",
+                "isPartOf": {
+                    "@type": "WebSite",
+                    "@id": `${window.location.origin}#website`,
+                    "name": "Bíblia Vive",
+                    "url": window.location.origin,
+                },
+                "about": {
+                    "@type": "Organization",
+                    "@id": `${window.location.origin}#organization`,
+                },
             },
             {
                 "@context": "https://schema.org",

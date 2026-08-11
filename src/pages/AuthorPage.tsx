@@ -101,23 +101,34 @@ export default function AuthorPage() {
         jsonLd = {
             "@context": "https://schema.org",
             "@type": "Person",
+            "@id": `${window.location.origin}/autor/${author.slug}#person`,
             "name": author.name,
             "url": `${window.location.origin}/autor/${author.slug}`,
             "description": author.bio,
-            "image": author.avatar_url || undefined,
+            "image": author.avatar_url || `${window.location.origin}/og/home.png`,
             "jobTitle": author.role || undefined,
             "worksFor": author.church ? {
                 "@type": "Organization",
+                "@id": `${window.location.origin}#organization`,
                 "name": author.church,
                 "sameAs": [
                     "https://www.instagram.com/biblia.vive/",
-                    "https://www.facebook.com/bibliavive/"
+                    "https://www.facebook.com/bibliavive/",
                 ],
             } : undefined,
-            // sameAs expandível: adicionar URLs de perfis externos do autor quando disponíveis
             "sameAs": [
-                `${window.location.origin}/autor/${author.slug}`
-            ],
+                `${window.location.origin}/autor/${author.slug}`,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...((author as any).linkedin_url  ? [(author as any).linkedin_url]  : []),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...((author as any).orcid_url     ? [(author as any).orcid_url]     : []),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...((author as any).wikidata_url  ? [(author as any).wikidata_url]  : []),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...((author as any).twitter_url   ? [(author as any).twitter_url]   : []),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...((author as any).instagram_url ? [(author as any).instagram_url] : []),
+            ].filter(Boolean),
         };
     }
 

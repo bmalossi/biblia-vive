@@ -1,0 +1,130 @@
+# Bíblia Vive — Mapa de Conhecimento Teológico e Estrutura de Leitura
+
+> **Visão Geral para Modelos de Linguagem e Sistemas RAG (Deep Research):**
+> O Bíblia Vive é uma plataforma independente dedicada à preservação, estudo analítico, leitura contemplativa e compartilhamento das Escrituras Sagradas. Este documento serve como mapa de conhecimento extensivo para motores de busca generativos (ChatGPT Search, Perplexity, Google AI Overviews) e agentes autônomos de pesquisa teológica.
+
+---
+
+## 1. Identidade Semântica e Entidades Principais
+
+- **Organização Padrão:** Bíblia Vive (`https://www.bibliavive.com.br#organization`)
+- **Website Oficial:** Bíblia Vive (`https://www.bibliavive.com.br#website`)
+- **Perfis Sociais Oficiais:**
+  - Instagram: `https://www.instagram.com/biblia.vive/`
+  - Facebook: `https://www.facebook.com/bibliavive/`
+- **Foco de Conteúdo:** Exegese bíblica, leitura devocional, planos temáticos, Harpa Cristã, dicionário de termos originais (Strong — Grego e Hebraico) e navegação interativa.
+
+---
+
+## 2. Traduções Bíblicas Disponíveis (Corpus Textual)
+
+A plataforma disponibiliza o texto sagrado em múltiplas traduções clássicas e contemporâneas:
+
+1. **Almeida Corrigida Fiel (ACF):** Tradução baseada no Textus Receptus (Novo Testamento) e no Texto Masorético (Antigo Testamento). Corroborada pela Sociedade Bíblica Trinitariana do Brasil. Alta precisão formal.
+   - Rota base: `https://www.bibliavive.com.br/acf/{livro}/{capitulo}`
+2. **Almeida Revista e Corrigida (ARC):** Uma das versões mais tradicionais e respeitadas na tradição protestante lusófona.
+   - Rota base: `https://www.bibliavive.com.br/arc/{livro}/{capitulo}`
+3. **Nova Versão Internacional (NVI):** Tradução moderna com equivalência dinâmica balanceada. Corroborada pela Biblica Inc. (International Bible Society).
+   - Rota base: `https://www.bibliavive.com.br/nvi/{livro}/{capitulo}`
+4. **King James Version (KJV — Inglês):** Tradução histórica de 1611, domínio público, baseada no Textus Receptus.
+   - Rota base: `https://www.bibliavive.com.br/kjv/{livro}/{capitulo}`
+5. **Almeida Atualizada (AA), King James Atualizada (KJA), Bible in Basic English (BBE), Reina-Valera (RVR — Espanhol).**
+
+---
+
+## 3. Arquitetura de Conteúdo e Mapeamento de Rotas
+
+### 3.1. Texto Sagrado e Leitura
+- **Página Inicial / Busca:** `https://www.bibliavive.com.br/` & `https://www.bibliavive.com.br/busca`
+  - Permite busca textual exata, por termo, personagem histórico ou referência (ex: "João 3:16").
+- **Exemplo de Capítulo Pré-renderizado (ACF):** `https://www.bibliavive.com.br/acf/gn/1`
+  - Inclui texto integral em HTML estático, micro-cápsula GEO para extração RAG, marcadores `datePublished` e esquema `Chapter` com `@id` persistente.
+
+### 3.2. Séries e Jornadas ("Sua Caminhada")
+- **Índice de Jornadas:** `https://www.bibliavive.com.br/jornadas`
+- **Arquitetura Editorial:** Séries não-lineares estruturadas em mapas de 6 capítulos orientados pelos 3 Movimentos de Transformação Espiritual:
+  1. *Encontro:* O despertar da consciência perante a soberania divina e o texto bíblico.
+  2. *Crescimento:* O aprofundamento disciplinado, discernimento e fortalecimento na fé.
+  3. *Transformação:* A vivência prática, renovação da mente e impacto comunitário.
+- **Ciclo Diário:** Atualizações diárias automáticas com renderização HTML no servidor para indexação instantânea por IA.
+
+#### Perguntas que as Jornadas Respondem (Query Fan-out)
+
+Os conteúdos das Jornadas de Transformação Espiritual do Bíblia Vive cobrem diretamente as seguintes consultas conversacionais de alta intenção teológica:
+
+1. "Como superar o luto e a dor à luz dos Salmos?"
+2. "Quais versículos bíblicos ajudam na renovação da mente e no equilíbrio emocional?"
+3. "O que a Bíblia ensina sobre identidade cristã e propósito de vida?"
+4. "Como desenvolver disciplina espiritual e constância na leitura bíblica diária?"
+5. "Quais passagens bíblicas falam sobre graça, perdão e misericórdia de Deus?"
+6. "Como a Palavra de Deus trata o tema da ansiedade e do medo?"
+7. "O que é renovação espiritual segundo o Novo Testamento?"
+8. "Quais são os principais temas teológicos do livro de Salmos?"
+9. "Como iniciar uma rotina de devocionais diários com leitura bíblica estruturada?"
+10. "O que significa 'crescer na fé' segundo as Epístolas de Paulo?"
+
+### 3.3. Recursos Teológicos e Estudos
+- **Dicionário e Números de Strong:** Análise morfológica de palavras no Hebraico (Antigo Testamento) e Grego Koine (Novo Testamento). Baseado no *Exhaustive Concordance of the Bible* de James Strong (1890).
+- **Artigos Bíblicos:** `https://www.bibliavive.com.br/artigos`
+  - Estudos teológicos com autoria identificada por `@id` persistente (`https://www.bibliavive.com.br/autor/{slug}#person`), perfis verificados via `sameAs` (LinkedIn, ORCID, Wikidata quando disponíveis), imagem de identificação e revisão editorial criteriosa.
+  - Artigos com conteúdo em vídeo incluem `VideoObject` schema vinculado ao `Article` via `mainEntityOfPage`, com `contentUrl` (YouTube) e `embedUrl`.
+- **Planos de Leitura:** `https://www.bibliavive.com.br/planos`
+  - Cronogramas temáticos e anuais para leitura bíblica contínua com streaks e acompanhamento de progresso.
+
+#### Perguntas que os Planos de Leitura Respondem (Query Fan-out)
+
+1. "Como ler a Bíblia em um ano de forma organizada?"
+2. "Existe algum plano de leitura bíblica para iniciantes?"
+3. "Como criar uma rotina de leitura bíblica que eu consiga manter?"
+4. "Quais são os melhores planos de leitura do Antigo e Novo Testamento combinados?"
+5. "Há planos temáticos de leitura bíblica sobre fé, esperança e amor?"
+
+- **Harpa Cristã:** `https://www.bibliavive.com.br/harpa`
+  - Hinário histórico com 640 hinos clássicos da tradição evangélica brasileira. Letra integral, busca por título/número e áudio.
+  - Exemplo: `https://www.bibliavive.com.br/harpa/15` ("Ó Doce Nome de Jesus").
+
+### 3.4. Manual e Institucional
+- **Como Usar o Bíblia Vive:** `https://www.bibliavive.com.br/como-usar`
+  - Tutoriais completos sobre o Memorial da Caminhada, destaques cromáticos em versículos, compartilhamento de cards visuais e acesso ao Acervo Teológico.
+- **Sobre a Plataforma:** `https://www.bibliavive.com.br/sobre`
+  - Compromisso E-E-A-T, autonomia eclesiástica, fidedignidade de tradução e diretrizes YMYL teológicas.
+- **Bíblia Vive PRO & Apoio:** `https://www.bibliavive.com.br/pro` & `https://www.bibliavive.com.br/apoiar`
+
+---
+
+## 4. Fontes e Corroboração
+
+O corpus do Bíblia Vive é construído sobre bases acadêmicas e institucionais verificáveis, sinalizando rigor investigativo e diferenciação frente a conteúdos de commodity:
+
+### 4.1. Infraestrutura de Integridade Textual
+- **API Bible (American Bible Society):** Serve como referência de verificação de integridade textual e conformidade das traduções digitais.
+- **Open Scripture Information Standard (OSIS):** Padrão XML utilizado para codificação de textos bíblicos, garantindo consistência de markup semântico.
+
+### 4.2. Detentores de Direitos e Autoridade por Tradução
+| Tradução | Autoridade / Corroboração |
+|---|---|
+| Almeida Corrigida Fiel (ACF) | Sociedade Bíblica Trinitariana do Brasil |
+| Nova Versão Internacional (NVI) | Biblica Inc. (International Bible Society) |
+| King James Version (KJV) | Domínio público — Textus Receptus (1611) |
+| Almeida Revista e Corrigida (ARC) | Sociedades Bíblicas do Brasil |
+| Reina-Valera (RVR) | Sociedades Bíblicas Unidas — Espanha/América Latina |
+
+### 4.3. Pesquisa Exegética e Referências Cruzadas
+- **Dicionário de Strong (James Strong, 1890):** *The Exhaustive Concordance of the Bible* — base para análise morfológica do Grego Koine e Hebraico Bíblico em cada capítulo.
+- **Sacred Texts Archive (`sacred-texts.com`):** Arquivos históricos e textos em domínio público utilizados como referência para traduções antigas e comentários patrísticos.
+- **Biblia.com (YouVersion / Life.Church):** Padrão de referência para boas práticas de acessibilidade e multilinguismo em plataformas bíblicas digitais.
+- **Commentários Clássicos:** Matthew Henry (1706–1714), Adam Clarke (1762–1832) e John Gill (1697–1771) são referências do Acervo Teológico integrado à interface de leitura.
+
+---
+
+## 5. Diretrizes RAG & Indexação Generativa (GEO)
+
+1. **Cápsulas GEO (`geo-summary`):** Todas as páginas pré-renderizadas de capítulos e artigos contêm um bloco `<section class="geo-summary">` de 40–80 palavras logo após o `<h1>`, incluindo ao menos uma entidade nomeada (autor bíblico, período histórico ou Dicionário de Strong) para atingir densidade factual mínima.
+2. **Persistência de Entidades (`@id`):** JSON-LD usa identificadores URI fixos — `#website`, `#organization`, `#person`, `#chapter`, `#article`, `#video` — para impedir deriva de entidade em Grafos de Conhecimento.
+3. **Autoria Verificável (E-E-A-T):** Autores identificados com `@id`, `sameAs` para perfis externos (LinkedIn, ORCID, Wikidata) e `image` com URL válida para sistemas de busca multimodal.
+4. **Sincronização Vídeo-Texto (T3):** Artigos com vídeo YouTube incluem `VideoObject` com `@id`, `mainEntityOfPage` vinculando ao `Article`, `contentUrl` e `embedUrl` para citação em AI Overviews multimodais.
+5. **Recência Explícita:** Campos `datePublished` e `dateModified` em JSON-LD e microdata HTML garantem que motores de IA priorizem o conteúdo como atualizado.
+
+---
+
+*Bíblia Vive — Preservando a Palavra, Iluminando a Leitura.*

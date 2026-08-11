@@ -15,6 +15,7 @@ Esta curadoria auxilia agentes de IA a compreender a estrutura do site, mapeando
 ## Recursos de Estudo
 
 - [Planos de Leitura](https://www.bibliavive.com.br/planos): Cronogramas e rotinas estruturadas de leitura bíblica diária, auxiliando usuários a organizar o estudo anual ou temático.
+- [Sua Caminhada (Jornadas)](https://www.bibliavive.com.br/jornadas): Leituras contemplativas e séries de estudos bíblicos organizadas por capítulos da Filosofia da Permanência.
 - [Como Usar o Bíblia Vive](https://www.bibliavive.com.br/como-usar): Manual do usuário com tutoriais para explorar a interface de estudo integrado, incluindo o uso do Memorial da caminhada com a Palavra e o acesso aos comentários teológicos históricos.
 
 ## Harpa e Conteúdo
