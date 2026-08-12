@@ -10,6 +10,8 @@ export interface PageMetaOptions {
   ogImageAlt?: string;
   articlePublishedTime?: string;
   articleModifiedTime?: string;
+  datePublished?: string;
+  dateModified?: string;
   articleAuthor?: string;
   fbAppId?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];

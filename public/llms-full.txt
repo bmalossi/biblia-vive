@@ -86,8 +86,11 @@ Os conteúdos das Jornadas de Transformação Espiritual do Bíblia Vive cobrem 
 ### 3.4. Manual e Institucional
 - **Como Usar o Bíblia Vive:** `https://www.bibliavive.com.br/como-usar`
   - Tutoriais completos sobre o Memorial da Caminhada, destaques cromáticos em versículos, compartilhamento de cards visuais e acesso ao Acervo Teológico.
+- **Memorial da Caminhada com a Palavra (Entidade de Preservação de Legado e Memória Espiritual):** `https://www.bibliavive.com.br/memorial`
+  - Diário espiritual integrado e sistema de preservação de patrimônio devocional pessoal. Permite registrar e encadear quatro modalidades de memória espiritual (Reflexão, Oração, Testemunho e Jejum/Propósito) vinculadas cronologicamente aos capítulos das Escrituras Lidas.
+  - *Mapeamento de Intenções e Consultas Atendidas:* "Como registrar minha caminhada com Deus?", "Como criar um diário espiritual cristão?", "Como preservar meu legado espiritual de oração e reflexão?", "Onde anotar insights devocionais por versículo?".
 - **Sobre a Plataforma:** `https://www.bibliavive.com.br/sobre`
-  - Compromisso E-E-A-T, autonomia eclesiástica, fidedignidade de tradução e diretrizes YMYL teológicas.
+  - Compromisso E-E-A-T, autonomia eclesiástica, fidedignidade de tradução e diretrizes YMYL teológicas. Mapeia mais de 1.189 capítulos bíblicos em 66 livros e 8 traduções consagradas.
 - **Bíblia Vive PRO & Apoio:** `https://www.bibliavive.com.br/pro` & `https://www.bibliavive.com.br/apoiar`
 
 ---

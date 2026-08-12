@@ -774,25 +774,53 @@ function homeMetaTags() {
 
 function planosMetaTags() {
   const title = 'Planos de Leitura | Bíblia Vive';
-  const desc  = 'Escolha um plano de leitura bíblica e leia a Bíblia em 30, 90 ou 365 dias. Planos diários com histórico de progresso.';
+  const desc  = 'Escolha um plano de leitura bíblica e leia a Bíblia em 30, 90 ou 365 dias. Planos diários com histórico de progresso e estatísticas.';
   const url   = `${CANONICAL_ORIGIN}/planos`;
+  
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">Os Planos de Leitura do Bíblia Vive estruturam a leitura bíblica diária em metas realistas (30, 90 ou 365 dias) com acompanhamento de streaks e histórico de progresso, promovendo constância e intimidade com a Palavra de Deus.</section>`;
+
   const seoContent =
-    `<main style="font-family:sans-serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Planos de Leitura Bíblica</h1>` +
+    geoSummary +
     `<p>${desc}</p>` +
     `<ul>` +
-    `<li>Plano de 30 dias — Quatro Evangelhos</li>` +
-    `<li>Plano de 90 dias — Novo Testamento</li>` +
-    `<li>Plano de 365 dias — Bíblia inteira</li>` +
+    `<li><strong>Quatro Evangelhos em 30 dias:</strong> Leitura concentrada da vida e ensinamentos de Jesus (Mateus, Marcos, Lucas e João).</li>` +
+    `<li><strong>Novo Testamento em 90 dias:</strong> Leitura trimestral de todos os 260 capítulos do Novo Testamento.</li>` +
+    `<li><strong>Bíblia inteira em 365 dias:</strong> Leitura anual completa dos 1.189 capítulos do Antigo e Novo Testamento.</li>` +
     `</ul>` +
     `<a href="/">Voltar para a página inicial</a>` +
     `</main>`;
-  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Planos de Leitura Bíblica',
+      url,
+      description: desc,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Quatro Evangelhos em 30 dias', description: 'Mateus, Marcos, Lucas e João em 1 mês' },
+        { '@type': 'ListItem', position: 2, name: 'Novo Testamento em 90 dias', description: 'Leitura trimestral dos 260 capítulos do NT' },
+        { '@type': 'ListItem', position: 3, name: 'Bíblia inteira em 365 dias', description: 'Leitura anual completa dos 1.189 capítulos' },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Início', item: CANONICAL_ORIGIN },
+        { '@type': 'ListItem', position: 2, name: 'Planos de Leitura', item: url },
+      ],
+    },
+  ];
+
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent, customJsonLd: jsonLd });
 }
 
 function jornadasMetaTags(seriesGroups = []) {
   const title = 'Sua caminhada — Leituras Contemplativas | Bíblia Vive';
-  const desc  = 'Explore a biblioteca de capítulos da sua caminhada de Permanência. Leituras contemplativas organizadas por séries.';
+  const desc  = 'Explore a biblioteca de capítulos da sua caminhada de Permanência. Leituras contemplativas organizadas pelas 3 séries de transformação espiritual.';
   const url   = `${CANONICAL_ORIGIN}/jornadas`;
 
   const esc = (s) => String(s ?? '')
@@ -841,14 +869,24 @@ function jornadasMetaTags(seriesGroups = []) {
     seriesHtml = `<p>Caminhadas contínuas e séries de leituras contemplativas são publicadas diariamente. Acesse a Bíblia Vive para acompanhar a Filosofia da Permanência.</p>`;
   }
 
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">Sua Caminhada reúne séries de leituras contemplativas organizadas em mapas de 6 capítulos orientados pelos 3 Movimentos de Transformação Espiritual: Encontro, Crescimento e Transformação. Publicações diárias preparadas para a vivência disciplinada das Escrituras.</section>`;
+
   const seoContent =
     `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Sua caminhada — Leituras Contemplativas</h1>` +
+    geoSummary +
     `<p style="font-size:1rem;color:#666;margin-bottom:2rem">` +
     `Caminhadas contínuas para preparar seu coração e conduzi-lo à leitura das Escrituras na Filosofia da Permanência.` +
     `</p>` +
     seriesHtml +
     `</main>`;
+
+  const itemList = seriesGroups.map((group, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: `Série ${group.seriesOrder} — ${group.seriesName}`,
+    description: `Série contemplativa com ${group.chapters.length} capítulos bíblicos nos 3 Movimentos de Transformação.`,
+  }));
 
   const jsonLd = [
     {
@@ -861,6 +899,18 @@ function jornadasMetaTags(seriesGroups = []) {
     },
     {
       '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Séries da Caminhada de Permanência',
+      url,
+      description: 'Séries organizadas pelos 3 Movimentos de Transformação Espiritual: Encontro, Crescimento e Transformação.',
+      itemListElement: itemList.length > 0 ? itemList : [
+        { '@type': 'ListItem', position: 1, name: 'Movimento 1 — Encontro com a Palavra' },
+        { '@type': 'ListItem', position: 2, name: 'Movimento 2 — Crescimento e Discernimento' },
+        { '@type': 'ListItem', position: 3, name: 'Movimento 3 — Transformação Prática' },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Início', item: CANONICAL_ORIGIN },
@@ -869,25 +919,12 @@ function jornadasMetaTags(seriesGroups = []) {
     },
   ];
 
-  return {
-    META_TITLE:       `<title>${title}</title>`,
-    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
-    OG_URL:           `<meta property="og:url" content="${url}" />`,
-    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
-    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
-    OG_TYPE:          `<meta property="og:type" content="website" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
-    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
-    SEO_CONTENT:      seoContent,
-  };
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent, customJsonLd: jsonLd });
 }
 
 function artigosIndexMetaTags(articles) {
   const title = 'Artigos Bíblicos | Bíblia Vive';
-  const desc  = 'Explore artigos e conteúdo sobre a Palavra de Deus.';
+  const desc  = 'Explore artigos e conteúdo teológico sobre a Palavra de Deus.';
   const url   = `${CANONICAL_ORIGIN}/artigos`;
   const articleLinks = articles.slice(0, 30).map(a =>
     `<li><a href="/artigos/${a.slug}">${a.title}</a></li>`
@@ -918,135 +955,57 @@ function comoUsarMetaTags() {
   const desc  = 'Aprenda a usar as ferramentas do Bíblia Vive: comentários teológicos históricos, Memorial da caminhada com a Palavra, destaques coloridos, compartilhamento e planos de leitura.';
   const url   = `${CANONICAL_ORIGIN}/como-usar`;
 
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">A Bíblia Vive oferece ferramentas integradas para estudo exegético profundo, busca instantânea de versículos, análise de idiomas originais (Dicionário de Strong com mais de 10.000 entradas), comentários teológicos históricos (Matthew Henry, Albert Barnes, John Gill) e Jornadas de Transformação Espiritual organizadas na Filosofia da Permanência.</section>`;
 
   const seoContent =
 `<main class="bv-seo-only" style="font-family:Georgia,'Times New Roman',serif;max-width:780px;margin:0 auto;padding:1rem;line-height:1.65;color:#1a1a1a">
   <h1>Como usar o Bíblia Vive — Guia de Estudo</h1>
+  ${geoSummary}
   <p>O Bíblia Vive é uma aplicação web progressiva para leitura e estudo da Bíblia em português. Esta página descreve, em texto, todas as ferramentas disponíveis na plataforma: análise de versículos com comentários teológicos históricos, Memorial da caminhada com a Palavra, destaques coloridos, compartilhamento de cards para redes sociais e planos de leitura diários.</p>
 
   <h2>Estudar com Comentários Teológicos</h2>
-  <p>O recurso de Comentários do Bíblia Vive conecta você ao pensamento de teólogos históricos como <strong>Matthew Henry</strong>, <strong>Albert Barnes</strong> e <strong>John Gill</strong> sobre qualquer versículo da Bíblia. O sistema utiliza IA com RAG (Recuperação Aumentada por Geração) para localizar os trechos mais relevantes de cada comentarista, traduzir e adaptar os fragmentos e organizá-los por teólogo. O processo leva de 60 a 90 segundos.</p>
+  <p>O recurso de Comentários do Bíblia Vive conecta você ao pensamento de teólogos históricos como <strong>Matthew Henry</strong>, <strong>Albert Barnes</strong> e <strong>John Gill</strong> sobre qualquer versículo da Bíblia. O sistema utiliza IA com RAG (Recuperação Aumentada por Geração) para localizar os trechos mais relevantes de cada comentarista, traduzir e adaptar os fragmentos e organizá-los por teólogo.</p>
   <p>Para usar, siga estes passos:</p>
   <ol>
     <li>Abra um capítulo da Bíblia (por exemplo, João 3).</li>
     <li>Clique no versículo que deseja estudar (por exemplo, João 3:16).</li>
     <li>Na barra de ações que aparece, clique no botão "Estudar" — o Painel de Estudo abre na tela.</li>
-    <li>No Painel de Estudo, selecione a aba "Comentários" — o painel tem quatro abas: Contexto, Referências, Idioma Original e Comentários.</li>
+    <li>No Painel de Estudo, selecione a aba "Comentários".</li>
     <li>Clique em "Buscar Comentários" para acionar a busca nos comentários históricos.</li>
-    <li>Leia os comentários exibidos por teólogo, reflita e, se desejar, crie uma Nota no versículo com os seus insights.</li>
   </ol>
-  <p>O Painel de Estudo também disponibiliza, nas demais abas, informações de contexto histórico e literário do livro (aba <strong>Contexto</strong>), referências cruzadas em outras passagens (aba <strong>Referências</strong>) e análise do idioma original com Strong, transliteração e dados morfológicos (aba <strong>Idioma Original</strong>).</p>
 
   <h2>Memorial — Sua Caminhada com a Palavra</h2>
-  <p>O <em>Memorial</em> é um diário espiritual integrado à leitura que preserva os momentos mais significativos da sua jornada com a Palavra. Ao ler um capítulo, você pode abrir o Caderno e registrar quatro tipos de memória vinculados àquele trecho: <strong>Reflexão</strong>, <strong>Oração</strong>, <strong>Testemunho</strong> e <strong>Jejum / Propósito</strong>. Também é possível criar cadernos livres para estudos mais abrangentes sobre um capítulo inteiro.</p>
-  <p>Como usar o Memorial:</p>
-  <ol>
-    <li>Abra a Bíblia e leia normalmente. Quando algo tocar seu coração, clique no botão flutuante do Caderno no canto inferior esquerdo da tela.</li>
-    <li>No painel que abre, escolha o tipo de registro: Reflexão, Oração, Testemunho ou Jejum / Propósito — ou crie um "Novo caderno livre" para um estudo mais extenso.</li>
-    <li>Escreva sua reflexão, oração ou testemunho. O registro ficará vinculado ao capítulo onde aquele momento aconteceu.</li>
-    <li>Acesse "Todos os Cadernos" para rever toda a sua caminhada em uma linha do tempo. Use a busca em tempo real para filtrar por título, conteúdo ou livro.</li>
-    <li>Abra o Memorial pelo menu da conta a qualquer momento para reencontrar sua história com a Palavra organizada cronologicamente.</li>
-  </ol>
-  <p>Cada novo capítulo pode se tornar uma nova lembrança. A Palavra permanece — o Memorial ajuda você a preservá-la.</p>
+  <p>O <em>Memorial</em> é um diário espiritual integrado à leitura que preserva os momentos mais significativos da sua jornada com a Palavra. Você pode registrar quatro tipos de memória: Reflexão, Oração, Testemunho e Jejum / Propósito.</p>
 
   <h2>Destaques — Cores e Marcações</h2>
-  <p>Os <strong>Destaques</strong> transformam sua Bíblia em um mapa visual do estudo. Ao colorir versículos, você cria camadas de significado que facilitam a revisão e o aprendizado. São 5 cores disponíveis, cada uma podendo representar uma categoria na sua metodologia pessoal.</p>
-  <p>Cores disponíveis e sugestão de uso:</p>
-  <ul>
-    <li><strong>Amarelo</strong> — Promessas de Deus</li>
-    <li><strong>Azul</strong> — Versículos de paz e conforto</li>
-    <li><strong>Verde</strong> — Mandamentos e instruções</li>
-    <li><strong>Rosa</strong> — Amor e graça</li>
-    <li><strong>Roxo</strong> — Profecias e mistérios</li>
-  </ul>
-  <p>Como destacar um versículo:</p>
-  <ol>
-    <li>Clique no versículo que deseja destacar. Você pode combinar Destaque e Memorial no mesmo versículo — são recursos independentes.</li>
-    <li>Na barra de ações, clique no botão "Destaque". Aparecerá um seletor com as 5 cores.</li>
-    <li>Clique na cor desejada e o versículo é destacado instantaneamente com um fundo translúcido que funciona tanto no modo claro quanto no escuro.</li>
-    <li>Para remover um destaque, clique novamente em "Destaque" e selecione a mesma cor ativa.</li>
-    <li>Crie seu próprio sistema de cores pessoal. O importante é ser consistente para que, ao revisitar um capítulo, as cores já contem a história do seu estudo anterior.</li>
-  </ol>
+  <p>Os <strong>Destaques</strong> transformam sua Bíblia em um mapa visual do estudo com 5 cores disponíveis: Amarelo (Promessas), Azul (Paz), Verde (Mandamentos), Rosa (Graça) e Roxo (Profecias).</p>
 
   <h2>Compartilhar — Cards de Versículos</h2>
-  <p>O Bíblia Vive gera <strong>cards visuais profissionais</strong> de qualquer versículo para você compartilhar nas redes sociais, grupos de WhatsApp, Telegram ou e-mail. São 5 templates exclusivos com formatos otimizados para cada plataforma:</p>
-  <ul>
-    <li><strong>Pergaminho</strong> — visual clássico e solene</li>
-    <li><strong>Minimalista</strong> — design limpo e direto</li>
-    <li><strong>Story</strong> — formato vertical 9:16, otimizado para Instagram Stories e TikTok</li>
-    <li><strong>Banner</strong> — formato horizontal para posts</li>
-    <li><strong>Editorial</strong> — estilo de revista, para textos maiores</li>
-  </ul>
-  <p>Como compartilhar um versículo:</p>
-  <ol>
-    <li>Clique no versículo que deseja compartilhar. Versículos curtos e impactantes como Filipenses 4:13, João 3:16 ou Salmos 23:1 funcionam muito bem.</li>
-    <li>Na barra de ações, clique em "Compartilhar". O gerador de cards abre com uma pré-visualização em tempo real.</li>
-    <li>Escolha um dos 5 templates e veja instantaneamente como o versículo ficará.</li>
-    <li>Clique em "Compartilhar Imagem" e escolha a plataforma (WhatsApp, Facebook, Twitter/X, Telegram, Instagram). O sistema copia a imagem para a área de transferência e abre a plataforma escolhida. No Instagram e TikTok, a imagem é baixada para você postar manualmente.</li>
-    <li>Alternativamente, use "Copiar Texto" para copiar o versículo no formato "Livro Capítulo:Versículo (Versão) | Bíblia Vive", ideal para mensagens e e-mails sem imagem.</li>
-  </ol>
+  <p>O Bíblia Vive gera <strong>cards visuais profissionais</strong> em 5 templates exclusivos (Pergaminho, Minimalista, Story 9:16, Banner, Editorial) para redes sociais.</p>
 
   <h2>Planos de Leitura Bíblica</h2>
-  <p>Os <strong>Planos de Leitura</strong> auxiliam você a manter a constância diária de leitura, dividindo as Escrituras em metas realistas e estruturadas. Escolha um plano, acompanhe seu progresso com o contador de ofensiva (streak) e crie intimidade diária com a Palavra.</p>
-  <p>Planos disponíveis:</p>
-  <ul>
-    <li><strong>Quatro Evangelhos em 30 dias</strong> — Mateus, Marcos, Lucas e João, para conhecer a fundo a vida e os ensinamentos de Jesus.</li>
-    <li><strong>Novo Testamento em 90 dias</strong> — leitura trimestral do NT.</li>
-    <li><strong>Bíblia inteira em 1 ano (365 dias)</strong> — leitura anual completa.</li>
-  </ul>
-  <p>Como usar um plano de leitura:</p>
-  <ol>
-    <li>Navegue até a aba de Planos e selecione o plano ideal para você.</li>
-    <li>Acompanhe suas estatísticas de leitura no dashboard: percentual concluído do plano e ofensiva (dias seguidos com leitura registrada).</li>
-    <li>Abra a leitura do dia — a seção "Leitura de Hoje" lista os capítulos reservados para o dia atual. Clique em qualquer um para ir à tela de leitura.</li>
-    <li>Marque o capítulo como lido (diretamente na tela de leitura ou pelo botão "Marcar como lido" no painel). O capítulo ficará riscado e o progresso do dia subirá.</li>
-    <li>Após concluir todas as leituras programadas do dia, use o botão "Avançar para o próximo dia" para atualizar o calendário do seu plano.</li>
-  </ol>
-  <p>Dica: escolha um horário fixo no seu dia (logo de manhã ou antes de dormir) para realizar a leitura programada. A constância de poucos minutos todos os dias é muito mais transformadora do que ler muitas horas de uma só vez.</p>
-
-  <p>O <strong>Painel de Estudo</strong> é a central de análise teológica de qualquer versículo, aberto pelo botão “Estudar” na barra de ações de um versículo selecionado. Ele contém quatro abas:</p>
-  <ul>
-    <li><strong>Contexto</strong> — informações de contexto histórico e literário do livro bíblico: autor, período, público, gênero, temas-chave, pessoas-chave e lugares-chave.</li>
-    <li><strong>Referências</strong> — referências cruzadas em outras passagens das Escrituras que dialogam com o versículo selecionado.</li>
-    <li><strong>Idioma Original</strong> — análise das línguas originais (hebraico e grego) com Strong, transliteração e dados morfológicos.</li>
-    <li><strong>Comentários</strong> — comentários teológicos históricos de Matthew Henry, Albert Barnes e John Gill, recuperados via IA com RAG.</li>
-  </ul>
-  <p>Para acessar o Painel de Estudo, abra um capítulo, clique em um versículo e depois no botão “Estudar”. Navegue entre as abas para explorar cada tipo de análise.</p>
-
-  <p>Para começar a usar o Bíblia Vive, visite a página inicial, escolha uma tradução (ACF, ARC, NVI, KJV, KJA, RVR1960, BBE), abra um capítulo e explore as ferramentas descritas acima.</p>
+  <p>Planos disponíveis: Quatro Evangelhos em 30 dias, Novo Testamento em 90 dias e Bíblia inteira em 365 dias.</p>
 </main>`;
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: 'Como usar o Bíblia Vive',
+    name: 'Como usar as ferramentas do Bíblia Vive',
     description: desc,
     url,
     inLanguage: 'pt-BR',
-    isPartOf: { '@type': 'WebSite', name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
+    isPartOf: { '@type': 'WebSite', '@id': `${CANONICAL_ORIGIN}#website`, name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
+    publisher: { '@type': 'Organization', '@id': `${CANONICAL_ORIGIN}#organization`, name: 'Bíblia Vive', url: CANONICAL_ORIGIN },
     step: [
-      { '@type': 'HowToSection', name: 'Estudar com Comentários Teológicos', text: 'Abra um capítulo, selecione um versículo, clique em Estudar, vá à aba Comentários e clique em Buscar Comentários para acessar Matthew Henry, Albert Barnes e John Gill via IA.' },
-      { '@type': 'HowToSection', name: 'Memorial — Sua Caminhada com a Palavra', text: 'Clique no botão flutuante do Caderno no canto inferior esquerdo, escolha o tipo de registro (Reflexão, Oração, Testemunho ou Jejum/Propósito) e preserve os momentos da sua jornada com a Palavra vinculados ao capítulo lido.' },
-      { '@type': 'HowToSection', name: 'Destaques Coloridos', text: 'Selecione um versículo, clique em Destaque e escolha uma das 5 cores para criar seu sistema visual de estudo.' },
-      { '@type': 'HowToSection', name: 'Compartilhar Cards de Versículos', text: 'Selecione um versículo, clique em Compartilhar, escolha um dos 5 templates e compartilhe a imagem em redes sociais ou copie o texto.' },
-      { '@type': 'HowToSection', name: 'Planos de Leitura', text: 'Escolha um plano (Evangelhos em 30 dias, NT em 90 dias, Bíblia em 365 dias), acompanhe o progresso e mantenha a ofensiva diária.' },
+      { '@type': 'HowToStep', position: 1, name: 'Estudar com Comentários Teológicos', text: 'Abra um capítulo, selecione um versículo, clique em Estudar, acesse a aba Comentários e consulte exegese histórica via RAG.' },
+      { '@type': 'HowToStep', position: 2, name: 'Registrar no Memorial', text: 'Clique no botão do Caderno, escolha a categoria (Reflexão, Oração, Testemunho, Jejum) e preserve sua memória espiritual encadeada à passagem.' },
+      { '@type': 'HowToStep', position: 3, name: 'Marcar Destaques Coloridos', text: 'Selecione um versículo e aplique uma das 5 cores com significado temático pessoal.' },
+      { '@type': 'HowToStep', position: 4, name: 'Gerar e Compartilhar Cards Visuais', text: 'Selecione um versículo, escolha entre 5 templates visuais (Story 9:16, Pergaminho, Minimalista) e compartilhe nas redes sociais.' },
+      { '@type': 'HowToStep', position: 5, name: 'Seguir um Plano de Leitura', text: 'Escolha um plano de 30, 90 ou 365 dias, acompanhe a barra de progresso e mantenha sua ofensiva diária.' },
     ],
   };
 
-  return {
-    META_TITLE:       `<title>${title}</title>`,
-    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
-    OG_URL:           `<meta property="og:url" content="${url}" />`,
-    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
-    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
-    OG_TYPE:          `<meta property="og:type" content="website" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
-    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
-    SEO_CONTENT:      seoContent,
-  };
+  return buildStaticMeta({ title, desc, url, type: 'HowTo', seoContent, customJsonLd: jsonLd });
 }
 
 function harpaMetaTags() {
@@ -1054,30 +1013,20 @@ function harpaMetaTags() {
   const desc  = 'Leia, pesquise e ouça os hinos tradicionais da Harpa Cristã. 636 hinos com busca instantânea, linha do tempo histórica e áudio de adoração.';
   const url   = `${CANONICAL_ORIGIN}/harpa`;
 
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">A Harpa Cristã no Bíblia Vive reúne o catálogo completo dos 636 hinos da hinologia pentecostal brasileira (nascida em 1922 em Recife/PE), com busca instantânea por número ou título, linha do tempo dos 100 anos de história e áudio de adoração.</section>`;
+
   const seoContent =
 `<main class="bv-seo-only" style="font-family:Georgia,'Times New Roman',serif;max-width:780px;margin:0 auto;padding:1rem;line-height:1.65;color:#1a1a1a">
   <h1>Harpa Cristã — Hinos de Adoração e Louvor</h1>
+  ${geoSummary}
   <p>A Harpa Cristã é o hinário oficial das Assembleias de Deus no Brasil, nascido em 1922 e continuamente ampliado e revisado até se tornar o hinário pentecostal mais conhecido do país. Acesse os 636 hinos tradicionais da Harpa Cristã no Bíblia Vive com busca por número ou título e áudio para adoração.</p>
 
   <h2>História da Harpa Cristã</h2>
-  <h3>Contexto anterior à Harpa Cristã</h3>
   <ul>
-    <li><strong>1861 – Salmos e Hinos:</strong> Publicação do hinário congregacional Salmos e Hinos, usado pela Assembleia de Deus em seus primeiros anos, junto com outros hinos protestantes tradicionais.</li>
-    <li><strong>1917–1921 – Hinários precursores:</strong> Missionários suecos da AD em Belém (PA) organizam um hinário com 194 hinos (1917) e depois lançam o Cantor Pentecostal (1921), com 44 hinos e 10 corinhos, já destacando a doutrina pentecostal.</li>
-  </ul>
-
-  <h3>Linha do tempo da Harpa Cristã</h3>
-  <ul>
-    <li><strong>1922 – 1ª edição da Harpa Cristã:</strong> Lançada pela AD em Recife (PE), torna-se o hinário oficial das Assembleias de Deus, com hinos para culto público, Santa Ceia, batismo, casamento, apresentação de crianças e cultos fúnebres; tiragem inicial de mil exemplares, distribuídos por Samuel Nyström.</li>
-    <li><strong>1923 – 2ª edição (300 hinos):</strong> Impressa no Rio de Janeiro, amplia o conteúdo para 300 hinos, consolidando o uso nacional da Harpa Cristã entre as igrejas assembleianas.</li>
-    <li><strong>1932 – Ampliação para 400 hinos:</strong> Novos cânticos são acrescentados e o hinário chega a 400 hinos, acompanhando o crescimento do movimento pentecostal no Brasil.</li>
-    <li><strong>1937 – Harpa Cristã com música:</strong> A Convenção Geral das Assembleias de Deus, reunida em São Paulo, nomeia uma comissão (incluindo Emílio Conde, Samuel Nyström e Paulo Leivas Macalão) para elaborar a primeira Harpa Cristã com letra e música, que se torna referência para o cântico congregacional.</li>
-    <li><strong>Décadas seguintes – Edição clássica com 524 hinos:</strong> Ao longo dos anos são acrescentados novos cânticos até chegar à famosa edição com 524 hinos; até 1981, todos foram revisados em letra e música, com grande participação do pastor Paulo Leivas Macalão.</li>
-    <li><strong>1979 – Revisão geral oficial:</strong> O Conselho Administrativo da CPAD e a CGADB nomeiam uma nova comissão para revisar música e letras da Harpa Cristã, com apoio técnico especializado em correção musical e textual.</li>
-    <li><strong>1992 – Harpa Cristã Atualizada:</strong> Lançada com ajustes de linguagem e forma, é adotada por algumas igrejas, mas boa parte das Assembleias de Deus mantém a Harpa Tradicional como preferida.</li>
-    <li><strong>1999 – Harpa Cristã Ampliada (640 hinos):</strong> A CPAD lança a Harpa Cristã Ampliada, acrescentando 116 novos hinos para atender melhor às necessidades cerimoniais e litúrgicas da igreja, totalizando 640 cânticos.</li>
-    <li><strong>2001–2010 – Ajuste para 636 hinos:</strong> O hinário passa por nova atualização, retirando quatro hinos pátrios nacionais e fixando o número em 636 hinos.</li>
-    <li><strong>2022 – 100 anos da Harpa Cristã:</strong> A Harpa Cristã completa um século de existência, reconhecida como o hinário mais conhecido e amado do Brasil, ultrapassando fronteiras denominacionais e marcando a história da hinódia pentecostal.</li>
+    <li><strong>1861 – Salmos e Hinos:</strong> Publicação do hinário congregacional Salmos e Hinos.</li>
+    <li><strong>1922 – 1ª edição da Harpa Cristã:</strong> Lançada pela AD em Recife (PE) com tiragem inicial distribuída por Samuel Nyström.</li>
+    <li><strong>1999 – Harpa Cristã Ampliada (640 hinos):</strong> CPAD lança edição ampliada com 640 cânticos.</li>
+    <li><strong>2022 – 100 anos da Harpa Cristã:</strong> Centenário do hinário mais conhecido e amado do Brasil.</li>
   </ul>
 </main>`;
 
@@ -1089,34 +1038,26 @@ function harpaMetaTags() {
     url,
   };
 
-  return {
-    META_TITLE:       `<title>${title}</title>`,
-    META_DESCRIPTION: `<meta name="description" content="${desc}" />`,
-    OG_URL:           `<meta property="og:url" content="${url}" />`,
-    OG_TITLE:         `<meta property="og:title" content="${title}" />`,
-    OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
-    OG_TYPE:          `<meta property="og:type" content="website" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
-    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
-    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
-    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
-    SEO_CONTENT:      seoContent,
-  };
+  return buildStaticMeta({ title, desc, url, type: 'MusicComposition', seoContent, customJsonLd: jsonLd });
 }
 
 function sobreMetaTags() {
   const title = 'Sobre o Bíblia Vive — Missão e Propósito | Bíblia Vive';
   const desc  = 'Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.';
   const url   = `${CANONICAL_ORIGIN}/sobre`;
+  
+  // T5: Princeton Rule — include exact theological statistics and historical facts
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">O Bíblia Vive é uma plataforma brasileira independente para estudo exegético e leitura contemplativa das Escrituras. Mapeia mais de 1.189 capítulos bíblicos em 66 livros com contextos históricos exclusivos, 8 traduções consagradas (como Almeida Corrigida Fiel e NVI) e mais de 10.000 referências exegéticas preservadas sob diretrizes YMYL e E-E-A-T teológico.</section>`;
+
   const seoContent =
     `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Sobre o Bíblia Vive</h1>` +
+    geoSummary +
     `<p>${desc}</p>` +
     `<h2>Nossa Missão</h2>` +
-    `<p>Levar a palavra de Deus com ferramentas modernas sem perder a essência milenar. O Bíblia Vive foi construído para potencializar o estudo devocional individual e em igreja, unindo tecnologia de ponta e reverência.</p>` +
+    `<p>Levar a palavra de Deus com ferramentas modernas sem perder a essência milenar. O Bíblia Vive mapeia os 1.189 capítulos da Bíblia distribuídos em 66 livros do Antigo e Novo Testamento com contextos históricos e literários exclusivos.</p>` +
     `<h2>Traduções e Fidedignidade</h2>` +
-    `<p>Utilizamos consagradas versões da Bíblia (ACF, ARC, NVI, KJV), prezando pela integridade técnica e fidedignidade textual.</p>` +
+    `<p>Oferecemos 8 traduções consagradas (ACF, ARC, NVI, KJV, KJA, AA, BBE, RVR), 636 hinos da Harpa Cristã e mais de 10.000 referências morfológicas do Dicionário de Strong, prezando pela integridade técnica e diretrizes YMYL e E-E-A-T teológico.</p>` +
     `</main>`;
   return buildStaticMeta({ title, desc, url, type: 'AboutPage', seoContent });
 }
@@ -1125,9 +1066,12 @@ function proMetaTags() {
   const title = 'Bíblia Vive PRO — Recursos Avançados de Estudo | Bíblia Vive';
   const desc  = 'Conheça os recursos adicionais do Bíblia Vive PRO: comentários teológicos expandidos, cadernos ilimitados no Memorial e suporte ao projeto.';
   const url   = `${CANONICAL_ORIGIN}/pro`;
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">O Bíblia Vive PRO oferece recursos estendidos de análise exegética: acesso ilimitado a comentários teológicos de Matthew Henry, John Gill e Albert Barnes via RAG, cadernos ilimitados no Memorial da Caminhada e suporte ao desenvolvimento independente da plataforma.</section>`;
+
   const seoContent =
     `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Bíblia Vive PRO</h1>` +
+    geoSummary +
     `<p>${desc}</p>` +
     `</main>`;
   return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
@@ -1137,9 +1081,12 @@ function apoiarMetaTags() {
   const title = 'Apoiar o Projeto | Bíblia Vive';
   const desc  = 'Saiba como apoiar o desenvolvimento independente da plataforma Bíblia Vive através de doações voluntárias via PIX.';
   const url   = `${CANONICAL_ORIGIN}/apoiar`;
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">O Bíblia Vive é uma iniciativa cristã independente suportada por doações voluntárias e assinaturas do Bíblia Vive PRO, sem vínculo denominacional exclusivo, mantendo o compromisso de levar as Escrituras com gratuidade e alta precisão técnica.</section>`;
+
   const seoContent =
     `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Apoiar o Projeto Bíblia Vive</h1>` +
+    geoSummary +
     `<p>${desc}</p>` +
     `</main>`;
   return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
@@ -1149,10 +1096,32 @@ function termosMetaTags() {
   const title = 'Termos de Uso e Privacidade | Bíblia Vive';
   const desc  = 'Termos de uso, políticas de privacidade e propriedade intelectual das traduções bíblicas da plataforma Bíblia Vive.';
   const url   = `${CANONICAL_ORIGIN}/termos-de-uso`;
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">Diretrizes de termos de uso e política de privacidade do Bíblia Vive: proteção de dados pessoais, propriedade intelectual de traduções bíblicas sob domínio público e licenciadas (NVI pela Biblica Inc., ACF pela Sociedade Trinitariana).</section>`;
+
   const seoContent =
     `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Termos de Uso e Privacidade</h1>` +
+    geoSummary +
     `<p>${desc}</p>` +
+    `</main>`;
+  return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
+}
+
+function memorialMetaTags() {
+  const title = 'Memorial da Caminhada com a Palavra | Bíblia Vive';
+  const desc  = 'Entidade de Preservação de Legado e Memória Espiritual. Preserve seus momentos mais significativos com as Escrituras Sagradas: reflexões, orações, testemunhos e propósitos vinculados a cada capítulo.';
+  const url   = `${CANONICAL_ORIGIN}/memorial`;
+  
+  // T2 + T4: Explicitly define Memorial as "Entidade de Preservação de Legado e Memória Espiritual"
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">O Memorial do Bíblia Vive é uma Entidade de Preservação de Legado e Memória Espiritual. Permite registrar e encadear reflexões, orações, testemunhos e propósitos de jejum vinculados às passagens bíblicas lidas, preservando a jornada pessoal de fé de forma perene e cronológica.</section>`;
+
+  const seoContent =
+    `<main style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<h1>Memorial da Caminhada com a Palavra</h1>` +
+    geoSummary +
+    `<p>${desc}</p>` +
+    `<h2>O que é o Memorial?</h2>` +
+    `<p>O Memorial é um diário espiritual integrado ao Bíblia Vive que preserva a sua história de estudo e meditação bíblica. Registre reflexões, orações, testemunhos e jejuns vinculados às passagens bíblicas lidas.</p>` +
     `</main>`;
   return buildStaticMeta({ title, desc, url, type: 'WebPage', seoContent });
 }
@@ -1430,6 +1399,13 @@ async function prerender() {
   await fs.writeFile(path.join(termosDir, 'index.html'), termosHtml, 'utf-8');
   console.log('[prerender]   ✓ dist/termos-de-uso/index.html');
 
+  // /memorial
+  const memorialHtml = replacePlaceholders(template, memorialMetaTags());
+  const memorialDir  = path.join(DIST_DIR, 'memorial');
+  await fs.mkdir(memorialDir, { recursive: true });
+  await fs.writeFile(path.join(memorialDir, 'index.html'), memorialHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/memorial/index.html');
+
 // ─── IndexNow Protocol ────────────────────────────────────────────────────────
 const INDEXNOW_KEY = '4f9b8c2e7a1d3f5b8e9a0c1d2e3f4a5b';
 
@@ -1461,6 +1437,7 @@ async function submitIndexNow(urlList) {
     { loc: `${CANONICAL_ORIGIN}/planos`,        changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/artigos`,       changefreq: 'weekly',  priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/como-usar`,     changefreq: 'monthly', priority: '0.7' },
+    { loc: `${CANONICAL_ORIGIN}/memorial`,      changefreq: 'weekly',  priority: '0.7' },
     { loc: `${CANONICAL_ORIGIN}/sobre`,         changefreq: 'monthly', priority: '0.5' },
     { loc: `${CANONICAL_ORIGIN}/apoiar`,        changefreq: 'monthly', priority: '0.5' },
     { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, changefreq: 'monthly', priority: '0.3' },
