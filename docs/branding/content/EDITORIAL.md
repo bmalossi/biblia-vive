@@ -287,11 +287,10 @@ Não constitui uma chamada comercial nem uma estratégia de conversão.
 
 Exemplo:
 
-Hoje, leia Filipenses 1.6.
+Hoje, leia Filipenses 1:6.
 
 Caso não esteja com sua Bíblia agora:
-
-📖 bibliavive.com.br/nvi/fp/1
+📖 bibliavive.com.br/nvi/fp/1#v6
 
 ### Princípio da Tecnologia Invisível
 

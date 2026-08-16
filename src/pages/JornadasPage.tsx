@@ -8,7 +8,7 @@ import {
   getEditorialChapterReferenceText,
 } from "@/types/editorialChapter";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { Loader2, Sparkles, X, ArrowRight, BookOpen } from "lucide-react";
+import { Loader2, Sparkles, X, ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 
 export default function JornadasPage() {
   usePageMeta({
@@ -45,14 +45,34 @@ export default function JornadasPage() {
   const [selectedChapter, setSelectedChapter] = useState<EditorialChapter | null>(
     null
   );
+  const [openSeriesNames, setOpenSeriesNames] = useState<string[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Deep link: abre o modal do capítulo automaticamente quando ?capitulo=ID
-  // está presente na URL (ex: chegando via notificação push).
+  const toggleSeries = (seriesName: string) => {
+    setOpenSeriesNames((prev) =>
+      prev.includes(seriesName)
+        ? prev.filter((name) => name !== seriesName)
+        : [...prev, seriesName]
+    );
+  };
+
+  // Deep link: abre o modal do capítulo e expande a série automaticamente quando ?capitulo=ID
+  // está presente na URL.
   useEffect(() => {
     if (loading) return;
     const capituloId = searchParams.get("capitulo");
     if (!capituloId) return;
+
+    const groupWithChapter = seriesGroups.find((g) =>
+      g.chapters.some((c) => c.id === capituloId)
+    );
+    if (groupWithChapter) {
+      setOpenSeriesNames((prev) =>
+        prev.includes(groupWithChapter.seriesName)
+          ? prev
+          : [...prev, groupWithChapter.seriesName]
+      );
+    }
 
     const allChapters = seriesGroups.flatMap((g) => g.chapters);
     const found = allChapters.find((c) => c.id === capituloId);
@@ -72,7 +92,7 @@ export default function JornadasPage() {
             <Sparkles className="h-3.5 w-3.5" />
             Filosofia da Permanência
           </p>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-app-text mb-4">
+          <h1 className="font-serif text-2xl md:text-3xl font-normal tracking-wide text-app-text mb-3">
             Sua caminhada
           </h1>
           <p className="mx-auto max-w-xl text-sm md:text-base text-app-text-muted leading-relaxed">
@@ -88,7 +108,7 @@ export default function JornadasPage() {
         ) : seriesGroups.length === 0 ? (
           <div className="rounded-2xl border border-border bg-app-surface p-12 text-center">
             <BookOpen className="mx-auto h-10 w-10 text-app-text-muted mb-3 opacity-40" />
-            <h2 className="font-serif text-lg text-app-text mb-1">
+            <h2 className="font-serif text-lg font-normal text-app-text mb-1">
               Nenhuma Jornada Disponível
             </h2>
             <p className="text-sm text-app-text-muted">
@@ -96,49 +116,70 @@ export default function JornadasPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-14">
-            {seriesGroups.map((group) => (
-              <section key={group.seriesName} className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-border pb-3">
-                  <h2 className="font-serif text-xl font-semibold text-app-text">
-                    Série {group.seriesOrder} · {group.seriesName}
-                  </h2>
-                  <span className="rounded-full bg-gold/10 px-2.5 py-0.5 font-mono text-xs text-gold">
-                    {group.chapters.length} {group.chapters.length === 1 ? "capítulo" : "capítulos"}
-                  </span>
-                </div>
+          <div className="space-y-4">
+            {seriesGroups.map((group) => {
+              const isOpen = openSeriesNames.includes(group.seriesName);
+              return (
+                <div
+                  key={group.seriesName}
+                  className="rounded-2xl border border-border bg-app-surface overflow-hidden transition-colors"
+                >
+                  <button
+                    onClick={() => toggleSeries(group.seriesName)}
+                    className="flex w-full items-center justify-between p-5 md:p-6 text-left group focus:outline-none"
+                    aria-expanded={isOpen}
+                  >
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h2 className="font-serif text-base md:text-lg font-normal tracking-wide text-app-text group-hover:text-gold transition-colors">
+                        {group.seriesOrder} · {group.seriesName}
+                      </h2>
+                      <span className="rounded-full bg-gold/10 px-2.5 py-0.5 font-mono text-xs text-gold">
+                        {group.chapters.length} {group.chapters.length === 1 ? "capítulo" : "capítulos"}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`h-5 w-5 text-app-text-muted transition-transform duration-200 group-hover:text-gold shrink-0 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
 
-                {/* Grade de Cards de Capítulos */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {group.chapters.map((ch) => (
-                    <button
-                      key={ch.id}
-                      onClick={() => setSelectedChapter(ch)}
-                      className="group flex flex-col justify-between rounded-xl border border-border bg-app-surface p-5 text-left transition-all hover:border-gold/50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gold/50 active:scale-[0.99]"
-                    >
-                      <div>
-                        <p className="font-mono text-[0.7rem] uppercase tracking-wider text-gold mb-2">
-                          Capítulo {ch.chapter_number}
-                        </p>
-                        <h3 className="font-serif text-base font-medium text-app-text group-hover:text-gold transition-colors line-clamp-2 mb-3">
-                          {ch.title}
-                        </h3>
-                        <p className="text-xs text-app-text-muted line-clamp-3 leading-relaxed mb-4">
-                          {ch.intro_text.replace(/\n\n/g, " ")}
-                        </p>
-                      </div>
+                  {isOpen && (
+                    <div className="px-6 pb-6 pt-2 border-t border-border/40 animate-in fade-in duration-200">
+                      {/* Grade de Cards de Capítulos */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {group.chapters.map((ch) => (
+                          <button
+                            key={ch.id}
+                            onClick={() => setSelectedChapter(ch)}
+                            className="group/card flex flex-col justify-between rounded-xl border border-border bg-app-raised p-5 text-left transition-all hover:border-gold/50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gold/50 active:scale-[0.99]"
+                          >
+                            <div>
+                              <p className="font-mono text-[0.7rem] uppercase tracking-wider text-gold mb-2">
+                                Capítulo {ch.chapter_number}
+                              </p>
+                              <h3 className="font-serif text-base font-medium text-app-text group-hover/card:text-gold transition-colors line-clamp-2 mb-3">
+                                {ch.title}
+                              </h3>
+                              <p className="text-xs text-app-text-muted line-clamp-3 leading-relaxed mb-4">
+                                {ch.intro_text.replace(/\n\n/g, " ")}
+                              </p>
+                            </div>
 
-                      <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs text-app-text-muted">
-                        <span>{getEditorialChapterReferenceText(ch)}</span>
-                        <span className="text-gold font-medium group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                          Ler <ArrowRight className="h-3 w-3" />
-                        </span>
+                            <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs text-app-text-muted">
+                              <span>{getEditorialChapterReferenceText(ch)}</span>
+                              <span className="text-gold font-medium group-hover/card:translate-x-1 transition-transform flex items-center gap-1">
+                                Ler <ArrowRight className="h-3 w-3" />
+                              </span>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    </button>
-                  ))}
+                    </div>
+                  )}
                 </div>
-              </section>
-            ))}
+              );
+            })}
           </div>
         )}
 
