@@ -210,6 +210,14 @@ Função RPC no Supabase que realiza busca por similaridade de cosseno entre o e
 **Cache de Estudo (ai_study_cache)**:
 Tabela Supabase que armazena as respostas estruturadas das funções de IA para evitar chamadas redundantes à OpenAI e reduzir a latência para o Leitor. Chave primária: `verse_id` + `question_type` (ex: `JHN.3.16` + `commentary`).
 
+**Sheet de Revelação (Quick Look Sheet)**:
+Componente UI em formato de Bottom Sheet (drawer móvel de aproximadamente 60% da altura da tela) que exibe instantaneamente (<100ms) o trecho mais relevante de um comentário teológico histórico para versículos com comentários já cacheados. Elimina a troca de abas e reduz a fricção cognitiva na leitura.
+_Evitar_: modal de comentário, popup teológico, preview lateral
+
+**Indicador de Cache de Versículo**:
+Marcador visual mínimo e elegante (borda pontilhada sutil ou ícone discreto de 4px) no texto de versículos que já possuem comentários teológicos salvos em cache.
+_Evitar_: badge chamativo, ícone grande de balão de fala
+
 ## Harpa Cristã
 
 **Hino**:

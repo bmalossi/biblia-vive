@@ -181,7 +181,9 @@ const ptBR: TranslationDict = {
   "study.commentaryLoading": "Consultando comentaristas...",
   "study.commentaryIntro": "Análise profunda deste versículo baseada em contextos históricos e teológicos.",
   "toolbar.study": "Estudar",
+  "toolbar.viewComments": "Ver Comentários",
   "toolbar.ariaStudy": "Estudar versículo {ref}",
+  "toolbar.ariaQuickLook": "Ver comentários teológicos de {ref}",
 
   // Auth (Sprint 7)
   "auth.signIn": "Entrar",

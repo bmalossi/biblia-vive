@@ -5,6 +5,9 @@ import { prefetchLexicons, getLanguageLabel } from "@/lib/strongs";
 import AudioPlayer from "@/components/AudioPlayer";
 import WorshipCard from "@/components/WorshipCard";
 import VerseToolbar from "@/components/VerseToolbar";
+import { QuickLookSheet } from "@/components/QuickLookSheet";
+import { useVerseCommentCache } from "@/hooks/useVerseCommentCache";
+import { getStudyData, type Commentary } from "@/lib/studyPanel";
 import NoteModal from "@/components/NoteModal";
 import AuthModal from "@/components/AuthModal";
 import NotePopover from "@/components/NotePopover";
@@ -299,6 +302,20 @@ export default function ReadingPage() {
   const echoContext = echoResult?.context ?? 'direct';
   const [isEchoModalOpen, setIsEchoModalOpen] = useState(false);
 
+  const { t, locale } = useTranslation();
+
+  // Estados do Quick Look Sheet
+  const [isQuickLookOpen, setIsQuickLookOpen] = useState(false);
+  const [quickLookCommentaries, setQuickLookCommentaries] = useState<Commentary[] | null>(null);
+  const [isQuickLookLoading, setIsQuickLookLoading] = useState(false);
+
+  const currentLang = String(locale).startsWith("pt") ? "pt" : "en";
+  const { hasCacheForVerse } = useVerseCommentCache(
+    selectedBook?.id,
+    chapterNumber,
+    currentLang
+  );
+
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
   const chapterGridRef = useRef<HTMLDivElement>(null);
   const verseRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -306,7 +323,6 @@ export default function ReadingPage() {
   const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const churchMode = useChurchMode();
   const { preferences, updatePreference, resetPreferences } = useReadingPreferences({ rootId: "reading-root" });
-  const { t, locale } = useTranslation();
   const { user } = useAuth();
   const { isPro, isTemplo } = useSubscription();
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
@@ -1040,6 +1056,30 @@ export default function ReadingPage() {
     setIsStudyPanelOpen(true);
   };
 
+  const handleQuickLook = async () => {
+    if (!selectedVerse || !selectedBook) return;
+    const vNum = Number(selectedVerse.verseNumber);
+    setIsQuickLookOpen(true);
+    setIsQuickLookLoading(true);
+    setQuickLookCommentaries(null);
+
+    try {
+      const studyData = await getStudyData(
+        selectedBook.id,
+        chapterNumber,
+        vNum,
+        selectedVersion,
+        currentLang
+      );
+      setQuickLookCommentaries(studyData.commentaries);
+    } catch (err) {
+      console.warn("Failed to load quick look commentary:", err);
+      setQuickLookCommentaries([]);
+    } finally {
+      setIsQuickLookLoading(false);
+    }
+  };
+
   const handleChapterCommentary = async () => {
     if (!isPro && !hasFreeChapterCommentary && !cachedChapterCommentary) {
       navigate('/pro');
@@ -1731,8 +1771,15 @@ export default function ReadingPage() {
                                   />
                                 </span>
                               )}
-                              <span className="mr-2 inline-block w-6 align-top font-mono text-[0.65rem] text-gold transition-opacity duration-100 group-hover:opacity-100" style={{ opacity: isHovered ? 1 : 0.6, flexShrink: 0 }}>
+                              <span className="mr-2 inline-block min-w-6 align-top font-mono text-[0.65rem] text-gold transition-opacity duration-100 group-hover:opacity-100" style={{ opacity: isHovered ? 1 : 0.6, flexShrink: 0 }}>
                                 {verseNumber}
+                                {hasCacheForVerse(verse.number) && (
+                                  <span
+                                    className="w-1 h-1 rounded-full bg-gold/50 inline-block align-top ml-0.5 mb-1"
+                                    title="Comentário disponível"
+                                    aria-label="Comentário disponível"
+                                  />
+                                )}
                               </span>
                               {renderVerseText(primaryDiffTokens, primaryText, verseNumber)}
                             </p>
@@ -2014,6 +2061,8 @@ export default function ReadingPage() {
           onCopy={handleCopy}
           onShare={handleShare}
           onStudy={handleStudy}
+          onQuickLook={handleQuickLook}
+          hasCache={selectedVerse ? hasCacheForVerse(selectedVerse.verseNumber) : false}
           onHighlight={(color) => {
             if (!selectedVerse) return;
             void addHighlight(Number(selectedVerse.verseNumber), color);
@@ -2162,6 +2211,19 @@ export default function ReadingPage() {
             onRefresh={refreshEcho}
           />
         )}
+
+        {/* Quick Look Sheet (Sheet de Revelação) */}
+        <QuickLookSheet
+          isOpen={isQuickLookOpen}
+          onClose={() => setIsQuickLookOpen(false)}
+          onOpenFullStudy={() => {
+            setIsQuickLookOpen(false);
+            handleStudy();
+          }}
+          verseReference={selectedVerse?.reference ?? ""}
+          commentaries={quickLookCommentaries}
+          isLoading={isQuickLookLoading}
+        />
 
         {isStudyPanelOpen && studyVerse && selectedBook && (
           <StudyPanel

@@ -129,6 +129,58 @@ export async function cacheStudyResponse(
   }
 }
 
+/**
+ * Busca em lote todos os números de versículos do capítulo que possuem comentários em cache (IA ou manuais).
+ */
+export async function getChapterCachedVerseNumbers(
+  bookId: string,
+  chapter: number | string,
+  language: string = 'pt'
+): Promise<Set<number>> {
+  const cachedVerses = new Set<number>();
+  try {
+    const supabase = await getSupabaseClient();
+    if (!supabase) return cachedVerses;
+
+    const bookUpper = bookId.toUpperCase();
+    const prefix = `${bookUpper}.${chapter}.`;
+
+    const [aiRes, manualRes] = await Promise.all([
+      supabase
+        .from('ai_study_cache')
+        .select('verse_id')
+        .eq('question_type', 'commentary')
+        .like('verse_id', `${prefix}%`),
+      supabase
+        .from('manual_commentaries')
+        .select('verse_id')
+        .eq('question_type', 'commentary')
+        .like('verse_id', `${prefix}%`)
+    ]);
+
+    const processRows = (rows: { verse_id: string }[] | null) => {
+      if (!rows) return;
+      for (const row of rows) {
+        if (!row.verse_id) continue;
+        const cleanId = row.verse_id.split(':')[0]; // Remove sufixo de idioma como :pt
+        const parts = cleanId.split('.');
+        if (parts.length >= 3) {
+          const vNum = parseInt(parts[2], 10);
+          if (!isNaN(vNum) && vNum > 0) {
+            cachedVerses.add(vNum);
+          }
+        }
+      }
+    };
+
+    processRows(aiRes.data);
+    processRows(manualRes.data);
+  } catch (error) {
+    console.warn('Error fetching chapter cached verse numbers:', error);
+  }
+  return cachedVerses;
+}
+
 // ─── Comentários Manuais ─────────────────────────────────────────────────────
 
 /**

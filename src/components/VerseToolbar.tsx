@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clipboard, Highlighter, PencilLine, Share2, BookOpen, X } from "lucide-react";
+import { Clipboard, Highlighter, PencilLine, Share2, BookOpen, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/i18n";
 import HighlightPicker, { HIGHLIGHT_CLASSES } from "@/components/HighlightPicker";
@@ -13,6 +13,7 @@ interface VerseToolbarProps {
   onCopy: () => void;
   onShare: () => void;
   onStudy: () => void;
+  onQuickLook?: () => void;
   onHighlight: (color: HighlightColor) => void;
   onRemoveHighlight: () => void;
   onNote: () => void;
@@ -23,6 +24,7 @@ interface VerseToolbarProps {
   studyOpen?: boolean;
   activeHighlight?: HighlightColor | null;
   hasNote?: boolean;
+  hasCache?: boolean;
 }
 
 export default function VerseToolbar({
@@ -32,6 +34,7 @@ export default function VerseToolbar({
   onCopy,
   onShare,
   onStudy,
+  onQuickLook,
   onHighlight,
   onRemoveHighlight,
   onNote,
@@ -42,6 +45,7 @@ export default function VerseToolbar({
   studyOpen = false,
   activeHighlight = null,
   hasNote = false,
+  hasCache = false,
 }: VerseToolbarProps) {
   const firstButtonRef = useRef<HTMLButtonElement>(null);
   const { t } = useTranslation();
@@ -98,25 +102,43 @@ export default function VerseToolbar({
       </button>
 
       <div className={cn("flex items-center flex-wrap", isMobile ? "gap-1" : "gap-1.5")}>
-        {/* Study Button */}
-        <Button
-          aria-label={t("toolbar.ariaStudy", { ref: ariaReference })}
-          aria-pressed={studyOpen}
-          className={cn(
-            buttonClassName,
-            studyOpen
-              ? "border-gold bg-gold-bg text-gold"
-              : "border-gold/40 text-gold",
-          )}
-          onClick={onStudy}
-          ref={firstButtonRef}
-          size="sm"
-          type="button"
-          variant="outline"
-        >
-          <BookOpen className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
-          {t("toolbar.study")}
-        </Button>
+        {/* Study / QuickLook Button */}
+        {hasCache ? (
+          <Button
+            aria-label={t("toolbar.ariaQuickLook", { ref: ariaReference })}
+            className={cn(
+              buttonClassName,
+              "border-gold bg-gold/15 text-gold hover:bg-gold hover:text-primary-foreground font-semibold shadow-sm",
+            )}
+            onClick={onQuickLook ?? onStudy}
+            ref={firstButtonRef}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <Sparkles className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
+            {t("toolbar.viewComments")}
+          </Button>
+        ) : (
+          <Button
+            aria-label={t("toolbar.ariaStudy", { ref: ariaReference })}
+            aria-pressed={studyOpen}
+            className={cn(
+              buttonClassName,
+              studyOpen
+                ? "border-gold bg-gold-bg text-gold"
+                : "border-gold/40 text-gold",
+            )}
+            onClick={onStudy}
+            ref={firstButtonRef}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <BookOpen className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
+            {t("toolbar.study")}
+          </Button>
+        )}
 
         {/* Copy */}
         <Button

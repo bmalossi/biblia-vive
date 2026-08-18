@@ -181,7 +181,9 @@ const es: TranslationDict = {
     "study.commentaryLoading": "Consultando comentaristas...",
     "study.commentaryIntro": "Análisis profundo de este versículo basado en contextos históricos y teológicos.",
     "toolbar.study": "Estudiar",
+    "toolbar.viewComments": "Ver Comentarios",
     "toolbar.ariaStudy": "Estudiar versículo {ref}",
+    "toolbar.ariaQuickLook": "Ver comentarios teológicos de {ref}",
 
     // Auth (Sprint 7)
     "auth.signIn": "Iniciar sesión",

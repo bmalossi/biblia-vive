@@ -181,7 +181,9 @@ const en: TranslationDict = {
     "study.commentaryLoading": "Consulting commentators...",
     "study.commentaryIntro": "Deep analysis of this verse based on historical and theological contexts.",
     "toolbar.study": "Study",
+    "toolbar.viewComments": "View Commentary",
     "toolbar.ariaStudy": "Study verse {ref}",
+    "toolbar.ariaQuickLook": "View theological commentary for {ref}",
 
     // Auth (Sprint 7)
     "auth.signIn": "Sign In",
