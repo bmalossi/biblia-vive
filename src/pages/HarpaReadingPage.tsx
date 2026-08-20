@@ -110,7 +110,6 @@ export default function HarpaReadingPage() {
   const [strophes, setStrophes] = useState<Strophe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [audioAutoPlay, setAudioAutoPlay] = useState(false);
 
   const numero = useMemo(() => parseInt(hymnNumber ?? "", 10), [hymnNumber]);
 
@@ -255,9 +254,6 @@ export default function HarpaReadingPage() {
             <HarpaWorshipCard
               hymnNumber={numero}
               title={hymnInfo.tituloFormatado}
-              autoPlay={audioAutoPlay}
-              onAutoPlayConsumed={() => setAudioAutoPlay(false)}
-              onEnded={nextNumber !== null ? () => { navigate(`/harpa/${nextNumber}`); setAudioAutoPlay(true); } : undefined}
             />
 
             {/* Version label — same style as ReadingPage version label */}

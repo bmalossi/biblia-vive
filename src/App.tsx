@@ -9,6 +9,7 @@ import { PWAProvider } from "@/contexts/PWAContext";
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import ScrollToTop from "@/components/ScrollToTop";
 import { NotebookProvider } from "@/contexts/NotebookContext";
+import { HarpaPlayerProvider } from "@/contexts/HarpaPlayerContext";
 import GlobalNotebookContainer from "@/components/GlobalNotebookContainer";
 
 
@@ -77,10 +78,11 @@ const App = () => (
         <AuthProvider>
           <TooltipProvider>
             <NotebookProvider>
-              <ScrollToTop />
-              <ToastViewport />
-              <Suspense fallback={<PageFallback />}>
-                <Routes>
+              <HarpaPlayerProvider>
+                <ScrollToTop />
+                <ToastViewport />
+                <Suspense fallback={<PageFallback />}>
+                  <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/busca" element={<SearchPage />} />
                   <Route path="/harpa" element={<HarpaPage />} />
@@ -116,13 +118,14 @@ const App = () => (
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Suspense>
-              <GlobalNotebookContainer />
+                <GlobalNotebookContainer />
+              </HarpaPlayerProvider>
             </NotebookProvider>
           </TooltipProvider>
         </AuthProvider>
       </PWAProvider>
+      <SpeedInsights />
     </BrowserRouter>
-    <SpeedInsights />
   </QueryClientProvider>
 );
 

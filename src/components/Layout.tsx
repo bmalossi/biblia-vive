@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import NotificationSoftAsk from "@/components/NotificationSoftAsk";
+import HarpaPlayerBar from "@/components/HarpaPlayerBar";
 import { getVersion } from "@/lib/themes";
 import { Link, useLocation } from "react-router-dom";
 import { ReactNode } from "react";
@@ -117,6 +118,7 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
         </ul>
       </nav>
 
+      <HarpaPlayerBar />
       <NotificationSoftAsk />
     </div>
   );
