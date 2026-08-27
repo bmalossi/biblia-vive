@@ -789,6 +789,10 @@ export default function ReadingPage() {
       if (echoStore.getMatchingEcho) {
         const found = await echoStore.getMatchingEcho(selectedBook.id, chapterNumber);
         setEchoResult(found);
+        // Carimba lastEchoAt para acionar o cool-down (evita repetição excessiva)
+        if (found && echoStore.markEchoed) {
+          echoStore.markEchoed(found.entry.id).catch(() => { /* silencioso */ });
+        }
       }
     } catch {
       setEchoResult(null);

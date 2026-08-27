@@ -1,119 +1,163 @@
-# ✦ Bíblia Vive
+# ✦ Bíblia Vive — Plataforma de Leitura, Estudo e Edificação Bíblica
 
-> A Palavra que vive, o estudo que esclarece.
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![PWA Ready](https://img.shields.io/badge/PWA-Progressive_Web_App-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
 
-O **Bíblia Vive** é uma aplicação web progressiva (PWA) de alto desempenho, criada para oferecer uma experiência de leitura e estudo bíblico em português com foco em clareza, profundidade e excelência de interface.
+> **A Palavra que vive, o estudo que esclarece, a caminhada que transforma.**
 
-Mais do que uma Bíblia online, o projeto combina leitura imersiva, recursos avançados de estudo, contexto histórico e ferramentas modernas de comparação, anotação e áudio em uma experiência pensada para uso diário.
+O **[Bíblia Vive](https://www.bibliavive.com.br)** é uma aplicação web progressiva (PWA) de alta performance e experiência imersiva, desenvolvida para transformar a forma como as pessoas leem, estudam, registram e compartilham as Escrituras Sagradas.
 
-## ✨ Funcionalidades Principais
+Unindo fidelidade teológica, curadoria histórica, inteligência de dados e design editorial refinado, a plataforma oferece uma experiência viva para a vida devocional e o estudo bíblico aprofundado no dia a dia.
 
-- **Leitura imersiva**: interface focada, fluida e livre de distrações, com tipografia refinada para leitura prolongada.
-- **Curadoria de comentários históricos**:
-  - A IA atua como uma camada de curadoria, não como autora teológica.
-  - O sistema localiza, seleciona e organiza trechos relevantes de comentaristas históricos e obras de referência.
-  - Quando aplicável, a IA também auxilia na tradução e adaptação desses fragmentos para melhorar acessibilidade e compreensão.
-- **Estudo das línguas originais**:
-  - Integração com o Dicionário Strong.
-  - Suporte a hebraico e grego com transliteração e dados morfológicos.
-- **Contexto histórico e literário**: informações sobre autoria, período, temas, estrutura e propósito dos livros bíblicos.
-- **Comparação paralela de versões**: visualização lado a lado com destaque para diferenças textuais entre traduções.
-- **Recursos de estudo pessoal**: marcações, destaques, anotações e experiências premium voltadas a aprofundamento individual.
-- **Harpa Cristã**: acervo completo de hinos de louvor com busca instantânea por número e título, player de áudio integrado com o R2 Cloudflare e layout de leitura com destaque automático de refrão/coro.
-- **Áudio e acessibilidade**: leitura em voz com suporte a tecnologias modernas de síntese e reprodução, incluindo modo de reprodução contínua (avanço automático ao próximo capítulo/hino) ou modo de repetição (loop) em todos os players de áudio (Salmos, Harpa e Áudio Narrado).
-- **Experiência offline (PWA)**: suporte a instalação em dispositivos móveis e desktop, com carregamento rápido e uso contínuo.
+---
 
-## 🚀 Stack e Arquitetura
+## 🌟 Funcionalidades em Destaque
 
-O projeto foi construído com uma stack moderna, orientada a performance, escalabilidade e experiência de uso:
+### 📖 Leitura Imersiva e Multiversão
+* **Interface Fluida & Tipografia Editorial**: Modos de leitura pensados para conforto visual prolongado (tema claro, escuro e sépia), com controle total de fontes e espaçamento.
+* **Comparações Paralelas**: Visualize versículos lado a lado entre traduções com destaque visual de variações textuais (diff dinâmico).
+* **Múltiplas Versões & Línguas**: Suporte a ACF, ARC, NVI, KJA, KJV, RVR1960 e BBE.
 
-- **Frontend**: React, Vite e TypeScript.
-- **UI**: Tailwind CSS, Radix UI e Lucide Icons.
-- **Backend e dados**: Supabase (PostgreSQL, autenticação, storage e edge/serverless functions).
-- **Pagamentos e assinatura**: Stripe.
-- **IA aplicada à curadoria**: OpenAI para seleção, filtragem e apoio à organização de conteúdos históricos.
-- **Áudio**: Cache para otimização de entrega em R2 Cloudflare.
-- **SEO e indexação**: prerendering, metadados estruturados, sitemap e páginas otimizadas para descoberta orgânica.
+### 🏛️ Estudo Aprofundado & Curadoria Histórica
+* **Línguas Originais (Dicionário Strong)**: Suporte completo ao hebraico, aramaico e grego com morfologia, transliteração, pronúncia e lemas unificados.
+* **Curadoria de Comentários Históricos com IA**: A inteligência artificial atua exclusivamente na curadoria, localização e tradução de comentários clássicos de teólogos da história da Igreja (sem geração inventiva de doutrina).
+* **Referências Cruzadas & Contexto**: Informações sobre autoria, época, público-alvo, temas-chave e conexões teológicas imediatas por capítulo e versículo.
 
-## 🛠 Desenvolvimento local
+### 📓 Cadernos de Estudo (Estudo por Capítulo & Temático)
+* **Workspace Dedicado de Anotações**: Interface em gaveta flutuante (*bottom sheet* no mobile e painel lateral no desktop) que permite escrever sem perder a visão do texto bíblico.
+* **Organização Flexível**: Cadernos vinculados a capítulos específicos ou globais por tema, com suporte a formatação avançada (Markdown e Rich Text).
+* **Exportação Completa**: Exporte seus cadernos e anotações diretamente em **PDF** ou **Word (.docx)** diagramados.
+
+### 🪨 Meu Memorial — Marcos da Caminhada
+* **Linha do Tempo Espiritual**: Registre memórias, reflexões, pedidos de oração, jejuns e testemunhos vinculados a passagens bíblicas.
+* **Eco do Memorial**: Reencontro inteligente com anotações e orações passadas diretamente no capítulo lido, incentivando a reflexão sobre orações respondidas e fidelidade de Deus.
+* **Filtros e Busca em Tempo Real**: Localize orações respondidas, entradas favoritas e temas em segundos.
+
+### 🌿 Jornadas — Leituras Contemplativas
+* **Ciclos de Permanência**: Séries editoriais estruturadas no movimento de *Encontro*, *Crescimento* e *Transformação*.
+* **Leitura Guiada**: Meditações bíblicas temáticas para aprofundamento pessoal e discipulado.
+
+### 🎵 Harpa Cristã & Áudio Integrado
+* **Acervo Completo de Hinos**: Letras integradas com busca instantânea por número e título, com destaque de estrofes e refrão.
+* **Player de Áudio de Alta Performance**: Hospedagem otimizada no Cloudflare R2 com avanço contínuo (reprodução automática do próximo hino/capítulo) e modo repetição (loop).
+* **Áudio Narrado & Síntese de Voz (TTS)**: Ouça capítulos narrados com controles inteligentes de velocidade e pausa.
+
+### 🎨 Criação de Cards & Compartilhamento Social
+* **Gerador de Cards Bíblicos**: Modelos exclusivos (Pergaminho, Minimalista, Story, Banner e Editorial) prontos para redes sociais (Instagram Stories, Feed, WhatsApp).
+* **Estatísticas & Planos de Leitura**: Acompanhamento de metas diárias (planos de 30, 90 e 365 dias) com sequências (*streaks*) e cards de progresso compartilháveis.
+
+### 📜 Artigos, Autores & Governança Editorial (E-E-A-T)
+* **Páginas de Artigos & Perfis de Autores**: Conteúdos doutrinários e teológicos com biografia, filiação ministerial e badges de revisão pastoral.
+* **Metadados Estruturados Avançados**: Schemas completos Schema.org (`Article`, `Person`, `Chapter`, `BibleVersion`) para máxima relevância e autoridade nos mecanismos de busca.
+
+### 📱 Experiência Offline e PWA
+* Suporte total a instalação como aplicativo nativo no Android, iOS, Windows e macOS via Service Workers e cache offline inteligente.
+* Notificações push contextuais para devocionais diários e planos de leitura.
+
+---
+
+## 🏗️ Arquitetura & Stack Tecnológica
+
+O ecossistema do **Bíblia Vive** adota padrões modernos de arquitetura JAMstack e Serverless:
+
+```
+├── Frontend SPA / PWA (React 18 + Vite + TypeScript)
+│   ├── UI: Tailwind CSS + Radix UI + Lucide Icons + Framer Motion
+│   ├── Estado & Cache: TanStack React Query + Context API
+│   └── Exportadores: jsPDF + docx + html-to-image
+├── Backend as a Service (Supabase)
+│   ├── PostgreSQL com RLS (Row Level Security)
+│   ├── Auth (Magic Link, OAuth & Email)
+│   ├── Edge Functions (Deno / TypeScript)
+│   └── Storage
+├── Áudio & Storage CDN: Cloudflare R2
+├── Assinaturas & Pagamentos: Stripe API (Checkout & Webhooks)
+├── IA & Curadoria: OpenAI GPT-4o API
+└── SEO & Entrega:
+    ├── Pré-renderizador estático proprietário (scripts/prerender.mjs)
+    ├── IndexNow Protocol (Bing & buscadores parceiros)
+    └── Sitemap.xml dinâmico multi-versões (+5.000 URLs indexáveis)
+```
+
+---
+
+## 🚀 Começando
 
 ### Pré-requisitos
-
-- **Node.js** v18+
-- **npm** ou compatível
-- **Supabase CLI** (opcional)
-- Variáveis de ambiente para os serviços utilizados
+* **Node.js** `>= 18.0.0`
+* **npm**, **pnpm** ou **yarn**
+* Conta e projeto configurados no **Supabase**
 
 ### Instalação
 
+1. Clone o repositório:
 ```bash
 git clone https://github.com/bmalossi/biblia-vive.git
 cd biblia-vive
+```
+
+2. Instale as dependências:
+```bash
 npm install
 ```
 
-### Ambiente
+3. Configure as variáveis de ambiente:
+Copie o arquivo de exemplo e preencha suas credenciais:
+```bash
+cp .env.example .env
+```
 
-Crie um arquivo `.env` com base no `.env.example` e configure as variáveis necessárias para seu ambiente local.
+Principais chaves de configuração:
+```env
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-anon-key
+SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key
 
-Exemplos de variáveis usadas pelo projeto:
+# Pagamentos (Stripe)
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PRICE_ID=price_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `OPENAI_API_KEY`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PRICE_ID`
-- `STRIPE_WEBHOOK_SECRET`
-- `ELEVENLABS_API_KEY`
+# IA & Integrações
+OPENAI_API_KEY=sk-...
+INDEXNOW_KEY=sua-chave-indexnow
+```
 
-### Execução
-
+4. Inicie o servidor de desenvolvimento:
 ```bash
 npm run dev
 ```
 
-## 📚 Textos bíblicos e créditos
+---
 
-O código-fonte deste projeto refere-se à aplicação **Bíblia Vive** e à sua arquitetura de produto.
+## 📦 Scripts Disponíveis
 
-Os textos bíblicos disponibilizados pela plataforma pertencem aos seus respectivos detentores de direitos autorais. Este repositório não reivindica titularidade sobre traduções bíblicas, comentários históricos ou conteúdos de terceiros, reconhecendo e atribuindo os créditos devidos a cada fonte correspondente.
+* `npm run dev`: Inicia o servidor local Vite em modo de desenvolvimento.
+* `npm run build`: Compila a aplicação TypeScript/React e executa o pré-renderizador de páginas estáticas (`prerender.mjs`).
+* `npm run preview`: Pré-visualiza o pacote de produção compilado localmente.
+* `npm run test`: Executa os testes unitários e de integração via Vitest.
+* `npm run indexnow`: Envia notificações de URLs atualizadas para o Bing via IndexNow.
 
-### Traduções e créditos
+---
 
-- **Almeida Corrigida Fiel (ACF)**  
-  Bíblia Sagrada – Almeida Corrigida Fiel (ACF).  
-  © Sociedade Bíblica Trinitariana do Brasil.
+## 📖 Direitos Autorais & Créditos Editoriais
 
-- **Nova Versão Internacional (NVI)**  
-  Bíblia Sagrada – Nova Versão Internacional (NVI).  
-  Copyright © International Bible Society / Biblica.
+O código-fonte e o design de experiência pertencem ao projeto **Bíblia Vive**. 
 
-- **Almeida Revista e Corrigida (ARC)**  
-  Texto bíblico © Sociedade Bíblica do Brasil.
+Os textos das traduções bíblicas e comentários históricos pertencem aos seus respectivos detentores de direitos e editoras:
+* **ACF**: Sociedade Bíblica Trinitariana do Brasil.
+* **NVI**: Biblica, Inc. / Sociedade Bíblica Internacional.
+* **ARC**: Sociedade Bíblica do Brasil (SBB).
+* **KJA**: Sociedade Bíblica Ibero-Americana & Abba Press.
+* **KJV & BBE**: Domínio Público nas jurisdições aplicáveis.
 
-- **King James Atualizada (KJA)**  
-  Bíblia King James Atualizada (KJA).  
-  © Sociedade Bíblica Ibero-Americana & Abba Press.
+---
 
-- **Reina-Valera 1960 (RVR1960)**  
-  Reina-Valera 1960 ® © Sociedades Bíblicas en América Latina, 1960; renovado © Sociedades Bíblicas Unidas, 1988.
-
-- **Bible in Basic English (BBE)**  
-  Tradução em domínio público, conforme documentação pública disponível.
-
-- **King James Version (KJV)**  
-  Utilizada considerando seu status de domínio público em diversas jurisdições, observadas as condições aplicáveis em localidades específicas.
-
-- **AA (identificador interno da aplicação)**  
-  A origem textual e os termos aplicáveis devem seguir a edição correspondente utilizada pela plataforma.
-
-## 📜 Licença do projeto
-
-Salvo indicação em contrário quanto a conteúdos de terceiros, o código deste projeto pode ser licenciado separadamente da base textual bíblica.
-
-Os textos bíblicos, traduções, nomes editoriais, marcas e conteúdos correlatos permanecem vinculados aos seus respectivos titulares.
-
-## ✦ Propósito
-
-O **Bíblia Vive** existe para ampliar o acesso à leitura e ao estudo bíblico com seriedade, beleza e profundidade — unindo tradição, tecnologia e usabilidade em uma experiência digital à altura da importância do texto.
+<p align="center">
+  Desenvolvido com reverência, excelência e dedicação para a edificação da Igreja. 🕊️<br/>
+  <b><a href="https://www.bibliavive.com.br">Acesse bibliavive.com.br</a></b>
+</p>

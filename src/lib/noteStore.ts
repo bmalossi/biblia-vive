@@ -76,6 +76,7 @@ export interface NoteStore {
     toggleFavorite?(id: string): Promise<boolean>;
     markAnswered?(id: string, answeredNote?: string): Promise<void>;
     getMatchingEcho?(bookId?: string, chapter?: number): Promise<EchoResult | null>;
+    markEchoed?(id: string): Promise<void>;
     addEcoUpdate?(id: string, text: string): Promise<void>;
 }
 
@@ -274,6 +275,25 @@ export class SupabaseNoteStore implements NoteStore {
         return selectBestEchoWithContext(all, bookId, chapter);
     }
 
+    async markEchoed(id: string): Promise<void> {
+        const now = new Date().toISOString();
+        // Grava lastEchoAt diretamente na coluna metadata para não alterar updated_at
+        // (não queremos que o "reencontro" mude a ordem de exibição na lista de memoriais)
+        const { data: existing } = await supabase
+            .from("user_notes")
+            .select("metadata")
+            .eq("id", id)
+            .eq("user_id", this.userId)
+            .maybeSingle();
+        const currentMetadata = existing?.metadata || {};
+        const { error } = await supabase
+            .from("user_notes")
+            .update({ metadata: { ...currentMetadata, last_echoed_at: now } })
+            .eq("id", id)
+            .eq("user_id", this.userId);
+        if (error) console.warn("[Eco] markEchoed failed:", error.message);
+    }
+
     async addEcoUpdate(id: string, text: string): Promise<void> {
         const { data: existing } = await supabase
             .from("user_notes")
@@ -373,9 +393,25 @@ export function selectBestEchoWithContext(
     const eligible = entries.filter(e => !isOnCooldown(e));
     if (eligible.length === 0) return null;
 
+    // Índice de rotação diária — muda a cada meia-noite UTC, garantindo
+    // que cada dia exiba um registro diferente do pool disponível.
+    const DAY = 24 * 60 * 60 * 1000;
+    const dayIndex = Math.floor(Date.now() / DAY);
+
+    /** Seleciona um item do array usando rotação diária, priorizando orações. */
+    function pickByDay<T extends MemorialEntry>(pool: T[]): T {
+        if (pool.length === 1) return pool[0];
+        // Orações em andamento têm slot prioritário no início do ciclo
+        const prayers = pool.filter(e => e.type === 'prayer' && e.status !== 'answered');
+        const others  = pool.filter(e => !(e.type === 'prayer' && e.status !== 'answered'));
+        // Ordenamos cada sub-grupo de forma estável (por data de criação)
+        prayers.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        others.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        const ordered = [...prayers, ...others];
+        return ordered[dayIndex % ordered.length];
+    }
+
     // ── Prioridade 1: Vínculo Direto ─────────────────────────────────────────
-    // Apenas registros com vínculo literal ao livro+capítulo atual.
-    // Nunca promove registros de outros capítulos como se fossem "daqui".
     if (currentBookId && currentChapter !== undefined) {
         const direct = eligible.filter(
             e =>
@@ -383,16 +419,12 @@ export function selectBestEchoWithContext(
                 Number(e.chapter) === Number(currentChapter)
         );
         if (direct.length > 0) {
-            direct.sort(rankEntry);
-            return { entry: direct[0], context: 'direct' };
+            return { entry: pickByDay(direct), context: 'direct' };
         }
     }
 
     // ── Prioridade 2: Aniversário Histórico ───────────────────────────────────
-    // Exibe registros cujo aniversário de 6 meses ou 1 ano caia dentro de
-    // uma janela de tolerância ao redor de hoje. Independente do capítulo atual.
     const now = Date.now();
-    const DAY = 24 * 60 * 60 * 1000;
     const ANNIVERSARY_WINDOWS = [
         { label: '1y', target: 365 * DAY, tolerance: 7 * DAY },
         { label: '6m', target: 180 * DAY, tolerance: 5 * DAY },
@@ -404,23 +436,20 @@ export function selectBestEchoWithContext(
             return Math.abs(age - win.target) <= win.tolerance;
         });
         if (matches.length > 0) {
-            matches.sort(rankEntry);
-            return { entry: matches[0], context: 'anniversary' };
+            return { entry: pickByDay(matches), context: 'anniversary' };
         }
     }
 
     // ── Prioridade 3: Silêncio (default) ─────────────────────────────────────
-    // Não há vínculo nem aniversário. O silêncio é a resposta padrão.
-    // Apenas com probabilidade de 20% sorteamos um "registro órfão" global.
-    // Testemunhos são excluídos deste sorteio: sua natureza narrativa não deve
-    // ser descontextualizada para capítulos aos quais não pertencem.
-    if (Math.random() > 0.20) return null;
-
+    // Sorteio de 20% para registros órfãos (exceto testemunhos).
+    // O sorteio usa o índice de dia para ser determinístico e não flicker
+    // entre renders — mas muda a cada 5 dias para variar a frequência.
     const orphanPool = eligible.filter(e => e.type !== 'testimony');
     if (orphanPool.length === 0) return null;
+    // A cada ciclo de 5 dias, 1 deles exibe o eco (20%). Usamos modulo determinístico.
+    if ((dayIndex % 5) !== 0) return null;
 
-    orphanPool.sort(rankEntry);
-    return { entry: orphanPool[0], context: 'orphan' };
+    return { entry: pickByDay(orphanPool), context: 'orphan' };
 }
 
 
@@ -568,6 +597,15 @@ export class LocalNoteStore implements NoteStore {
     async getMatchingEcho(bookId?: string, chapter?: number): Promise<EchoResult | null> {
         const all = await this.getAll();
         return selectBestEchoWithContext(all, bookId, chapter);
+    }
+
+    async markEchoed(id: string): Promise<void> {
+        const notes = readLocal();
+        const idx = notes.findIndex(n => n.id === id);
+        if (idx < 0) return;
+        // Grava apenas lastEchoAt — não altera updatedAt para não perturbar ordenação
+        notes[idx].lastEchoAt = new Date().toISOString();
+        writeLocal(notes);
     }
 
     async addEcoUpdate(id: string, text: string): Promise<void> {
