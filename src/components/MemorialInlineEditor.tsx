@@ -263,7 +263,7 @@ export default function MemorialInlineEditor({
             </div>
 
             {/* Formulário Scrollável */}
-            <form onSubmit={handleSubmit} className="p-4 space-y-3.5 overflow-y-auto flex-1">
+            <div className="p-4 space-y-3.5 overflow-y-auto flex-1">
                 {/* Seletor de Categoria */}
                 <div className="flex rounded-xl bg-app-raised p-1 gap-1 border border-border/50">
                     {(["reflection", "prayer", "testimony", "fasting"] as MemorialCategory[]).map((cat) => {
@@ -514,7 +514,7 @@ export default function MemorialInlineEditor({
                         className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.8rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
                     />
                 </div>
-            </form>
+            </div>
         </div>
     );
 }
