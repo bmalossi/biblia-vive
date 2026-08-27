@@ -61,14 +61,17 @@ export default function EchoBanner({ entry, echoContext, onOpenModal }: EchoBann
     const badge = contextBadge[echoContext];
 
     return (
-        <div className="mb-6 rounded-2xl bg-app-surface border border-gold/40 p-4 shadow-sm transition-all animate-fade-in flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0 text-gold">
-                    <StoneIcon className="h-5 w-5 text-gold" />
+        <div className="relative overflow-hidden mb-6 rounded-2xl bg-gradient-to-r from-app-surface via-app-surface to-gold/5 border border-gold/40 hover:border-gold/60 p-4 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)] transition-all duration-500 animate-in fade-in zoom-in-95 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+            {/* Brilho dourado pulsante e sutil de fundo */}
+            <div className="absolute -top-12 -left-12 w-28 h-28 bg-gold/10 rounded-full blur-2xl pointer-events-none group-hover:bg-gold/15 transition-all duration-700" />
+
+            <div className="relative flex items-start gap-3">
+                <div className="mt-0.5 flex-shrink-0 text-gold p-2 rounded-xl bg-gold/10 border border-gold/20">
+                    <StoneIcon className="h-4 w-4 text-gold" />
                 </div>
                 <div className="space-y-0.5">
                     {badge && (
-                        <span className="inline-block mb-1 text-[0.6rem] uppercase tracking-widest font-sans font-semibold text-app-text-muted border border-border px-1.5 py-0.5 rounded-md">
+                        <span className="inline-block mb-1 text-[0.6rem] uppercase tracking-widest font-sans font-semibold text-gold border border-gold/30 bg-gold/5 px-2 py-0.5 rounded-full">
                             {badge}
                         </span>
                     )}
@@ -84,7 +87,7 @@ export default function EchoBanner({ entry, echoContext, onOpenModal }: EchoBann
             <button
                 type="button"
                 onClick={onOpenModal}
-                className="flex-shrink-0 self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gold text-black font-medium text-xs hover:bg-gold/90 transition-colors shadow-xs"
+                className="relative flex-shrink-0 self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gold text-black font-medium text-xs hover:bg-gold/90 transition-all duration-200 shadow-xs active:scale-95"
             >
                 <span>Reencontrar</span>
                 <ArrowRight className="h-3.5 w-3.5" />
