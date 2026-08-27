@@ -35,6 +35,7 @@ import { exportNotesToTXT, exportNotesToPDF } from '@/lib/notesExport';
 import { findBookGlobally } from '@/lib/books';
 import AuthModal from '@/components/AuthModal';
 import MemorialEntryModal from '@/components/MemorialEntryModal';
+import { MemorialStoneStack } from '@/components/memorial/MemorialStoneStack';
 import { cn } from '@/lib/utils';
 import { groupEntriesByTime } from '@/lib/memorialUtils';
 
@@ -233,7 +234,7 @@ export default function MemorialPage() {
         <Layout>
             <main className="min-h-screen bg-app-base px-4 py-8 max-w-3xl mx-auto font-sans">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-8 pb-6 border-b border-border/60">
+                <div className="flex items-start justify-between mb-6 pb-6 border-b border-border/60">
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
                             <button
@@ -254,6 +255,13 @@ export default function MemorialPage() {
                         </p>
                     </div>
                 </div>
+
+                {/* Marcos de Fé · Pilha de Pedras / Ebenézer */}
+                {!loading && (
+                    <div className="mb-8">
+                        <MemorialStoneStack totalEntries={entries.length} />
+                    </div>
+                )}
 
                 {/* Barra de Busca e Filtros */}
                 <div className="space-y-4 mb-8">
