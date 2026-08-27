@@ -7,9 +7,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useRef } from "react";
-import { X, Save, Trash2, Calendar } from "lucide-react";
+import { X, Trash2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
+import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 
 interface MemorialEntryModalProps {
     isOpen: boolean;
@@ -156,10 +157,7 @@ export default function MemorialEntryModal({
         ? (verse ? `${bookName} ${chapter}:${verse}` : `${bookName} ${chapter}`)
         : "Registro livre (sem versículo)";
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setIsSubmitting(true);
-
+    async function handleSaveAction(): Promise<boolean> {
         try {
             let compiledContent = content.trim();
             const metadataPayload: MemorialMetadata = {};
@@ -224,9 +222,10 @@ export default function MemorialEntryModal({
                 metadata: metadataPayload,
             });
 
-            onClose();
-        } finally {
-            setIsSubmitting(false);
+            return true;
+        } catch (err) {
+            console.error("Erro ao salvar registro no Memorial:", err);
+            return false;
         }
     }
 
@@ -508,36 +507,31 @@ export default function MemorialEntryModal({
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex items-center justify-between pt-3 border-t border-border/60">
+                    <div className="flex items-center justify-between pt-4 border-t border-border/60 gap-3">
                         {existingEntry && onDelete ? (
                             <button
                                 type="button"
                                 onClick={() => onDelete(existingEntry.id)}
-                                className="flex items-center gap-1.5 text-[0.78rem] text-destructive hover:bg-destructive/10 px-2.5 py-1.5 rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 text-[0.78rem] text-destructive hover:bg-destructive/10 px-2.5 py-2 rounded-xl transition-colors shrink-0"
                             >
                                 <Trash2 className="h-3.5 w-3.5" />
                                 Excluir
                             </button>
                         ) : (
-                            <span />
-                        )}
-
-                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-3 py-1.5 text-[0.78rem] text-app-text-muted hover:text-app-text transition-colors"
+                                className="px-3 py-2 text-[0.82rem] text-app-text-muted hover:text-app-text transition-colors shrink-0"
                             >
                                 Cancelar
                             </button>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gold font-sans font-medium text-[0.8rem] text-black hover:bg-gold/90 disabled:opacity-50 transition-colors shadow-sm"
-                            >
-                                <Save className="h-3.5 w-3.5" />
-                                <span>{isSubmitting ? "Guardando..." : "Guardar Memória"}</span>
-                            </button>
+                        )}
+
+                        <div className="flex-1 max-w-[220px]">
+                            <SaveMemorialButton
+                                onSave={handleSaveAction}
+                                onSuccessComplete={onClose}
+                            />
                         </div>
                     </div>
                 </form>

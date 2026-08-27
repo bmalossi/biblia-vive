@@ -101,6 +101,18 @@ export default {
             height: "0",
           },
         },
+        sweep: {
+          "0%": { transform: "translateX(-110%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+        "shimmer-pulse": {
+          "0%, 100%": { opacity: "0.3", filter: "brightness(1)" },
+          "50%": { opacity: "0.8", filter: "brightness(1.3)" },
+        },
+        "scale-in": {
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
         "notebook-remind": {
           "0%, 100%": {
             transform: "scale(1)",
@@ -121,6 +133,9 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        sweep: "sweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+        "shimmer-pulse": "shimmer-pulse 2s infinite ease-in-out",
+        "scale-in": "scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "notebook-remind": "notebook-remind 1.5s ease-in-out",
       },
     },
