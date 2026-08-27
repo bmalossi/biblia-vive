@@ -12,6 +12,7 @@ import { X, CheckCircle2, ExternalLink } from "lucide-react";
 import { type MemorialEntry, type NoteStore } from "@/lib/noteStore";
 import { cn } from "@/lib/utils";
 import StoneIcon from "@/components/StoneIcon";
+import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 
 interface EchoModalProps {
     isOpen: boolean;
@@ -165,7 +166,7 @@ export default function EchoModal({ isOpen, onClose, entry, store, onRefresh }: 
                     )}
 
                     {/* Formulário para Adicionar Nova Atualização */}
-                    <form onSubmit={handleAddUpdate} className="space-y-3 pt-2">
+                    <div className="space-y-3 pt-2">
                         <textarea
                             value={updateInput}
                             onChange={(e) => setUpdateInput(e.target.value)}
@@ -173,25 +174,37 @@ export default function EchoModal({ isOpen, onClose, entry, store, onRefresh }: 
                             placeholder="Escreva uma breve resposta ou atualização sobre esta memória..."
                             className="w-full rounded-2xl border border-border bg-app-raised p-3.5 text-xs font-serif text-app-text placeholder:text-app-text-muted focus:outline-none focus:ring-1 focus:ring-gold/50"
                         />
-                        <div className="flex items-center justify-between gap-4">
-                            <button
-                                type="submit"
-                                disabled={!updateInput.trim() || submitting}
-                                className="py-2 px-4 rounded-xl bg-gold text-black font-semibold text-xs hover:bg-gold/90 disabled:opacity-50 transition-colors shadow-xs"
-                            >
-                                {submitting ? "Gravando..." : "Registrar Atualização"}
-                            </button>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                            <div className="w-full sm:max-w-[240px]">
+                                <SaveMemorialButton
+                                    disabled={!updateInput.trim()}
+                                    idleText="Registrar Atualização"
+                                    savingText="Gravando no Memorial..."
+                                    successText="Atualização Gravada"
+                                    onSave={async () => {
+                                        const text = updateInput.trim();
+                                        if (!text) return false;
+                                        if (store.addEcoUpdate) {
+                                            await store.addEcoUpdate(entry.id, text);
+                                            setUpdateInput("");
+                                            onRefresh();
+                                            return true;
+                                        }
+                                        return false;
+                                    }}
+                                />
+                            </div>
 
                             <Link
                                 to={`/memorial/${entry.id}`}
                                 onClick={onClose}
-                                className="text-xs text-app-text-muted hover:text-gold transition-colors inline-flex items-center gap-1 font-sans"
+                                className="text-xs text-app-text-muted hover:text-gold transition-colors inline-flex items-center justify-center sm:justify-start gap-1 font-sans py-2"
                             >
                                 <span>Abrir no Memorial</span>
                                 <ExternalLink className="h-3 w-3" />
                             </Link>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

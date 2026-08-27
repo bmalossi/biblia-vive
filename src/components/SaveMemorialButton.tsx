@@ -5,6 +5,10 @@ export interface SaveMemorialButtonProps {
   onSave: () => Promise<boolean>;
   onSuccessComplete?: () => void;
   className?: string;
+  idleText?: string;
+  savingText?: string;
+  successText?: string;
+  disabled?: boolean;
 }
 
 type SaveState = "idle" | "saving" | "success";
@@ -13,6 +17,10 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
   onSave,
   onSuccessComplete,
   className = "",
+  idleText = "Selar no Memorial",
+  savingText = "Registrando na Caminhada...",
+  successText = "Guardado no Coração",
+  disabled = false,
 }) => {
   const [state, setState] = useState<SaveState>("idle");
 
@@ -30,7 +38,7 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    if (state !== "idle") return;
+    if (state !== "idle" || disabled) return;
 
     setState("saving");
 
@@ -64,13 +72,17 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
     <button
       type="button"
       onClick={handleSave}
-      disabled={state !== "idle"}
+      disabled={state !== "idle" || disabled}
       className={`
         relative overflow-hidden w-full py-3 px-5 rounded-xl font-medium
         transition-all duration-300 transform active:scale-[0.98]
         flex items-center justify-center gap-2.5 focus:outline-none select-none
-        ${state === "idle"
+        ${state === "idle" && !disabled
           ? "bg-app-raised hover:bg-app-raised/80 text-app-text border border-gold/30 hover:border-gold/50 shadow-sm"
+          : ""
+        }
+        ${state === "idle" && disabled
+          ? "bg-app-raised/40 text-app-text-muted/50 border border-border/40 cursor-not-allowed opacity-50"
           : ""
         }
         ${state === "saving"
@@ -94,17 +106,17 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
       {/* Estado Idle */}
       {state === "idle" && (
         <>
-          <Bookmark className="w-4 h-4 text-gold" />
-          <span className="tracking-wide font-serif text-[0.95rem]">Selar no Memorial</span>
+          <Bookmark className="w-4 h-4 text-gold shrink-0" />
+          <span className="tracking-wide font-serif text-[0.92rem] truncate">{idleText}</span>
         </>
       )}
 
       {/* Estado Salvando */}
       {state === "saving" && (
         <div className="flex items-center gap-2.5">
-          <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-          <span className="animate-shimmer-pulse font-serif text-[0.95rem] text-gold/90">
-            Registrando na Caminhada...
+          <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin shrink-0" />
+          <span className="animate-shimmer-pulse font-serif text-[0.92rem] text-gold/90 truncate">
+            {savingText}
           </span>
         </div>
       )}
@@ -112,11 +124,11 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
       {/* Estado Sucesso */}
       {state === "success" && (
         <div className="flex items-center gap-2 animate-scale-in">
-          <Check className="w-4 h-4 text-emerald-400" />
-          <span className="font-serif tracking-wide text-[0.95rem] text-app-text">
-            Guardado no Coração
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span className="font-serif tracking-wide text-[0.92rem] text-app-text truncate">
+            {successText}
           </span>
-          <Sparkles className="w-3.5 h-3.5 text-gold animate-pulse" />
+          <Sparkles className="w-3.5 h-3.5 text-gold animate-pulse shrink-0" />
         </div>
       )}
     </button>

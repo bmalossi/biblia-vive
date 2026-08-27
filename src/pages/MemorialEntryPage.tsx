@@ -14,6 +14,7 @@ import { createNoteStore, type MemorialCategory, type MemorialEntry } from "@/li
 import { findBookGlobally } from "@/lib/books";
 import AuthModal from "@/components/AuthModal";
 import MemorialEntryModal from "@/components/MemorialEntryModal";
+import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 import { cn } from "@/lib/utils";
 
 export default function MemorialEntryPage() {
@@ -28,6 +29,7 @@ export default function MemorialEntryPage() {
     const [authOpen, setAuthOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [updateText, setUpdateText] = useState("");
 
     const store = useMemo(() => createNoteStore(user?.id ?? null), [user]);
 
@@ -328,34 +330,34 @@ export default function MemorialEntryPage() {
 
                     {/* Formulário para Adicionar Nova Atualização */}
                     <div className="pt-2">
-                        <form
-                            onSubmit={async (e) => {
-                                e.preventDefault();
-                                const form = e.currentTarget;
-                                const input = form.elements.namedItem("updateText") as HTMLInputElement;
-                                const val = input?.value.trim();
-                                if (!val) return;
-                                if (store.addEcoUpdate) {
-                                    await store.addEcoUpdate(entry.id, val);
-                                    await fetchEntry();
-                                    form.reset();
-                                }
-                            }}
-                            className="space-y-3"
-                        >
+                        <div className="space-y-3">
                             <textarea
-                                name="updateText"
+                                value={updateText}
+                                onChange={(e) => setUpdateText(e.target.value)}
                                 rows={3}
                                 placeholder="Registre como Deus respondeu ou sustentou você desde então..."
                                 className="w-full rounded-xl border border-border bg-app-surface p-3 text-sm font-serif text-app-text placeholder:text-app-text-muted focus:outline-none focus:ring-1 focus:ring-gold/50"
                             />
-                            <button
-                                type="submit"
-                                className="py-2 px-4 rounded-xl bg-gold/15 text-gold border border-gold/30 font-medium text-xs hover:bg-gold/25 transition-colors"
-                            >
-                                Registrar Atualização
-                            </button>
-                        </form>
+                            <div className="max-w-[240px]">
+                                <SaveMemorialButton
+                                    disabled={!updateText.trim()}
+                                    idleText="Registrar Atualização"
+                                    savingText="Gravando no Memorial..."
+                                    successText="Atualização Gravada"
+                                    onSave={async () => {
+                                        const val = updateText.trim();
+                                        if (!val) return false;
+                                        if (store.addEcoUpdate) {
+                                            await store.addEcoUpdate(entry.id, val);
+                                            await fetchEntry();
+                                            setUpdateText("");
+                                            return true;
+                                        }
+                                        return false;
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </article>

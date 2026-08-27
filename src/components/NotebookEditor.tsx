@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import type { ChapterNotebook } from "@/lib/notebookStore";
 import type { SaveStatus } from "@/hooks/useNotebooks";
 import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
+import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 
 interface NotebookEditorProps {
     notebook: ChapterNotebook | null; // null = novo caderno em branco
@@ -300,7 +301,7 @@ export default function NotebookEditor({
             </div>
 
             {/* Rodapé do editor com botão Salvar e status */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-border/40 bg-app-surface/20 shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border/40 bg-app-surface/20 shrink-0 gap-3">
                 <div className="flex items-center">
                     {saveStatus && (
                         <span className={cn("text-[0.72rem] flex items-center gap-1 transition-colors", statusColor)}>
@@ -309,13 +310,23 @@ export default function NotebookEditor({
                         </span>
                     )}
                 </div>
-                <Button
-                    type="button"
-                    onClick={handleSaveAndClose}
-                    className="bg-gold text-black hover:bg-gold/90 text-xs font-semibold h-8 px-5 rounded-lg"
-                >
-                    Salvar
-                </Button>
+                <div className="w-[180px]">
+                    <SaveMemorialButton
+                        className="py-1.5 px-3 text-xs rounded-lg"
+                        idleText="Salvar Caderno"
+                        savingText="Gravando..."
+                        successText="Caderno Salvo"
+                        onSave={async () => {
+                            try {
+                                onSave({ id: notebook?.id, title: title || null, content }, true);
+                                return true;
+                            } catch {
+                                return false;
+                            }
+                        }}
+                        onSuccessComplete={onBack}
+                    />
+                </div>
             </div>
         </div>
     );
