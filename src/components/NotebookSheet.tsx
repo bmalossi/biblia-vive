@@ -169,8 +169,8 @@ export default function NotebookSheet({
     const handleSaveMemorialInline = useCallback(async (data: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }) => {
         await noteStore.save(data);
         await loadMemorialEntries();
-        setIsCreatingMemorial(false);
-        setSelectedMemorialEntry(null);
+        // Não fecha o editor aqui — o fechamento é feito pelo onSuccessComplete do SaveMemorialButton
+        // após o efeito visual de sucesso (sweep + vibração) completar.
     }, [noteStore, loadMemorialEntries]);
 
     const handleDeleteMemorialInline = useCallback(async (id: string) => {
