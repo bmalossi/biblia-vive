@@ -22,7 +22,7 @@ describe("SaveMemorialButton", () => {
     const onSave = vi.fn().mockResolvedValue(true);
     render(<SaveMemorialButton onSave={onSave} />);
 
-    expect(screen.getByRole("button")).toHaveTextContent("Selar no Memorial");
+    expect(screen.getByRole("button")).toHaveTextContent("Guardar");
   });
 
   it("handles successful save flow with haptic vibration and callback", async () => {
@@ -43,7 +43,7 @@ describe("SaveMemorialButton", () => {
     fireEvent.click(button);
 
     // Should transition to saving
-    expect(screen.getByText("Registrando na Caminhada...")).toBeInTheDocument();
+    expect(screen.getByText("Guardando...")).toBeInTheDocument();
     expect(button).toBeDisabled();
 
     // Resolve save promise
@@ -82,7 +82,7 @@ describe("SaveMemorialButton", () => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(screen.getByText("Selar no Memorial")).toBeInTheDocument();
+    expect(screen.getByText("Guardar")).toBeInTheDocument();
     expect(button).not.toBeDisabled();
     expect(navigator.vibrate).not.toHaveBeenCalled();
   });

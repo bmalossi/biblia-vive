@@ -527,8 +527,11 @@ export default function MemorialEntryModal({
                             </button>
                         )}
 
-                        <div className="flex-1 max-w-[220px]">
+                        <div className="flex-1 max-w-[200px]">
                             <SaveMemorialButton
+                                idleText="Guardar Memória"
+                                savingText="Guardando..."
+                                successText="Guardado"
                                 onSave={handleSaveAction}
                                 onSuccessComplete={onClose}
                             />

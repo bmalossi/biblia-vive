@@ -310,12 +310,12 @@ export default function NotebookEditor({
                         </span>
                     )}
                 </div>
-                <div className="w-[180px]">
+                <div className="w-[120px]">
                     <SaveMemorialButton
-                        className="py-1.5 px-3 text-xs rounded-lg"
-                        idleText="Salvar Caderno"
-                        savingText="Gravando..."
-                        successText="Caderno Salvo"
+                        className="h-8 px-4 text-xs font-semibold rounded-lg"
+                        idleText="Guardar"
+                        savingText="Guardando..."
+                        successText="Guardado"
                         onSave={async () => {
                             try {
                                 onSave({ id: notebook?.id, title: title || null, content }, true);

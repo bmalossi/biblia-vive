@@ -7,9 +7,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
+import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 
 interface MemorialInlineEditorProps {
     category: MemorialCategory;
@@ -210,9 +211,9 @@ export default function MemorialInlineEditor({
                 metadata: metadataPayload,
             });
 
-            onBack();
-        } finally {
-            setIsSubmitting(false);
+            return true;
+        } catch {
+            return false;
         }
     }
 
@@ -240,15 +241,16 @@ export default function MemorialInlineEditor({
                             <Trash2 className="h-4 w-4" />
                         </button>
                     )}
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold font-sans font-medium text-[0.78rem] text-black hover:bg-gold/90 disabled:opacity-50 transition-colors shadow-sm"
-                    >
-                        <Save className="h-3.5 w-3.5" />
-                        <span>{isSubmitting ? "Guardando..." : "Guardar"}</span>
-                    </button>
+                    <div className="w-[120px]">
+                        <SaveMemorialButton
+                            idleText="Guardar"
+                            savingText="Guardando..."
+                            successText="Guardado"
+                            className="py-1.5 px-3 text-xs rounded-xl"
+                            onSave={handleSaveAction}
+                            onSuccessComplete={onBack}
+                        />
+                    </div>
                 </div>
             </div>
 
