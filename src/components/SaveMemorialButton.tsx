@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Sparkles, Check, Bookmark } from "lucide-react";
+import { Save, Check } from "lucide-react";
 
 export interface SaveMemorialButtonProps {
   onSave: () => Promise<boolean>;
@@ -20,7 +20,7 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
   className = "",
   idleText = "Guardar",
   savingText = "Guardando...",
-  successText = "Guardado no Coração",
+  successText = "Guardado",
   disabled = false,
   variant = "gold",
 }) => {
@@ -113,7 +113,7 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
       {/* Estado Idle */}
       {state === "idle" && (
         <>
-          <Sparkles className={`w-3.5 h-3.5 shrink-0 ${isGoldVariant ? "text-black" : "text-gold"}`} />
+          <Save className={`w-3.5 h-3.5 shrink-0 ${isGoldVariant ? "text-black" : "text-gold"}`} />
           <span className="font-medium tracking-wide truncate">{idleText}</span>
         </>
       )}

@@ -57,7 +57,7 @@ describe("SaveMemorialButton", () => {
     });
 
     // Should transition to success state
-    expect(screen.getByText("Guardado no Coração")).toBeInTheDocument();
+    expect(screen.getByText("Guardado")).toBeInTheDocument();
     expect(navigator.vibrate).toHaveBeenCalledWith(35);
 
     // Advance timer to trigger onSuccessComplete

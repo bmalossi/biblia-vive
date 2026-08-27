@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles } from "lucide-react";
+import { Scroll } from "lucide-react";
 
 export interface MemorialStoneStackProps {
   totalEntries: number;
@@ -88,7 +88,7 @@ export const MemorialStoneStack: React.FC<MemorialStoneStackProps> = ({
 
           <div className="space-y-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Scroll className="w-3.5 h-3.5" />
               <span>Marcos de Fé · Ebenézer</span>
             </div>
             <h2 className="text-base font-serif font-medium text-app-text">

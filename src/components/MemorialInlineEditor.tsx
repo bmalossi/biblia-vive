@@ -139,9 +139,7 @@ export default function MemorialInlineEditor({
             : `${bookName} ${chapter}`
         : "Registro livre (sem versículo)";
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setIsSubmitting(true);
+    async function handleSaveAction(): Promise<boolean> {
 
         try {
             let compiledContent = content.trim();
