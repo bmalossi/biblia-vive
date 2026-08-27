@@ -1,6 +1,24 @@
 import React, { useState } from "react";
 import { Save, Check } from "lucide-react";
 
+// ─── ⚙️  TIMING — ajuste aqui os tempos do efeito de salvamento ───────────────
+//
+//  MIN_SAVE_MS       Tempo mínimo que o estado "Guardando..." fica visível (ms).
+//                    Evita um flash instantâneo se o servidor responder rápido.
+//
+//  SUCCESS_HOLD_MS   Quanto tempo o estado de sucesso (sweep + ✓) permanece na
+//                    tela ANTES de chamar onSuccessComplete (fechar editor, etc).
+//                    Aumente para dar mais tempo ao efeito de luz.
+//
+//  HAPTIC_PULSE_MS   Duração da vibração háptica no dispositivo (ms).
+//
+const TIMING = {
+  MIN_SAVE_MS:     400,   // mínimo "Guardando..." visível
+  SUCCESS_HOLD_MS: 1800,  // ← aumente aqui para o efeito durar mais
+  HAPTIC_PULSE_MS: 35,    // vibração háptica
+} as const;
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface SaveMemorialButtonProps {
   onSave: () => Promise<boolean>;
   onSuccessComplete?: () => void;
@@ -29,7 +47,7 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
   const triggerHaptic = () => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator && typeof navigator.vibrate === "function") {
       try {
-        navigator.vibrate(35);
+        navigator.vibrate(TIMING.HAPTIC_PULSE_MS);
       } catch {
         // Degrada silenciosamente se não for permitido pelo dispositivo
       }
@@ -53,7 +71,7 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
     }
 
     const elapsed = Date.now() - start;
-    const remaining = Math.max(400 - elapsed, 0);
+    const remaining = Math.max(TIMING.MIN_SAVE_MS - elapsed, 0);
 
     setTimeout(() => {
       if (success) {
@@ -61,7 +79,7 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
         triggerHaptic();
 
         if (onSuccessComplete) {
-          setTimeout(onSuccessComplete, 450);
+          setTimeout(onSuccessComplete, TIMING.SUCCESS_HOLD_MS);
         }
       } else {
         setState("idle");
