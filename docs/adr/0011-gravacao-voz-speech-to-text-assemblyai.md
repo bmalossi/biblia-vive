@@ -15,11 +15,13 @@ A interface precisava disponibilizar uma ferramenta de captura imediata de áudi
    - Adoção do modelo **`universal-2`** (`speech_models: ["universal-2"]`) para o MVP, garantindo a opção de melhor custo-benefício.
    - Parâmetros configurados para pontuação automática (`punctuate: true`), formatação de texto (`format_text: true`) e idioma português (`language_code: "pt"`).
 
-2. **Segurança de Credenciais e Proxy Serverless (`/api/stt.ts`):**
+2. **Segurança de Credenciais e Proxy Serverless Assíncrono (`/api/stt.ts`):**
    - A chave de API (`ASSEMBLYAI_API_KEY`) reside estritamente no ambiente do servidor (`.env`, `.env.local` e Vercel Environment Variables).
    - Nenhuma chave é exposta ao código cliente ou ao repositório público.
-   - O endpoint serverless `/api/stt.ts` recebe o áudio binário do navegador, realiza o upload na AssemblyAI, submete o job e executa o polling até a conclusão da transcrição.
-   - No ambiente local de desenvolvimento, um middleware dedicado no `vite.config.ts` (`apiDevServerPlugin`) intercepta e executa as rotas `/api/*` carregando as variáveis de ambiente locais.
+   - Para contornar o limite de tempo de execução estrito de 10s das Serverless Functions no plano Hobby da Vercel (evitando erros 504 Gateway Timeout), a rota adota padrão assíncrono:
+     - `POST /api/stt`: Recebe o áudio binário, faz upload na AssemblyAI, submete o job e retorna imediatamente `{ id, status: "queued" }` em menos de 2 segundos.
+     - `GET /api/stt?id=<id>`: Realiza a consulta rápida de status e texto pronto (`completed`), respondendo em ~200ms a cada ciclo de polling disparado pelo navegador.
+   - No ambiente local de desenvolvimento, o middleware no `vite.config.ts` (`apiDevServerPlugin`) intercepta e executa as rotas `/api/*` carregando as variáveis de ambiente locais.
 
 3. **Permissões de Hardware e Ciclo de Vida do Microfone:**
    - Atualização do cabeçalho `Permissions-Policy` no `vercel.json` para `microphone=(self)`.

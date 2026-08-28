@@ -184,6 +184,7 @@ export default function QuickVoiceMemorial() {
         setIsProcessing(true);
 
         try {
+            // 1. Enviar áudio para criação do job de transcrição
             const response = await fetch("/api/stt", {
                 method: "POST",
                 headers: {
@@ -194,11 +195,42 @@ export default function QuickVoiceMemorial() {
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error || `Falha na transcrição (${response.status})`);
+                throw new Error(errData.error || `Falha no envio do áudio (${response.status})`);
             }
 
-            const data = await response.json();
-            const text = data.text?.trim();
+            const initialData = await response.json();
+            const transcriptId = initialData.id;
+
+            if (!transcriptId) {
+                throw new Error("Não foi possível iniciar a transcrição.");
+            }
+
+            // 2. Polling assíncrono no cliente (evita Gateway Timeout de 10s no Vercel Hobby)
+            let text = "";
+            const maxWaitMs = 50000;
+            const intervalMs = 1200;
+            const startTime = Date.now();
+
+            while (Date.now() - startTime < maxWaitMs) {
+                await new Promise((resolve) => setTimeout(resolve, intervalMs));
+
+                const pollRes = await fetch(`/api/stt?id=${encodeURIComponent(transcriptId)}`);
+                if (!pollRes.ok) {
+                    const errData = await pollRes.json().catch(() => ({}));
+                    throw new Error(errData.error || `Erro na verificação (${pollRes.status})`);
+                }
+
+                const pollData = await pollRes.json();
+
+                if (pollData.status === "completed") {
+                    text = (pollData.text || "").trim();
+                    break;
+                }
+
+                if (pollData.status === "error") {
+                    throw new Error(pollData.error || "Falha no processamento do áudio pela IA.");
+                }
+            }
 
             if (!text) {
                 throw new Error("Nenhuma fala detectada no áudio gravado.");
