@@ -91,25 +91,26 @@ export default function MemorialEntryModal({
             }
 
             const meta = existingEntry?.metadata || {};
+            const rawContent = existingEntry?.content || "";
 
-            // SOAP
+            // SOAP (Reflexão)
             setSoapS(meta.soap?.scripture || verseText || "");
-            setSoapO(meta.soap?.observation || "");
+            setSoapO(meta.soap?.observation || (cat === 'reflection' ? rawContent : ""));
             setSoapA(meta.soap?.application || "");
             setSoapP(meta.soap?.prayer || "");
 
             // Oração
-            setMotivo(meta.motivo || "");
+            setMotivo(meta.motivo || (cat === 'prayer' ? rawContent : ""));
             setPedido(meta.pedido || "");
             setEntrega(meta.entrega || "");
 
             // Testemunho
-            setOQueAconteceu(meta.oQueAconteceu || "");
+            setOQueAconteceu(meta.oQueAconteceu || (cat === 'testimony' ? rawContent : ""));
             setComoDeusSustentou(meta.comoDeusSustentou || "");
             setDataFato(meta.dataFato || new Date().toISOString().split('T')[0]);
 
             // Propósito
-            setObjetivo(meta.objetivo || "");
+            setObjetivo(meta.objetivo || (cat === 'fasting' ? rawContent : ""));
             setDataInicio(meta.dataInicio || new Date().toISOString().split('T')[0]);
             setDataPrevista(meta.dataPrevista || "");
 
@@ -259,7 +260,7 @@ export default function MemorialEntryModal({
                 </div>
 
                 {/* Body Form */}
-                <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
+                <form onSubmit={(e) => { e.preventDefault(); handleSaveAction(); }} className="p-5 space-y-4 overflow-y-auto flex-1">
                     {/* Seletor de Categoria */}
                     <div className="flex rounded-xl bg-app-raised p-1 gap-1 border border-border/50">
                         {(['reflection', 'prayer', 'testimony', 'fasting'] as MemorialCategory[]).map(cat => {

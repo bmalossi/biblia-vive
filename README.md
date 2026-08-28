@@ -33,6 +33,7 @@ Unindo fidelidade teológica, curadoria histórica, inteligência de dados e des
 * **Exportação Completa**: Exporte seus cadernos e anotações diretamente em **PDF** ou **Word (.docx)** diagramados.
 
 ### 🪨 Meu Memorial — Marcos da Caminhada
+* **Gravação Rápida por Voz (Speech-to-Text)**: Registre orações, testemunhos e reflexões com zero fricção diretamente da página inicial. A transcrição inteligente em português (via AssemblyAI) é salva automaticamente no Memorial e mapeada para os campos corretos da categoria (Observação no SOAP, Motivo na Oração, etc.).
 * **Linha do Tempo Espiritual**: Registre memórias, reflexões, pedidos de oração, jejuns e testemunhos vinculados a passagens bíblicas.
 * **Eco do Memorial**: Reencontro inteligente com anotações e orações passadas diretamente no capítulo lido, incentivando a reflexão sobre orações respondidas e fidelidade de Deus.
 * **Filtros e Busca em Tempo Real**: Localize orações respondidas, entradas favoritas e temas em segundos.
@@ -75,6 +76,8 @@ O ecossistema do **Bíblia Vive** adota padrões modernos de arquitetura JAMstac
 │   ├── Edge Functions (Deno / TypeScript)
 │   └── Storage
 ├── Áudio & Storage CDN: Cloudflare R2
+├── Speech-to-Text (STT): AssemblyAI API (Proxy Serverless /api/stt.ts)
+├── Síntese de Voz (TTS): ElevenLabs API (Proxy Serverless /api/tts.ts)
 ├── Assinaturas & Pagamentos: Stripe API (Checkout & Webhooks)
 ├── IA & Curadoria: OpenAI GPT-4o API
 └── SEO & Entrega:

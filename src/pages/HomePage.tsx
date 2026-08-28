@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { Sparkles, ArrowRight } from "lucide-react";
 import PwaInstallCard from "@/components/PwaInstallCard";
+import QuickVoiceMemorial from "@/components/QuickVoiceMemorial";
 
 interface LastRead {
   capitulo: number;
@@ -113,6 +114,10 @@ export default function HomePage() {
     <Layout>
       <div className="flex flex-col">
         <h1 className="sr-only">Bíblia Vive — Leia e Estude a Bíblia Online</h1>
+
+        {/* Gravação Rápida por Voz para o Memorial */}
+        <QuickVoiceMemorial />
+
         {/* Livros em destaque no topo */}
         <section className="mt-2">
           <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">{t("home.oldTestament")}</h2>
