@@ -711,12 +711,42 @@ function generateArticleMetaTags(article) {
 
 function homeMetaTags() {
   const title = 'Bíblia Vive — Leia, Estude e Compartilhe a Bíblia';
-  const desc  = 'Leia, estude e compartilhe a Bíblia com comentários, planos de leitura e versículo do dia.';
+  const desc  = 'Leia, estude e compartilhe a Bíblia com comentários, planos de leitura e versículo do dia. Grave reflexões, orações e testemunhos por voz diretamente no seu Memorial espiritual.';
   const url   = `${CANONICAL_ORIGIN}/`;
+
+  const voiceSection =
+    `<section id="gravacao-por-voz" aria-labelledby="h2-voz" style="margin:2rem 0;padding:1rem 1.25rem;border-left:4px solid #c9a227;background:#faf8f0;font-family:serif">` +
+    `<h2 id="h2-voz" style="font-size:1.3rem;margin:0 0 0.5rem">Gravação por Voz para o Memorial Espiritual</h2>` +
+    `<p style="font-size:0.95rem;line-height:1.7;margin:0 0 0.75rem">O Bíblia Vive oferece gravação por voz nativa diretamente na página inicial e no Caderno de Estudos. Fale sua reflexão, oração ou testemunho e o texto é transcrito em tempo real e salvo automaticamente no seu Memorial espiritual, sem sair da tela de leitura.</p>` +
+    `<h3 style="font-size:1.05rem;margin:0.75rem 0 0.4rem">Como funciona a gravação por voz no Bíblia Vive?</h3>` +
+    `<p style="font-size:0.9rem;line-height:1.65;margin:0 0 0.75rem">Clique em "Gravar por Voz" na página inicial, selecione a categoria (Reflexão, Oração ou Testemunho), fale naturalmente em português, e clique em "Concluir e Guardar". O texto é transcrito em tempo real pela Web Speech API nativa do navegador e salvo no Memorial sem nenhum envio de áudio a servidores externos.</p>` +
+    `<h3 style="font-size:1.05rem;margin:0.75rem 0 0.4rem">Grave reflexões enquanto lê a Bíblia</h3>` +
+    `<p style="font-size:0.9rem;line-height:1.65;margin:0 0 0.75rem">No Caderno de Estudos de cada capítulo bíblico, o botão "Ditar por voz" permite registrar suas anotações sem interromper a leitura. O texto ditado é adicionado diretamente ao conteúdo do caderno e salvo automaticamente.</p>` +
+    `<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin:0.75rem 0" aria-label="Comparação das funcionalidades de gravação por voz">` +
+    `<thead><tr style="background:#f0ebe0"><th style="padding:0.4rem 0.6rem;text-align:left;border:1px solid #d9cba8">Local</th><th style="padding:0.4rem 0.6rem;text-align:left;border:1px solid #d9cba8">Funcionalidade</th><th style="padding:0.4rem 0.6rem;text-align:left;border:1px solid #d9cba8">Destino</th></tr></thead>` +
+    `<tbody>` +
+    `<tr><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Página Inicial</td><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Gravar por Voz (Reflexão, Oração, Testemunho, Propósito)</td><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Memorial Espiritual</td></tr>` +
+    `<tr><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Caderno de Estudos</td><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Ditar por Voz durante leitura do capítulo</td><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Notas do Caderno</td></tr>` +
+    `<tr><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Memorial (campos SOAP)</td><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Ditado campo a campo (Observação, Aplicação, Oração)</td><td style="padding:0.4rem 0.6rem;border:1px solid #d9cba8">Campos SOAP do Memorial</td></tr>` +
+    `</tbody></table>` +
+    `<h3 style="font-size:1.05rem;margin:0.75rem 0 0.4rem">Perguntas Frequentes sobre a Gravação por Voz</h3>` +
+    `<dl style="font-size:0.88rem;line-height:1.65">` +
+    `<dt style="font-weight:bold;margin-top:0.6rem">O áudio é enviado para algum servidor?</dt>` +
+    `<dd style="margin:0.2rem 0 0 1rem">Não. A transcrição é feita inteiramente pelo navegador (Web Speech API nativa do Chrome ou Edge), sem envio de dados de áudio a servidores do Bíblia Vive ou de terceiros.</dd>` +
+    `<dt style="font-weight:bold;margin-top:0.6rem">Quais navegadores suportam a gravação por voz?</dt>` +
+    `<dd style="margin:0.2rem 0 0 1rem">Google Chrome e Microsoft Edge em computadores e dispositivos Android. O Safari e Firefox têm suporte limitado à Web Speech API.</dd>` +
+    `<dt style="font-weight:bold;margin-top:0.6rem">Posso gravar em português do Brasil?</dt>` +
+    `<dd style="margin:0.2rem 0 0 1rem">Sim. A gravação é configurada para pt-BR, com suporte a ditado contínuo, pausas naturais e preview em tempo real do texto transcrito.</dd>` +
+    `<dt style="font-weight:bold;margin-top:0.6rem">A gravação por voz funciona sem internet?</dt>` +
+    `<dd style="margin:0.2rem 0 0 1rem">A Web Speech API requer conexão ativa para processar o reconhecimento de voz. O Bíblia Vive funciona offline para leitura, mas a gravação por voz exige internet.</dd>` +
+    `</dl>` +
+    `</section>`;
+
   const seoContent =
     `<main style="font-family:sans-serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>Bíblia Vive — Leia e Estude a Bíblia Online</h1>` +
     `<p>${desc}</p>` +
+    voiceSection +
     `<nav aria-label="Navegação principal"><ul>` +
     `<li><a href="/acf/gn/1">Bíblia ACF — Almeida Corrigida Fiel</a></li>` +
     `<li><a href="/arc/gn/1">Bíblia ARC — Almeida Revista e Corrigida</a></li>` +
@@ -752,6 +782,70 @@ function homeMetaTags() {
       sameAs: [
         'https://www.instagram.com/biblia.vive/',
         'https://www.facebook.com/bibliavive/'
+      ]
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      '@id': `${CANONICAL_ORIGIN}#app`,
+      name: 'Bíblia Vive',
+      url,
+      description: 'Aplicativo web progressivo (PWA) para leitura, estudo e compartilhamento da Bíblia em português e inglês. Inclui planos de leitura, memorial espiritual, caderno de estudos, gravação por voz, comentários e destaques.',
+      applicationCategory: 'LifestyleApplication',
+      operatingSystem: 'Web, Android, iOS',
+      inLanguage: ['pt-BR', 'en', 'es'],
+      featureList: [
+        'Leitura da Bíblia em 8 versões (ACF, ARC, NVI, AA, KJA, KJV, BBE, RVR)',
+        'Gravação por voz para registrar reflexões, orações e testemunhos no Memorial',
+        'Ditado por voz no Caderno de Estudos durante a leitura de capítulos',
+        'Memorial espiritual com categorias SOAP, Oração, Testemunho e Propósito',
+        'Caderno de estudos bíblicos por capítulo',
+        'Planos de leitura (30, 90 e 365 dias)',
+        'Versículo do dia',
+        'Destaques e anotações nos versículos',
+        'Compartilhamento de versículos como imagem',
+        'Modo offline (PWA)',
+        'Comentários bíblicos',
+        'Jornadas contemplativas'
+      ],
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'BRL',
+        availability: 'https://schema.org/InStock'
+      },
+      publisher: {
+        '@id': `${CANONICAL_ORIGIN}#organization`
+      }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'O Bíblia Vive tem gravação por voz?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sim. O Bíblia Vive possui gravação por voz nativa na página inicial (para salvar no Memorial Espiritual) e no Caderno de Estudos de cada capítulo. A transcrição é feita em tempo real pelo navegador (Web Speech API), sem envio de áudio a servidores externos, com suporte ao português do Brasil.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Como gravar reflexões por voz na Bíblia Vive?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Na página inicial do Bíblia Vive, clique em "Gravar por Voz", escolha a categoria (Reflexão, Oração, Testemunho ou Propósito), fale naturalmente em português e clique em "Concluir e Guardar". O texto é transcrito em tempo real e salvo automaticamente no Memorial Espiritual.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Posso ditar anotações enquanto leio a Bíblia?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sim. No Caderno de Estudos de cada capítulo bíblico, o botão "Ditar por voz" permite registrar suas anotações sem sair da tela de leitura. O texto ditado é adicionado diretamente ao caderno e salvo automaticamente no Bíblia Vive.'
+          }
+        }
       ]
     }
   ];
