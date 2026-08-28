@@ -235,15 +235,17 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
 
     if (supabaseUrl && supabaseServiceKey) {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      const { count, error: updateError } = await supabase
+      const { data, error: updateError } = await supabase
         .from(table)
         .update({ notification_sent_at: new Date().toISOString() })
         .eq("id", record.id)
-        .select("id", { count: "exact" });
+        .select("id");
+
+      const count = data?.length ?? 0;
 
       if (updateError) {
         console.warn(`[on-publish] Could not update notification_sent_at for ${table}:${record.id}:`, updateError.message);
-      } else if ((count ?? 0) === 0) {
+      } else if (count === 0) {
         // Outra instância do webhook já marcou antes — descartamos silenciosamente
         console.warn(`[on-publish] notification_sent_at já marcado por outra instância — descartando para ${table}:${record.id}`);
       } else {
