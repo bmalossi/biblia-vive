@@ -60,9 +60,9 @@ describe("SaveMemorialButton", () => {
     expect(screen.getByText("Guardado")).toBeInTheDocument();
     expect(navigator.vibrate).toHaveBeenCalledWith(35);
 
-    // Advance timer to trigger onSuccessComplete
+    // Advance timer to trigger onSuccessComplete (SUCCESS_HOLD_MS = 1800)
     act(() => {
-      vi.advanceTimersByTime(500);
+      vi.advanceTimersByTime(1800);
     });
 
     expect(onSuccessComplete).toHaveBeenCalledTimes(1);

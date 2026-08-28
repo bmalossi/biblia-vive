@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Mic, Square, Loader2, CheckCircle2, RefreshCw, Edit3, ArrowRight, AlertCircle, Info } from "lucide-react";
+import { Mic, Square, Check, RefreshCw, Edit3, ArrowRight, AlertCircle, Info } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { createNoteStore, MemorialCategory, MemorialEntry } from "@/lib/noteStore";
+import { createNoteStore, MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import MemorialEntryModal from "./MemorialEntryModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const MAX_RECORDING_SECONDS = 120; // 2 minutos máximo
+const SUCCESS_HOLD_MS = 1800; // Tempo do brilho de selamento ("Guardado no Coração")
+const HAPTIC_PULSE_MS = 35; // Duração da vibração háptica
 
 export default function QuickVoiceMemorial() {
     const { user } = useAuth();
@@ -16,6 +18,7 @@ export default function QuickVoiceMemorial() {
     const [category, setCategory] = useState<MemorialCategory>("reflection");
     const [isRecording, setIsRecording] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isSealing, setIsSealing] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [transcribedText, setTranscribedText] = useState<string | null>(null);
     const [savedEntry, setSavedEntry] = useState<MemorialEntry | null>(null);
@@ -27,6 +30,16 @@ export default function QuickVoiceMemorial() {
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<number | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
+
+    const triggerHaptic = () => {
+        if (typeof navigator !== "undefined" && "vibrate" in navigator && typeof navigator.vibrate === "function") {
+            try {
+                navigator.vibrate(HAPTIC_PULSE_MS);
+            } catch {
+                // Degrada silenciosamente se não for permitido
+            }
+        }
+    };
 
     const cleanupAudioStream = () => {
         if (streamRef.current) {
@@ -246,21 +259,29 @@ export default function QuickVoiceMemorial() {
 
             window.dispatchEvent(new CustomEvent("bv-memorial-updated"));
 
-            toast.success("Gravado e salvo com sucesso no seu Memorial!", {
-                description: text.length > 70 ? `${text.slice(0, 70)}...` : text,
-                action: {
-                    label: "Editar",
-                    onClick: () => setIsEditModalOpen(true),
-                },
-                duration: 6000,
-            });
+            // ── Disparo Sensorial de Selamento ──────────────────────────────
+            setIsProcessing(false);
+            setIsSealing(true);
+            triggerHaptic();
+
+            setTimeout(() => {
+                setIsSealing(false);
+                toast.success("Gravado e salvo com sucesso no seu Memorial!", {
+                    description: text.length > 70 ? `${text.slice(0, 70)}...` : text,
+                    action: {
+                        label: "Editar",
+                        onClick: () => setIsEditModalOpen(true),
+                    },
+                    duration: 6000,
+                });
+            }, SUCCESS_HOLD_MS);
 
         } catch (err: any) {
             console.error("Erro na transcrição:", err);
             setErrorMessage(err.message || "Ocorreu um erro ao transcrever o áudio.");
             toast.error(err.message || "Erro ao transcrever.");
-        } finally {
             setIsProcessing(false);
+        } finally {
             audioChunksRef.current = [];
         }
     };
@@ -357,20 +378,22 @@ export default function QuickVoiceMemorial() {
                 </div>
             )}
 
-            {/* Estado: GRAVANDO */}
+            {/* Estado 1: GRAVANDO (Aura dourada/sépia pulsante e ondas sutis) */}
             {isRecording && (
-                <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-gold/40 bg-surface/90 px-4 py-3">
-                    <div className="flex items-center gap-2.5">
+                <div className="mt-3 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-gold/60 bg-surface/95 px-4 py-3.5 animate-pulse-aura transition-all">
+                    <div className="flex items-center gap-3">
                         <span className="relative flex h-3.5 w-3.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-red-500"></span>
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/80 opacity-75"></span>
+                            <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-gold"></span>
                         </span>
-                        <p className="font-serif text-sm text-app-text">
-                            Ouvindo você...
-                        </p>
-                        <span className="font-mono text-xs text-gold">
-                            {formatSeconds(recordingTime)} / {formatSeconds(MAX_RECORDING_SECONDS)}
-                        </span>
+                        <div>
+                            <p className="font-serif text-sm font-medium text-app-text flex items-center gap-2">
+                                <span>Ouvindo com reverência...</span>
+                            </p>
+                            <span className="font-mono text-[0.72rem] text-gold/90">
+                                {formatSeconds(recordingTime)} / {formatSeconds(MAX_RECORDING_SECONDS)}
+                            </span>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -384,31 +407,55 @@ export default function QuickVoiceMemorial() {
                         <button
                             type="button"
                             onClick={stopRecording}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3.5 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-gold/90 shadow-2xs transition-all"
+                            className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3.5 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-gold/90 shadow-xs transition-all active:scale-[0.98]"
                         >
                             <Square className="h-3 w-3 fill-current" />
-                            Concluir e Salvar
+                            Concluir e Guardar
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Estado: TRANSCREVENDO */}
+            {/* Estado 2: TRANSCREVENDO / TRANSMISSÃO (A Pokébola Chacoalhando - Feixe Metálico em Loop) */}
             {isProcessing && (
-                <div className="mt-3 flex items-center justify-center gap-2.5 rounded-xl border border-gold/30 bg-surface/90 p-4">
-                    <Loader2 className="h-4 w-4 animate-spin text-gold" />
-                    <p className="font-serif text-xs text-app-text">
-                        Transcrevendo e guardando no Memorial...
-                    </p>
+                <div className="mt-3 relative overflow-hidden flex items-center justify-center gap-3 rounded-xl border border-gold/40 bg-surface/95 p-4.5 shadow-sm">
+                    {/* Feixe metálico fluindo continuamente em loop */}
+                    <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+                        <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-gold/25 to-transparent skew-x-12 animate-sweep-infinite" />
+                    </div>
+
+                    <div className="relative flex items-center gap-2.5 z-10">
+                        <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin shrink-0" />
+                        <p className="font-serif text-xs font-medium text-app-text animate-shimmer-pulse">
+                            Transcrevendo e guardando no Memorial...
+                        </p>
+                    </div>
                 </div>
             )}
 
-            {/* Estado: TRANSCRIÇÃO CONCLUÍDA */}
-            {transcribedText && savedEntry && !isRecording && !isProcessing && (
-                <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-gold/40 bg-surface/95 p-4">
+            {/* Estado 3: O SELAMENTO (O Brilho do Sucesso / "Guardado no Coração") */}
+            {isSealing && (
+                <div className="mt-3 relative overflow-hidden flex items-center justify-center gap-2.5 rounded-xl border border-emerald-500 bg-emerald-600/90 text-white p-4.5 shadow-[0_0_20px_rgba(16,185,129,0.35)] animate-scale-in">
+                    {/* Feixe de Luz Metálica de Celebração */}
+                    <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+                        <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 animate-sweep" />
+                    </div>
+
+                    <div className="relative flex items-center gap-2 z-10">
+                        <Check className="w-4 h-4 text-white shrink-0" />
+                        <span className="font-sans font-semibold text-xs tracking-wide">
+                            Guardado no Coração
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {/* Estado 4: TRANSCRIÇÃO CONCLUÍDA E REVELADA */}
+            {transcribedText && savedEntry && !isRecording && !isProcessing && !isSealing && (
+                <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-gold/40 bg-surface/95 p-4 animate-scale-in">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <Check className="h-3.5 w-3.5" />
                             <span>Salvo no Memorial</span>
                         </div>
                         <button
