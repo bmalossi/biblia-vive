@@ -32,6 +32,8 @@ import type { SaveStatus } from "@/hooks/useNotebooks";
 import { exportNotebooksToPDF, exportNotebooksToWord } from "@/lib/notebookExport";
 import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 
+import VoiceRecordButton from "@/components/VoiceRecordButton";
+
 interface NotebookEditorProps {
     notebook: ChapterNotebook | null; // null = novo caderno em branco
     contextLabel: string; // ex: "Romanos 8 - ACF"
@@ -247,10 +249,21 @@ export default function NotebookEditor({
 
             {/* Corpo do editor */}
             <div className="flex flex-col flex-1 min-h-0 px-4 py-3 gap-2">
-                {/* Contexto do capítulo (read-only) */}
-                <p className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-gold shrink-0">
-                    {contextLabel}
-                </p>
+                {/* Contexto do capítulo + Botão Gravar por Voz */}
+                <div className="flex items-center justify-between shrink-0">
+                    <p className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-gold">
+                        {contextLabel}
+                    </p>
+                    <VoiceRecordButton
+                        currentValue={content}
+                        onTranscript={(newText) => {
+                            setContent(newText);
+                            onSave({ id: notebook?.id, title: title || null, content: newText });
+                        }}
+                        label="Ditar por voz"
+                        size="sm"
+                    />
+                </div>
 
                 {/* Título */}
                 <input

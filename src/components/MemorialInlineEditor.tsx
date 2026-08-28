@@ -11,6 +11,7 @@ import { ArrowLeft, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
 import { SaveMemorialButton } from "@/components/SaveMemorialButton";
+import VoiceRecordButton from "@/components/VoiceRecordButton";
 
 interface MemorialInlineEditorProps {
     category: MemorialCategory;
@@ -328,9 +329,16 @@ export default function MemorialInlineEditor({
                     <div className="space-y-2.5">
                         {includeReference && (
                             <div>
-                                <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                    S — Escritura (Palavra)
-                                </label>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                        S — Escritura (Palavra)
+                                    </label>
+                                    <VoiceRecordButton
+                                        currentValue={soapS}
+                                        onTranscript={setSoapS}
+                                        size="icon"
+                                    />
+                                </div>
                                 <textarea
                                     value={soapS}
                                     onChange={(e) => setSoapS(e.target.value)}
@@ -341,9 +349,16 @@ export default function MemorialInlineEditor({
                             </div>
                         )}
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                O — Observação (O que Deus diz neste texto?)
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    O — Observação (O que Deus diz neste texto?)
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={soapO}
+                                    onTranscript={setSoapO}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={soapO}
                                 onChange={(e) => setSoapO(e.target.value)}
@@ -353,9 +368,16 @@ export default function MemorialInlineEditor({
                             />
                         </div>
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                A — Aplicação (Como aplico isso hoje?)
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    A — Aplicação (Como aplico isso hoje?)
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={soapA}
+                                    onTranscript={setSoapA}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={soapA}
                                 onChange={(e) => setSoapA(e.target.value)}
@@ -365,9 +387,16 @@ export default function MemorialInlineEditor({
                             />
                         </div>
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                P — Oração (Sua resposta a Deus)
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    P — Oração (Sua resposta a Deus)
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={soapP}
+                                    onTranscript={setSoapP}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={soapP}
                                 onChange={(e) => setSoapP(e.target.value)}
@@ -382,9 +411,16 @@ export default function MemorialInlineEditor({
                 {selectedCategory === "prayer" && (
                     <div className="space-y-2.5">
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                Motivo da Oração
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    Motivo da Oração
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={motivo}
+                                    onTranscript={setMotivo}
+                                    size="icon"
+                                />
+                            </div>
                             <input
                                 type="text"
                                 value={motivo}
@@ -394,9 +430,16 @@ export default function MemorialInlineEditor({
                             />
                         </div>
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                Seu Pedido Diante de Deus
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    Seu Pedido Diante de Deus
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={pedido}
+                                    onTranscript={setPedido}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={pedido}
                                 onChange={(e) => setPedido(e.target.value)}
@@ -406,9 +449,16 @@ export default function MemorialInlineEditor({
                             />
                         </div>
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                Entrega / Surrender
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    Entrega / Surrender
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={entrega}
+                                    onTranscript={setEntrega}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={entrega}
                                 onChange={(e) => setEntrega(e.target.value)}
@@ -423,9 +473,16 @@ export default function MemorialInlineEditor({
                 {selectedCategory === "testimony" && (
                     <div className="space-y-2.5">
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                O que aconteceu?
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    O que aconteceu?
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={oQueAconteceu}
+                                    onTranscript={setOQueAconteceu}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={oQueAconteceu}
                                 onChange={(e) => setOQueAconteceu(e.target.value)}
@@ -435,9 +492,16 @@ export default function MemorialInlineEditor({
                             />
                         </div>
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                Como Deus sustentou essa caminhada?
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    Como Deus sustentou essa caminhada?
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={comoDeusSustentou}
+                                    onTranscript={setComoDeusSustentou}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={comoDeusSustentou}
                                 onChange={(e) => setComoDeusSustentou(e.target.value)}
@@ -463,9 +527,16 @@ export default function MemorialInlineEditor({
                 {selectedCategory === "fasting" && (
                     <div className="space-y-2.5">
                         <div>
-                            <label className="block text-[0.7rem] font-sans text-gold font-medium mb-1">
-                                Objetivo do Propósito / Jejum
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[0.7rem] font-sans text-gold font-medium">
+                                    Objetivo do Propósito / Jejum
+                                </label>
+                                <VoiceRecordButton
+                                    currentValue={objetivo}
+                                    onTranscript={setObjetivo}
+                                    size="icon"
+                                />
+                            </div>
                             <textarea
                                 value={objetivo}
                                 onChange={(e) => setObjetivo(e.target.value)}

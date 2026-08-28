@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import MemorialEntryModal from "./MemorialEntryModal";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ensureMicrophonePermission } from "@/lib/microphonePermission";
 
 const MAX_RECORDING_SECONDS = 120; // 2 minutos máximo
 const SUCCESS_HOLD_MS = 1800;
@@ -30,8 +31,12 @@ export default function QuickVoiceMemorial() {
     // Web Speech API refs
     const recognitionRef = useRef<any>(null);
     const accumulatedFinalRef = useRef<string>("");
+    const interimRef = useRef<string>("");
     const isCancelledRef = useRef<boolean>(false);
+    const isRecordingRef = useRef<boolean>(false);
+    const isManualStopRef = useRef<boolean>(false);
     const timerRef = useRef<number | null>(null);
+    const restartTimeoutRef = useRef<number | null>(null);
     const categoryRef = useRef<MemorialCategory>(category);
 
     // Mantém categoryRef sincronizado para usar dentro do onend
@@ -50,11 +55,16 @@ export default function QuickVoiceMemorial() {
             clearInterval(timerRef.current);
             timerRef.current = null;
         }
+        if (restartTimeoutRef.current) {
+            clearTimeout(restartTimeoutRef.current);
+            restartTimeoutRef.current = null;
+        }
     };
 
     // Limpar recursos ao desmontar
     useEffect(() => {
         return () => {
+            isRecordingRef.current = false;
             stopTimer();
             if (recognitionRef.current) {
                 try { recognitionRef.current.abort(); } catch { /* silencioso */ }
@@ -66,7 +76,7 @@ export default function QuickVoiceMemorial() {
     // ── Salvar texto transcrito no Memorial ──────────────────────────────────
     const handleSaveText = async (text: string) => {
         if (!text.trim()) {
-            setErrorMessage("Nenhuma fala foi detectada. Tente novamente.");
+            setErrorMessage("Nenhuma fala foi detectada. Tente falar novamente.");
             return;
         }
 
@@ -149,14 +159,107 @@ export default function QuickVoiceMemorial() {
         }
     };
 
+    const setupRecognition = () => {
+        const SpeechRecognitionAPI =
+            (window as any).SpeechRecognition ||
+            (window as any).webkitSpeechRecognition;
+
+        if (!SpeechRecognitionAPI) return null;
+
+        const recognition = new SpeechRecognitionAPI();
+        recognition.lang = "pt-BR";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event: any) => {
+            let interim = "";
+            let finalStr = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalStr += transcript + " ";
+                } else {
+                    interim += transcript;
+                }
+            }
+            if (finalStr) {
+                accumulatedFinalRef.current += finalStr;
+            }
+            interimRef.current = interim;
+            setInterimText(interim);
+        };
+
+        recognition.onerror = (event: any) => {
+            if (event.error === "aborted" || event.error === "no-speech") return;
+
+            isRecordingRef.current = false;
+            isManualStopRef.current = false;
+            stopTimer();
+            setIsRecording(false);
+            setInterimText("");
+            interimRef.current = "";
+            recognitionRef.current = null;
+
+            const errorMap: Record<string, string> = {
+                "not-allowed": "Permissão de microfone negada. Permita o microfone no navegador.",
+                "audio-capture": "Microfone não encontrado ou indisponível.",
+                "network": "Erro de rede no serviço de voz.",
+                "service-not-allowed": "Serviço de voz não disponível.",
+            };
+            setErrorMessage(errorMap[event.error] || `Erro: ${event.error}`);
+        };
+
+        recognition.onend = () => {
+            // Se a sessão ainda está ativa e o usuário NÃO clicou em Concluir/Cancelar,
+            // o Chrome pausou por silêncio. Reinicia sem interrupção para o usuário.
+            if (isRecordingRef.current && !isManualStopRef.current && !isCancelledRef.current) {
+                restartTimeoutRef.current = window.setTimeout(() => {
+                    if (isRecordingRef.current && !isManualStopRef.current && !isCancelledRef.current) {
+                        try {
+                            const nextRec = setupRecognition();
+                            if (nextRec) {
+                                nextRec.start();
+                                recognitionRef.current = nextRec;
+                            }
+                        } catch {
+                            // Ignora e tenta na próxima
+                        }
+                    }
+                }, 50);
+                return;
+            }
+
+            // Encerramento voluntário
+            stopTimer();
+            setIsRecording(false);
+            setInterimText("");
+            interimRef.current = "";
+            recognitionRef.current = null;
+
+            if (isManualStopRef.current && !isCancelledRef.current) {
+                const finalText = accumulatedFinalRef.current.trim();
+                if (finalText) {
+                    handleSaveText(finalText);
+                } else {
+                    setErrorMessage("Nenhuma fala foi detectada. Tente falar novamente.");
+                }
+            }
+        };
+
+        return recognition;
+    };
+
     // ── Iniciar gravação (Web Speech API) ────────────────────────────────────
-    const startRecording = () => {
+    const startRecording = async () => {
         setErrorMessage(null);
         setTranscribedText(null);
         setSavedEntry(null);
         setInterimText("");
+        interimRef.current = "";
         accumulatedFinalRef.current = "";
         isCancelledRef.current = false;
+        isManualStopRef.current = false;
 
         const SpeechRecognitionAPI =
             (window as any).SpeechRecognition ||
@@ -169,54 +272,18 @@ export default function QuickVoiceMemorial() {
             return;
         }
 
+        // Garante que o navegador exiba o pop-up nativo de permissão se ainda não foi autorizado
+        const permResult = await ensureMicrophonePermission();
+        if (!permResult.ok) {
+            setErrorMessage(permResult.error || "Microfone não autorizado.");
+            return;
+        }
+
+        isRecordingRef.current = true;
+
         try {
-            const recognition = new SpeechRecognitionAPI();
-            recognition.lang = "pt-BR";
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-
-            recognition.onresult = (event: any) => {
-                let interim = "";
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        accumulatedFinalRef.current += transcript + " ";
-                    } else {
-                        interim = transcript;
-                    }
-                }
-                setInterimText(interim);
-            };
-
-            recognition.onerror = (event: any) => {
-                stopTimer();
-                setIsRecording(false);
-                setInterimText("");
-
-                if (event.error === "aborted") return; // ignorar cancels
-
-                const errorMap: Record<string, string> = {
-                    "not-allowed": "Permissão de microfone negada. Permita o microfone no navegador.",
-                    "no-speech": "Nenhuma fala detectada. Tente novamente.",
-                    "audio-capture": "Não foi possível acessar o microfone.",
-                    "network": "Erro de rede no reconhecimento de voz.",
-                };
-                setErrorMessage(errorMap[event.error] || `Erro no reconhecimento: ${event.error}`);
-            };
-
-            recognition.onend = () => {
-                stopTimer();
-                setIsRecording(false);
-                setInterimText("");
-                recognitionRef.current = null;
-
-                if (!isCancelledRef.current) {
-                    const finalText = accumulatedFinalRef.current.trim();
-                    handleSaveText(finalText);
-                }
-                isCancelledRef.current = false;
-            };
+            const recognition = setupRecognition();
+            if (!recognition) return;
 
             recognition.start();
             recognitionRef.current = recognition;
@@ -234,23 +301,50 @@ export default function QuickVoiceMemorial() {
             }, 1000);
 
         } catch (err: any) {
+            isRecordingRef.current = false;
+            setIsRecording(false);
             setErrorMessage(err.message || "Não foi possível iniciar o reconhecimento de voz.");
         }
     };
 
     // ── Parar gravação (salva) ───────────────────────────────────────────────
     const stopRecording = () => {
+        isManualStopRef.current = true;
+        isRecordingRef.current = false;
         stopTimer();
+        setIsRecording(false);
+
         if (recognitionRef.current) {
-            try { recognitionRef.current.stop(); } catch { /* silencioso */ }
+            try {
+                recognitionRef.current.stop();
+            } catch {
+                // Se .stop() falhar, salva diretamente
+                recognitionRef.current = null;
+                const finalText = accumulatedFinalRef.current.trim();
+                if (finalText) {
+                    handleSaveText(finalText);
+                } else {
+                    setErrorMessage("Nenhuma fala foi detectada. Tente falar novamente.");
+                }
+            }
+        } else {
+            const finalText = accumulatedFinalRef.current.trim();
+            if (finalText) {
+                handleSaveText(finalText);
+            } else {
+                setErrorMessage("Nenhuma fala foi detectada. Tente falar novamente.");
+            }
         }
     };
 
     // ── Cancelar gravação (descarta) ─────────────────────────────────────────
     const cancelRecording = () => {
         isCancelledRef.current = true;
+        isManualStopRef.current = false;
+        isRecordingRef.current = false;
         stopTimer();
         setInterimText("");
+        interimRef.current = "";
         accumulatedFinalRef.current = "";
         if (recognitionRef.current) {
             try { recognitionRef.current.abort(); } catch { /* silencioso */ }

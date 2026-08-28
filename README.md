@@ -28,7 +28,8 @@ Unindo fidelidade teológica, curadoria histórica, inteligência de dados e des
 * **Referências Cruzadas & Contexto**: Informações sobre autoria, época, público-alvo, temas-chave e conexões teológicas imediatas por capítulo e versículo.
 
 ### 📓 Cadernos de Estudo (Estudo por Capítulo & Temático)
-* **Workspace Dedicado de Anotações**: Interface em gaveta flutuante (*bottom sheet* no mobile e painel lateral no desktop) que permite escrever sem perder a visão do texto bíblico.
+* **Workspace Dedicado de Anotações**: Interface em gaveta flutuante (*bottom sheet* no mobile e painel lateral no desktop) que permite escrever ou ditar por voz sem perder a visão do texto bíblico.
+* **Ditado por Voz Integrado**: Botão de captura rápida por voz integrado diretamente no editor de anotações e em todos os formulários do Memorial (Reflexão SOAP, Oração, Testemunho, Propósito), permitindo registrar pensamentos em tempo real sem precisar digitar enquanto lê.
 * **Organização Flexível**: Cadernos vinculados a capítulos específicos ou globais por tema, com suporte a formatação avançada (Markdown e Rich Text).
 * **Exportação Completa**: Exporte seus cadernos e anotações diretamente em **PDF** ou **Word (.docx)** diagramados.
 
