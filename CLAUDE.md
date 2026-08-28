@@ -14,6 +14,6 @@ needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/a
 
 Single-context — one CONTEXT.md + docs/adr/ at repo root. See `docs/agents/domain.md`.
 
-### Speech-to-Text (AssemblyAI)
+### Speech-to-Text
 
-Serverless STT proxy in `/api/stt.ts` using AssemblyAI API (`universal-2`, `language_code: "pt"`). Never expose `ASSEMBLYAI_API_KEY` to client code.
+Client-side native Web Speech API (`SpeechRecognition` pt-BR) in `src/components/QuickVoiceMemorial.tsx` for real-time zero-latency transcription. Serverless STT proxy in `/api/stt.ts` kept as fallback infrastructure. Never expose private API keys to client code.

@@ -10,10 +10,12 @@ A interface precisava disponibilizar uma ferramenta de captura imediata de áudi
 
 ## Decisões de Arquitetura
 
-1. **Provedor e Modelo de Speech-to-Text (AssemblyAI):**
-   - Utilização da API da **AssemblyAI** em modo pré-gravado (`pre-recorded`), via upload direto de áudio WebM gravado pelo navegador.
-   - Adoção do modelo **`universal-2`** (`speech_models: ["universal-2"]`) para o MVP, garantindo a opção de melhor custo-benefício.
-   - Parâmetros configurados para pontuação automática (`punctuate: true`), formatação de texto (`format_text: true`) e idioma português (`language_code: "pt"`).
+1. **Mecanismo de Transcrição: Web Speech API (Nativa do Navegador)**
+   - Adoção da **Web Speech API** (`SpeechRecognition` / `webkitSpeechRecognition`) como mecanismo primário de transcrição, operando 100% no cliente (Chrome, Edge, Safari).
+   - Configuração: `lang: "pt-BR"`, `continuous: true`, `interimResults: true` — transcrição em tempo real enquanto o usuário fala, com preview inline visível durante a gravação.
+   - **Zero backend, zero timeout, zero custo** — elimina completamente o gargalo de upload de áudio binário para Vercel (que causava erros 504 Gateway Timeout no plano Hobby).
+   - Fallback com mensagem explicativa para browsers sem suporte (Firefox).
+   - A `api/stt.ts` permanece disponível como infraestrutura futura caso seja necessário processamento server-side avançado (ex: diarização, timestamps por palavra).
 
 2. **Segurança de Credenciais e Proxy Serverless Assíncrono (`/api/stt.ts`):**
    - A chave de API (`ASSEMBLYAI_API_KEY`) reside estritamente no ambiente do servidor (`.env`, `.env.local` e Vercel Environment Variables).
