@@ -1035,6 +1035,37 @@ export default function ReadingPage() {
     };
   }, [selectedBook, chapterNumber, location.pathname]);
 
+  // Eager Speculation Rules para o Próximo Capítulo (LCP = 0ms ao virar a página)
+  useEffect(() => {
+    if (!nextChapterInfo) return;
+    const nextUrl = `/${selectedVersion}/${nextChapterInfo.book.slug}/${nextChapterInfo.chapter}`;
+
+    const scriptId = "bv-speculation-next-chapter";
+    const existing = document.getElementById(scriptId);
+    if (existing) existing.remove();
+
+    if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+      const specScript = document.createElement("script");
+      specScript.id = scriptId;
+      specScript.type = "speculationrules";
+      specScript.textContent = JSON.stringify({
+        prerender: [
+          {
+            source: "list",
+            urls: [nextUrl],
+            eagerness: "eager"
+          }
+        ]
+      });
+      document.head.appendChild(specScript);
+    }
+
+    return () => {
+      const script = document.getElementById(scriptId);
+      if (script) script.remove();
+    };
+  }, [nextChapterInfo, selectedVersion]);
+
   const handleVersionChange = (nextVersion: BibleVersion) => {
     setVersion(nextVersion);
     if (!selectedBook) {

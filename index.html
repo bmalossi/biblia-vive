@@ -16,7 +16,16 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-        gtag('config', 'G-RNJ3P0061E', { send_page_view: true });
+
+        // Proteção para Speculation Rules: não envia pageview prematuro em aba de background prerender
+        var sendPageConfig = function() {
+          gtag('config', 'G-RNJ3P0061E', { send_page_view: true });
+        };
+        if (document.prerendering) {
+          document.addEventListener('prerenderingchange', sendPageConfig, { once: true });
+        } else {
+          sendPageConfig();
+        }
       };
     });
   </script>
@@ -145,9 +154,28 @@
       "source": "document",
       "where": {
         "and": [
-          {"href_matches": "/*"},
-          {"not": {"href_matches": ["/api/*", "/pro/*"]}}
+          { "href_matches": "/*" },
+          { "not": { "href_matches": [
+            "/api/*",
+            "/admin",
+            "/admin/*",
+            "/pro",
+            "/pro/*",
+            "/conta",
+            "/conta/*",
+            "/auth/*"
+          ]}},
+          { "not": { "selector_matches": ".do-not-prerender" }},
+          { "not": { "selector_matches": "[rel~=nofollow]" }},
+          { "not": { "selector_matches": "[target=_blank]" }}
         ]
+      },
+      "eagerness": "moderate"
+    }],
+    "prefetch": [{
+      "source": "document",
+      "where": {
+        "not": { "href_matches": "/*" }
       },
       "eagerness": "moderate"
     }]
