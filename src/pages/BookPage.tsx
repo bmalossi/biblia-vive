@@ -6,12 +6,30 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 import { useTranslation } from "@/i18n";
 import { Link, useParams } from "react-router-dom";
 import bookContextsData from "@/data/book-contexts.json";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useChapterViews, formatViewedAt } from "@/hooks/useChapterViews";
 
 export default function BookPage() {
   const { version, book } = useParams();
   const selectedVersion = isBibleVersion(version) ? version : getVersion();
   const selectedBook = findBookBySlug(book);
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const chapterViews = useChapterViews();
+  const [chapterViewDates, setChapterViewDates] = useState<Record<number, Date>>({});
+
+  useEffect(() => {
+    if (!selectedBook || !user?.id) {
+      setChapterViewDates({});
+      return;
+    }
+    let cancelled = false;
+    chapterViews.loadForBook(selectedBook.id).then((dates) => {
+      if (!cancelled) setChapterViewDates(dates);
+    });
+    return () => { cancelled = true; };
+  }, [selectedBook?.id, user?.id]);
 
   // Busca o contexto do livro de forma síncrona (import estático = SEO-friendly)
   const bookCtx = selectedBook
@@ -86,15 +104,25 @@ export default function BookPage() {
         aria-label={`Capítulos de ${selectedBook.name}`}
         className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-2 sm:grid-cols-[repeat(auto-fill,minmax(56px,1fr))]"
       >
-        {Array.from({ length: selectedBook.chapters }, (_, index) => index + 1).map((chapter) => (
-          <Link
-            className="flex h-12 items-center justify-center rounded-lg border border-border bg-app-raised font-sans text-sm text-app-text transition-colors hover:border-gold hover:bg-gold hover:text-primary-foreground"
-            key={chapter}
-            to={`/${selectedVersion}/${selectedBook.slug}/${chapter}`}
-          >
-            {chapter}
-          </Link>
-        ))}
+        {Array.from({ length: selectedBook.chapters }, (_, index) => index + 1).map((chapter) => {
+            const viewedAt = chapterViewDates[chapter];
+            const isVisited = !!viewedAt;
+            return (
+              <Link
+                className={[
+                  "flex h-12 items-center justify-center rounded-lg border font-sans text-sm transition-colors hover:border-gold hover:bg-gold hover:text-primary-foreground",
+                  isVisited
+                    ? "border-gold/40 bg-app-raised text-app-text"
+                    : "border-border bg-app-raised text-app-text",
+                ].join(" ")}
+                key={chapter}
+                title={isVisited ? `Visitado em ${formatViewedAt(viewedAt)}` : undefined}
+                to={`/${selectedVersion}/${selectedBook.slug}/${chapter}`}
+              >
+                {chapter}
+              </Link>
+            );
+          })}
       </section>
 
       {/* Divisor + Contexto do livro */}

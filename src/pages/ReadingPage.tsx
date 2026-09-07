@@ -80,6 +80,7 @@ import { requestCommentary } from "@/lib/studyPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotebookContext } from "@/contexts/NotebookContext";
 import { useCommentaryQuota } from "@/hooks/useCommentaryQuota";
+import { useChapterViews, formatViewedAt } from "@/hooks/useChapterViews";
 
 interface BookContextData {
   name: string;
@@ -295,6 +296,10 @@ export default function ReadingPage() {
   const [isChapterCommentaryLoading, setIsChapterCommentaryLoading] = useState(false);
   const { remaining: freeChapterCommentaryCount, canUse: hasFreeChapterCommentary, consume: consumeFreeChapterCommentary, setRemaining: setRemainingFreeChapterCommentary } = useCommentaryQuota('chapter');
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
+
+  // Última visualização por capítulo
+  const chapterViews = useChapterViews();
+  const [previousViewedAt, setPreviousViewedAt] = useState<Date | null>(null);
 
   // Estados do Eco do Memorial
   const [echoResult, setEchoResult] = useState<EchoResult | null>(null);
@@ -778,6 +783,49 @@ export default function ReadingPage() {
     if (!selectedBook) return;
     saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
   }, [chapterNumber, selectedBook, selectedVersion, user?.id]);
+
+  // Busca data anterior imediatamente (antes de registrar a visita atual)
+  useEffect(() => {
+    if (!selectedBook || !user?.id) {
+      setPreviousViewedAt(null);
+      return;
+    }
+    let cancelled = false;
+    chapterViews.getPreviousViewedAt(selectedBook.id, chapterNumber).then((prev) => {
+      if (!cancelled) setPreviousViewedAt(prev);
+    });
+    return () => { cancelled = true; };
+  }, [chapterNumber, selectedBook?.id, user?.id]);
+
+  // Registra visita apenas quando o leitor comprova engajamento:
+  // — ficou ≥ 60 segundos no capítulo, OU
+  // — rolou até o final da página (margem de 50px)
+  useEffect(() => {
+    if (!selectedBook || !user?.id) return;
+
+    let recorded = false;
+    const recordView = () => {
+      if (recorded) return;
+      recorded = true;
+      chapterViews.record(selectedBook.id, chapterNumber);
+    };
+
+    // Critério 1: 60 segundos contínuos
+    const timer = window.setTimeout(recordView, 60_000);
+
+    // Critério 2: scroll até o final da página
+    const onScroll = () => {
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      if (total - scrolled < 50) recordView();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [chapterNumber, selectedBook?.id, user?.id]);
 
   // Store estável para o Eco do Memorial (evita recriar a cada render)
   const echoStore = useMemo(() => createNoteStore(user?.id ?? null), [user?.id]);
@@ -1648,7 +1696,13 @@ export default function ReadingPage() {
               className="w-full shrink-0 rounded-2xl border border-border bg-app-surface px-4 py-7 md:px-6"
               style={{ maxWidth: compareEnabled ? "1120px" : "var(--column-width)" }}
             >
-              <h1 className="mb-4 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
+              <h1 className="mb-1 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
+              {previousViewedAt && user && (
+                <p className="mb-4 font-sans text-xs text-app-text-muted">
+                  Última visualização: {formatViewedAt(previousViewedAt)}
+                </p>
+              )}
+              {!previousViewedAt && <div className="mb-4" />}
               {chapterData?.fallbackNotice && (
                 <Alert className="mb-4 border-gold/40 bg-gold/10 text-gold-dark dark:text-gold-light">
                   <AlertTitle className="flex items-center gap-2 font-semibold text-sm">
