@@ -1,22 +1,9 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// VoiceRecordButton.tsx — Bíblia Vive
-//
-// Botão reutilizável de ditado por voz via Web Speech API nativa (pt-BR).
-// Pode ser acoplado a qualquer campo de texto (textarea/input) ou usado com
-// callback onTranscript. Oferece preview em tempo real, timer e cancelamento.
-//
-// Arquitetura robusta:
-//  - startValueRef: congela o valor inicial do campo ao iniciar a gravação,
-//    evitando duplicação de texto a cada renderização/interim result.
-//  - isRecordingRef + auto-restart em onend: garante que pausas de fala (no-speech)
-//    não encerrem a sessão antes de o usuário clicar em Concluir.
-//  - Cleanup completo no unmount.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Square, AlertCircle } from "lucide-react";
+import { Mic, Square, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ensureMicrophonePermission } from "@/lib/microphonePermission";
+import { startAudioCapture, AudioCaptureController, transcribeVoiceRecording } from "@/lib/audioTranscription";
+import { createSpeechRecognitionEngine, SpeechEngineController, isSpeechRecognitionSupported } from "@/lib/speechRecognitionEngine";
 
 interface VoiceRecordButtonProps {
     /** Callback chamado a cada resultado de transcrição (live) e ao concluir */
@@ -45,18 +32,17 @@ export default function VoiceRecordButton({
     label = "Ditar por voz",
 }: VoiceRecordButtonProps) {
     const [isRecording, setIsRecording] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const recognitionRef = useRef<any>(null);
-    const accumulatedFinalRef = useRef<string>("");
     // Snapshot do texto do campo no exato momento em que o usuário clicou em Gravar
     const startValueRef = useRef<string>("");
-    // Refs de controle de ciclo de vida
-    const isRecordingRef = useRef<boolean>(false);
-    const isManualStopRef = useRef<boolean>(false);
+    const liveTextRef = useRef<string>("");
+
+    const audioControllerRef = useRef<AudioCaptureController | null>(null);
+    const speechEngineRef = useRef<SpeechEngineController | null>(null);
     const timerRef = useRef<number | null>(null);
-    const restartTimeoutRef = useRef<number | null>(null);
 
     const triggerHaptic = () => {
         if (typeof navigator !== "undefined" && "vibrate" in navigator && typeof navigator.vibrate === "function") {
@@ -69,21 +55,14 @@ export default function VoiceRecordButton({
             clearInterval(timerRef.current);
             timerRef.current = null;
         }
-        if (restartTimeoutRef.current) {
-            clearTimeout(restartTimeoutRef.current);
-            restartTimeoutRef.current = null;
-        }
     };
 
     // Cleanup ao desmontar
     useEffect(() => {
         return () => {
-            isRecordingRef.current = false;
             stopTimer();
-            if (recognitionRef.current) {
-                try { recognitionRef.current.abort(); } catch { /* silencioso */ }
-                recognitionRef.current = null;
-            }
+            audioControllerRef.current?.cancel();
+            speechEngineRef.current?.cancel();
         };
     }, []);
 
@@ -93,117 +72,12 @@ export default function VoiceRecordButton({
         return (base + spokenText).trim();
     }, [mode]);
 
-    const setupRecognition = useCallback(() => {
-        const SpeechRecognitionAPI =
-            (window as any).SpeechRecognition ||
-            (window as any).webkitSpeechRecognition;
-
-        if (!SpeechRecognitionAPI) return null;
-
-        const recognition = new SpeechRecognitionAPI();
-        recognition.lang = "pt-BR";
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 1;
-
-        recognition.onresult = (event: any) => {
-            let interim = "";
-            let newlyFinalized = "";
-
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const t = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    newlyFinalized += t + " ";
-                } else {
-                    interim = t;
-                }
-            }
-
-            if (newlyFinalized) {
-                accumulatedFinalRef.current += newlyFinalized;
-            }
-
-            // Preview em tempo real: base inicial + fala acumulada até agora + interim atual
-            const liveSpoken = (accumulatedFinalRef.current + (interim ? interim : "")).trim();
-            if (liveSpoken) {
-                onTranscript(buildOutput(liveSpoken));
-            }
-        };
-
-        recognition.onerror = (event: any) => {
-            // Ignorar paradas manuais ou silêncios normais (no-speech)
-            if (event.error === "aborted" || event.error === "no-speech") return;
-
-            // Erro fatal real
-            isRecordingRef.current = false;
-            isManualStopRef.current = false;
-            stopTimer();
-            setIsRecording(false);
-            recognitionRef.current = null;
-
-            const errorMap: Record<string, string> = {
-                "not-allowed": "Microfone não autorizado. Permita o acesso nas configurações do navegador.",
-                "audio-capture": "Microfone não encontrado ou em uso por outro aplicativo.",
-                "network": "Erro de conexão no reconhecimento de voz.",
-                "service-not-allowed": "Serviço de voz não disponível.",
-            };
-            setErrorMessage(errorMap[event.error] ?? `Erro: ${event.error}`);
-            setTimeout(() => setErrorMessage(null), 5000);
-        };
-
-        recognition.onend = () => {
-            // Se a sessão ainda estiver ativa e o usuário NÃO clicou em Concluir,
-            // significa que o Chrome pausou por silêncio. Reinicia sem interrupção.
-            if (isRecordingRef.current && !isManualStopRef.current) {
-                restartTimeoutRef.current = window.setTimeout(() => {
-                    if (isRecordingRef.current && !isManualStopRef.current) {
-                        try {
-                            const nextRec = setupRecognition();
-                            if (nextRec) {
-                                nextRec.start();
-                                recognitionRef.current = nextRec;
-                            }
-                        } catch {
-                            // Se falhar ao reiniciar imediatamente, tenta novamente
-                        }
-                    }
-                }, 50);
-                return;
-            }
-
-            // Encerramento intencional (usuário clicou em Concluir)
-            stopTimer();
-            setIsRecording(false);
-            recognitionRef.current = null;
-            triggerHaptic();
-
-            const finalSpoken = accumulatedFinalRef.current.trim();
-            if (finalSpoken) {
-                onTranscript(buildOutput(finalSpoken));
-            }
-        };
-
-        return recognition;
-    }, [buildOutput, onTranscript]);
-
     const startRecording = async () => {
         setErrorMessage(null);
-        accumulatedFinalRef.current = "";
-        // Congela o valor atual do campo antes de ditar
         startValueRef.current = currentValue || "";
-        isManualStopRef.current = false;
+        liveTextRef.current = "";
 
-        const SpeechRecognitionAPI =
-            (window as any).SpeechRecognition ||
-            (window as any).webkitSpeechRecognition;
-
-        if (!SpeechRecognitionAPI) {
-            setErrorMessage("Navegador sem suporte a gravação de voz. Use Chrome ou Edge.");
-            setTimeout(() => setErrorMessage(null), 4000);
-            return;
-        }
-
-        // Garante que o navegador pergunte/autorize o uso do microfone
+        // Garante autorização de microfone
         const permResult = await ensureMicrophonePermission();
         if (!permResult.ok) {
             setErrorMessage(permResult.error || "Microfone não autorizado.");
@@ -211,14 +85,27 @@ export default function VoiceRecordButton({
             return;
         }
 
-        isRecordingRef.current = true;
-
         try {
-            const recognition = setupRecognition();
-            if (!recognition) return;
+            // 1. Inicia MediaRecorder para captura HD
+            const { controller } = await startAudioCapture();
+            audioControllerRef.current = controller;
 
-            recognition.start();
-            recognitionRef.current = recognition;
+            // 2. Inicia Web Speech determinístico sem duplicações
+            if (isSpeechRecognitionSupported()) {
+                const engine = createSpeechRecognitionEngine({
+                    onLiveUpdate: (state) => {
+                        liveTextRef.current = state.fullText;
+                        if (state.fullText) {
+                            onTranscript(buildOutput(state.fullText));
+                        }
+                    },
+                    onError: (errText) => {
+                        console.warn("[VoiceRecordButton Engine Warning]:", errText);
+                    },
+                });
+                speechEngineRef.current = engine;
+            }
+
             setIsRecording(true);
             setRecordingTime(0);
             triggerHaptic();
@@ -232,41 +119,65 @@ export default function VoiceRecordButton({
                     return prev + 1;
                 });
             }, 1000);
+
         } catch (err: any) {
-            isRecordingRef.current = false;
+            console.error("Erro ao iniciar gravação:", err);
             setIsRecording(false);
             setErrorMessage(err.message || "Erro ao iniciar gravação.");
             setTimeout(() => setErrorMessage(null), 4000);
         }
     };
 
-    const stopRecording = () => {
-        isManualStopRef.current = true;
-        isRecordingRef.current = false;
+    const stopRecording = async () => {
         stopTimer();
+        setIsRecording(false);
+        setIsProcessing(true);
+        triggerHaptic();
 
-        if (recognitionRef.current) {
+        // 1. Finaliza Web Speech e obtém o texto capturado localmente
+        const fallbackText = speechEngineRef.current?.stop() || liveTextRef.current || "";
+        speechEngineRef.current = null;
+
+        // Atualiza imediatamente com o texto capturado até agora
+        if (fallbackText) {
+            onTranscript(buildOutput(fallbackText));
+        }
+
+        // 2. Finaliza MediaRecorder e obtém o blob de áudio
+        let audioBlob: Blob | null = null;
+        if (audioControllerRef.current) {
+            audioBlob = await audioControllerRef.current.stop();
+            audioControllerRef.current = null;
+        }
+
+        // 3. Se temos áudio, tenta aprimorar com AssemblyAI via Cloudflare R2
+        if (audioBlob && audioBlob.size >= 400) {
             try {
-                recognitionRef.current.stop();
-            } catch {
-                // Se .stop() falhar, entrega o texto diretamente
-                recognitionRef.current = null;
-                setIsRecording(false);
-                const finalSpoken = accumulatedFinalRef.current.trim();
-                if (finalSpoken) {
-                    onTranscript(buildOutput(finalSpoken));
+                const result = await transcribeVoiceRecording({
+                    audioBlob,
+                    fallbackText,
+                    maxWaitMs: 6000,
+                });
+
+                if (result.text && result.text !== fallbackText) {
+                    onTranscript(buildOutput(result.text));
                 }
-            }
-        } else {
-            setIsRecording(false);
-            const finalSpoken = accumulatedFinalRef.current.trim();
-            if (finalSpoken) {
-                onTranscript(buildOutput(finalSpoken));
+            } catch {
+                // Silencioso: já temos o fallbackText entregue
             }
         }
+
+        setIsProcessing(false);
     };
 
-    // ── UI ───────────────────────────────────────────────────────────────────
+    if (isProcessing) {
+        return (
+            <div className={cn("inline-flex items-center gap-1.5 rounded-lg bg-gold/10 border border-gold/30 px-2 py-1 text-gold text-xs", className)}>
+                <Loader2 className="h-3 w-3 animate-spin text-gold" />
+                <span className="text-[0.68rem] font-sans">Aprimorando...</span>
+            </div>
+        );
+    }
 
     if (isRecording) {
         return (

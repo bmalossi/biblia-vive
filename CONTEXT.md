@@ -63,8 +63,8 @@ Categoria de Registro do Memorial para registro de fatos marcantes e como Deus s
 Categoria de Registro do Memorial para acompanhamento de períodos dedicados de busca espiritual com data inicial, data prevista e status. Cor institucional: Cinza ardósia.
 
 **Gravação por Voz (Speech-to-Text)**:
-Recurso de captura e transcrição imediata de fala posicionado na página inicial (`HomePage`) que permite a Visitantes e Leitores registrar uma Reflexão, Oração ou Testemunho por voz com zero fricção (ex.: enquanto dirigem ou em movimento). Utiliza a Web Speech API nativa do navegador para transcrição em tempo real em pt-BR e salva automaticamente no Memorial, com mapeamento semântico imediato para o campo correto da categoria (Reflexão → Observação, Oração → Motivo, Testemunho → O que Deus fez, Propósito → Objetivo).
-_Evitar_: ditado, comando de voz, assistente de voz, gravação de áudio simples
+Recurso de captura e transcrição imediata de fala posicionado na página inicial (`HomePage`) e no Caderno de Estudos que permite a Visitantes e Leitores registrar uma Reflexão, Oração ou Testemunho por voz com zero fricção (ex.: enquanto dirigem ou em movimento). Opera em arquitetura híbrida de alta fidelidade: captura áudio em alta definição com cancelamento de ruído/eco, envia diretamente para o Cloudflare R2 (com zero tráfego pesado na Vercel) e transcreve via AssemblyAI (modelo Universal-2 em pt-BR com pontuação correta), mantendo a Web Speech API determinística (sem duplicação de palavras) como preview visual em tempo real e fallback automático em caso de instabilidade de rede ou timeout. Salva automaticamente no Memorial, com mapeamento semântico imediato para o campo correto da categoria (Reflexão → Observação, Oração → Motivo, Testemunho → O que Deus fez, Propósito → Objetivo).
+_Evitar_: comando de voz, assistente de voz, gravação de áudio simples
 
 ### Conteúdo Bíblico
 

@@ -34,7 +34,7 @@ Unindo fidelidade teológica, curadoria histórica, inteligência de dados e des
 * **Exportação Completa**: Exporte seus cadernos e anotações diretamente em **PDF** ou **Word (.docx)** diagramados.
 
 ### 🪨 Meu Memorial — Marcos da Caminhada
-* **Gravação Rápida por Voz (Speech-to-Text)**: Registre orações, testemunhos e reflexões com zero fricção diretamente da página inicial. Utiliza transcrição nativa em tempo real no navegador (Web Speech API em pt-BR), com preview imediato da fala e salvamento instantâneo no Memorial mapeado para os campos estruturados da categoria (Observação no SOAP, Motivo na Oração, etc.).
+* **Gravação Rápida por Voz (Arquitetura Híbrida de Alta Fidelidade)**: Registre orações, testemunhos e reflexões com zero fricção diretamente da página inicial ou no Caderno de Estudos. Combina captura em áudio HD enviada diretamente para a borda do **Cloudflare R2** com refinamento via **AssemblyAI (modelo Universal-2 em pt-BR)** com pontuação perfeita, mantendo a **Web Speech API** nativa (sem duplicação de palavras) como preview em tempo real e fallback automático e instantâneo.
 * **Linha do Tempo Espiritual**: Registre memórias, reflexões, pedidos de oração, jejuns e testemunhos vinculados a passagens bíblicas.
 * **Eco do Memorial**: Reencontro inteligente com anotações e orações passadas diretamente no capítulo lido, incentivando a reflexão sobre orações respondidas e fidelidade de Deus.
 * **Filtros e Busca em Tempo Real**: Localize orações respondidas, entradas favoritas e temas em segundos.

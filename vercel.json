@@ -24,6 +24,9 @@
         "api/r2-list-images.ts": {
             "maxDuration": 10
         },
+        "api/voice-upload-url.ts": {
+            "maxDuration": 10
+        },
         "api/notifications/subscribe.ts": {
             "maxDuration": 10
         },
