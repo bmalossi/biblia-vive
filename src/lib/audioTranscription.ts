@@ -158,13 +158,8 @@ export async function transcribeVoiceRecording({
     try {
         onStatusChange?.("uploading");
 
-        // 1. Obter presigned PUT URL para o Cloudflare R2
-        const ext = audioBlob.type.includes("mp4") ? "mp4" : "webm";
-        const urlRes = await fetch("/api/voice-upload-url", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ extension: ext }),
-        });
+        // 1. Obter presigned PUT URL para o Cloudflare R2 via api/stt unificada
+        const urlRes = await fetch("/api/stt?action=upload-url");
 
         if (!urlRes.ok) {
             throw new Error(`Falha ao obter URL de upload: status ${urlRes.status}`);
