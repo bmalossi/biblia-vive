@@ -93,18 +93,26 @@ export default async function handler(req: any, res?: any) {
 
             // Sub-ação: Gerar presigned PUT URL para o Cloudflare R2
             if (action === "upload-url") {
+                const KNOWN_VOICE_KEY_ID = "384799f1caa54c7541a3b0cb92dff40e";
+                const KNOWN_VOICE_SECRET = "9af9de40ff51791735ea43f1555864c847b532e9a68ecce4faee845b235b557b";
+
                 const r2AccessKeyId = (
                     process.env.VOICE_R2_ACCESS_KEY_ID ||
                     process.env.R2_VOICE_ACCESS_KEY_ID ||
-                    process.env.R2_ACCESS_KEY_ID ||
-                    "384799f1caa54c7541a3b0cb92dff40e"
+                    KNOWN_VOICE_KEY_ID
                 ).trim().replace(/^["']|["']$/g, "");
 
-                const r2SecretAccessKey = (
+                // Se a chave for a de voz dedicada, garante o segredo correto correspondente
+                // evitando misturar com segredos antigos de upload de artigos configurados na Vercel
+                let r2SecretAccessKey = (
                     process.env.VOICE_R2_SECRET_ACCESS_KEY ||
                     process.env.R2_VOICE_SECRET_ACCESS_KEY ||
-                    "9af9de40ff51791735ea43f1555864c847b532e9a68ecce4faee845b235b557b"
+                    ""
                 ).trim().replace(/^["']|["']$/g, "");
+
+                if (!r2SecretAccessKey || r2AccessKeyId === KNOWN_VOICE_KEY_ID) {
+                    r2SecretAccessKey = KNOWN_VOICE_SECRET;
+                }
 
                 const r2Endpoint = (
                     process.env.VOICE_R2_ENDPOINT ||
