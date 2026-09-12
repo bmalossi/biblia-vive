@@ -144,7 +144,7 @@ export interface TranscribeResult {
 export async function transcribeVoiceRecording({
     audioBlob,
     fallbackText,
-    maxWaitMs = 7000,
+    maxWaitMs = 20000,
     onStatusChange,
 }: TranscribeOptions): Promise<TranscribeResult> {
     const cleanFallback = fallbackText.trim();
@@ -162,7 +162,8 @@ export async function transcribeVoiceRecording({
         const urlRes = await fetch("/api/stt?action=upload-url");
 
         if (!urlRes.ok) {
-            throw new Error(`Falha ao obter URL de upload: status ${urlRes.status}`);
+            const errData = await urlRes.json().catch(() => ({}));
+            throw new Error(`Falha ao obter URL de upload: status ${urlRes.status} (${errData?.error || "desconhecido"})`);
         }
 
         const { uploadUrl, audioUrl } = await urlRes.json();
@@ -180,7 +181,8 @@ export async function transcribeVoiceRecording({
         });
 
         if (!uploadRes.ok) {
-            throw new Error(`Falha no upload direto para o R2: status ${uploadRes.status}`);
+            const errBody = await uploadRes.text().catch(() => "");
+            throw new Error(`Falha no upload direto para o R2: status ${uploadRes.status} (${errBody.slice(0, 120)})`);
         }
 
         onStatusChange?.("transcribing");
@@ -193,7 +195,8 @@ export async function transcribeVoiceRecording({
         });
 
         if (!submitRes.ok) {
-            throw new Error(`Falha ao submeter transcrição: status ${submitRes.status}`);
+            const errData = await submitRes.json().catch(() => ({}));
+            throw new Error(`Falha ao submeter transcrição: status ${submitRes.status} (${errData?.error || "desconhecido"})`);
         }
 
         const { id: transcriptId } = await submitRes.json();
@@ -201,10 +204,10 @@ export async function transcribeVoiceRecording({
             throw new Error("ID de transcrição não retornado pela AssemblyAI.");
         }
 
-        // 4. Polling rápido com limite estrito de tempo
+        // 4. Polling com limite de tempo (AssemblyAI leva ~10 a 15s)
         const startTime = Date.now();
         while (Date.now() - startTime < maxWaitMs) {
-            await new Promise((r) => setTimeout(r, 900));
+            await new Promise((r) => setTimeout(r, 1000));
 
             const pollRes = await fetch(`/api/stt?id=${encodeURIComponent(transcriptId)}`);
             if (pollRes.ok) {
@@ -226,7 +229,7 @@ export async function transcribeVoiceRecording({
         throw new Error("Tempo limite de processamento com IA excedido.");
 
     } catch (err: any) {
-        console.warn("[Voice Transcription Fallback]:", err?.message || err);
+        console.warn("[Voice Transcription Fallback - Web Speech Usado]:", err?.message || err);
         onStatusChange?.("fallback");
         // Fallback transparente: retorna o texto limpo do Web Speech
         return { text: cleanFallback, source: "webspeech" };

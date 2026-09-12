@@ -1,4 +1,7 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env" });
+
 import { createClient } from "@supabase/supabase-js";
 import {
   generateArticleHtml,
@@ -10,6 +13,16 @@ import { purgeCloudflareUrls } from "../api/publish/_cloudflare-purge.js";
 
 async function main() {
   console.log("=== Backfill de Artigos para o Bucket R2 ===");
+
+  const bucketName = process.env.R2_HTML_BUCKET_NAME || process.env.R2_BUCKET_NAME;
+  if (!bucketName) {
+    console.error("\n❌ Erro: Configuração do bucket R2 ausente.");
+    console.error("Adicione a variável R2_HTML_BUCKET_NAME com o nome do bucket criado no seu arquivo .env.local:");
+    console.error("  R2_HTML_BUCKET_NAME=nome-do-seu-novo-bucket\n");
+    process.exit(1);
+  }
+
+  console.log(`Bucket R2 de destino: ${bucketName}`);
 
   const supabaseUrl =
     process.env.SUPABASE_URL ||

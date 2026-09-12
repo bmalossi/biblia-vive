@@ -61,7 +61,11 @@ function createPresignedPutUrl({
 
 export default async function handler(req: any, res?: any) {
     const method = req.method || (req as Request).method;
-    const apiKey = process.env.ASSEMBLYAI_API_KEY;
+    const apiKey = (
+        process.env.ASSEMBLYAI_API_KEY ||
+        process.env.VITE_ASSEMBLYAI_API_KEY ||
+        "ba6b97fe1e144f9b879d9795ab834b56"
+    ).trim().replace(/^["']|["']$/g, "");
 
     const respondJson = (data: any, status = 200) => {
         if (res && typeof res.status === "function") {
@@ -89,11 +93,37 @@ export default async function handler(req: any, res?: any) {
 
             // Sub-ação: Gerar presigned PUT URL para o Cloudflare R2
             if (action === "upload-url") {
-                const r2AccessKeyId = process.env.VOICE_R2_ACCESS_KEY_ID || process.env.R2_VOICE_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID;
-                const r2SecretAccessKey = process.env.VOICE_R2_SECRET_ACCESS_KEY || process.env.R2_VOICE_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
-                const r2Endpoint = process.env.VOICE_R2_ENDPOINT || process.env.R2_ENDPOINT;
-                const r2BucketName = process.env.VOICE_R2_BUCKET_NAME || process.env.R2_BUCKET_NAME;
-                const r2PublicUrl = process.env.VOICE_R2_PUBLIC_URL || process.env.VITE_R2_PUBLIC_URL || process.env.R2_PUBLIC_URL || "https://midia.bibliavive.com.br";
+                const r2AccessKeyId = (
+                    process.env.VOICE_R2_ACCESS_KEY_ID ||
+                    process.env.R2_VOICE_ACCESS_KEY_ID ||
+                    process.env.R2_ACCESS_KEY_ID ||
+                    "384799f1caa54c7541a3b0cb92dff40e"
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2SecretAccessKey = (
+                    process.env.VOICE_R2_SECRET_ACCESS_KEY ||
+                    process.env.R2_VOICE_SECRET_ACCESS_KEY ||
+                    "9af9de40ff51791735ea43f1555864c847b532e9a68ecce4faee845b235b557b"
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2Endpoint = (
+                    process.env.VOICE_R2_ENDPOINT ||
+                    process.env.R2_ENDPOINT ||
+                    "https://a63dc175e27a1425b6ead0b1c1ccd53c.r2.cloudflarestorage.com"
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2BucketName = (
+                    process.env.VOICE_R2_BUCKET_NAME ||
+                    process.env.R2_BUCKET_NAME ||
+                    "imagens-artigos"
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2PublicUrl = (
+                    process.env.VOICE_R2_PUBLIC_URL ||
+                    process.env.VITE_R2_PUBLIC_URL ||
+                    process.env.R2_PUBLIC_URL ||
+                    "https://midia.bibliavive.com.br"
+                ).trim().replace(/^["']|["']$/g, "");
 
                 if (!r2AccessKeyId || !r2SecretAccessKey || !r2Endpoint || !r2BucketName) {
                     return respondJson({ error: "R2 voice storage credentials are not configured on the server" }, 500);
@@ -155,6 +185,10 @@ export default async function handler(req: any, res?: any) {
     // ─── POST /api/stt ─── Submeter transcrição via URL (R2) ou upload direto
     if (method === "POST") {
         try {
+            if (!apiKey) {
+                return respondJson({ error: "ASSEMBLYAI_API_KEY is not configured on the server" }, 500);
+            }
+
             let audioUrl = "";
 
             // 1. Tenta extrair audioUrl de JSON body (Fluxo recomendado via Cloudflare R2)
@@ -206,7 +240,7 @@ export default async function handler(req: any, res?: any) {
                 return respondJson({ error: "audioUrl is required or audio payload was empty" }, 400);
             }
 
-            // 3. Submeter job de transcrição para a AssemblyAI (modelo universal-2 em pt-BR)
+            // 3. Submeter job de transcrição para a AssemblyAI (Universal-3.5-pro com fallback Universal-2 em pt-BR)
             const transcriptRes = await fetch("https://api.assemblyai.com/v2/transcript", {
                 method: "POST",
                 headers: {
@@ -215,7 +249,7 @@ export default async function handler(req: any, res?: any) {
                 },
                 body: JSON.stringify({
                     audio_url: audioUrl,
-                    speech_models: ["universal-2"],
+                    speech_models: ["universal-3-5-pro", "universal-2"],
                     language_code: "pt",
                     punctuate: true,
                     format_text: true
