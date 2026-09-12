@@ -62,9 +62,10 @@ function createPresignedPutUrl({
 export default async function handler(req: any, res?: any) {
     const method = req.method || (req as Request).method;
     const apiKey = (
+        process.env.VOICE_ASSEMBLYAI_API_KEY ||
         process.env.ASSEMBLYAI_API_KEY ||
         process.env.VITE_ASSEMBLYAI_API_KEY ||
-        "ba6b97fe1e144f9b879d9795ab834b56"
+        ""
     ).trim().replace(/^["']|["']$/g, "");
 
     const respondJson = (data: any, status = 200) => {
@@ -93,26 +94,19 @@ export default async function handler(req: any, res?: any) {
 
             // Sub-ação: Gerar presigned PUT URL para o Cloudflare R2
             if (action === "upload-url") {
-                const KNOWN_VOICE_KEY_ID = "384799f1caa54c7541a3b0cb92dff40e";
-                const KNOWN_VOICE_SECRET = "9af9de40ff51791735ea43f1555864c847b532e9a68ecce4faee845b235b557b";
-
                 const r2AccessKeyId = (
                     process.env.VOICE_R2_ACCESS_KEY_ID ||
                     process.env.R2_VOICE_ACCESS_KEY_ID ||
-                    KNOWN_VOICE_KEY_ID
-                ).trim().replace(/^["']|["']$/g, "");
-
-                // Se a chave for a de voz dedicada, garante o segredo correto correspondente
-                // evitando misturar com segredos antigos de upload de artigos configurados na Vercel
-                let r2SecretAccessKey = (
-                    process.env.VOICE_R2_SECRET_ACCESS_KEY ||
-                    process.env.R2_VOICE_SECRET_ACCESS_KEY ||
+                    process.env.R2_ACCESS_KEY_ID ||
                     ""
                 ).trim().replace(/^["']|["']$/g, "");
 
-                if (!r2SecretAccessKey || r2AccessKeyId === KNOWN_VOICE_KEY_ID) {
-                    r2SecretAccessKey = KNOWN_VOICE_SECRET;
-                }
+                const r2SecretAccessKey = (
+                    process.env.VOICE_R2_SECRET_ACCESS_KEY ||
+                    process.env.R2_VOICE_SECRET_ACCESS_KEY ||
+                    process.env.R2_SECRET_ACCESS_KEY ||
+                    ""
+                ).trim().replace(/^["']|["']$/g, "");
 
                 const r2Endpoint = (
                     process.env.VOICE_R2_ENDPOINT ||
@@ -134,7 +128,9 @@ export default async function handler(req: any, res?: any) {
                 ).trim().replace(/^["']|["']$/g, "");
 
                 if (!r2AccessKeyId || !r2SecretAccessKey || !r2Endpoint || !r2BucketName) {
-                    return respondJson({ error: "R2 voice storage credentials are not configured on the server" }, 500);
+                    return respondJson({
+                        error: "Credenciais de armazenamento de voz no R2 não configuradas no servidor (VOICE_R2_ACCESS_KEY_ID / VOICE_R2_SECRET_ACCESS_KEY)"
+                    }, 500);
                 }
 
                 const randomSuffix = randomBytes(6).toString("hex");
