@@ -170,6 +170,8 @@ export default function AdminArtigosPage() {
         setError(null);
         setSuccessMsg(null);
 
+        const currentArticle = editingId ? articles.find(a => a.id === editingId) : null;
+
         const payload = {
             title: form.title,
             slug: form.slug,
@@ -179,7 +181,9 @@ export default function AdminArtigosPage() {
             meta_description: form.meta_description || null,
             cover_image_url: form.cover_image_url || null,
             featured: form.featured,
-            published_at: publish ? new Date().toISOString() : (editingId ? undefined : null),
+            published_at: publish
+                ? (currentArticle?.published_at || new Date().toISOString())
+                : (editingId ? (currentArticle?.status === "publicado" ? null : currentArticle?.published_at) : null),
             author_id: form.author_id || null,
             reviewed_by: form.reviewed_by || null,
         };

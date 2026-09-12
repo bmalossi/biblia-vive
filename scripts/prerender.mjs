@@ -1371,7 +1371,6 @@ async function prerender() {
       const outDir   = path.join(DIST_DIR, 'artigos', article.slug);
       await fs.mkdir(outDir, { recursive: true });
       await fs.writeFile(path.join(outDir, 'index.html'), html, 'utf-8');
-      sitemapXml += sitemapUrl(`${CANONICAL_ORIGIN}/artigos/${article.slug}`, 'weekly', '0.6');
       totalArticles++;
     } catch (err) {
       console.warn(`[prerender]   ⚠ Could not prerender article "${article.slug}": ${err.message}`);
@@ -1542,8 +1541,17 @@ async function submitIndexNow(urlList) {
   }
   sitemapXml += '</urlset>';
 
-  // Write sitemap
-  await fs.writeFile(path.join(DIST_DIR, 'sitemap.xml'), sitemapXml, 'utf-8');
+  // Write sitemap-outros.xml (preserves all Bible chapters, author pages, and static pages)
+  await fs.writeFile(path.join(DIST_DIR, 'sitemap-outros.xml'), sitemapXml, 'utf-8');
+  console.log('[prerender]   ✓ dist/sitemap-outros.xml generated.');
+
+  // Ensure no static dist/sitemap.xml exists so /sitemap.xml routes dynamically to /api/sitemap-index
+  try {
+    await fs.unlink(path.join(DIST_DIR, 'sitemap.xml'));
+    console.log('[prerender]   ✓ Cleaned up legacy dist/sitemap.xml.');
+  } catch {
+    // File didn't exist, which is expected
+  }
 
   // Also copy IndexNow key file to DIST_DIR if needed
   try {

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { sendPushNotification, sendArticleNotification } from "./_send.js";
+import { processArticlePublication } from "../publish/_pipeline.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -154,19 +155,48 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     );
   }
 
-  // 3. Regras de filtro para evitar notificações indevidas / duplicadas
-  if (record.status !== "publicado" || record.notification_sent_at) {
+  // 3. Regras de filtro de status básico
+  if (record.status !== "publicado") {
     return new Response(
       JSON.stringify({
         success: true,
         skipped: true,
-        reason: "Record status is not 'publicado' or notification was already sent",
+        reason: "Record status is not 'publicado'",
       }),
       { status: 200, headers: JSON_HEADERS }
     );
   }
 
-  // 3b. Para capítulos de jornada: só notificar se publish_date for hoje ou no passado.
+  // 4. Executar pipeline de publicação para artigos (Geração HTML + R2)
+  let publicationResult = null;
+  if (table === "articles" && record.id) {
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      publicationResult = await processArticlePublication(record.id, supabase);
+    }
+  }
+
+  // 5. Regras de filtro para envio de notificação push
+  const isAlreadyNotified = Boolean(record.notification_sent_at);
+  const isUpdateOfAlreadyPublished = type === "UPDATE" && Boolean(old_record && old_record.status === "publicado");
+
+  if (isAlreadyNotified || isUpdateOfAlreadyPublished) {
+    return new Response(
+      JSON.stringify({
+        success: true,
+        skipped: true,
+        publication: publicationResult,
+        reason: isAlreadyNotified
+          ? "Notification was already sent previously"
+          : "Record was already published previously",
+      }),
+      { status: 200, headers: JSON_HEADERS }
+    );
+  }
+
+  // 5b. Para capítulos de jornada: só notificar se publish_date for hoje ou no passado.
   //     Agendamentos futuros devem ser notificados pelo Cron Job, não imediatamente.
   if (table === "editorial_chapters" && record.publish_date) {
     const todayStr = new Date().toISOString().split("T")[0];
@@ -182,20 +212,7 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     }
   }
 
-
-  if (type === "UPDATE") {
-    // Para UPDATE: notificar apenas se o status anterior NÃO era "publicado" E notification_sent_at for nulo
-    if (old_record && old_record.status === "publicado") {
-      return new Response(
-        JSON.stringify({
-          success: true,
-          skipped: true,
-          reason: "Record was already published previously",
-        }),
-        { status: 200, headers: JSON_HEADERS }
-      );
-    }
-  } else if (type !== "INSERT") {
+  if (type !== "INSERT" && type !== "UPDATE") {
     // Ignorar DELETE ou outros tipos de evento
     return new Response(
       JSON.stringify({ success: true, skipped: true, reason: `Event type '${type}' ignored` }),
@@ -203,7 +220,7 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     );
   }
 
-  // 4. Montar título, mensagem e link da notificação
+  // 6. Montar título, mensagem e link da notificação
   const appUrl = process.env.VITE_APP_URL || "https://www.bibliavive.com.br";
   let title = "";
   let body = "";
@@ -218,17 +235,13 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     body = record.series_name
       ? `${record.series_name}: ${record.title}`
       : record.title || "Um novo capítulo de jornada foi publicado!";
-    // Link inclui o ID do capítulo como query param para abrir o modal diretamente.
-    // JornadasPage lê ?capitulo=ID e abre o card automaticamente.
     link = `${appUrl}/jornadas?capitulo=${record.id}`;
   }
 
-  // 5. Disparar notificação push via Firebase Cloud Messaging
+  // 7. Disparar notificação push via Firebase Cloud Messaging
   const result = await sendPushNotification({ title, body, link });
 
-  // 6. Atualizar notification_sent_at APENAS se ao menos 1 entrega foi confirmada pelo Firebase
-  //    Usa UPDATE condicional (IS NULL) como "claim atômico" para evitar duplo envio
-  //    em caso de webhooks concorrentes (race condition).
+  // 8. Atualizar notification_sent_at APENAS se ao menos 1 entrega foi confirmada pelo Firebase
   if (result.successCount > 0 && record.id) {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -246,7 +259,6 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
       if (updateError) {
         console.warn(`[on-publish] Could not update notification_sent_at for ${table}:${record.id}:`, updateError.message);
       } else if (count === 0) {
-        // Outra instância do webhook já marcou antes — descartamos silenciosamente
         console.warn(`[on-publish] notification_sent_at já marcado por outra instância — descartando para ${table}:${record.id}`);
       } else {
         console.log(`[on-publish] notification_sent_at marcado para ${table}:${record.id}`);
@@ -256,13 +268,12 @@ async function handleWebhook(request: Request, webhookSecret: string): Promise<R
     console.warn(`[on-publish] successCount=0 — notification_sent_at NÃO atualizado para ${table}:${record.id}. Reprocessamento futuro permitido.`);
   }
 
-
-
   return new Response(
     JSON.stringify({
       success: true,
       sent: result.sent,
       failed: result.failed,
+      publication: publicationResult,
       table,
       id: record.id,
     }),
@@ -276,9 +287,15 @@ export async function POST(request: Request) {
     const webhookSecret = process.env.SUPABASE_WEBHOOK_SECRET;
     const providedSecret = request.headers.get("x-webhook-secret");
 
-    // Se há um secret configurado e o header foi enviado → rota de webhook do Supabase
-    // Caso contrário → rota manual (Admin)
-    if (webhookSecret && providedSecret !== null) {
+    // Se há um secret configurado no ambiente:
+    // Deve validar autenticação estrita do webhook
+    if (webhookSecret) {
+      if (!providedSecret || providedSecret !== webhookSecret) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized: invalid or missing x-webhook-secret header" }),
+          { status: 401, headers: JSON_HEADERS }
+        );
+      }
       return await handleWebhook(request, webhookSecret);
     }
 
