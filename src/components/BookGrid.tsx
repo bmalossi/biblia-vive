@@ -12,26 +12,35 @@ interface BookGridProps {
 export default function BookGrid({ books, version, currentReading }: BookGridProps) {
   const { t } = useTranslation();
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
-      {books.map((book) => (
-        <Tooltip key={book.id}>
-          <TooltipTrigger asChild>
-            <Link
-              className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm group"
-              to={`/${version}/${book.slug}`}
-            >
-              {currentReading?.slug === book.slug && (
-                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold group-hover:bg-primary-foreground" />
-              )}
-              <p className="truncate font-sans text-[0.72rem] font-medium text-app-text group-hover:text-primary-foreground">{book.name}</p>
-              <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted group-hover:text-primary-foreground/80">{t("reading.chaptersCount", { count: book.chapters })}</p>
-            </Link>
-          </TooltipTrigger>
-          {currentReading?.slug === book.slug && (
-            <TooltipContent>{t("reading.currentlyAt", { book: book.name, chapter: currentReading.chapter })}</TooltipContent>
-          )}
-        </Tooltip>
-      ))}
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {books.map((book) => {
+        const isCurrent = currentReading?.slug === book.slug;
+        return (
+          <Tooltip key={book.id}>
+            <TooltipTrigger asChild>
+              <Link
+                className="group relative flex min-h-[48px] flex-col justify-between rounded-lg border border-border bg-app-surface px-3 py-2.5 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm"
+                to={`/${version}/${book.slug}`}
+              >
+                {isCurrent && (
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold group-hover:bg-primary-foreground" />
+                )}
+                <p className="font-sans text-xs sm:text-[0.78rem] font-medium leading-snug text-app-text break-words text-balance group-hover:text-primary-foreground pr-3">
+                  {book.name}
+                </p>
+                <p className="mt-1 font-sans text-[0.65rem] text-app-text-muted group-hover:text-primary-foreground/80">
+                  {t("reading.chaptersCount", { count: book.chapters })}
+                </p>
+              </Link>
+            </TooltipTrigger>
+            {isCurrent && (
+              <TooltipContent>
+                {t("reading.currentlyAt", { book: book.name, chapter: currentReading.chapter })}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        );
+      })}
     </div>
   );
 }

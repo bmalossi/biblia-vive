@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // NotebookFloatingButton.tsx — Bíblia Vive
 //
-// Botão flutuante no canto inferior esquerdo para acessar os cadernos.
+// Botão flutuante no canto inferior direito para acessar os cadernos.
 // Exibe badge numérico caso existam cadernos no capítulo atual.
 // Pisca suavemente de tempos em tempos quando fechado para lembrar o usuário de escrever.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,9 +71,9 @@ export default function NotebookFloatingButton({
             aria-label={accessibleName}
             title={accessibleName}
             className={cn(
-                "fixed left-4 z-40",
+                "fixed right-4 z-40",
                 isFocusMode ? "bottom-6" : "bottom-20 md:bottom-6",
-                "md:left-6 md:bottom-6",
+                "md:right-6 md:bottom-6",
                 "flex h-12 w-12 items-center justify-center rounded-full shadow-lg",
                 // Desativa transições durante o blink para que os keyframes não conflitem com transition-all
                 shouldBlink ? "" : "transition-all duration-300",

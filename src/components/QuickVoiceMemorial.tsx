@@ -228,7 +228,7 @@ export default function QuickVoiceMemorial() {
         const result = await transcribeVoiceRecording({
             audioBlob,
             fallbackText,
-            maxWaitMs: 7000,
+            maxWaitMs: 20000,
             onStatusChange: (status) => {
                 if (status === "uploading") {
                     setProcessingStep("Enviando áudio...");
@@ -276,14 +276,20 @@ export default function QuickVoiceMemorial() {
 
     return (
         <section className="mb-6 pt-1">
-            {/* Linha Principal */}
-            <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center min-h-[36px]">
-                {/* Título + Ícone '!' */}
-                <div className="flex items-center gap-2 sm:absolute sm:left-0">
-                    <h2 className="font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">
-                        Gravação por Voz
-                    </h2>
+            {/* Linha Principal: Botão Gravar + Ícone '!' ao lado direito */}
+            {!isRecording && !isProcessing && !transcribedText && (
+                <div className="flex items-center justify-center gap-2">
+                    {/* Botão Gravar sua Reflexão por Voz */}
+                    <button
+                        type="button"
+                        onClick={startRecording}
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-gold/90 transition-all shadow-2xs active:scale-[0.98]"
+                    >
+                        <Mic className="h-3.5 w-3.5" />
+                        <span>Gravar Reflexão com Voz</span>
+                    </button>
 
+                    {/* Ícone '!' de Informações ao lado direito do botão */}
                     <TooltipProvider delayDuration={150}>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -291,7 +297,7 @@ export default function QuickVoiceMemorial() {
                                     type="button"
                                     onClick={() => setShowMobileTooltip(prev => !prev)}
                                     aria-label="Informações sobre a gravação por voz"
-                                    className="inline-flex h-3.5 w-3.5 min-w-[14px] min-h-[14px] max-w-[14px] max-h-[14px] aspect-square shrink-0 items-center justify-center rounded-full border border-gold/60 text-[9px] font-mono font-bold leading-none text-gold/90 hover:border-gold hover:text-gold transition-colors p-0 select-none"
+                                    className="inline-flex h-4 w-4 min-w-[16px] min-h-[16px] max-w-[16px] max-h-[16px] aspect-square shrink-0 items-center justify-center rounded-full border border-gold/60 text-[10px] font-mono font-bold leading-none text-gold/90 hover:border-gold hover:text-gold transition-colors p-0 select-none"
                                 >
                                     !
                                 </button>
@@ -302,46 +308,7 @@ export default function QuickVoiceMemorial() {
                         </Tooltip>
                     </TooltipProvider>
                 </div>
-
-                {/* Seletor de Categoria + Botão Gravar */}
-                {!isRecording && !isProcessing && !transcribedText && (
-                    <div className="flex flex-wrap items-center justify-center gap-2.5 w-full sm:w-auto">
-                        {/* Pílulas de Categoria */}
-                        <div className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-surface/80 p-0.5">
-                            {(
-                                [
-                                    { id: "reflection", label: "Reflexão" },
-                                    { id: "prayer", label: "Oração" },
-                                    { id: "testimony", label: "Testemunho" },
-                                ] as const
-                            ).map((item) => (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => setCategory(item.id)}
-                                    className={`rounded-full px-2.5 py-1 text-[0.72rem] font-sans transition-colors ${
-                                        category === item.id
-                                            ? "bg-gold text-primary-foreground font-medium shadow-2xs"
-                                            : "text-app-text-muted hover:text-app-text"
-                                    }`}
-                                >
-                                    {item.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Botão Gravar por Voz */}
-                        <button
-                            type="button"
-                            onClick={startRecording}
-                            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gold px-3.5 py-1.5 text-xs font-medium text-primary-foreground hover:bg-gold/90 transition-all shadow-2xs active:scale-[0.98]"
-                        >
-                            <Mic className="h-3.5 w-3.5" />
-                            <span>Gravar por Voz</span>
-                        </button>
-                    </div>
-                )}
-            </div>
+            )}
 
             {/* Tooltip inline no mobile */}
             {showMobileTooltip && (

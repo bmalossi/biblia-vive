@@ -156,14 +156,14 @@ export default function VoiceRecordButton({
                 const result = await transcribeVoiceRecording({
                     audioBlob,
                     fallbackText,
-                    maxWaitMs: 6000,
+                    maxWaitMs: 20000,
                 });
 
-                if (result.text && result.text !== fallbackText) {
+                if (result.text && result.text.trim() && result.text !== fallbackText) {
                     onTranscript(buildOutput(result.text));
                 }
-            } catch {
-                // Silencioso: já temos o fallbackText entregue
+            } catch (err) {
+                console.warn("[VoiceRecordButton] Falha ao aprimorar com IA:", err);
             }
         }
 
@@ -174,7 +174,7 @@ export default function VoiceRecordButton({
         return (
             <div className={cn("inline-flex items-center gap-1.5 rounded-lg bg-gold/10 border border-gold/30 px-2 py-1 text-gold text-xs", className)}>
                 <Loader2 className="h-3 w-3 animate-spin text-gold" />
-                <span className="text-[0.68rem] font-sans">Aprimorando...</span>
+                <span className="text-[0.68rem] font-sans">Aprimorando com IA...</span>
             </div>
         );
     }

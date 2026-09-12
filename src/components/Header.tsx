@@ -627,20 +627,6 @@ export default function Header() {
             </Link>
           )}
 
-          {/* Mobile: search icon */}
-          {!isMobileMenuOpen && (
-            <button
-              aria-label="Abrir busca"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-app-surface text-app-text md:hidden transition-colors hover:bg-app-raised"
-              onClick={() => {
-                setIsMobileSearchOpen((v) => !v);
-                setHistory(readHistory());
-              }}
-              type="button"
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          )}
 
           {/* Mobile: Hamburger — uses Sheet (right drawer) */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
