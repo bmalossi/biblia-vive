@@ -25,6 +25,29 @@ export async function POST(request: Request) {
       );
     }
 
+    const url = new URL(request.url);
+    const isUnsubscribe = url.searchParams.get("action") === "unsubscribe" || body?.action === "unsubscribe";
+
+    if (isUnsubscribe) {
+      const { error } = await supabase
+        .from("push_tokens")
+        .delete()
+        .eq("token", token);
+
+      if (error) {
+        console.error("Unsubscribe error:", error);
+        return new Response(
+          JSON.stringify({ error: "Failed to remove token" }),
+          { status: 500, headers: JSON_HEADERS }
+        );
+      }
+
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: JSON_HEADERS,
+      });
+    }
+
     const payload: { token: string; user_id?: string | null } = { token };
     if (userId && typeof userId === "string") {
       payload.user_id = userId;

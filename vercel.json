@@ -27,22 +27,10 @@
         "api/notifications/subscribe.ts": {
             "maxDuration": 10
         },
-        "api/notifications/unsubscribe.ts": {
-            "maxDuration": 10
-        },
-        "api/notifications/stats.ts": {
-            "maxDuration": 10
-        },
         "api/notifications/on-publish.ts": {
             "maxDuration": 30
         },
-        "api/sitemap-index.ts": {
-            "maxDuration": 10
-        },
-        "api/sitemap-articles.ts": {
-            "maxDuration": 15
-        },
-        "api/feed.ts": {
+        "api/seo.ts": {
             "maxDuration": 15
         }
     },
@@ -92,24 +80,28 @@
     ],
     "rewrites": [
         {
+            "source": "/api/notifications/unsubscribe",
+            "destination": "/api/notifications/subscribe?action=unsubscribe"
+        },
+        {
             "source": "/api/(.*)",
             "destination": "/api/$1"
         },
         {
             "source": "/sitemap.xml",
-            "destination": "/api/sitemap-index"
+            "destination": "/api/seo?type=index"
         },
         {
             "source": "/sitemap-artigos.xml",
-            "destination": "/api/sitemap-articles"
+            "destination": "/api/seo?type=articles"
         },
         {
             "source": "/feed.xml",
-            "destination": "/api/feed"
+            "destination": "/api/seo?type=feed"
         },
         {
             "source": "/feed",
-            "destination": "/api/feed"
+            "destination": "/api/seo?type=feed"
         },
         {
             "source": "/(.*)",
