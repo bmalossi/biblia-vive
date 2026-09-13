@@ -224,30 +224,37 @@ export default function QuickVoiceMemorial() {
             return;
         }
 
-        // 3. Executa transcrição via Cloudflare R2 + AssemblyAI
-        const result = await transcribeVoiceRecording({
-            audioBlob,
-            fallbackText,
-            maxWaitMs: 20000,
-            onStatusChange: (status) => {
-                if (status === "uploading") {
-                    setProcessingStep("Enviando áudio...");
-                } else if (status === "transcribing") {
-                    setProcessingStep("Transcrevendo com IA...");
-                } else if (status === "completed") {
-                    setProcessingStep("Guardando no Memorial...");
-                } else {
-                    setProcessingStep("Guardando no Memorial...");
-                }
-            },
-        });
+        // 3. Executa transcrição via Cloudflare R2 + AssemblyAI (com fallback configurável)
+        try {
+            const result = await transcribeVoiceRecording({
+                audioBlob,
+                fallbackText,
+                maxWaitMs: 20000,
+                onStatusChange: (status) => {
+                    if (status === "uploading") {
+                        setProcessingStep("Enviando áudio...");
+                    } else if (status === "transcribing") {
+                        setProcessingStep("Transcrevendo com IA...");
+                    } else if (status === "completed") {
+                        setProcessingStep("Guardando no Memorial...");
+                    } else {
+                        setProcessingStep("Guardando no Memorial...");
+                    }
+                },
+            });
 
-        const finalText = result.text.trim();
-        if (finalText) {
-            await handleSaveText(finalText);
-        } else {
+            const finalText = result.text.trim();
+            if (finalText) {
+                await handleSaveText(finalText);
+            } else {
+                setIsProcessing(false);
+                setErrorMessage("Nenhuma fala foi detectada. Tente falar novamente.");
+            }
+        } catch (err: any) {
+            console.error("[QuickVoiceMemorial] Falha na transcrição:", err);
             setIsProcessing(false);
-            setErrorMessage("Nenhuma fala foi detectada. Tente falar novamente.");
+            setErrorMessage(err.message || "Erro no processamento da voz.");
+            toast.error(err.message || "Erro na transcrição de voz.");
         }
     };
 

@@ -44,6 +44,7 @@ const HarpaPage = lazy(() => import("./pages/HarpaPage"));
 const HarpaReadingPage = lazy(() => import("./pages/HarpaReadingPage"));
 const AdminAutoresPage = lazy(() => import('./pages/AdminAutoresPage'));
 const AdminCapitulosPage = lazy(() => import('./pages/AdminCapitulosPage'));
+const AdminConfiguracoesPage = lazy(() => import('./pages/AdminConfiguracoesPage'));
 const JornadasPage = lazy(() => import('./pages/JornadasPage'));
 const AuthorPage = lazy(() => import('./pages/AuthorPage'));
 
@@ -101,6 +102,7 @@ const App = () => (
                   <Route path="/admin/autores" element={<AdminAutoresPage />} />
                   <Route path="/admin/comentarios" element={<AdminComentariosPage />} />
                   <Route path="/admin/usuarios" element={<AdminUsuariosPage />} />
+                  <Route path="/admin/configuracoes" element={<AdminConfiguracoesPage />} />
                   <Route path="/pro" element={<PricingPage />} />
                   <Route path="/pro/success" element={<ProSuccessPage />} />
                   <Route path="/widget/daily" element={<WidgetDailyVerse />} />

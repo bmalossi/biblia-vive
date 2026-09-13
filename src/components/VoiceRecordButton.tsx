@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ensureMicrophonePermission } from "@/lib/microphonePermission";
 import { startAudioCapture, AudioCaptureController, transcribeVoiceRecording } from "@/lib/audioTranscription";
 import { createSpeechRecognitionEngine, SpeechEngineController, isSpeechRecognitionSupported } from "@/lib/speechRecognitionEngine";
+import { isWebSpeechFallbackDisabled } from "@/lib/voiceSettings";
 
 interface VoiceRecordButtonProps {
     /** Callback chamado a cada resultado de transcrição (live) e ao concluir */
@@ -138,8 +139,10 @@ export default function VoiceRecordButton({
         const fallbackText = speechEngineRef.current?.stop() || liveTextRef.current || "";
         speechEngineRef.current = null;
 
-        // Atualiza imediatamente com o texto capturado até agora
-        if (fallbackText) {
+        const fallbackDisabled = isWebSpeechFallbackDisabled();
+
+        // Atualiza com preview do Web Speech apenas se fallback estiver habilitado
+        if (fallbackText && !fallbackDisabled) {
             onTranscript(buildOutput(fallbackText));
         }
 
@@ -150,21 +153,31 @@ export default function VoiceRecordButton({
             audioControllerRef.current = null;
         }
 
-        // 3. Se temos áudio, tenta aprimorar com AssemblyAI via Cloudflare R2
+        // 3. Se temos áudio, tenta aprimorar com AssemblyAI via Cloudflare R2 / Direct
         if (audioBlob && audioBlob.size >= 400) {
             try {
                 const result = await transcribeVoiceRecording({
                     audioBlob,
                     fallbackText,
                     maxWaitMs: 20000,
+                    disableFallback: fallbackDisabled,
                 });
 
-                if (result.text && result.text.trim() && result.text !== fallbackText) {
+                if (result.text && result.text.trim()) {
                     onTranscript(buildOutput(result.text));
                 }
-            } catch (err) {
+            } catch (err: any) {
                 console.warn("[VoiceRecordButton] Falha ao aprimorar com IA:", err);
+                if (fallbackDisabled) {
+                    onTranscript(startValueRef.current);
+                    setErrorMessage(err.message || "Falha na transcrição por IA.");
+                    setTimeout(() => setErrorMessage(null), 5000);
+                }
             }
+        } else if (fallbackDisabled) {
+            onTranscript(startValueRef.current);
+            setErrorMessage("Áudio não detectado.");
+            setTimeout(() => setErrorMessage(null), 4000);
         }
 
         setIsProcessing(false);

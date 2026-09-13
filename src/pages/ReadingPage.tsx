@@ -67,7 +67,7 @@ import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
 import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
-import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock } from "lucide-react";
+import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -297,6 +297,28 @@ export default function ReadingPage() {
   const { remaining: freeChapterCommentaryCount, canUse: hasFreeChapterCommentary, consume: consumeFreeChapterCommentary, setRemaining: setRemainingFreeChapterCommentary } = useCommentaryQuota('chapter');
   const [hashHighlightedVerse, setHashHighlightedVerse] = useState<string | null>(null);
 
+  // Estado para painel lateral de capítulos colapsável no desktop
+  const [isChapterSidebarOpen, setIsChapterSidebarOpen] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("bv_chapter_sidebar_open");
+      return saved !== null ? saved === "true" : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleChapterSidebar = useCallback(() => {
+    setIsChapterSidebarOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("bv_chapter_sidebar_open", String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
   // Última visualização por capítulo
   const chapterViews = useChapterViews();
   const [previousViewedAt, setPreviousViewedAt] = useState<Date | null>(null);
@@ -493,6 +515,9 @@ export default function ReadingPage() {
     disabled: isClausuraDisabled,
     mouseThreshold: 10,
   });
+
+  // Centraliza o texto bíblico com max-w-2xl mx-auto quando a barra lateral estiver fechada, em modo foco ou em clausura
+  const isCenteredLayout = (!isChapterSidebarOpen || preferences.focusMode || isClausuraActive) && !compareEnabled;
 
   const setVerseRef = useCallback(
     (key: string) => (element: HTMLDivElement | null) => {
@@ -1613,6 +1638,20 @@ export default function ReadingPage() {
                     {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                   </Button>
 
+                  {!compareEnabled && selectedBook && (
+                    <Button
+                      aria-label={isChapterSidebarOpen ? "Recolher painel de capítulos" : "Expandir painel de capítulos"}
+                      title={isChapterSidebarOpen ? "Recolher painel de capítulos" : "Mostrar painel de capítulos"}
+                      className="hidden lg:inline-flex"
+                      onClick={toggleChapterSidebar}
+                      size="icon"
+                      type="button"
+                      variant="outline"
+                    >
+                      {isChapterSidebarOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+                    </Button>
+                  )}
+
                   {notes.length > 0 && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -1720,12 +1759,15 @@ export default function ReadingPage() {
             )}
           </div>
         ) : (
-          <div className="mx-auto w-full flex items-start justify-center gap-4 xl:gap-10">
+          <div className={cn("mx-auto w-full flex items-start justify-center transition-all duration-300", !isCenteredLayout && "gap-4 xl:gap-10")}>
             <article
               aria-busy={loading}
               aria-live="polite"
-              className="w-full shrink-0 rounded-2xl border border-border bg-app-surface px-4 py-7 md:px-6"
-              style={{ maxWidth: compareEnabled ? "1120px" : "var(--column-width)" }}
+              className={cn(
+                "w-full shrink-0 rounded-2xl border border-border bg-app-surface px-4 py-7 md:px-6 transition-all duration-300",
+                isCenteredLayout && "max-w-2xl mx-auto"
+              )}
+              style={{ maxWidth: compareEnabled ? "1120px" : isCenteredLayout ? undefined : "var(--column-width)" }}
             >
               <h1 className="mb-1 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
               {previousViewedAt && user && (
@@ -1997,17 +2039,27 @@ export default function ReadingPage() {
             </article>
 
             {/* Sticky Chapter Sidebar on Desktop */}
-            {!compareEnabled && selectedBook && (
+            {!compareEnabled && selectedBook && isChapterSidebarOpen && !preferences.focusMode && !isClausuraActive && (
               <aside className={cn(
-                "hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 transition-all duration-500",
-                cachedChapterCommentary ? "w-[320px] xl:w-[380px] 2xl:w-[420px]" : "w-[140px] xl:w-[180px] 2xl:w-[220px]",
-                isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
+                "hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 transition-all duration-300",
+                cachedChapterCommentary ? "w-[320px] xl:w-[380px] 2xl:w-[420px]" : "w-[140px] xl:w-[180px] 2xl:w-[220px]"
               )}>
                 <div className="flex flex-col items-center pb-8 pt-2 w-full">
                   {!preferences.focusMode && (
-                    <span className="text-[0.6rem] font-mono text-app-text-muted uppercase tracking-widest mb-4 opacity-70">
-                      Capítulos
-                    </span>
+                    <div className="flex items-center justify-between w-full mb-4 px-1">
+                      <span className="text-[0.6rem] font-mono text-app-text-muted uppercase tracking-widest opacity-70">
+                        Capítulos
+                      </span>
+                      <button
+                        type="button"
+                        onClick={toggleChapterSidebar}
+                        className="p-1 rounded-md text-app-text-muted hover:text-gold hover:bg-app-raised transition-colors cursor-pointer"
+                        aria-label="Recolher painel de capítulos"
+                        title="Recolher painel de capítulos"
+                      >
+                        <PanelRightClose className="h-4 w-4" />
+                      </button>
+                    </div>
                   )}
                   <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2 xl:gap-2.5 w-full justify-items-center">
                     {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(c => (
@@ -2031,7 +2083,6 @@ export default function ReadingPage() {
 
                   {/* Chapter Commentary Button in Sidebar */}
                   <div className="w-full mt-8 border-t border-border/50 pt-6 flex flex-col items-center justify-center">
-                    {isPro && <CommentaryQuota compact className="w-full mb-4 px-2" />}
                     {!isPro && freeChapterCommentaryCount === 0 && !cachedChapterCommentary ? (
                       <div className="w-full rounded-xl border border-gold/20 bg-gold-bg/10 p-5 text-center space-y-3 animate-in fade-in">
                         <div className="mx-auto w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center">
@@ -2098,6 +2149,7 @@ export default function ReadingPage() {
                           </div>
                         </div>
                         <div className="pb-8">
+                          {isPro && <CommentaryQuota compact className="w-full mb-4 px-1" />}
                           <BiblicalCommentary
                             commentaries={(function () {
                               try {
@@ -2114,6 +2166,28 @@ export default function ReadingPage() {
                   </div>
                 </div>
               </aside>
+            )}
+
+            {/* Botão flutuante para reabrir painel lateral de capítulos quando colapsado */}
+            {!compareEnabled && selectedBook && !isChapterSidebarOpen && !preferences.focusMode && (
+              <div
+                className={cn(
+                  "hidden lg:block fixed right-4 top-28 z-30 transition-opacity",
+                  isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-200"
+                )}
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleChapterSidebar}
+                  className="h-8 gap-1.5 rounded-full border-border bg-app-surface/90 px-3 text-xs text-app-text-muted hover:text-gold hover:border-gold/50 shadow-md backdrop-blur-sm"
+                  aria-label="Expandir painel de capítulos"
+                  title="Mostrar painel de capítulos"
+                >
+                  <PanelRightOpen className="h-3.5 w-3.5 text-gold" />
+                  <span className="font-mono text-[0.7rem] uppercase tracking-wider">Capítulos</span>
+                </Button>
+              </div>
             )}
 
           </div>

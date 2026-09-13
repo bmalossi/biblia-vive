@@ -124,10 +124,13 @@ export async function startAudioCapture(): Promise<{
     return { controller, stream };
 }
 
+import { isWebSpeechFallbackDisabled } from "./voiceSettings";
+
 export interface TranscribeOptions {
     audioBlob: Blob | null;
     fallbackText: string;
     maxWaitMs?: number;
+    disableFallback?: boolean;
     onStatusChange?: (status: "uploading" | "transcribing" | "completed" | "fallback") => void;
 }
 
@@ -138,19 +141,28 @@ export interface TranscribeResult {
 
 /**
  * Executa a transcrição do áudio via Cloudflare R2 + AssemblyAI.
- * Se o áudio for nulo, muito curto (< 300 bytes) ou qualquer etapa falhar/estourar o tempo,
- * retorna de forma instantânea e transparente o fallbackText do Web Speech.
+ * Se o upload para o R2 falhar (por exemplo, erro de credencial ou CORS),
+ * tenta automaticamente envio binário direto para a AssemblyAI via /api/stt.
+ * Se a IA falhar e o fallback do Web Speech estiver desativado no Admin,
+ * lança erro explícito para diagnóstico imediato.
  */
 export async function transcribeVoiceRecording({
     audioBlob,
     fallbackText,
     maxWaitMs = 20000,
+    disableFallback,
     onStatusChange,
 }: TranscribeOptions): Promise<TranscribeResult> {
     const cleanFallback = fallbackText.trim();
+    const shouldDisableFallback = typeof disableFallback === "boolean"
+        ? disableFallback
+        : isWebSpeechFallbackDisabled();
 
-    // Se não há áudio ou é minúsculo, usa fallback diretamente
+    // Se não há áudio ou é minúsculo
     if (!audioBlob || audioBlob.size < 400) {
+        if (shouldDisableFallback) {
+            throw new Error("Nenhum áudio foi capturado pelo gravador. Verifique as permissões de microfone.");
+        }
         onStatusChange?.("fallback");
         return { text: cleanFallback, source: "webspeech" };
     }
@@ -158,53 +170,79 @@ export async function transcribeVoiceRecording({
     try {
         onStatusChange?.("uploading");
 
-        // 1. Obter presigned PUT URL para o Cloudflare R2 via api/stt unificada
-        const urlRes = await fetch("/api/stt?action=upload-url");
+        let transcriptId: string | null = null;
 
-        if (!urlRes.ok) {
-            const errData = await urlRes.json().catch(() => ({}));
-            throw new Error(`Falha ao obter URL de upload: status ${urlRes.status} (${errData?.error || "desconhecido"})`);
+        // 1. Tentar caminho primário: Presigned PUT URL para o Cloudflare R2
+        let usedR2 = false;
+        try {
+            const urlRes = await fetch("/api/stt?action=upload-url");
+            if (urlRes.ok) {
+                const { uploadUrl, audioUrl } = await urlRes.json();
+                if (uploadUrl && audioUrl) {
+                    const uploadRes = await fetch(uploadUrl, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": audioBlob.type || "audio/webm",
+                        },
+                        body: audioBlob,
+                    });
+
+                    if (uploadRes.ok) {
+                        usedR2 = true;
+                        onStatusChange?.("transcribing");
+
+                        // Submeter URL do R2 para AssemblyAI
+                        const submitRes = await fetch("/api/stt", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ audioUrl }),
+                        });
+
+                        if (submitRes.ok) {
+                            const submitData = await submitRes.json();
+                            transcriptId = submitData.id || null;
+                        } else {
+                            const errData = await submitRes.json().catch(() => ({}));
+                            console.warn("[STT R2 Submit Warning]", errData?.error);
+                        }
+                    } else {
+                        console.warn(`[STT R2 PUT Warning]: status ${uploadRes.status}`);
+                    }
+                }
+            }
+        } catch (r2Err) {
+            console.warn("[STT R2 Path Failed, fallback to direct upload]:", r2Err);
         }
 
-        const { uploadUrl, audioUrl } = await urlRes.json();
-        if (!uploadUrl || !audioUrl) {
-            throw new Error("URL de upload inválida recebida do servidor.");
+        // 2. Se o caminho R2 falhou, usar o caminho direto via /api/stt (Direct AssemblyAI proxy)
+        if (!transcriptId) {
+            onStatusChange?.("uploading");
+            console.log("[STT] Enviando áudio diretamente para /api/stt...");
+
+            const directRes = await fetch("/api/stt", {
+                method: "POST",
+                headers: {
+                    "Content-Type": audioBlob.type || "audio/webm",
+                },
+                body: audioBlob,
+            });
+
+            if (!directRes.ok) {
+                const errData = await directRes.json().catch(() => ({}));
+                throw new Error(`Falha no upload direto para IA: status ${directRes.status} (${errData?.error || "desconhecido"})`);
+            }
+
+            const directData = await directRes.json();
+            transcriptId = directData.id || null;
         }
 
-        // 2. Upload direto para o Cloudflare R2 (zero tráfego pesado na Vercel)
-        const uploadRes = await fetch(uploadUrl, {
-            method: "PUT",
-            headers: {
-                "Content-Type": audioBlob.type || "audio/webm",
-            },
-            body: audioBlob,
-        });
-
-        if (!uploadRes.ok) {
-            const errBody = await uploadRes.text().catch(() => "");
-            throw new Error(`Falha no upload direto para o R2: status ${uploadRes.status} (${errBody.slice(0, 120)})`);
-        }
-
-        onStatusChange?.("transcribing");
-
-        // 3. Submeter à AssemblyAI enviando apenas a URL do áudio no R2
-        const submitRes = await fetch("/api/stt", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ audioUrl }),
-        });
-
-        if (!submitRes.ok) {
-            const errData = await submitRes.json().catch(() => ({}));
-            throw new Error(`Falha ao submeter transcrição: status ${submitRes.status} (${errData?.error || "desconhecido"})`);
-        }
-
-        const { id: transcriptId } = await submitRes.json();
         if (!transcriptId) {
             throw new Error("ID de transcrição não retornado pela AssemblyAI.");
         }
 
-        // 4. Polling com limite de tempo (AssemblyAI leva ~10 a 15s)
+        onStatusChange?.("transcribing");
+
+        // 3. Polling com limite de tempo (AssemblyAI leva ~6 a 12s)
         const startTime = Date.now();
         while (Date.now() - startTime < maxWaitMs) {
             await new Promise((r) => setTimeout(r, 1000));
@@ -225,13 +263,18 @@ export async function transcribeVoiceRecording({
             }
         }
 
-        // Se estourou o tempo de polling, segue para fallback
-        throw new Error("Tempo limite de processamento com IA excedido.");
+        // Se estourou o tempo de polling
+        throw new Error("Tempo limite de processamento com IA excedido (timeout).");
 
     } catch (err: any) {
+        if (shouldDisableFallback) {
+            console.error("[STT AssemblyAI Error - Fallback Desativado no Admin]:", err?.message || err);
+            throw new Error(err?.message || "Erro desconhecido na transcrição por IA.");
+        }
+
         console.warn("[Voice Transcription Fallback - Web Speech Usado]:", err?.message || err);
         onStatusChange?.("fallback");
-        // Fallback transparente: retorna o texto limpo do Web Speech
+        // Fallback transparente: retorna o texto do Web Speech
         return { text: cleanFallback, source: "webspeech" };
     }
 }

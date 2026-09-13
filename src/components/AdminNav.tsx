@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NavLink } from "react-router-dom";
-import { BarChart3, FileText, BookOpen, Users, User, Sparkles } from "lucide-react";
+import { BarChart3, FileText, BookOpen, Users, User, Sparkles, Sliders } from "lucide-react";
 
 export default function AdminNav() {
     const linkCls = ({ isActive }: { isActive: boolean }) =>
@@ -38,6 +38,10 @@ export default function AdminNav() {
             <NavLink to="/admin/usuarios" className={linkCls}>
                 <Users className="h-4 w-4" />
                 Usuários
+            </NavLink>
+            <NavLink to="/admin/configuracoes" className={linkCls}>
+                <Sliders className="h-4 w-4" />
+                Configurações
             </NavLink>
         </nav>
     );

@@ -10,8 +10,9 @@ import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
 import AdminNav from "@/components/AdminNav";
-import { Loader2, Sparkles, LogIn, XCircle, Bell, BarChart3 } from "lucide-react";
+import { Loader2, Sparkles, LogIn, XCircle, Bell, BarChart3, Mic, Sliders, ChevronRight } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useVoiceSettings } from "@/lib/voiceSettings";
 
 function daysAgoIso(days: number): string {
     const date = new Date();
@@ -43,6 +44,8 @@ export default function AdminPage() {
     const [notificationStats, setNotificationStats] = useState<NotificationStats | null>(null);
     const [notificationStatsError, setNotificationStatsError] = useState<string | null>(null);
     const [loadingStats, setLoadingStats] = useState(false);
+
+    const { isFallbackEnabled, toggleFallback } = useVoiceSettings();
 
     useEffect(() => {
         if (authLoading) return;
@@ -250,6 +253,64 @@ export default function AdminPage() {
                                 </>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                {/* Card de Configuração de Voz / IA */}
+                <div className="rounded-2xl border border-border bg-app-surface p-6 shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                                <Mic className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs uppercase tracking-widest text-app-text-muted">
+                                    Voz & IA (AssemblyAI)
+                                </p>
+                                <h3 className="mt-1 font-serif text-lg text-app-text">
+                                    Fallback Web Speech
+                                </h3>
+                                <p className="mt-1 text-xs text-app-text-muted max-w-md">
+                                    {isFallbackEnabled
+                                        ? "Ativado: Se a IA falhar, usa o texto capturado pelo navegador como contingência."
+                                        : "Desativado (Modo Estrito): Exige resposta da AssemblyAI. Se falhar, avisa erro sem salvar texto cru."}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Switch rápido */}
+                        <div className="flex items-center shrink-0">
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={isFallbackEnabled}
+                                onClick={toggleFallback}
+                                className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none ${
+                                    isFallbackEnabled ? "bg-gold" : "bg-zinc-700"
+                                }`}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-black shadow-md transition-transform duration-200 ${
+                                        isFallbackEnabled ? "translate-x-6" : "translate-x-1"
+                                    }`}
+                                />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 border-t border-border/50 pt-4 flex items-center justify-between text-xs">
+                        <span className="inline-flex items-center gap-1.5 font-medium text-gold">
+                            <span className={`h-2 w-2 rounded-full ${isFallbackEnabled ? "bg-emerald-500" : "bg-amber-500 animate-pulse"}`} />
+                            {isFallbackEnabled ? "Fallback Ativado" : "Modo Estrito (AssemblyAI Exclusivo)"}
+                        </span>
+                        <Link
+                            to="/admin/configuracoes"
+                            className="inline-flex items-center gap-1 text-app-text-muted hover:text-gold transition-colors font-medium"
+                        >
+                            <Sliders className="h-3.5 w-3.5" />
+                            <span>Diagnóstico e Opções</span>
+                            <ChevronRight className="h-3.5 w-3.5" />
+                        </Link>
                     </div>
                 </div>
             </div>

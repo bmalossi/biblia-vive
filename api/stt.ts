@@ -92,6 +92,45 @@ export default async function handler(req: any, res?: any) {
                 action = url.searchParams.get("action");
             }
 
+            // Sub-ação: Diagnóstico de integridade (AssemblyAI e R2)
+            if (action === "health") {
+                const r2AccessKeyId = (
+                    process.env.VOICE_R2_ACCESS_KEY_ID ||
+                    process.env.R2_VOICE_ACCESS_KEY_ID ||
+                    process.env.R2_ACCESS_KEY_ID ||
+                    ""
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2SecretAccessKey = (
+                    process.env.VOICE_R2_SECRET_ACCESS_KEY ||
+                    process.env.R2_VOICE_SECRET_ACCESS_KEY ||
+                    process.env.R2_SECRET_ACCESS_KEY ||
+                    ""
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2Endpoint = (
+                    process.env.VOICE_R2_ENDPOINT ||
+                    process.env.R2_ENDPOINT ||
+                    "https://a63dc175e27a1425b6ead0b1c1ccd53c.r2.cloudflarestorage.com"
+                ).trim().replace(/^["']|["']$/g, "");
+
+                const r2BucketName = (
+                    process.env.VOICE_R2_BUCKET_NAME ||
+                    process.env.R2_BUCKET_NAME ||
+                    "imagens-artigos"
+                ).trim().replace(/^["']|["']$/g, "");
+
+                return respondJson({
+                    status: "ok",
+                    assemblyai_configured: Boolean(apiKey),
+                    assemblyai_key_prefix: apiKey ? apiKey.slice(0, 6) + "..." : null,
+                    r2_configured: Boolean(r2AccessKeyId && r2SecretAccessKey),
+                    r2_key_prefix: r2AccessKeyId ? r2AccessKeyId.slice(0, 8) + "..." : null,
+                    r2_endpoint: r2Endpoint,
+                    r2_bucket: r2BucketName,
+                }, 200);
+            }
+
             // Sub-ação: Gerar presigned PUT URL para o Cloudflare R2
             if (action === "upload-url") {
                 const r2AccessKeyId = (
@@ -208,22 +247,34 @@ export default async function handler(req: any, res?: any) {
                 }
             }
 
-            // 2. Se não veio audioUrl, verifica se veio binário direto (fallback legado)
+            // 2. Se não veio audioUrl, verifica se veio binário direto (fallback direto para AssemblyAI)
             if (!audioUrl) {
-                let audioBuffer: ArrayBuffer | null = null;
+                let audioBuffer: Buffer | null = null;
                 const contentType = (req.headers && (req.headers["content-type"] || req.headers.get?.("content-type"))) || "";
 
-                if (typeof (req as Request).formData === "function" && contentType.includes("multipart/form-data")) {
+                if (Buffer.isBuffer(req.body)) {
+                    audioBuffer = req.body;
+                } else if (typeof (req as Request).formData === "function" && contentType.includes("multipart/form-data")) {
                     const formData = await (req as Request).formData();
                     const file = formData.get("audio");
                     if (file && file instanceof Blob) {
-                        audioBuffer = await file.arrayBuffer();
+                        const ab = await file.arrayBuffer();
+                        audioBuffer = Buffer.from(ab);
                     }
                 } else if (typeof (req as Request).arrayBuffer === "function") {
-                    audioBuffer = await (req as Request).arrayBuffer();
+                    const ab = await (req as Request).arrayBuffer();
+                    audioBuffer = Buffer.from(ab);
+                } else if (req && typeof req[Symbol.asyncIterator] === "function") {
+                    const chunks: any[] = [];
+                    for await (const chunk of req) {
+                        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+                    }
+                    if (chunks.length > 0) {
+                        audioBuffer = Buffer.concat(chunks);
+                    }
                 }
 
-                if (audioBuffer && audioBuffer.byteLength >= 100) {
+                if (audioBuffer && audioBuffer.length >= 100) {
                     const uploadRes = await fetch("https://api.assemblyai.com/v2/upload", {
                         method: "POST",
                         headers: {
@@ -236,6 +287,9 @@ export default async function handler(req: any, res?: any) {
                     if (uploadRes.ok) {
                         const uploadData = await uploadRes.json();
                         audioUrl = uploadData.upload_url;
+                    } else {
+                        const errTxt = await uploadRes.text().catch(() => "");
+                        console.error("[AssemblyAI Direct Upload Error]", uploadRes.status, errTxt);
                     }
                 }
             }
