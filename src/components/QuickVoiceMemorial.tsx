@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { ensureMicrophonePermission } from "@/lib/microphonePermission";
 import { startAudioCapture, AudioCaptureController, transcribeVoiceRecording } from "@/lib/audioTranscription";
 import { createSpeechRecognitionEngine, SpeechEngineController, isSpeechRecognitionSupported } from "@/lib/speechRecognitionEngine";
+import { isWebSpeechFallbackDisabled } from "@/lib/voiceSettings";
 
 const MAX_RECORDING_SECONDS = 120; // 2 minutos máximo
 const SUCCESS_HOLD_MS = 1800;
@@ -24,7 +25,6 @@ export default function QuickVoiceMemorial() {
     const [isSealing, setIsSealing] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [transcribedText, setTranscribedText] = useState<string | null>(null);
-    const [livePreviewText, setLivePreviewText] = useState<string>("");
     const [savedEntry, setSavedEntry] = useState<MemorialEntry | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -34,6 +34,7 @@ export default function QuickVoiceMemorial() {
     // Refs de controle de captura e reconhecimento
     const audioControllerRef = useRef<AudioCaptureController | null>(null);
     const speechEngineRef = useRef<SpeechEngineController | null>(null);
+    const fallbackTextRef = useRef<string>("");
     const timerRef = useRef<number | null>(null);
     const categoryRef = useRef<MemorialCategory>(category);
 
@@ -147,12 +148,12 @@ export default function QuickVoiceMemorial() {
         }
     };
 
-    // ── Iniciar gravação (Captura HD + Preview ao vivo) ───────────────────────
+    // ── Iniciar gravação (Captura de Áudio HD sem ruído na tela) ─────────────
     const startRecording = async () => {
         setErrorMessage(null);
         setTranscribedText(null);
         setSavedEntry(null);
-        setLivePreviewText("");
+        fallbackTextRef.current = "";
 
         // Garante permissão explícita no navegador
         const permResult = await ensureMicrophonePermission();
@@ -166,11 +167,11 @@ export default function QuickVoiceMemorial() {
             const { controller } = await startAudioCapture();
             audioControllerRef.current = controller;
 
-            // 2. Inicia Web Speech determinístico para preview ao vivo (sem duplicação)
-            if (isSpeechRecognitionSupported()) {
+            // 2. Coleta silenciosa de contingência em segundo plano (apenas se fallback estiver ativo)
+            if (!isWebSpeechFallbackDisabled() && isSpeechRecognitionSupported()) {
                 const engine = createSpeechRecognitionEngine({
                     onLiveUpdate: (state) => {
-                        setLivePreviewText(state.fullText);
+                        fallbackTextRef.current = state.fullText;
                     },
                     onError: (errText) => {
                         console.warn("[Speech Engine Warning]:", errText);
@@ -215,8 +216,8 @@ export default function QuickVoiceMemorial() {
         setIsProcessing(true);
         setProcessingStep("Refinando áudio com IA...");
 
-        // 1. Finaliza reconhecimento Web Speech e obtém o texto de fallback
-        const fallbackText = speechEngineRef.current?.stop() || livePreviewText || "";
+        // 1. Finaliza reconhecimento Web Speech de contingência se ativo
+        const fallbackText = speechEngineRef.current?.stop() || fallbackTextRef.current || "";
         speechEngineRef.current = null;
 
         // 2. Finaliza MediaRecorder e obtém o arquivo de áudio binário
@@ -276,7 +277,6 @@ export default function QuickVoiceMemorial() {
 
         setIsRecording(false);
         setIsProcessing(false);
-        setLivePreviewText("");
         setRecordingTime(0);
     };
 
@@ -342,32 +342,26 @@ export default function QuickVoiceMemorial() {
 
             {/* Estado 1: GRAVANDO */}
             {isRecording && (
-                <div className="mt-3 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-gold/60 bg-surface/95 px-4 py-3.5 animate-pulse-aura transition-all">
-                    <div className="flex flex-col gap-1 flex-1 min-w-0">
-                        <div className="flex items-center gap-3">
-                            <span className="relative flex h-3.5 w-3.5 shrink-0">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/80 opacity-75"></span>
-                                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-gold"></span>
-                            </span>
-                            <div>
-                                <p className="font-serif text-sm font-medium text-app-text">
-                                    Ouvindo com reverência...
-                                </p>
-                                <span className="font-mono text-[0.72rem] text-gold/90">
-                                    {formatSeconds(recordingTime)} / {formatSeconds(MAX_RECORDING_SECONDS)}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Preview em tempo real da transcrição (determinístico e sem duplicações) */}
-                        {livePreviewText && (
-                            <p className="mt-1.5 ml-6 font-serif text-xs italic leading-relaxed text-app-text-muted line-clamp-2">
-                                {livePreviewText}
+                <div className="mt-3 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-gold/60 bg-surface/95 px-4 py-3.5 animate-pulse-aura transition-all">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className="relative flex h-3.5 w-3.5 shrink-0">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/80 opacity-75"></span>
+                            <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-gold"></span>
+                        </span>
+                        <div>
+                            <p className="font-serif text-sm font-medium text-app-text">
+                                Gravando áudio com alta fidelidade...
                             </p>
-                        )}
+                            <p className="text-[0.72rem] text-app-text-muted">
+                                Fale com naturalidade. A IA fará a transcrição e pontuação ao concluir.
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2.5 shrink-0">
+                        <span className="font-mono text-xs font-semibold text-gold bg-gold/10 px-2.5 py-1 rounded-full border border-gold/30">
+                            {formatSeconds(recordingTime)} / {formatSeconds(MAX_RECORDING_SECONDS)}
+                        </span>
                         <button
                             type="button"
                             onClick={cancelRecording}

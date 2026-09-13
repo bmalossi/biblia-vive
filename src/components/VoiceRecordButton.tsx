@@ -91,14 +91,12 @@ export default function VoiceRecordButton({
             const { controller } = await startAudioCapture();
             audioControllerRef.current = controller;
 
-            // 2. Inicia Web Speech determinístico sem duplicações
-            if (isSpeechRecognitionSupported()) {
+            // 2. Coleta silenciosa de contingência em segundo plano (apenas se fallback estiver ativo)
+            if (!isWebSpeechFallbackDisabled() && isSpeechRecognitionSupported()) {
                 const engine = createSpeechRecognitionEngine({
                     onLiveUpdate: (state) => {
                         liveTextRef.current = state.fullText;
-                        if (state.fullText) {
-                            onTranscript(buildOutput(state.fullText));
-                        }
+                        // Silencioso: não emite transcrição realtime durante a gravação
                     },
                     onError: (errText) => {
                         console.warn("[VoiceRecordButton Engine Warning]:", errText);
@@ -143,16 +141,11 @@ export default function VoiceRecordButton({
         setIsProcessing(true);
         triggerHaptic();
 
-        // 1. Finaliza Web Speech e obtém o texto capturado localmente
+        // 1. Finaliza Web Speech e obtém o texto de contingência se ativo
         const fallbackText = speechEngineRef.current?.stop() || liveTextRef.current || "";
         speechEngineRef.current = null;
 
         const fallbackDisabled = isWebSpeechFallbackDisabled();
-
-        // Atualiza com preview do Web Speech apenas se fallback estiver habilitado
-        if (fallbackText && !fallbackDisabled) {
-            onTranscript(buildOutput(fallbackText));
-        }
 
         // 2. Finaliza MediaRecorder e obtém o blob de áudio
         let audioBlob: Blob | null = null;
@@ -161,7 +154,7 @@ export default function VoiceRecordButton({
             audioControllerRef.current = null;
         }
 
-        // 3. Se temos áudio, tenta aprimorar com AssemblyAI via Cloudflare R2 / Direct
+        // 3. Se temos áudio, envia para AssemblyAI (Cloudflare R2 ou Direct Proxy)
         if (audioBlob && audioBlob.size >= 400) {
             try {
                 const result = await transcribeVoiceRecording({
@@ -180,8 +173,12 @@ export default function VoiceRecordButton({
                     onTranscript(startValueRef.current);
                     setErrorMessage(err.message || "Falha na transcrição por IA.");
                     setTimeout(() => setErrorMessage(null), 5000);
+                } else if (fallbackText) {
+                    onTranscript(buildOutput(fallbackText));
                 }
             }
+        } else if (!fallbackDisabled && fallbackText) {
+            onTranscript(buildOutput(fallbackText));
         } else if (fallbackDisabled) {
             onTranscript(startValueRef.current);
             setErrorMessage("Áudio não detectado.");
