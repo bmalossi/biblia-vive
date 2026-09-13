@@ -60,7 +60,7 @@ async function main() {
   let successCount = 0;
   let failCount = 0;
   const purgedUrls: string[] = [];
-  const cacheDomain = process.env.R2_CACHE_DOMAIN || "cache.bibliavive.com.br";
+  const cacheDomain = process.env.R2_CACHE_DOMAIN || "midia.bibliavive.com.br";
 
   for (let i = 0; i < articles.length; i++) {
     const art = articles[i] as ArticleData;

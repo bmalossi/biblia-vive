@@ -95,7 +95,7 @@ describe("Ticket 4: Invalidação Granular de Cache Cloudflare", () => {
   it("purgeArticleCache deve montar as URLs corretas do artigo e do índice", async () => {
     process.env.CLOUDFLARE_API_TOKEN = "test-token-123";
     process.env.CLOUDFLARE_ZONE_ID = "test-zone-456";
-    process.env.R2_CACHE_DOMAIN = "cache.bibliavive.com.br";
+    delete process.env.R2_CACHE_DOMAIN;
 
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -111,8 +111,8 @@ describe("Ticket 4: Invalidação Granular de Cache Cloudflare", () => {
       expect.objectContaining({
         body: JSON.stringify({
           files: [
-            "https://cache.bibliavive.com.br/artigos/graca-de-deus.html",
-            "https://cache.bibliavive.com.br/artigos/index.html",
+            "https://midia.bibliavive.com.br/artigos/graca-de-deus.html",
+            "https://midia.bibliavive.com.br/artigos/index.html",
           ],
         }),
       })

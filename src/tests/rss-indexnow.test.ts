@@ -12,7 +12,8 @@ vi.mock("@supabase/supabase-js", () => ({
   }),
 }));
 
-import feedHandler from "../../api/feed";
+import seoHandler from "../../api/seo";
+const feedHandler = seoHandler;
 import { notifyIndexNowSingle } from "../../api/publish/_indexnow-single";
 
 describe("Ticket 7: Feed RSS Dinâmico e Disparo Pontual de IndexNow", () => {

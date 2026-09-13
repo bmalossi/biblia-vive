@@ -4,7 +4,7 @@ import middleware from "../../middleware";
 describe("Ticket 3: Entrega no Edge e Roteamento via Vercel Middleware", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    process.env.R2_CACHE_DOMAIN = "cache.bibliavive.com.br";
+    delete process.env.R2_CACHE_DOMAIN;
   });
 
   it("deve interceptar /artigos e retornar 200 com HTML de index e Cache-Control", async () => {
@@ -33,7 +33,7 @@ describe("Ticket 3: Entrega no Edge e Roteamento via Vercel Middleware", () => {
     expect(body).toBe(fakeHtml);
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      "https://cache.bibliavive.com.br/artigos/index.html",
+      "https://midia.bibliavive.com.br/artigos/index.html",
       expect.objectContaining({
         headers: { "User-Agent": "BibliaVive-Edge-Middleware/1.0" },
       })
@@ -65,7 +65,7 @@ describe("Ticket 3: Entrega no Edge e Roteamento via Vercel Middleware", () => {
     expect(body).toBe(fakeHtml);
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      "https://cache.bibliavive.com.br/artigos/o-caminho-da-oracao.html",
+      "https://midia.bibliavive.com.br/artigos/o-caminho-da-oracao.html",
       expect.anything()
     );
   });

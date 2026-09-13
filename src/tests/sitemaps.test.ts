@@ -12,8 +12,9 @@ vi.mock("@supabase/supabase-js", () => ({
   }),
 }));
 
-import sitemapIndexHandler from "../../api/sitemap-index";
-import sitemapArticlesHandler from "../../api/sitemap-articles";
+import seoHandler from "../../api/seo";
+const sitemapIndexHandler = seoHandler;
+const sitemapArticlesHandler = seoHandler;
 
 describe("Ticket 6: Sitemaps Granulares (Sitemap Index & Artigos Dinâmicos)", () => {
   beforeEach(() => {

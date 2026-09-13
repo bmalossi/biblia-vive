@@ -4,7 +4,7 @@ export interface PurgeResult {
   error?: string;
 }
 
-const DEFAULT_CACHE_DOMAIN = "cache.bibliavive.com.br";
+const DEFAULT_CACHE_DOMAIN = "midia.bibliavive.com.br";
 
 /**
  * Granular cache purge for Cloudflare CDN.

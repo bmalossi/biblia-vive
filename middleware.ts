@@ -4,7 +4,7 @@ export const config = {
   matcher: ["/artigos", "/artigos/:path*"],
 };
 
-const DEFAULT_CACHE_DOMAIN = "cache.bibliavive.com.br";
+const DEFAULT_CACHE_DOMAIN = "midia.bibliavive.com.br";
 const FETCH_TIMEOUT_MS = 3500;
 
 export default async function middleware(request: Request) {
