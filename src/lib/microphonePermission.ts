@@ -43,57 +43,12 @@ export async function ensureMicrophonePermission(): Promise<MicPermissionResult>
                     error: "O microfone está bloqueado nas configurações do site. Clique no ícone de cadeado/configurações ao lado do endereço do site (URL) e altere 'Microfone' para 'Permitir'.",
                 };
             }
-
-            if (permissionStatus.state === "granted") {
-                // Já autorizado anteriormente — pode prosseguir direto
-                return { ok: true };
-            }
         } catch {
-            // Alguns browsers não implementam a query com 'microphone', prossegue para o passo 3
+            // Alguns browsers não implementam a query com 'microphone'
         }
     }
 
-    // 3. Permissão em "prompt" (ou desconhecida): chama getUserMedia para forçar o navegador
-    // a abrir o pop-up nativo de permissão
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-        // Libera imediatamente todos os canais de áudio capturados
-        // para que a Web Speech API assuma o microfone com exclusividade
-        stream.getTracks().forEach((track) => {
-            try {
-                track.stop();
-            } catch {
-                // Silencioso
-            }
-        });
-
-        return { ok: true };
-    } catch (err: any) {
-        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-            return {
-                ok: false,
-                error: "Permissão de microfone negada. Clique no ícone ao lado do endereço do site (URL) e altere para 'Permitir'.",
-            };
-        }
-
-        if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-            return {
-                ok: false,
-                error: "Nenhum microfone foi encontrado no seu computador ou celular.",
-            };
-        }
-
-        if (err.name === "NotReadableError" || err.name === "TrackStartError") {
-            return {
-                ok: false,
-                error: "O microfone está em uso por outro aplicativo. Feche outros apps de áudio e tente novamente.",
-            };
-        }
-
-        return {
-            ok: false,
-            error: err.message || "Não foi possível acessar o microfone.",
-        };
-    }
+    // Não criamos streams fantasmas aqui para não prender o hardware do microfone.
+    // O startAudioCapture() abrirá diretamente o stream oficial único com as constraints de HD.
+    return { ok: true };
 }

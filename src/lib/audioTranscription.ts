@@ -68,43 +68,74 @@ export async function startAudioCapture(): Promise<{
     mediaRecorder.start(250); // Coleta fatias a cada 250ms
 
     const cleanup = () => {
-        stream.getTracks().forEach((track) => {
-            try {
-                track.enabled = false;
-                track.stop();
-            } catch {
-                // Silencioso
-            }
-        });
+        try {
+            stream.getTracks().forEach((track) => {
+                try {
+                    track.enabled = false;
+                    track.stop();
+                } catch {
+                    // Silencioso
+                }
+            });
+        } catch {
+            // Silencioso
+        }
     };
 
     const controller: AudioCaptureController = {
         stop: () => {
             return new Promise<Blob | null>((resolve) => {
-                if (isCancelled || mediaRecorder.state === "inactive") {
+                let resolved = false;
+
+                const finish = (blob: Blob | null) => {
+                    if (resolved) return;
+                    resolved = true;
                     cleanup();
-                    resolve(null);
+                    resolve(blob);
+                };
+
+                if (isCancelled || mediaRecorder.state === "inactive") {
+                    finish(null);
                     return;
                 }
 
                 mediaRecorder.onstop = () => {
-                    cleanup();
                     if (isCancelled || chunks.length === 0) {
-                        resolve(null);
+                        finish(null);
                         return;
                     }
                     const finalBlob = new Blob(chunks, {
                         type: mediaRecorder.mimeType || "audio/webm",
                     });
-                    resolve(finalBlob);
+                    finish(finalBlob);
                 };
 
                 try {
+                    if (mediaRecorder.state === "recording") {
+                        try {
+                            mediaRecorder.requestData();
+                        } catch {
+                            // Silencioso
+                        }
+                    }
                     mediaRecorder.stop();
                 } catch {
-                    cleanup();
-                    resolve(null);
+                    finish(null);
+                    return;
                 }
+
+                // Libera imediatamente todos os canais de áudio do microfone no sistema operacional
+                cleanup();
+
+                // Failsafe: se onstop do navegador demorar mais de 500ms
+                setTimeout(() => {
+                    if (!resolved) {
+                        const finalBlob = chunks.length > 0
+                            ? new Blob(chunks, { type: mediaRecorder.mimeType || "audio/webm" })
+                            : null;
+                        finish(finalBlob);
+                    }
+                }, 500);
             });
         },
         cancel: () => {

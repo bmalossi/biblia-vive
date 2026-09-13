@@ -171,28 +171,45 @@ export function createSpeechRecognitionEngine({
         stop: () => {
             isManualStop = true;
             isRunning = false;
-            if (restartTimeout) clearTimeout(restartTimeout);
+            if (restartTimeout) {
+                clearTimeout(restartTimeout);
+                restartTimeout = null;
+            }
 
+            // 1. Salva o texto consolidado até este exato momento
+            const finalText = computeFullText();
+
+            // 2. Encerra imediatamente o microfone no navegador
             if (activeRecognition) {
                 try {
-                    activeRecognition.stop();
+                    // Desvincula eventos para evitar re-gatilhos assíncronos
+                    activeRecognition.onresult = null;
+                    activeRecognition.onerror = null;
+                    activeRecognition.onend = null;
+
+                    // abort() força o encerramento imediato do hardware do microfone no Chrome/Edge/Safari
+                    activeRecognition.abort();
                 } catch {
                     // Silencioso
                 }
                 activeRecognition = null;
             }
 
-            // Consolida tudo o que foi falado
-            const finalText = computeFullText();
             return finalText;
         },
         cancel: () => {
             isCancelled = true;
             isRunning = false;
-            if (restartTimeout) clearTimeout(restartTimeout);
+            if (restartTimeout) {
+                clearTimeout(restartTimeout);
+                restartTimeout = null;
+            }
 
             if (activeRecognition) {
                 try {
+                    activeRecognition.onresult = null;
+                    activeRecognition.onerror = null;
+                    activeRecognition.onend = null;
                     activeRecognition.abort();
                 } catch {
                     // Silencioso

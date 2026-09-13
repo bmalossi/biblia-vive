@@ -124,8 +124,16 @@ export default function VoiceRecordButton({
         } catch (err: any) {
             console.error("Erro ao iniciar gravação:", err);
             setIsRecording(false);
-            setErrorMessage(err.message || "Erro ao iniciar gravação.");
-            setTimeout(() => setErrorMessage(null), 4000);
+            if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                setErrorMessage("Permissão de microfone negada. Permita nas configurações do navegador.");
+            } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                setErrorMessage("Nenhum microfone encontrado.");
+            } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
+                setErrorMessage("Microfone ocupado por outro app.");
+            } else {
+                setErrorMessage(err.message || "Erro ao iniciar gravação.");
+            }
+            setTimeout(() => setErrorMessage(null), 5000);
         }
     };
 

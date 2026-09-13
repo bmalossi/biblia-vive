@@ -196,7 +196,15 @@ export default function QuickVoiceMemorial() {
         } catch (err: any) {
             console.error("Erro ao iniciar gravação de voz:", err);
             setIsRecording(false);
-            setErrorMessage(err.message || "Não foi possível iniciar o microfone.");
+            if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                setErrorMessage("Permissão de microfone negada. Clique no ícone de cadeado ao lado da URL e permita o microfone.");
+            } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                setErrorMessage("Nenhum microfone foi detectado no dispositivo.");
+            } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
+                setErrorMessage("O microfone está sendo usado por outro aplicativo.");
+            } else {
+                setErrorMessage(err.message || "Não foi possível iniciar o microfone.");
+            }
         }
     };
 
