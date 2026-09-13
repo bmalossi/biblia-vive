@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry } from "@/lib/noteStore";
-import { findBookGlobally } from "@/lib/books";
+import { MEMORIAL_CATEGORY_CONFIG, getBibleLink } from "@/lib/memorialUtils";
 import SpotlightCard from "@/components/memorial/SpotlightCard";
 import {
   DropdownMenu,
@@ -53,36 +53,10 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const categoryConfig: Record<MemorialCategory, { label: string; classes: string }> = {
-    reflection: {
-      label: "Reflexão",
-      classes: "bg-gold/10 text-gold border-gold/30 font-medium",
-    },
-    prayer: {
-      label: "Oração",
-      classes: "bg-blue-500/10 text-blue-400 border-blue-500/30 font-medium",
-    },
-    testimony: {
-      label: "Testemunho",
-      classes: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-medium",
-    },
-    fasting: {
-      label: "Propósito",
-      classes: "bg-app-raised text-app-text-muted border-border font-medium",
-    },
-  };
-
   const category = (entry.type as MemorialCategory) || "reflection";
-  const catInfo = categoryConfig[category] || categoryConfig.reflection;
+  const catInfo = MEMORIAL_CATEGORY_CONFIG[category] || MEMORIAL_CATEGORY_CONFIG.reflection;
   const isPrayer = category === "prayer";
   const isAnswered = Boolean(entry.answeredAt);
-
-  function getBibleLink() {
-    const bk = findBookGlobally(entry.bookId);
-    const slug = bk ? bk.slug : entry.bookId.toLowerCase();
-    const ver = entry.version || "acf";
-    return `/${ver}/${slug}/${entry.chapter}${entry.verse ? `#v${entry.verse}` : ""}`;
-  }
 
   function formatDate(iso: string) {
     try {
@@ -130,7 +104,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 
             {/* Referência Bíblica */}
             <Link
-              to={getBibleLink()}
+              to={getBibleLink(entry)}
               onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center gap-1 text-[0.78rem] font-medium text-app-text hover:text-gold transition-colors"
               title="Ir para o texto bíblico"
@@ -144,8 +118,9 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 
             {/* Indicador de Favorito */}
             {entry.favorite && (
-              <span title="Marco Favorito">
+              <span title="Marco Favorito" aria-label="Marco Favorito">
                 <Star className="h-3.5 w-3.5 text-gold fill-gold" />
+                <span className="sr-only">Marco Favorito</span>
               </span>
             )}
           </div>
@@ -173,7 +148,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                 onClick={(e) => e.stopPropagation()}
               >
                 <DropdownMenuItem
-                  onClick={() => navigate(getBibleLink())}
+                  onClick={() => navigate(getBibleLink(entry))}
                   className="cursor-pointer gap-2 py-2"
                 >
                   <ExternalLink className="h-3.5 w-3.5 text-app-text-muted" />
@@ -205,7 +180,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                     className="cursor-pointer gap-2 py-2"
                   >
                     <Edit3 className="h-3.5 w-3.5 text-app-text-muted" />
-                    <span>Editar registro</span>
+                    <span>Editar marco</span>
                   </DropdownMenuItem>
                 )}
 

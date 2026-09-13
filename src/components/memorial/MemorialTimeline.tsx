@@ -66,9 +66,7 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
                   className="z-10 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-gold/40 bg-app-surface/95 text-gold text-[0.72rem] font-serif shadow-xs backdrop-blur-xs ml-0 md:ml-0"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-                  <span className="tracking-wide">
-                    {group.yearHeader ? `${group.label} · ${group.yearHeader}` : group.label}
-                  </span>
+                  <span className="tracking-wide">{group.label}</span>
                 </div>
               </div>
 
@@ -116,14 +114,14 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
 
                       {/* Card de Memória:
                           Mobile: deslocado para a direita da linha com pl-12 (48px)
-                          Desktop: ocupa largura balanceada de md:w-[calc(50%-2rem)]
+                          Desktop: ocupa largura balanceada de md:w-[calc(50%-2rem)] com md:pr-8 / md:pl-8
                       */}
                       <div
                         className={cn(
                           "w-full pl-12 md:pl-0",
                           isLeft
-                            ? "md:w-[calc(50%-2rem)] md:mr-auto md:pr-4"
-                            : "md:w-[calc(50%-2rem)] md:ml-auto md:pl-4"
+                            ? "md:w-[calc(50%-2rem)] md:mr-auto md:pr-8"
+                            : "md:w-[calc(50%-2rem)] md:ml-auto md:pl-8"
                         )}
                       >
                         {renderCard ? renderCard(entry, globalIndex) : (

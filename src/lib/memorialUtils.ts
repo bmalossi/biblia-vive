@@ -1,9 +1,39 @@
-﻿// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // memorialUtils.ts — Bíblia Vive · Sprint 27
 // Helper para agrupamento temporal e utilitários do Memorial
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { MemorialEntry } from "./noteStore";
+import type { MemorialCategory, MemorialEntry } from "./noteStore";
+import { findBookGlobally } from "./books";
+
+export const MEMORIAL_CATEGORY_CONFIG: Record<
+    MemorialCategory,
+    { label: string; classes: string }
+> = {
+    reflection: {
+        label: "Reflexão",
+        classes: "bg-gold/10 text-gold border-gold/30 font-medium",
+    },
+    prayer: {
+        label: "Oração",
+        classes: "bg-blue-500/10 text-blue-400 border-blue-500/30 font-medium",
+    },
+    testimony: {
+        label: "Testemunho",
+        classes: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-medium",
+    },
+    fasting: {
+        label: "Propósito",
+        classes: "bg-app-raised text-app-text-muted border-border font-medium",
+    },
+};
+
+export function getBibleLink(entry: Pick<MemorialEntry, "bookId" | "chapter" | "verse" | "version">): string {
+    const bk = findBookGlobally(entry.bookId);
+    const slug = bk ? bk.slug : entry.bookId.toLowerCase();
+    const ver = entry.version || "acf";
+    return `/${ver}/${slug}/${entry.chapter}${entry.verse ? `#v${entry.verse}` : ""}`;
+}
 
 export interface TimeGroup {
     key: string;

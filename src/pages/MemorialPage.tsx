@@ -27,6 +27,7 @@ import MemorialEntryModal from '@/components/MemorialEntryModal';
 import MemorialHeader, { type MemorialFilterType } from '@/components/memorial/MemorialHeader';
 import MemorialTimeline from '@/components/memorial/MemorialTimeline';
 import MemorialCard from '@/components/memorial/MemorialCard';
+import AnswerPrayerDialog from '@/components/memorial/AnswerPrayerDialog';
 import Layout from '@/components/Layout';
 
 export default function MemorialPage() {
@@ -247,6 +248,47 @@ export default function MemorialPage() {
                 ) : (
                     <MemorialTimeline
                         entries={filteredEntries}
+                        emptyState={(function () {
+                            const emptyMessages: Record<string, { title: string; desc: string }> = {
+                                prayer: {
+                                    title: "Nenhuma oração em espera",
+                                    desc: "Apresente suas súplicas e pedidos ao Senhor. Quando Ele responder, você poderá registrar este marco.",
+                                },
+                                testimony: {
+                                    title: "Nenhum testemunho registrado ainda",
+                                    desc: "Quando Deus operar prodígios ou livramentos em sua jornada, grave sua pedra de memória aqui.",
+                                },
+                                answered: {
+                                    title: "Nenhuma oração respondida arquivada ainda",
+                                    desc: "Suas orações atendidas se transformarão em monumentos de gratidão neste Altar.",
+                                },
+                                reflection: {
+                                    title: "Nenhuma reflexão registrada",
+                                    desc: "Medite na Palavra durante sua leitura diária e registre aqui os aprendizados que o Espírito Santo lhe revelar.",
+                                },
+                                fasting: {
+                                    title: "Nenhum propósito ou jejum registrado",
+                                    desc: "Consagre seus propósitos diante de Deus para acompanhar seu progresso e fidelidade.",
+                                },
+                                favorite: {
+                                    title: "Nenhum marco favorito",
+                                    desc: "Você pode favoritar seus marcos mais marcantes tocando no menu de opções de cada card.",
+                                },
+                            };
+
+                            const info = emptyMessages[activeFilter];
+                            if (!info) return undefined;
+
+                            return (
+                                <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-border space-y-3 bg-app-surface/30 max-w-xl mx-auto">
+                                    <Scroll className="h-10 w-10 text-app-text-muted/40 mx-auto" />
+                                    <p className="text-[0.95rem] font-serif text-app-text">{info.title}</p>
+                                    <p className="text-[0.8rem] text-app-text-muted max-w-sm mx-auto leading-relaxed">
+                                        {info.desc}
+                                    </p>
+                                </div>
+                            );
+                        })()}
                         renderCard={(entry) => (
                             <MemorialCard
                                 entry={entry}
@@ -295,63 +337,15 @@ export default function MemorialPage() {
                     onDelete={selectedEntry ? () => handleDelete(selectedEntry.id) : undefined}
                 />
 
-                {/* Modal de Registro de Resposta de Oração Contextual */}
-                {answerModalEntry && (
-                    <div
-                        role="dialog"
-                        aria-labelledby="modal-answer-title"
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
-                    >
-                        <div className="w-full max-w-md rounded-2xl bg-app-surface border border-border p-5 space-y-4 shadow-2xl">
-                            <div className="flex items-center justify-between">
-                                <h3 id="modal-answer-title" className="text-[0.95rem] font-serif font-semibold text-app-text flex items-center gap-2">
-                                    <CheckCircle2 className="h-5 w-5 text-gold" />
-                                    <span>Registrar Oração Respondida</span>
-                                </h3>
-                                <button
-                                    type="button"
-                                    onClick={() => setAnswerModalEntry(null)}
-                                    className="p-1 rounded-lg hover:bg-app-raised text-app-text-muted hover:text-app-text transition-colors cursor-pointer"
-                                    aria-label="Fechar"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-
-                            <p className="text-[0.8rem] text-app-text-muted leading-relaxed">
-                                "A fidelidade do Senhor permanece para sempre." Registre o testemunho de como Deus respondeu a esta oração para erguer seu memorial:
-                            </p>
-
-                            <form onSubmit={handleSaveAnswer} className="space-y-4">
-                                <textarea
-                                    value={answerText}
-                                    onChange={e => setAnswerText(e.target.value)}
-                                    placeholder="Descreva como o Senhor atendeu a sua oração..."
-                                    rows={4}
-                                    autoFocus
-                                    className="w-full resize-none rounded-xl border border-border bg-app-surface p-3 text-[0.85rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 shadow-xs"
-                                />
-
-                                <div className="flex items-center justify-end gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setAnswerModalEntry(null)}
-                                        className="px-3.5 py-1.5 text-[0.78rem] text-app-text-muted hover:text-app-text transition-colors cursor-pointer"
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={isAnswering}
-                                        className="px-4 py-2 rounded-xl bg-gold font-sans font-semibold text-[0.8rem] text-black hover:bg-gold/90 disabled:opacity-50 transition-colors shadow-xs cursor-pointer active:scale-95"
-                                    >
-                                        {isAnswering ? "Salvando..." : "Salvar Testemunho"}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
+                {/* Diálogo Contextual de Registro de Resposta de Oração */}
+                <AnswerPrayerDialog
+                    isOpen={Boolean(answerModalEntry)}
+                    onClose={() => setAnswerModalEntry(null)}
+                    answerText={answerText}
+                    onAnswerTextChange={setAnswerText}
+                    onSubmit={handleSaveAnswer}
+                    isSubmitting={isAnswering}
+                />
 
                 {/* Modal de Autenticação */}
                 <AuthModal
