@@ -106,8 +106,8 @@ describe("Motor de Memórias (selectBestEcho)", () => {
 
         const echo = await store.getMatchingEcho("proverbios", 3);
         expect(echo).not.toBeNull();
-        expect(echo?.bookId).toBe("proverbios");
-        expect(echo?.chapter).toBe(3);
+        expect(echo?.entry.bookId).toBe("proverbios");
+        expect(echo?.entry.chapter).toBe(3);
     });
 
     it("LocalNoteStore anexa atualizações em metadata.eco_updates sem sobrescrever histórico", async () => {

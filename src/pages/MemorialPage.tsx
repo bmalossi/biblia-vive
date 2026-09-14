@@ -27,6 +27,7 @@ import MemorialEntryModal from '@/components/MemorialEntryModal';
 import MemorialHeader, { type MemorialFilterType } from '@/components/memorial/MemorialHeader';
 import MemorialTimeline from '@/components/memorial/MemorialTimeline';
 import MemorialCard from '@/components/memorial/MemorialCard';
+import MemorialNoteModal from '@/components/memorial/MemorialNoteModal';
 import AnswerPrayerDialog from '@/components/memorial/AnswerPrayerDialog';
 import Layout from '@/components/Layout';
 
@@ -49,6 +50,9 @@ export default function MemorialPage() {
     const [activeFilter, setActiveFilter] = useState<MemorialFilterType>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [authOpen, setAuthOpen] = useState(false);
+
+    // Modal de Visualização Expansiva (Scale In Card)
+    const [expandedNote, setExpandedNote] = useState<MemorialEntry | null>(null);
 
     // Modal de Criação / Edição de Marco
     const [selectedEntry, setSelectedEntry] = useState<MemorialEntry | null>(null);
@@ -292,7 +296,7 @@ export default function MemorialPage() {
                         renderCard={(entry) => (
                             <MemorialCard
                                 entry={entry}
-                                onCardClick={(e) => navigate(`/memorial/${e.id}`)}
+                                onCardClick={(e) => setExpandedNote(e)}
                                 onMarkAnswered={handleOpenAnswerModal}
                                 onToggleFavorite={(e) => handleToggleFavorite(e.id)}
                                 onEdit={(e) => {
@@ -304,6 +308,34 @@ export default function MemorialPage() {
                         )}
                     />
                 )}
+
+                {/* Modal Expansivo Scale In Card (Linha Sagrada) */}
+                <MemorialNoteModal
+                    note={expandedNote}
+                    isOpen={Boolean(expandedNote)}
+                    onClose={() => setExpandedNote(null)}
+                    onMarkAnswered={(entry) => {
+                        setExpandedNote(null);
+                        handleOpenAnswerModal(entry);
+                    }}
+                    onToggleFavorite={async (entry) => {
+                        await handleToggleFavorite(entry.id);
+                        setExpandedNote((prev) =>
+                            prev && prev.id === entry.id
+                                ? { ...prev, favorite: !prev.favorite }
+                                : prev
+                        );
+                    }}
+                    onEdit={(entry) => {
+                        setExpandedNote(null);
+                        setSelectedEntry(entry);
+                        setIsEditModalOpen(true);
+                    }}
+                    onDelete={(entry) => {
+                        handleDelete(entry.id);
+                        setExpandedNote(null);
+                    }}
+                />
 
                 {/* Modal de Criação ou Edição de Registro */}
                 <MemorialEntryModal
