@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry } from "@/lib/noteStore";
-import { MEMORIAL_CATEGORY_CONFIG, getBibleLink } from "@/lib/memorialUtils";
+import { MEMORIAL_CATEGORY_CONFIG, getBibleLink, hasBibleReference } from "@/lib/memorialUtils";
 import SpotlightCard from "@/components/memorial/SpotlightCard";
 import {
   DropdownMenu,
@@ -57,6 +57,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
   const catInfo = MEMORIAL_CATEGORY_CONFIG[category] || MEMORIAL_CATEGORY_CONFIG.reflection;
   const isPrayer = category === "prayer";
   const isAnswered = Boolean(entry.answeredAt);
+  const hasRef = hasBibleReference(entry);
 
   function formatDate(iso: string) {
     try {
@@ -102,19 +103,21 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
               {catInfo.label}
             </span>
 
-            {/* Referência Bíblica */}
-            <Link
-              to={getBibleLink(entry)}
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-[0.78rem] font-medium text-app-text hover:text-gold transition-colors"
-              title="Ir para o texto bíblico"
-            >
-              <span>
-                {entry.bookName} {entry.chapter}
-                {entry.verse ? `:${entry.verse}` : ""}
-              </span>
-              <ExternalLink className="h-3 w-3 opacity-60" />
-            </Link>
+            {/* Referência Bíblica (apenas se vinculada) */}
+            {hasRef && (
+              <Link
+                to={getBibleLink(entry)}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-[0.78rem] font-medium text-app-text hover:text-gold transition-colors"
+                title="Ir para o texto bíblico"
+              >
+                <span>
+                  {entry.bookName} {entry.chapter}
+                  {entry.verse ? `:${entry.verse}` : ""}
+                </span>
+                <ExternalLink className="h-3 w-3 opacity-60" />
+              </Link>
+            )}
 
             {/* Indicador de Favorito */}
             {entry.favorite && (
@@ -147,13 +150,15 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                 className="w-48 bg-app-surface border border-border shadow-md rounded-xl p-1 text-xs"
                 onClick={(e) => e.stopPropagation()}
               >
-                <DropdownMenuItem
-                  onClick={() => navigate(getBibleLink(entry))}
-                  className="cursor-pointer gap-2 py-2"
-                >
-                  <ExternalLink className="h-3.5 w-3.5 text-app-text-muted" />
-                  <span>Abrir no texto bíblico</span>
-                </DropdownMenuItem>
+                {hasRef && (
+                  <DropdownMenuItem
+                    onClick={() => navigate(getBibleLink(entry))}
+                    className="cursor-pointer gap-2 py-2"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 text-app-text-muted" />
+                    <span>Abrir no texto bíblico</span>
+                  </DropdownMenuItem>
+                )}
 
                 {onToggleFavorite && (
                   <DropdownMenuItem

@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Scroll } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialEntry, MemorialCategory } from "@/lib/noteStore";
-import { groupEntriesByTime, type TimeGroup } from "@/lib/memorialUtils";
+import { groupEntriesByTime, hasBibleReference, type TimeGroup } from "@/lib/memorialUtils";
 
 export interface MemorialTimelineProps {
   entries: MemorialEntry[];
@@ -126,7 +126,7 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
                       >
                         {renderCard ? renderCard(entry, globalIndex) : (
                           <div className="p-4 rounded-2xl border border-border bg-app-surface text-app-text text-sm">
-                            <h4 className="font-serif font-semibold">{entry.title || entry.bookName}</h4>
+                            <h4 className="font-serif font-semibold">{entry.title || (hasBibleReference(entry) ? entry.bookName : "")}</h4>
                             <p className="text-xs text-app-text-muted mt-1">{entry.content}</p>
                           </div>
                         )}

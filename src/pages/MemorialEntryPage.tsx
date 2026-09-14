@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { createNoteStore, type MemorialCategory, type MemorialEntry } from "@/lib/noteStore";
 import { findBookGlobally } from "@/lib/books";
+import { hasBibleReference } from "@/lib/memorialUtils";
 import AuthModal from "@/components/AuthModal";
 import MemorialEntryModal from "@/components/MemorialEntryModal";
 import { SaveMemorialButton } from "@/components/SaveMemorialButton";
@@ -34,7 +35,9 @@ export default function MemorialEntryPage() {
     const store = useMemo(() => createNoteStore(user?.id ?? null), [user]);
 
     usePageMeta({
-        title: entry ? `${entry.title || entry.bookName + ' ' + entry.chapter} — Meu Memorial` : "Meu Memorial — Bíblia Vive",
+        title: entry
+            ? `${entry.title || (hasBibleReference(entry) ? `${entry.bookName} ${entry.chapter}` : "Registro")} — Meu Memorial`
+            : "Meu Memorial — Bíblia Vive",
         robots: "noindex, nofollow",
     });
 
@@ -53,12 +56,14 @@ export default function MemorialEntryPage() {
             const found = all.find((item) => item.id === id) || null;
             setEntry(found);
 
-            if (found) {
+            if (found && hasBibleReference(found)) {
                 const chapterItems = await store.getByChapter(found.bookId, found.chapter);
                 const filtered = chapterItems
                     .filter((item) => item.id !== found.id)
                     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 setOtherEntries(filtered);
+            } else {
+                setOtherEntries([]);
             }
         } finally {
             setLoading(false);
@@ -86,6 +91,7 @@ export default function MemorialEntryPage() {
     }
 
     function getBibleLink(item: MemorialEntry) {
+        if (!hasBibleReference(item)) return "";
         const bk = findBookGlobally(item.bookId);
         const slug = bk ? bk.slug : item.bookId.toLowerCase();
         const ver = item.version || "acf";
@@ -96,9 +102,13 @@ export default function MemorialEntryPage() {
         if (!entry) return;
         const config = categoryConfig[entry.type] || categoryConfig.reflection;
         const formattedDate = formatDateLong(entry.createdAt);
-        const refText = `${entry.bookName} ${entry.chapter}${entry.verse ? `:${entry.verse}` : ""}`;
+        const refText = hasBibleReference(entry)
+            ? `${entry.bookName} ${entry.chapter}${entry.verse ? `:${entry.verse}` : ""}`
+            : "";
         
-        let text = `${config.label} • ${refText}\n${formattedDate}\n\n`;
+        let text = refText
+            ? `${config.label} • ${refText}\n${formattedDate}\n\n`
+            : `${config.label}\n${formattedDate}\n\n`;
         if (entry.title) text += `${entry.title}\n\n`;
         text += entry.content;
 
@@ -222,12 +232,14 @@ export default function MemorialEntryPage() {
                         </span>
                     </div>
 
-                    <Link
-                        to={getBibleLink(entry)}
-                        className="inline-block text-lg font-serif font-semibold text-gold hover:underline"
-                    >
-                        {entry.bookName} {entry.chapter}{entry.verse ? `:${entry.verse}` : ""}
-                    </Link>
+                    {hasBibleReference(entry) && (
+                        <Link
+                            to={getBibleLink(entry)}
+                            className="inline-block text-lg font-serif font-semibold text-gold hover:underline"
+                        >
+                            {entry.bookName} {entry.chapter}{entry.verse ? `:${entry.verse}` : ""}
+                        </Link>
+                    )}
 
                     {entry.title && (
                         <h1 className="text-2xl font-serif font-bold text-app-text tracking-tight pt-2">

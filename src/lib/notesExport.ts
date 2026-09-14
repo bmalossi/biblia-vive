@@ -5,12 +5,18 @@
 // Separado de noteStore.ts para não carregar jsPDF no bundle principal.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { VerseNote } from "./noteStore";
+import type { VerseNote, MemorialEntry } from "./noteStore";
+import { hasBibleReference } from "./memorialUtils";
 
-export function exportNotesToTXT(notes: VerseNote[]): void {
-    const lines = notes.map(n =>
-        `${n.bookName} ${n.chapter}:${n.verse}\n"${n.verseText}"\n\n${n.content}\n\n---\n`
-    );
+export function exportNotesToTXT(notes: (VerseNote | MemorialEntry)[]): void {
+    const lines = notes.map(n => {
+        const hasRef = hasBibleReference(n);
+        const refLine = hasRef
+            ? `${n.bookName} ${n.chapter}${n.verse ? `:${n.verse}` : ""}`
+            : (("title" in n && n.title) ? n.title : "");
+        const verseQuote = (hasRef && n.verseText) ? `"${n.verseText}"\n\n` : "";
+        return `${refLine ? refLine + "\n" : ""}${verseQuote}${n.content}\n\n---\n`;
+    });
     const blob = new Blob(
         [`BÍBLIA VIVE — MINHAS NOTAS\n${"=".repeat(40)}\n\n`, ...lines],
         { type: "text/plain;charset=utf-8" }
@@ -23,7 +29,7 @@ export function exportNotesToTXT(notes: VerseNote[]): void {
     URL.revokeObjectURL(url);
 }
 
-export async function exportNotesToPDF(notes: VerseNote[], isSingleChapter = false): Promise<void> {
+export async function exportNotesToPDF(notes: (VerseNote | MemorialEntry)[], isSingleChapter = false): Promise<void> {
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const margin = 20;
@@ -51,7 +57,7 @@ export async function exportNotesToPDF(notes: VerseNote[], isSingleChapter = fal
     doc.setFont("times", "italic");
     doc.setFontSize(28);
     doc.setTextColor(190, 160, 100);
-    centerText(isSingleChapter && notes.length > 0 ? `Anotações: ${notes[0].bookName} ${notes[0].chapter}` : "Minhas Anotações", y);
+    centerText(isSingleChapter && notes.length > 0 && hasBibleReference(notes[0]) ? `Anotações: ${notes[0].bookName} ${notes[0].chapter}` : "Minhas Anotações", y);
 
     y += 20;
     doc.setDrawColor(210, 190, 140);
@@ -74,13 +80,22 @@ export async function exportNotesToPDF(notes: VerseNote[], isSingleChapter = fal
             y = margin + 10;
         }
 
-        doc.setFont("times", "bold");
-        doc.setFontSize(12);
-        doc.setTextColor(50, 50, 50);
-        doc.text(`${note.bookName} ${note.chapter}:${note.verse}`, margin, y);
-        y += 6;
+        const hasRef = hasBibleReference(note);
+        if (hasRef) {
+            doc.setFont("times", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(50, 50, 50);
+            doc.text(`${note.bookName} ${note.chapter}${note.verse ? `:${note.verse}` : ""}`, margin, y);
+            y += 6;
+        } else if ("title" in note && note.title) {
+            doc.setFont("times", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(50, 50, 50);
+            doc.text(note.title, margin, y);
+            y += 6;
+        }
 
-        if (note.verseText) {
+        if (hasRef && note.verseText) {
             doc.setFont("times", "italic");
             doc.setFontSize(11);
             doc.setTextColor(120, 120, 120);

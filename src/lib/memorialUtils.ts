@@ -28,7 +28,41 @@ export const MEMORIAL_CATEGORY_CONFIG: Record<
     },
 };
 
+/**
+ * Verifica se o registro do Memorial possui uma referência bíblica válida associada.
+ * Retorna false para registros livres (bookId "geral", "none", capítulo <= 0 ou ausente).
+ */
+export function hasBibleReference(entry?: {
+    bookId?: string | null;
+    bookName?: string | null;
+    chapter?: number | null;
+} | null): boolean {
+    if (!entry) return false;
+    const bId = entry.bookId?.trim().toLowerCase();
+    const bName = entry.bookName?.trim().toLowerCase();
+    const ch = Number(entry.chapter);
+    if (!bId || bId === "geral" || bId === "none") return false;
+    if (!bName || bName === "geral" || bName === "none") return false;
+    if (!ch || ch <= 0 || isNaN(ch)) return false;
+    return true;
+}
+
+/**
+ * Retorna a referência bíblica formatada (ex: "Salmos 23:1" ou "Salmos 23").
+ * Retorna string vazia se não houver referência bíblica válida.
+ */
+export function formatBibleReference(entry?: {
+    bookId?: string | null;
+    bookName?: string | null;
+    chapter?: number | null;
+    verse?: number | null;
+} | null): string {
+    if (!entry || !hasBibleReference(entry)) return "";
+    return `${entry.bookName} ${entry.chapter}${entry.verse ? `:${entry.verse}` : ""}`;
+}
+
 export function getBibleLink(entry: Pick<MemorialEntry, "bookId" | "chapter" | "verse" | "version">): string {
+    if (!hasBibleReference(entry)) return "";
     const bk = findBookGlobally(entry.bookId);
     const slug = bk ? bk.slug : entry.bookId.toLowerCase();
     const ver = entry.version || "acf";

@@ -1,5 +1,5 @@
-﻿import { describe, it, expect } from "vitest";
-import { groupEntriesByTime } from "../lib/memorialUtils";
+import { describe, it, expect } from "vitest";
+import { groupEntriesByTime, hasBibleReference, formatBibleReference, getBibleLink } from "../lib/memorialUtils";
 import type { MemorialEntry } from "../lib/noteStore";
 
 describe("groupEntriesByTime", () => {
@@ -51,5 +51,35 @@ describe("groupEntriesByTime", () => {
     it("should return empty array for empty input", () => {
         const groups = groupEntriesByTime([], fixedNow);
         expect(groups).toEqual([]);
+    });
+});
+
+describe("hasBibleReference and formatBibleReference", () => {
+    it("returns true and formats reference for valid book and chapter", () => {
+        const entry = { bookId: "sl", bookName: "Salmos", chapter: 23, verse: 1, version: "acf" };
+        expect(hasBibleReference(entry)).toBe(true);
+        expect(formatBibleReference(entry)).toBe("Salmos 23:1");
+        expect(getBibleLink(entry)).toBe("/acf/sl/23#v1");
+    });
+
+    it("returns true for chapter without verse", () => {
+        const entry = { bookId: "sl", bookName: "Salmos", chapter: 23, verse: null, version: "acf" };
+        expect(hasBibleReference(entry)).toBe(true);
+        expect(formatBibleReference(entry)).toBe("Salmos 23");
+        expect(getBibleLink(entry)).toBe("/acf/sl/23");
+    });
+
+    it("returns false for Geral / 0 or unlinked entries", () => {
+        const entry = { bookId: "geral", bookName: "Geral", chapter: 0, verse: null, version: "acf" };
+        expect(hasBibleReference(entry)).toBe(false);
+        expect(formatBibleReference(entry)).toBe("");
+        expect(getBibleLink(entry)).toBe("");
+    });
+
+    it("returns false for null/undefined or empty book", () => {
+        expect(hasBibleReference(null)).toBe(false);
+        expect(hasBibleReference(undefined)).toBe(false);
+        expect(hasBibleReference({ bookId: "", bookName: "", chapter: 0 })).toBe(false);
+        expect(hasBibleReference({ bookId: "none", bookName: "none", chapter: 0 })).toBe(false);
     });
 });

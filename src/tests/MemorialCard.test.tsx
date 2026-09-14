@@ -109,4 +109,34 @@ describe("MemorialCard Component", () => {
 
     expect(handleCardClick).toHaveBeenCalledWith(mockTestimony);
   });
+
+  it("does NOT display 'Geral 0' or any biblical reference when entry is not linked to scripture", () => {
+    const mockUnlinkedEntry: MemorialEntry = {
+      id: "unlinked-1",
+      userId: "user-1",
+      bookId: "geral",
+      bookName: "Geral",
+      chapter: 0,
+      verse: null,
+      version: "",
+      type: "reflection",
+      title: "Reflexão Espontânea",
+      content: "Uma reflexão livre sem vínculo com versículo específico.",
+      createdAt: "2026-03-01T10:00:00Z",
+      updatedAt: "2026-03-01T10:00:00Z",
+    };
+
+    render(
+      <MemoryRouter>
+        <MemorialCard entry={mockUnlinkedEntry} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Reflexão Espontânea")).toBeInTheDocument();
+    expect(screen.getByText(/Uma reflexão livre/)).toBeInTheDocument();
+    // Ensure "Geral" or "Geral 0" is NOT rendered anywhere in the document
+    expect(screen.queryByText(/Geral 0/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Geral/i)).not.toBeInTheDocument();
+    expect(screen.queryByTitle(/Ir para o texto bíblico/i)).not.toBeInTheDocument();
+  });
 });

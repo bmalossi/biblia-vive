@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, Trash2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
+import { hasBibleReference } from "@/lib/memorialUtils";
 import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 import VoiceRecordButton from "@/components/VoiceRecordButton";
 
@@ -86,9 +87,9 @@ export default function MemorialEntryModal({
 
             // Define se deve exibir/vincular a referência bíblica
             if (existingEntry) {
-                setIncludeReference(Boolean(existingEntry.verse || existingEntry.verseText));
+                setIncludeReference(hasBibleReference(existingEntry));
             } else {
-                setIncludeReference(true);
+                setIncludeReference(hasBibleReference({ bookId, bookName, chapter }));
             }
 
             const meta = existingEntry?.metadata || {};
@@ -155,7 +156,9 @@ export default function MemorialEntryModal({
 
     const currentConfig = categoryConfigs[selectedCategory];
 
-    const referenceText = includeReference
+    const hasInitialRef = hasBibleReference({ bookId, bookName, chapter });
+
+    const referenceText = includeReference && hasInitialRef
         ? (verse ? `${bookName} ${chapter}:${verse}` : `${bookName} ${chapter}`)
         : "Registro livre (sem versículo)";
 
@@ -214,11 +217,11 @@ export default function MemorialEntryModal({
                 type: selectedCategory,
                 title: title.trim() || undefined,
                 content: compiledContent || title.trim() || "Registro do Memorial",
-                bookId,
-                bookName,
-                chapter,
+                bookId: includeReference ? bookId : "geral",
+                bookName: includeReference ? bookName : "Geral",
+                chapter: includeReference ? chapter : 0,
                 verse: includeReference ? verse : null,
-                version,
+                version: includeReference ? version : "",
                 verseText: includeReference ? (verseText || undefined) : undefined,
                 tags: parsedTags,
                 metadata: metadataPayload,
@@ -286,17 +289,19 @@ export default function MemorialEntryModal({
                     </div>
 
                     {/* Opção de desvincular apresentação de versículo/capítulo */}
-                    <div className="flex items-center justify-between px-1 py-1 border-b border-border/40 pb-2">
-                        <label className="flex items-center gap-2 cursor-pointer text-[0.75rem] text-app-text-muted hover:text-app-text transition-colors select-none">
-                            <input
-                                type="checkbox"
-                                checked={includeReference}
-                                onChange={e => setIncludeReference(e.target.checked)}
-                                className="rounded border-border bg-app-surface text-gold focus:ring-gold/50 h-3.5 w-3.5 accent-gold"
-                            />
-                            <span>Vincular ao versículo/capítulo ({verse ? `${bookName} ${chapter}:${verse}` : `${bookName} ${chapter}`})</span>
-                        </label>
-                    </div>
+                    {hasInitialRef && (
+                        <div className="flex items-center justify-between px-1 py-1 border-b border-border/40 pb-2">
+                            <label className="flex items-center gap-2 cursor-pointer text-[0.75rem] text-app-text-muted hover:text-app-text transition-colors select-none">
+                                <input
+                                    type="checkbox"
+                                    checked={includeReference}
+                                    onChange={e => setIncludeReference(e.target.checked)}
+                                    className="rounded border-border bg-app-surface text-gold focus:ring-gold/50 h-3.5 w-3.5 accent-gold"
+                                />
+                                <span>Vincular ao versículo/capítulo ({verse ? `${bookName} ${chapter}:${verse}` : `${bookName} ${chapter}`})</span>
+                            </label>
+                        </div>
+                    )}
 
                     {/* Título do Registro */}
                     <div>
