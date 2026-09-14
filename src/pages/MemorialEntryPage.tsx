@@ -110,7 +110,25 @@ export default function MemorialEntryPage() {
             ? `${config.label} • ${refText}\n${formattedDate}\n\n`
             : `${config.label}\n${formattedDate}\n\n`;
         if (entry.title) text += `${entry.title}\n\n`;
-        text += entry.content;
+
+        const soapMeta = entry.metadata?.soap;
+        const hasSoapMeta = Boolean(
+            entry.type === "reflection" &&
+            soapMeta &&
+            (soapMeta.scripture || soapMeta.observation || soapMeta.application || soapMeta.prayer)
+        );
+
+        if (hasSoapMeta && soapMeta) {
+            const soapParts = [
+                (soapMeta.scripture || entry.verseText) ? `Escritura (S):\n"${soapMeta.scripture || entry.verseText}"` : '',
+                soapMeta.observation ? `Observação (O):\n${soapMeta.observation}` : '',
+                soapMeta.application ? `Aplicação (A):\n${soapMeta.application}` : '',
+                soapMeta.prayer ? `Oração (P):\n${soapMeta.prayer}` : '',
+            ].filter(Boolean).join("\n\n");
+            text += soapParts || entry.content;
+        } else {
+            text += entry.content;
+        }
 
         if (entry.answeredAt && entry.answeredNote) {
             text += `\n\nOração Respondida (${formatDateLong(entry.answeredAt)}):\n${entry.answeredNote}`;
@@ -205,6 +223,11 @@ export default function MemorialEntryPage() {
 
     const conf = categoryConfig[entry.type] || categoryConfig.reflection;
     const soap = entry.metadata?.soap;
+    const hasSoap = Boolean(
+        entry.type === "reflection" &&
+        soap &&
+        (soap.scripture || soap.observation || soap.application || soap.prayer)
+    );
 
     return (
         <main className="min-h-screen bg-app-base px-4 py-10 max-w-2xl mx-auto font-sans space-y-10">
@@ -248,26 +271,25 @@ export default function MemorialEntryPage() {
                     )}
                 </div>
 
-                {/* Versículo citado se houver */}
-                {entry.verseText && (
+                {/* Versículo citado se houver (somente quando não houver card estruturado SOAP com a Escritura) */}
+                {entry.verseText && !hasSoap && (
                     <blockquote className="pl-4 border-l-2 border-gold/40 text-app-text-muted italic text-sm leading-relaxed font-serif">
                         "{entry.verseText}"
                     </blockquote>
                 )}
 
-                {/* Conteúdo Principal */}
-                <div className="text-base text-app-text font-serif leading-relaxed whitespace-pre-wrap space-y-4">
-                    {entry.content}
-                </div>
-
-                {/* Detalhes do SOAP se for Reflexão */}
-                {/* Detalhes do SOAP se for Reflexão */}
-                {entry.type === "reflection" && soap && (soap.scripture || soap.observation || soap.application || soap.prayer) && (
+                {/* Conteúdo Principal — exibido diretamente apenas quando não for um registro estruturado SOAP */}
+                {!hasSoap ? (
+                    <div className="text-base text-app-text font-serif leading-relaxed whitespace-pre-wrap space-y-4">
+                        {entry.content}
+                    </div>
+                ) : (
+                    /* Registro único no card com as separações naturais do formato SOAP */
                     <div className="rounded-2xl border border-border bg-app-surface p-6 space-y-4 text-sm font-sans">
-                        {soap.scripture && (
+                        {(soap.scripture || entry.verseText) && (
                             <div>
                                 <h4 className="text-xs font-semibold uppercase tracking-wider text-gold mb-1">Escritura (S)</h4>
-                                <p className="text-app-text leading-relaxed">{soap.scripture}</p>
+                                <p className="text-app-text leading-relaxed">{soap.scripture || entry.verseText}</p>
                             </div>
                         )}
                         {soap.observation && (
