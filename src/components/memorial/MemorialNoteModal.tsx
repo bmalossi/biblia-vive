@@ -161,7 +161,7 @@ export const MemorialNoteModal: React.FC<MemorialNoteModalProps> = ({
     <>
       <AnimatePresence>
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-[70] flex items-center justify-center"
           role="dialog"
           aria-modal="true"
           aria-labelledby="memorial-note-title"
@@ -460,7 +460,7 @@ export const MemorialNoteModal: React.FC<MemorialNoteModalProps> = ({
               </div>
 
               {/* Conteúdo Rolável no Mobile */}
-              <div className="overflow-y-auto px-5 pb-8 space-y-5 flex-1">
+              <div className="overflow-y-auto px-5 pt-1 pb-6 space-y-5 flex-1 overscroll-contain">
                 {/* Topo do Drawer */}
                 <div className="flex items-start justify-between gap-3 pb-3 border-b border-border/50">
                   <div className="space-y-1">
@@ -500,7 +500,7 @@ export const MemorialNoteModal: React.FC<MemorialNoteModalProps> = ({
                         type="button"
                         onClick={() => onToggleFavorite(note)}
                         aria-label="Favoritar marco"
-                        className="p-1.5 rounded-lg text-app-text-muted hover:text-gold"
+                        className="p-1.5 rounded-lg text-app-text-muted hover:text-gold cursor-pointer"
                       >
                         <Star
                           className={cn(
@@ -514,7 +514,7 @@ export const MemorialNoteModal: React.FC<MemorialNoteModalProps> = ({
                       type="button"
                       onClick={onClose}
                       aria-label="Fechar"
-                      className="p-1.5 rounded-lg text-app-text-muted hover:text-app-text"
+                      className="p-1.5 rounded-lg text-app-text-muted hover:text-app-text cursor-pointer"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -601,7 +601,7 @@ export const MemorialNoteModal: React.FC<MemorialNoteModalProps> = ({
                           onClick={() => {
                             onMarkAnswered?.(note);
                           }}
-                          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gold text-black font-semibold text-xs active:scale-95 transition-transform"
+                          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gold text-black font-semibold text-xs active:scale-95 transition-transform cursor-pointer"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" />
                           <span>Marcar como Oração Respondida</span>
@@ -622,50 +622,50 @@ export const MemorialNoteModal: React.FC<MemorialNoteModalProps> = ({
                     )}
                   </div>
                 )}
+              </div>
 
-                {/* Ações Inferiores no Mobile */}
-                <div className="pt-3 border-t border-border/50 flex items-center justify-between gap-3 text-xs text-app-text-muted">
-                  <div className="flex items-center gap-2">
-                    {onEdit && (
-                      <button
-                        type="button"
-                        onClick={() => onEdit(note)}
-                        className="inline-flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-app-raised hover:text-app-text"
-                      >
-                        <Edit3 className="h-3.5 w-3.5" />
-                        <span>Editar</span>
-                      </button>
-                    )}
+              {/* Ações Inferiores Fixas no Rodapé do Drawer com Safe-Area */}
+              <div className="px-5 py-3 border-t border-border/60 bg-app-surface/95 backdrop-blur-xs flex items-center justify-between gap-3 text-xs text-app-text-muted shrink-0 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+                <div className="flex items-center gap-2">
+                  {onEdit && (
                     <button
                       type="button"
-                      onClick={handleCopy}
-                      className="inline-flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-app-raised hover:text-app-text"
+                      onClick={() => onEdit(note)}
+                      className="inline-flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg hover:bg-app-raised hover:text-app-text cursor-pointer transition-colors"
                     >
-                      {copied ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-emerald-400" />
-                          <span className="text-emerald-400 font-medium">Copiado ✓</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5" />
-                          <span>Copiar</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {onDelete && (
-                    <button
-                      type="button"
-                      onClick={() => setDeleteDialogOpen(true)}
-                      className="inline-flex items-center gap-1 text-destructive/80 hover:text-destructive py-1 px-2"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      <span>Excluir</span>
+                      <Edit3 className="h-3.5 w-3.5" />
+                      <span>Editar</span>
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="inline-flex items-center gap-1.5 py-1.5 px-2.5 rounded-lg hover:bg-app-raised hover:text-app-text cursor-pointer transition-colors"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                        <span className="text-emerald-400 font-medium">Copiado ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" />
+                        <span>Copiar</span>
+                      </>
+                    )}
+                  </button>
                 </div>
+
+                {onDelete && (
+                  <button
+                    type="button"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-destructive hover:bg-destructive/10 py-1.5 px-2.5 rounded-lg cursor-pointer transition-colors"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>Excluir</span>
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
