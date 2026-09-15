@@ -19,7 +19,7 @@ export default function BookGrid({ books, version, currentReading }: BookGridPro
           <Tooltip key={book.id}>
             <TooltipTrigger asChild>
               <Link
-                className="group relative flex min-h-[48px] flex-col justify-between rounded-lg border border-border bg-app-surface px-3 py-2.5 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm"
+                className="group relative flex min-h-[48px] flex-col justify-between rounded-lg border border-border bg-app-surface px-3 py-2.5 transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold"
                 to={`/${version}/${book.slug}`}
               >
                 {isCurrent && (

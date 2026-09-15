@@ -125,7 +125,7 @@ export default function HarpaPage() {
                 <Tooltip key={hymn.numero}>
                   <TooltipTrigger asChild>
                     <Link
-                      className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm group"
+                      className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold group"
                       to={`/harpa/${hymn.numero}`}
                     >
                       <div className="flex items-center justify-between gap-1 mb-0.5">

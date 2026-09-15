@@ -8,7 +8,7 @@ import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import {
-    Flame, Calendar, BookOpen, CheckCircle, ArrowRight,
+    Flame, Calendar, CheckCircle, ArrowRight,
     Check, ChevronRight, Trophy, SkipForward, ArrowLeft,
 } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
@@ -92,9 +92,6 @@ export default function ReadingPlansPage() {
                                     key={plan.id}
                                     className="flex flex-col rounded-2xl border border-border bg-app-surface p-6 shadow-sm transition-all hover:shadow-md hover:border-gold/30"
                                 >
-                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gold-bg text-gold">
-                                        <BookOpen className="h-6 w-6" />
-                                    </div>
                                     <h3 className="mb-2 font-serif text-xl font-bold text-app-text">{plan.name}</h3>
                                     <p className="mb-6 flex-1 text-sm text-app-text-muted">{plan.description}</p>
 

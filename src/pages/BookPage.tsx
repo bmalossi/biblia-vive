@@ -110,7 +110,7 @@ export default function BookPage() {
             return (
               <Link
                 className={[
-                  "flex h-12 items-center justify-center rounded-lg border font-sans text-sm transition-colors hover:border-gold hover:bg-gold hover:text-primary-foreground",
+                  "flex h-12 items-center justify-center rounded-lg border font-sans text-sm transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold hover:text-primary-foreground",
                   isVisited
                     ? "border-gold/40 bg-app-raised text-app-text"
                     : "border-border bg-app-raised text-app-text",

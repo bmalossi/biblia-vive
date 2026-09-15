@@ -39,7 +39,7 @@ export default function HomeQuickActions({
     >
       <Link
         to={continueUrl}
-        className="group relative flex h-full items-center justify-center gap-2 rounded-lg border border-border bg-app-surface px-3 text-xs font-medium text-app-text transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm"
+        className="group relative flex h-full items-center justify-center gap-2 rounded-lg border border-border bg-app-surface px-3 text-xs font-medium text-app-text transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold"
       >
         <Bookmark className="h-3.5 w-3.5 shrink-0 text-gold transition-all duration-150 group-hover:text-primary-foreground" />
         <span className="truncate font-sans font-medium text-app-text transition-colors duration-150 group-hover:text-primary-foreground">
@@ -49,7 +49,7 @@ export default function HomeQuickActions({
 
       <Link
         to={todayUrl}
-        className="group relative flex h-full items-center justify-center gap-2 rounded-lg border border-border bg-app-surface px-3 text-xs font-medium text-app-text transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-gold hover:bg-gold hover:shadow-sm"
+        className="group relative flex h-full items-center justify-center gap-2 rounded-lg border border-border bg-app-surface px-3 text-xs font-medium text-app-text transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold"
       >
         <Calendar className="h-3.5 w-3.5 shrink-0 text-gold transition-all duration-150 group-hover:text-primary-foreground" />
         <span className="truncate font-sans font-medium text-app-text transition-colors duration-150 group-hover:text-primary-foreground">

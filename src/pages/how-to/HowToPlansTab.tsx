@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 function MockPlanCard() {
   return (
     <div className="flex flex-col rounded-xl border border-border bg-app-surface p-4 shadow-sm w-full max-w-[280px] mx-auto">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 text-gold">
-        <BookOpen className="h-5 w-5" />
-      </div>
       <h3 className="mb-1 font-serif text-sm font-bold text-app-text">Evangelhos em 30 dias</h3>
       <p className="mb-4 flex-1 text-[0.62rem] text-app-text-muted leading-relaxed">
         Leia os quatro evangelhos (Mateus, Marcos, Lucas e João) para conhecer a fundo a vida e ensinamentos de Jesus.

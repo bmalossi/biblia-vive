@@ -387,7 +387,7 @@ export default function Header() {
                 width="160"
                 height="32"
                 className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
-                src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
+                src={"/logo-biblia-branco-fundo-transparente.webp"}
               />
             </Link>
             {stickyTitle.title && (
@@ -441,7 +441,7 @@ export default function Header() {
               width="160"
               height="32"
               className="h-8 w-auto transition-transform duration-300 group-hover:scale-105"
-              src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
+              src={"/logo-biblia-branco-fundo-transparente.webp"}
             />
           </Link>
 
@@ -658,7 +658,7 @@ export default function Header() {
                     width="140"
                     height="28"
                     className="h-7 w-auto"
-                    src={theme === "dark" ? "/logo-biblia-branco-fundo-transparente.webp" : "/logo-transparente-lateral.webp"}
+                    src={"/logo-biblia-branco-fundo-transparente.webp"}
                   />
                 </Link>
               </div>
