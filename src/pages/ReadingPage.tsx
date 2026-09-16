@@ -1070,33 +1070,44 @@ export default function ReadingPage() {
     };
   }, [selectedBook, chapterNumber, location.pathname]);
 
-  // Eager Speculation Rules para o Próximo Capítulo (LCP = 0ms ao virar a página)
+  // Speculation Rules para o Próximo Capítulo com proteção anti-cascata
   useEffect(() => {
     if (!nextChapterInfo) return;
-    const nextUrl = `/${selectedVersion}/${nextChapterInfo.book.slug}/${nextChapterInfo.chapter}`;
 
-    const scriptId = "bv-speculation-next-chapter";
-    const existing = document.getElementById(scriptId);
-    if (existing) existing.remove();
+    const setupSpeculation = () => {
+      const nextUrl = `/${selectedVersion}/${nextChapterInfo.book.slug}/${nextChapterInfo.chapter}`;
+      const scriptId = "bv-speculation-next-chapter";
+      const existing = document.getElementById(scriptId);
+      if (existing) existing.remove();
 
-    if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
-      const specScript = document.createElement("script");
-      specScript.id = scriptId;
-      specScript.type = "speculationrules";
-      specScript.textContent = JSON.stringify({
-        prerender: [
-          {
-            source: "list",
-            urls: [nextUrl],
-            eagerness: "eager"
-          }
-        ]
-      });
-      document.head.appendChild(specScript);
+      if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+        const specScript = document.createElement("script");
+        specScript.id = scriptId;
+        specScript.type = "speculationrules";
+        specScript.textContent = JSON.stringify({
+          prerender: [
+            {
+              source: "list",
+              urls: [nextUrl],
+              eagerness: "moderate"
+            }
+          ]
+        });
+        document.head.appendChild(specScript);
+      }
+    };
+
+    // PROTEÇÃO CRÍTICA: Se a página atual ainda está em prerender em segundo plano,
+    // aguarda ela ser ativada pelo usuário antes de engatilhar o próximo capítulo.
+    if (document.prerendering) {
+      document.addEventListener("prerenderingchange", setupSpeculation, { once: true });
+    } else {
+      setupSpeculation();
     }
 
     return () => {
-      const script = document.getElementById(scriptId);
+      document.removeEventListener("prerenderingchange", setupSpeculation);
+      const script = document.getElementById("bv-speculation-next-chapter");
       if (script) script.remove();
     };
   }, [nextChapterInfo, selectedVersion]);

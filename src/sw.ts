@@ -86,7 +86,7 @@ registerRoute(
     url.pathname.endsWith(".mp3") ||
     url.pathname.endsWith(".wav") ||
     url.hostname === "midia.bibliavive.com.br" ||
-    url.hostname.endsWith(".bibliavive.com.br"),
+    url.hostname === "audio.bibliavive.com.br",
   new NetworkOnly()
 );
 

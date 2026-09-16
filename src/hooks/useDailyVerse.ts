@@ -38,6 +38,40 @@ export function useDailyVerse(
 
     useEffect(() => {
         let cancelled = false;
+        const todayKey = 'bv_daily_verse_' + new Date().toISOString().slice(0, 10);
+
+        // 1. Tenta carregar do cache da sessão para evitar chamadas de API repetidas
+        try {
+            const cached = sessionStorage.getItem(todayKey);
+            if (cached) {
+                const parsed: ApiVerseResponse | null = JSON.parse(cached);
+                if (parsed?.text) {
+                    setVerse({
+                        text: parsed.text,
+                        reference: parsed.reference,
+                        reflection: parsed.reflection,
+                        isCurated: true,
+                    });
+                    setLoading(false);
+                    return;
+                }
+            }
+        } catch {
+            // sessionStorage indisponível ou erro de parse
+        }
+
+        // 2. Se a página estiver em prerender de fundo, aguarda ativação para não consumir requests
+        if (document.prerendering) {
+            const onActivate = () => {
+                document.removeEventListener('prerenderingchange', onActivate);
+                fetchVerse();
+            };
+            document.addEventListener('prerenderingchange', onActivate);
+            return () => {
+                document.removeEventListener('prerenderingchange', onActivate);
+            };
+        }
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -58,6 +92,15 @@ export function useDailyVerse(
                 const data: ApiVerseResponse | null = await res.json();
 
                 if (cancelled) return;
+
+                // Salva no cache da sessão
+                try {
+                    if (data?.text) {
+                        sessionStorage.setItem(todayKey, JSON.stringify(data));
+                    }
+                } catch {
+                    // ignore storage quota
+                }
 
                 if (data?.text) {
                     setVerse({
