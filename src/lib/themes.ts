@@ -74,12 +74,17 @@ export function isBibleVersion(value?: string | null): value is BibleVersion {
 
 export function getTheme(): Theme {
   const stored = localStorage.getItem(THEME_KEY);
-  return stored === "light" || stored === "dark" || stored === "sepia" ? stored : "sepia";
+  return stored === "light" || stored === "dark" || stored === "sepia" ? stored : "dark";
 }
 
 export function setTheme(theme: Theme) {
   localStorage.setItem(THEME_KEY, theme);
   document.documentElement.setAttribute("data-theme", theme);
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
   window.dispatchEvent(new CustomEvent("bv-theme-change", { detail: theme }));
 }
 

@@ -156,27 +156,53 @@ export default function HomePage() {
     ogType: "website",
   });
 
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+
   return (
     <Layout>
       <div className="flex flex-col">
         <h1 className="sr-only">Bíblia Vive — Leia e Estude a Bíblia Online</h1>
 
-        {/* Gravação Rápida por Voz para o Memorial */}
-        <QuickVoiceMemorial />
+        {/* Bloco Superior: Atalhos Rápidos e Banner Hero bem próximos */}
+        <div className="flex flex-col space-y-2.5 sm:space-y-3">
+          {/* 1. Barra Superior de Ações Rápidas (< 50px) */}
+          <HomeQuickActions
+            lastRead={lastRead}
+            lastReadBookName={lastReadBook?.name}
+            version={version}
+            onStartVoiceRecording={() => setIsVoiceModalOpen(true)}
+            onOpenNotifications={() => {
+              window.dispatchEvent(new CustomEvent("bv-show-notifications"));
+            }}
+          />
 
-        {/* Atalhos Rápidos Compactos (< 50px) */}
-        <HomeQuickActions
-          lastRead={lastRead}
-          lastReadBookName={lastReadBook?.name}
-          version={version}
-        />
+          {/* Modal de Gravação de Reflexão por Voz */}
+          <QuickVoiceMemorial
+            isOpen={isVoiceModalOpen}
+            onClose={() => setIsVoiceModalOpen(false)}
+          />
 
-        {/* Seletor de Testamento e Grade de Livros */}
-        <section className="mt-2">
+          {/* 2. Banner Hero do Capítulo de Hoje com Detalhes Modernos */}
+          <CapituloDeHojeSection />
+        </div>
+
+        {/* 3. Seção "Bíblia" com Abas de Testamentos e Grade de Livros */}
+        <section className="mt-7 sm:mt-8 space-y-3.5">
+          {/* Título e Subtítulo */}
+          <div className="space-y-0.5">
+            <h2 className="font-serif text-2xl sm:text-[1.75rem] font-normal tracking-tight text-app-text">
+              Bíblia
+            </h2>
+            <p className="font-sans text-xs text-app-text-muted">
+              A Palavra de Deus, ao seu alcance. Leia, medite, viva.
+            </p>
+          </div>
+
+          {/* Seletor de Testamento Estilo Pílula */}
           <div
             role="tablist"
             aria-label="Filtrar por testamento"
-            className="mb-4 flex items-center gap-2 border-b border-border pb-3"
+            className="flex items-center gap-2 pt-0.5 pb-0.5"
           >
             <button
               role="tab"
@@ -185,13 +211,13 @@ export default function HomePage() {
               id="tab-at"
               onClick={() => setActiveTestament("AT")}
               className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
+                "rounded-full px-4 py-1.5 text-xs font-medium transition-all cursor-pointer",
                 activeTestament === "AT"
-                  ? "bg-gold text-primary-foreground font-semibold shadow-sm"
-                  : "bg-app-surface text-app-text-muted hover:bg-app-raised hover:text-app-text border border-border"
+                  ? "bg-gold text-[#121110] font-semibold shadow-xs"
+                  : "bg-transparent text-app-text-muted hover:text-app-text border border-border/80"
               )}
             >
-              {t("home.oldTestament")} ({oldTestament.length})
+              {t("home.oldTestament")}
             </button>
             <button
               role="tab"
@@ -200,20 +226,22 @@ export default function HomePage() {
               id="tab-nt"
               onClick={() => setActiveTestament("NT")}
               className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
+                "rounded-full px-4 py-1.5 text-xs font-medium transition-all cursor-pointer",
                 activeTestament === "NT"
-                  ? "bg-gold text-primary-foreground font-semibold shadow-sm"
-                  : "bg-app-surface text-app-text-muted hover:bg-app-raised hover:text-app-text border border-border"
+                  ? "bg-gold text-[#121110] font-semibold shadow-xs"
+                  : "bg-transparent text-app-text-muted hover:text-app-text border border-border/80"
               )}
             >
-              {t("home.newTestament")} ({newTestament.length})
+              {t("home.newTestament")}
             </button>
           </div>
 
+          {/* Grade de Livros em 6 Colunas */}
           <div
             id="book-grid-panel"
             role="tabpanel"
             aria-labelledby={activeTestament === "AT" ? "tab-at" : "tab-nt"}
+            className="pt-1"
           >
             <BookGrid
               books={activeTestament === "AT" ? oldTestament : newTestament}
@@ -223,18 +251,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Divisor após os livros do Novo Testamento */}
-        <div className="my-8 border-t border-border" />
-
-        <CapituloDeHojeSection />
-
-
+        {/* Divisor após os livros da Bíblia */}
+        <div className="my-6 border-t border-border/60" />
 
         {/* Artigos em destaque */}
         <ArtigosRecentes />
 
-        {/* Card PWA no final da página */}
-        <section className="mt-12 overflow-hidden md:hidden">
+        {/* Card PWA no final da página para mobile */}
+        <section className="mt-6 overflow-hidden md:hidden">
           <PwaInstallCard variant="home" />
         </section>
       </div>

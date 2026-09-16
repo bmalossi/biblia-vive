@@ -24,7 +24,9 @@ import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParse
 import { getVersion, getTheme, type Theme } from "@/lib/themes";
 import {
   BookOpen,
+  ChevronDown,
   Clock3,
+  Crown,
   HelpCircle,
   Loader2,
   LogIn,
@@ -313,22 +315,22 @@ export default function Header() {
   const ProBadge = () => (
     <div
       aria-label="Plano PRO ativo"
-      className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-full select-none cursor-default"
+      className="flex items-center gap-1.5 px-3 py-1 bg-gold/10 border border-gold/40 rounded-full select-none cursor-default"
     >
-      <StarIcon className="w-3 h-3 text-gold" />
-      <span className="text-[0.7rem] font-semibold text-gold tracking-widest">PRO</span>
+      <Crown className="w-3.5 h-3.5 text-gold" />
+      <span className="text-xs font-semibold text-gold tracking-wider">PRO</span>
     </div>
   );
 
   /** "Assine PRO" CTA button */
   const ProCtaButton = ({ className = "" }: { className?: string }) => (
     <button
-      className={`flex items-center gap-1.5 rounded-full border border-gold/30 bg-transparent px-2.5 py-1 text-xs font-medium text-gold opacity-80 transition-all hover:bg-gold/10 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${className}`}
+      className={`flex items-center gap-1.5 rounded-full border border-gold/40 bg-transparent px-3 py-1 text-xs font-semibold text-gold transition-all hover:bg-gold/10 hover:border-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${className}`}
       onClick={() => navigate("/pro")}
       type="button"
     >
-      <StarIcon className="w-3 h-3" />
-      Assine PRO
+      <Crown className="w-3.5 h-3.5 text-gold" />
+      PRO
     </button>
   );
 
@@ -497,7 +499,7 @@ export default function Header() {
                 className="h-9 rounded-full border-border bg-app-surface pl-9 w-full"
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={openSearch}
-                placeholder="Jo 3:16, Sl 23, amor, fé…"
+                placeholder="Busque um livro, capítulo ou palavra..."
                 ref={inputRef}
                 role="combobox"
                 value={query}
@@ -541,80 +543,84 @@ export default function Header() {
 
           <Link
             to="/apoiar"
-            className="hidden md:inline-flex h-7 items-center gap-1 rounded-full border border-gold/30 bg-transparent px-2.5 text-xs font-medium text-gold opacity-80 transition-all hover:bg-gold hover:text-primary-foreground hover:border-gold hover:opacity-100 flex-shrink-0"
+            className="hidden md:inline-flex h-7 items-center gap-1 rounded-full border border-gold/40 bg-transparent px-2.5 text-xs font-semibold text-gold transition-all hover:bg-gold hover:text-primary-foreground hover:border-gold flex-shrink-0"
           >
             <Heart className="h-3 w-3" />
             Apoiar
           </Link>
 
-          {/* Account dropdown (desktop, logged in) */}
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  aria-label="Menu da conta"
-                  className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border hover:border-gold/40 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-                >
+          {/* Account dropdown (desktop) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="Menu da conta"
+                className="hidden md:inline-flex items-center gap-1 rounded-full border border-border/80 hover:border-gold/50 bg-app-surface/40 p-0.5 pr-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              >
+                {user ? (
                   <AvatarCircle size="sm" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[200px]">
-                <DropdownMenuLabel className="font-normal">
-                  <p className="text-xs font-semibold text-app-text truncate">{displayName}</p>
-                  <p className="text-xs text-app-text-muted truncate">{user.email}</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2"
-                  onSelect={() => navigate("/conta")}
-                >
-                  <User className="h-4 w-4" />
-                  Minha Conta
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {/* Selectors inside dropdown */}
-                <div className="px-2 py-1 flex items-center gap-2">
-                  <LanguageSelector />
-                  <VersionSelector />
-                  <ThemeToggle />
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2 text-red-400 focus:text-red-400"
-                  disabled={isPending}
-                  onSelect={handleSignOut}
-                >
-                  {isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <LogOut className="h-4 w-4" />
-                  )}
-                  Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Login button (desktop, not logged in) */}
-          {!user && (
-            <button
-              aria-label="Entrar na conta"
-              className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-transparent px-3 text-sm font-medium text-app-text-muted transition-colors hover:bg-app-raised hover:text-app-text flex-shrink-0"
-              onClick={() => setAuthModalOpen(true)}
-              type="button"
-            >
-              <LogIn className="h-4 w-4" />
-              Entrar
-            </button>
-          )}
-
-          {/* Theme toggle always visible on desktop (outside dropdown for quick access) */}
-          {!user && (
-            <div className="hidden md:flex items-center gap-1.5">
-              <VersionSelector />
-              <ThemeToggle />
-            </div>
-          )}
+                ) : (
+                  <span className="relative inline-flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-app-surface h-7 w-7 text-[0.68rem] font-semibold text-app-text select-none">
+                    BV
+                  </span>
+                )}
+                <ChevronDown className="h-3 w-3 text-app-text-muted" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[200px]">
+              {user ? (
+                <>
+                  <DropdownMenuLabel className="font-normal">
+                    <p className="text-xs font-semibold text-app-text truncate">{displayName}</p>
+                    <p className="text-xs text-app-text-muted truncate">{user.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2"
+                    onSelect={() => navigate("/conta")}
+                  >
+                    <User className="h-4 w-4" />
+                    Minha Conta
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {/* Selectors inside dropdown */}
+                  <div className="px-2 py-1 flex items-center gap-2">
+                    <LanguageSelector />
+                    <VersionSelector />
+                    <ThemeToggle />
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2 text-red-400 focus:text-red-400"
+                    disabled={isPending}
+                    onSelect={handleSignOut}
+                  >
+                    {isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <LogOut className="h-4 w-4" />
+                    )}
+                    Sair
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2 font-medium text-gold"
+                    onSelect={() => setAuthModalOpen(true)}
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Entrar na Conta
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1 flex items-center gap-2">
+                    <LanguageSelector />
+                    <VersionSelector />
+                    <ThemeToggle />
+                  </div>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Mobile: Apoiar icon */}
           {!isMobileMenuOpen && (

@@ -42,10 +42,19 @@
   <script>
     (function () {
       try {
+        const theme = localStorage.getItem("bv-theme") || "dark";
+        const root = document.documentElement;
+        root.setAttribute("data-theme", theme);
+        if (theme === "dark") {
+          root.classList.add("dark");
+        } else {
+          root.classList.remove("dark");
+        }
+
         const font = localStorage.getItem("bv_font") || "lora";
         const fontSize = Number(localStorage.getItem("bv_font_size")) || 18;
         const verseSpacing = Number(localStorage.getItem("bv_verse_spacing")) || 0.8;
-        const columnWidth = localStorage.getItem("bv_column_width") || "normal";
+        const columnWidth = localStorage.getItem("bv_column_width") || "wide";
 
         const fontMap = {
           lora: '"Lora", serif',
@@ -70,13 +79,12 @@
           document.head.appendChild(style);
         }
 
-        const root = document.documentElement;
         root.style.setProperty("--font-reading", fontMap[font] || fontMap.lora);
         root.style.setProperty("--font-size-reading", `${Math.min(28, Math.max(14, Math.round(fontSize)))}px`);
         root.style.setProperty("--verse-spacing", `${Math.min(1.6, Math.max(0.4, verseSpacing))}rem`);
         root.style.setProperty(
           "--column-width",
-          columnWidth === "narrow" ? "520px" : columnWidth === "wide" ? "860px" : "680px",
+          columnWidth === "narrow" ? "520px" : columnWidth === "normal" ? "680px" : "860px",
         );
       } catch {
         // ignore
@@ -85,9 +93,25 @@
   </script>
   <style>
     /* Critical styles for skip-link and background to prevent FOUC */
-    body {
+    :root,
+    [data-theme="dark"] {
+      background-color: #151311;
+      color: #ede8df;
+    }
+
+    [data-theme="sepia"] {
       background-color: #f3f0e8;
-      /* Matches sepia theme background */
+      color: #2c251e;
+    }
+
+    [data-theme="light"] {
+      background-color: #ffffff;
+      color: #1a1a1a;
+    }
+
+    body {
+      background-color: inherit;
+      color: inherit;
       margin: 0;
     }
 

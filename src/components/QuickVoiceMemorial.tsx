@@ -11,11 +11,19 @@ import { startAudioCapture, AudioCaptureController, transcribeVoiceRecording } f
 import { createSpeechRecognitionEngine, SpeechEngineController, isSpeechRecognitionSupported } from "@/lib/speechRecognitionEngine";
 import { isWebSpeechFallbackDisabled } from "@/lib/voiceSettings";
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+
 const MAX_RECORDING_SECONDS = 120; // 2 minutos máximo
 const SUCCESS_HOLD_MS = 1800;
 const HAPTIC_PULSE_MS = 35;
 
-export default function QuickVoiceMemorial() {
+interface QuickVoiceMemorialProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function QuickVoiceMemorial({ isOpen, onClose }: QuickVoiceMemorialProps = {}) {
     const { user } = useAuth();
     const store = useMemo(() => createNoteStore(user?.id ?? null), [user]);
 
@@ -288,6 +296,213 @@ export default function QuickVoiceMemorial() {
 
     const tooltipText =
         "Dirigindo ou em movimento? Toque para falar e guarde sua oração, testemunho ou reflexão sem precisar digitar.";
+
+    if (isOpen !== undefined) {
+        return (
+            <>
+                <Dialog
+                    open={isOpen}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            if (isRecording) cancelRecording();
+                            onClose?.();
+                        }
+                    }}
+                >
+                    <DialogContent className="max-w-md border-border bg-app-surface text-app-text p-6 shadow-2xl rounded-2xl">
+                        <DialogHeader className="text-left space-y-1">
+                            <DialogTitle className="font-serif text-lg font-semibold text-app-text flex items-center gap-2">
+                                <Mic className="h-4 w-4 text-gold" />
+                                Gravar Reflexão com Voz
+                            </DialogTitle>
+                            <DialogDescription className="text-xs text-app-text-muted">
+                                Fale naturalmente para registrar sua oração, reflexão, testemunho ou propósito no Memorial.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {/* Seletor de Categoria */}
+                        <div className="pt-2">
+                            <p className="text-[0.7rem] uppercase tracking-wider text-app-text-muted font-mono mb-2 font-medium">
+                                Categoria
+                            </p>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                                {(["reflection", "prayer", "testimony", "fasting"] as MemorialCategory[]).map((cat) => {
+                                    const labels: Record<MemorialCategory, string> = {
+                                        reflection: "Reflexão",
+                                        prayer: "Oração",
+                                        testimony: "Testemunho",
+                                        fasting: "Propósito",
+                                    };
+                                    const isActive = category === cat;
+                                    return (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            disabled={isRecording || isProcessing}
+                                            onClick={() => setCategory(cat)}
+                                            className={cn(
+                                                "rounded-full px-3 py-1 text-xs font-medium transition-all",
+                                                isActive
+                                                    ? "bg-gold text-primary-foreground font-semibold shadow-xs"
+                                                    : "bg-app-raised/80 text-app-text-muted hover:bg-app-raised hover:text-app-text border border-border/70"
+                                            )}
+                                        >
+                                            {labels[cat]}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Mensagem de Erro */}
+                        {errorMessage && (
+                            <div className="mt-2 flex items-center gap-2.5 rounded-lg bg-red-600 px-3.5 py-2.5 text-xs font-medium text-white shadow-sm">
+                                <AlertCircle className="h-4 w-4 shrink-0 text-white" />
+                                <span className="flex-1 leading-snug text-white">{errorMessage}</span>
+                            </div>
+                        )}
+
+                        {/* Estado Repouso: Botão Iniciar Gravação */}
+                        {!isRecording && !isProcessing && !transcribedText && (
+                            <div className="pt-4 flex flex-col items-center justify-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={startRecording}
+                                    className="inline-flex items-center justify-center gap-2.5 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-gold/90 shadow-md transition-all active:scale-[0.98]"
+                                >
+                                    <Mic className="h-4 w-4" />
+                                    <span>Começar a Gravar</span>
+                                </button>
+                                <p className="text-[0.7rem] text-app-text-muted text-center max-w-xs">
+                                    O áudio será transcrito com IA e guardado no seu Memorial Espiritual.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Estado Gravando */}
+                        {isRecording && (
+                            <div className="mt-3 relative overflow-hidden flex flex-col items-center justify-center gap-4 rounded-xl border border-gold/60 bg-app-raised/80 p-5 animate-pulse-aura transition-all text-center">
+                                <div className="flex items-center gap-3">
+                                    <span className="relative flex h-3.5 w-3.5 shrink-0">
+                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/80 opacity-75"></span>
+                                        <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-gold"></span>
+                                    </span>
+                                    <span className="font-serif text-sm font-medium text-app-text">
+                                        Gravando áudio com alta fidelidade...
+                                    </span>
+                                </div>
+
+                                <span className="font-mono text-sm font-semibold text-gold bg-gold/10 px-3 py-1 rounded-full border border-gold/30">
+                                    {formatSeconds(recordingTime)} / {formatSeconds(MAX_RECORDING_SECONDS)}
+                                </span>
+
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={cancelRecording}
+                                        className="rounded-md px-3 py-1.5 text-xs text-app-text-muted hover:bg-accent transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={stopRecording}
+                                        className="inline-flex items-center gap-1.5 rounded-full bg-gold px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-gold/90 shadow-xs transition-all active:scale-[0.98]"
+                                    >
+                                        <Square className="h-3 w-3 fill-current" />
+                                        Concluir e Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Estado Processando */}
+                        {isProcessing && (
+                            <div className="mt-3 relative overflow-hidden flex items-center justify-center gap-3 rounded-xl border border-gold/40 bg-app-raised/80 p-5 shadow-sm">
+                                <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin shrink-0" />
+                                <p className="font-serif text-xs font-medium text-app-text">
+                                    {processingStep}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Estado Selando */}
+                        {isSealing && (
+                            <div className="mt-3 flex items-center justify-center gap-2.5 rounded-xl border border-emerald-500 bg-emerald-600/90 text-white p-4 shadow-sm animate-scale-in">
+                                <Check className="w-4 h-4 text-white shrink-0" />
+                                <span className="font-sans font-semibold text-xs tracking-wide">
+                                    Guardado no Coração
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Transcrição salva */}
+                        {transcribedText && savedEntry && !isRecording && !isProcessing && !isSealing && (
+                            <div className="mt-3 flex flex-col gap-3 rounded-xl border border-gold/40 bg-app-raised/60 p-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-500">
+                                        <Check className="h-3.5 w-3.5" />
+                                        <span>Salvo no Memorial</span>
+                                    </div>
+                                </div>
+                                <p className="rounded-lg border border-border/50 bg-app-surface/90 p-3 font-serif text-xs italic leading-relaxed text-app-text">
+                                    "{transcribedText}"
+                                </p>
+                                <div className="flex items-center justify-between pt-1">
+                                    <button
+                                        type="button"
+                                        onClick={startRecording}
+                                        className="inline-flex items-center gap-1 text-xs text-app-text-muted hover:text-gold transition-colors"
+                                    >
+                                        <RefreshCw className="h-3 w-3" />
+                                        Gravar outro
+                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <Link
+                                            to="/memorial"
+                                            onClick={onClose}
+                                            className="inline-flex items-center gap-1 rounded-md bg-gold px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-gold/90 transition-colors"
+                                        >
+                                            Ver no Memorial
+                                            <ArrowRight className="h-3 w-3" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Modal de Edição */}
+                {savedEntry && (
+                    <MemorialEntryModal
+                        isOpen={isEditModalOpen}
+                        onClose={() => setIsEditModalOpen(false)}
+                        category={savedEntry.type}
+                        bookId={savedEntry.bookId}
+                        bookName={savedEntry.bookName}
+                        chapter={savedEntry.chapter}
+                        version={savedEntry.version}
+                        existingEntry={savedEntry}
+                        onSave={async (updatedData) => {
+                            await store.save({ ...updatedData, id: savedEntry.id });
+                            setSavedEntry({ ...savedEntry, ...updatedData });
+                            setTranscribedText(updatedData.content);
+                            setIsEditModalOpen(false);
+                            toast.success("Registro atualizado com sucesso!");
+                        }}
+                        onDelete={async (id) => {
+                            await store.delete(id);
+                            setTranscribedText(null);
+                            setSavedEntry(null);
+                            setIsEditModalOpen(false);
+                            toast.success("Registro excluído.");
+                        }}
+                    />
+                )}
+            </>
+        );
+    }
 
     return (
         <section className="mb-6 pt-1">

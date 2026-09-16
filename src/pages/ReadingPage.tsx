@@ -1,4 +1,10 @@
 import Layout from "@/components/Layout";
+import GoldenAmbientMist from "@/components/GoldenAmbientMist";
+import ReadingChapterGridCard from "@/components/ReadingChapterGridCard";
+import ReadingBottomNav from "@/components/ReadingBottomNav";
+import BookPickerModal from "@/components/BookPickerModal";
+import VersionPickerModal from "@/components/VersionPickerModal";
+import { useReadingTheme } from "@/hooks/useReadingTheme";
 import SettingsPanel from "@/components/SettingsPanel";
 import StudyPanel from "@/components/StudyPanel";
 import { prefetchLexicons, getLanguageLabel } from "@/lib/strongs";
@@ -58,7 +64,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { useReadingPreferences } from "@/hooks/useReadingPreferences";
+import { useReadingPreferences, COLUMN_WIDTH_MAP } from "@/hooks/useReadingPreferences";
 import { useTTS } from "@/hooks/useTTS";
 import { useInactivity } from "@/hooks/useInactivity";
 import { usePageMeta } from "@/hooks/usePageMeta";
@@ -67,7 +73,7 @@ import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
 import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
-import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen, ChevronRight } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -265,6 +271,8 @@ export default function ReadingPage() {
   // True only when reading the original-language version AND the book is Hebrew (OT)
   const isHebrewReading = selectedVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico";
 
+  const { isDark, isSepia, isLight } = useReadingTheme();
+
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -285,6 +293,8 @@ export default function ReadingPage() {
   const [bookContext, setBookContext] = useState<BookContextData | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChapterPickerOpen, setIsChapterPickerOpen] = useState(false);
+  const [isBookPickerOpen, setIsBookPickerOpen] = useState(false);
+  const [isVersionPickerOpen, setIsVersionPickerOpen] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const [focusTopVisible, setFocusTopVisible] = useState(true);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
@@ -1456,10 +1466,18 @@ export default function ReadingPage() {
   }
 
   return (
-    <Layout hideHeader={false} hideMobileNav={preferences.focusMode} isClausuraActive={isClausuraActive}>
+    <Layout
+      hideHeader={false}
+      hideMobileNav={preferences.focusMode}
+      hideFooter={true}
+      isClausuraActive={isClausuraActive}
+      maxWidthClassName="max-w-[1400px] px-2 sm:px-4 md:px-8"
+      className={isDark ? "bg-[#151311]" : isSepia ? "bg-[#f4ede2]" : "bg-[#ffffff]"}
+    >
+      <GoldenAmbientMist />
       <div
         className={cn(
-          "relative transition-[padding-left] duration-300",
+          "relative z-10 transition-[padding-left] duration-300",
           isNotebookOpen && !isMobile && "lg:pl-[clamp(320px,28vw,440px)]"
         )}
         id="reading-root"
@@ -1468,7 +1486,7 @@ export default function ReadingPage() {
 
         {!preferences.focusMode && (
           <>
-            <section className={cn("mx-auto w-full max-w-6xl px-4 md:px-6 transition-opacity", isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0")}>
+            <section className={cn("mx-auto w-full max-w-[1600px] px-2 sm:px-4 md:px-6 transition-opacity", isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0")}>
               {chapterData?.fallbackNotice && (
                 <Alert className="mb-4 border-gold/40 bg-gold-bg/20 text-app-text">
                   <AlertTitle className="font-medium text-gold flex items-center gap-2">
@@ -1526,70 +1544,105 @@ export default function ReadingPage() {
                 </div>
               )}
               <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <Breadcrumb>
-                  <BreadcrumbList className="leading-none">
-                    <BreadcrumbItem>
-                      <BreadcrumbLink asChild>
-                        <button className="inline-flex items-center font-sans uppercase leading-none tracking-[0.08em]" onClick={() => setIsSettingsOpen(true)} type="button">
+                <div className="flex flex-col gap-2.5">
+                  <Breadcrumb>
+                    <BreadcrumbList className="leading-none text-xs text-muted-foreground">
+                      <BreadcrumbItem>
+                        <button
+                          className="inline-flex items-center font-sans uppercase leading-none tracking-[0.08em] font-semibold text-muted-foreground hover:text-gold transition-colors cursor-pointer"
+                          onClick={() => setIsVersionPickerOpen(true)}
+                          type="button"
+                          title="Trocar versão da Bíblia"
+                        >
                           {selectedVersion.toUpperCase()}
                         </button>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      {selectedBook ? (
-                        <BreadcrumbLink asChild>
-                          <Link className="inline-flex items-center leading-none" to={`/${selectedVersion}/${selectedBook.slug}`}>
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator className="text-muted-foreground/60">
+                        <ChevronRight className="h-3 w-3" />
+                      </BreadcrumbSeparator>
+                      <BreadcrumbItem>
+                        {selectedBook ? (
+                          <button
+                            className="inline-flex items-center leading-none text-app-text hover:text-gold transition-colors font-medium cursor-pointer"
+                            onClick={() => setIsBookPickerOpen(true)}
+                            type="button"
+                            title="Trocar livro da Bíblia"
+                          >
                             {selectedBook.name}
-                          </Link>
-                        </BreadcrumbLink>
-                      ) : (
-                        <BreadcrumbPage>{t("reading.book")}</BreadcrumbPage>
-                      )}
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <Dialog onOpenChange={setIsChapterPickerOpen} open={isChapterPickerOpen}>
-                        <DialogTrigger asChild>
-                          <button className="inline-flex items-center font-sans leading-none" type="button">
-                            {t("home.chapter")} {chapterNumber}
                           </button>
-                        </DialogTrigger>
-                        <DialogContent aria-label={t("reading.selectChapter")} className="max-w-xl border-border bg-app-surface sm:rounded-2xl" role="dialog">
-                          <DialogHeader>
-                            <DialogTitle>{t("reading.selectChapter")}</DialogTitle>
-                            <DialogDescription>
-                              {selectedBook ? t("reading.chooseChapterBook", { book: selectedBook.name }) : t("reading.chooseChapter")}
-                            </DialogDescription>
-                          </DialogHeader>
+                        ) : (
+                          <BreadcrumbPage>{t("reading.book")}</BreadcrumbPage>
+                        )}
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator className="text-muted-foreground/60">
+                        <ChevronRight className="h-3 w-3" />
+                      </BreadcrumbSeparator>
+                      <BreadcrumbItem>
+                        <Dialog onOpenChange={setIsChapterPickerOpen} open={isChapterPickerOpen}>
+                          <DialogTrigger asChild>
+                            <button
+                              className="inline-flex items-center font-sans leading-none text-app-text font-medium hover:text-gold transition-colors cursor-pointer"
+                              type="button"
+                              title="Trocar capítulo"
+                            >
+                              {t("home.chapter")} {chapterNumber}
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent
+                            aria-label={t("reading.selectChapter")}
+                            className={cn(
+                              "max-w-xl border sm:rounded-2xl transition-colors duration-300",
+                              isDark
+                                ? "border-[#382f23]/80 bg-[#161412] text-[#f5f5f0]"
+                                : isSepia
+                                  ? "border-[#d8c8b0] bg-[#f6f0e4] text-[#2e241d]"
+                                  : "border-neutral-200 bg-white text-neutral-900"
+                            )}
+                            role="dialog"
+                          >
+                            <DialogHeader>
+                              <DialogTitle className="text-app-text">{t("reading.selectChapter")}</DialogTitle>
+                              <DialogDescription className="text-muted-foreground">
+                                {selectedBook ? t("reading.chooseChapterBook", { book: selectedBook.name }) : t("reading.chooseChapter")}
+                              </DialogDescription>
+                            </DialogHeader>
 
-                          <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
-                            {chapterGrid.map((item) => {
-                              const active = item === chapterNumber;
-                              return (
-                                <Button
-                                  aria-current={active ? "true" : undefined}
-                                  className={active ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg" : ""}
-                                  data-chapter={item}
-                                  key={item}
-                                  onClick={() => {
-                                    goToChapter(item);
-                                    setIsChapterPickerOpen(false);
-                                  }}
-                                  size="sm"
-                                  type="button"
-                                  variant="outline"
-                                >
-                                  {item}
-                                </Button>
-                              );
-                            })}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
+                            <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
+                              {chapterGrid.map((item) => {
+                                const active = item === chapterNumber;
+                                return (
+                                  <Button
+                                    aria-current={active ? "true" : undefined}
+                                    className={cn(
+                                      active
+                                        ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg"
+                                        : isDark
+                                          ? "border-[#382f23]/50 text-[#ded9ce] hover:bg-[#221e1a]"
+                                          : isSepia
+                                            ? "border-[#d8c8b0] text-[#4a3a2d] hover:bg-[#ede4d4]"
+                                            : "border-neutral-200 text-neutral-800 hover:bg-neutral-100"
+                                    )}
+                                    data-chapter={item}
+                                    key={item}
+                                    onClick={() => {
+                                      goToChapter(item);
+                                      setIsChapterPickerOpen(false);
+                                    }}
+                                    size="sm"
+                                    type="button"
+                                    variant="outline"
+                                  >
+                                    {item}
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </BreadcrumbItem>
+                    </BreadcrumbList>
+                  </Breadcrumb>
+                </div>
 
                 <div className="flex flex-wrap items-center justify-end gap-2">
                   <div className="hidden items-center gap-3 flex-shrink-0 rounded-md h-10 border border-border bg-app-surface px-4 sm:flex">
@@ -1759,23 +1812,43 @@ export default function ReadingPage() {
             )}
           </div>
         ) : (
-          <div className={cn("mx-auto w-full flex items-start justify-center transition-all duration-300", !isCenteredLayout && "gap-4 xl:gap-10")}>
+          <div
+            className={cn(
+              "mx-auto w-full flex items-start justify-center transition-all duration-300",
+              !isCenteredLayout && "gap-8 xl:gap-12"
+            )}
+          >
             <article
               aria-busy={loading}
               aria-live="polite"
               className={cn(
-                "w-full shrink-0 rounded-2xl border border-border bg-app-surface px-4 py-7 md:px-6 transition-all duration-300",
-                isCenteredLayout && "max-w-2xl mx-auto"
+                "w-full min-w-0 bg-transparent border-0 shadow-none p-0 transition-all duration-300",
+                isCenteredLayout ? "mx-auto" : "mx-auto lg:mx-0 pr-0 lg:pr-4"
               )}
-              style={{ maxWidth: compareEnabled ? "1120px" : isCenteredLayout ? undefined : "var(--column-width)" }}
+              style={{
+                maxWidth: compareEnabled
+                  ? "1120px"
+                  : (COLUMN_WIDTH_MAP[preferences.columnWidth] || "var(--column-width, 860px)"),
+              }}
             >
-              <h1 className="mb-1 text-2xl text-app-text">{selectedBook?.name} — {t("home.chapter")} {chapterNumber}</h1>
-              {previousViewedAt && user && (
-                <p className="mb-4 font-sans text-xs text-app-text-muted">
-                  Última visualização: {formatViewedAt(previousViewedAt)}
+              <div className="mb-6">
+                <h1 className={cn(
+                  "font-serif text-3xl sm:text-4xl font-semibold tracking-tight transition-colors duration-300",
+                  isDark ? "text-[#f5f5f0]" : isSepia ? "text-[#2e241d]" : "text-neutral-900"
+                )}>
+                  {selectedBook?.name} — {t("home.chapter")} {chapterNumber}
+                </h1>
+                <p className={cn(
+                  "mt-2 font-sans text-xs transition-colors duration-300",
+                  isDark ? "text-[#a89f91]" : isSepia ? "text-[#7d6c5d]" : "text-neutral-500"
+                )}>
+                  Última visualização: {formatViewedAt(previousViewedAt || new Date())}
                 </p>
-              )}
-              {!previousViewedAt && <div className="mb-4" />}
+                <div className={cn(
+                  "w-full h-px mt-5 mb-6 transition-colors duration-300",
+                  isDark ? "bg-[#382f23]/60" : isSepia ? "bg-[#d8c8b0]" : "bg-neutral-200"
+                )} />
+              </div>
               {chapterData?.fallbackNotice && (
                 <Alert className="mb-4 border-gold/40 bg-gold/10 text-gold-dark dark:text-gold-light">
                   <AlertTitle className="flex items-center gap-2 font-semibold text-sm">
@@ -1878,19 +1951,11 @@ export default function ReadingPage() {
                             tabIndex={0}
                             style={{ marginBottom: "var(--verse-spacing)" }}
                           >
-                            <p
-                              className={cn("text-app-text flex items-start gap-2", isHebrewReading && "font-hebrew")}
-                              dir={isHebrewReading ? "rtl" : undefined}
-                              style={{
-                                fontFamily: isHebrewReading ? "var(--font-hebrew)" : "var(--font-reading)",
-                                fontSize: "var(--font-size-reading)",
-                                lineHeight: "1.85",
-                              }}
-                            >
+                            <div className="flex items-start gap-3 sm:gap-4">
                               {/* Church Mode Checkbox */}
                               {churchMode.isActive && (
                                 <span
-                                  className="flex-shrink-0 mt-[0.35rem]"
+                                  className="flex-shrink-0 mt-1"
                                   onClick={(e) => { e.stopPropagation(); handleChurchCheckbox({ number: verse.number, text: primaryText, version: selectedVersion }); }}
                                 >
                                   <input
@@ -1902,18 +1967,31 @@ export default function ReadingPage() {
                                   />
                                 </span>
                               )}
-                              <span className="mr-2 inline-block min-w-6 align-top font-mono text-[0.65rem] text-gold transition-opacity duration-100 group-hover:opacity-100" style={{ opacity: isHovered ? 1 : 0.6, flexShrink: 0 }}>
+                              <span
+                                className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none transition-opacity duration-100"
+                                style={{ opacity: isHovered ? 1 : 0.75 }}
+                              >
                                 {verseNumber}
                                 {hasCacheForVerse(verse.number) && (
                                   <span
-                                    className="w-1 h-1 rounded-full bg-gold/50 inline-block align-top ml-0.5 mb-1"
+                                    className="w-1.5 h-1.5 rounded-full bg-gold inline-block align-top ml-1"
                                     title="Comentário disponível"
                                     aria-label="Comentário disponível"
                                   />
                                 )}
                               </span>
-                              {renderVerseText(primaryDiffTokens, primaryText, verseNumber)}
-                            </p>
+                              <p
+                                className={cn("flex-1 text-app-text min-w-0", isHebrewReading && "font-hebrew")}
+                                dir={isHebrewReading ? "rtl" : undefined}
+                                style={{
+                                  fontFamily: isHebrewReading ? "var(--font-hebrew)" : "var(--font-reading)",
+                                  fontSize: "var(--font-size-reading)",
+                                  lineHeight: "1.85",
+                                }}
+                              >
+                                {renderVerseText(primaryDiffTokens, primaryText, verseNumber)}
+                              </p>
+                            </div>
                           </div>
                         );
 
@@ -1993,18 +2071,22 @@ export default function ReadingPage() {
                               tabIndex={0}
                               style={{ marginBottom: "var(--verse-spacing)" }}
                             >
-                              <p
-                                className={cn("text-app-text", compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" && "font-hebrew")}
-                                dir={compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "rtl" : undefined}
-                                style={{
-                                  fontFamily: compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "var(--font-hebrew)" : "var(--font-reading)",
-                                  fontSize: "var(--font-size-reading)",
-                                  lineHeight: "1.85",
-                                }}
-                              >
-                                <span className="mr-2 inline-block w-6 align-top font-mono text-[0.65rem] text-gold">{verseNumber}</span>
-                                {renderVerseText(compareDiffTokens, cleanedContent, verseNumber)}
-                              </p>
+                              <div className="flex items-start gap-3 sm:gap-4">
+                                <span className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none opacity-80">
+                                  {verseNumber}
+                                </span>
+                                <p
+                                  className={cn("flex-1 text-app-text min-w-0", compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" && "font-hebrew")}
+                                  dir={compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "rtl" : undefined}
+                                  style={{
+                                    fontFamily: compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "var(--font-hebrew)" : "var(--font-reading)",
+                                    fontSize: "var(--font-size-reading)",
+                                    lineHeight: "1.85",
+                                  }}
+                                >
+                                  {renderVerseText(compareDiffTokens, cleanedContent, verseNumber)}
+                                </p>
+                              </div>
                             </div>
                           );
                         })}
@@ -2014,7 +2096,21 @@ export default function ReadingPage() {
                 )}
               </div>
 
-              {/* Removido do bottom conforme o pedido do usuário para jogar para sidebar direita */}
+              {/* Barra inferior de navegação */}
+              {!preferences.focusMode && (
+                <ReadingBottomNav
+                  currentVersion={selectedVersion}
+                  onVersionChange={handleVersionChange}
+                  onOpenVersionModal={() => setIsVersionPickerOpen(true)}
+                  prevChapterInfo={prevChapterInfo}
+                  nextChapterInfo={nextChapterInfo}
+                  onNavigate={(ch, slug) => {
+                    goToChapter(ch, slug);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  onFinish={() => navigate("/")}
+                />
+              )}
 
               {!loading && !error && isPartOfTodayReading && activePlan && (
                 <DailyReadingBadge
@@ -2038,135 +2134,116 @@ export default function ReadingPage() {
               )}
             </article>
 
-            {/* Sticky Chapter Sidebar on Desktop */}
+            {/* Column 2: Sticky Chapter Grid Card on Desktop */}
             {!compareEnabled && selectedBook && isChapterSidebarOpen && !preferences.focusMode && !isClausuraActive && (
-              <aside className={cn(
-                "hidden lg:block shrink-0 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pl-4 pr-4 transition-all duration-300",
-                cachedChapterCommentary ? "w-[320px] xl:w-[380px] 2xl:w-[420px]" : "w-[140px] xl:w-[180px] 2xl:w-[220px]"
-              )}>
-                <div className="flex flex-col items-center pb-8 pt-2 w-full">
-                  {!preferences.focusMode && (
-                    <div className="flex items-center justify-between w-full mb-4 px-1">
-                      <span className="text-[0.6rem] font-mono text-app-text-muted uppercase tracking-widest opacity-70">
-                        Capítulos
-                      </span>
-                      <button
-                        type="button"
-                        onClick={toggleChapterSidebar}
-                        className="p-1 rounded-md text-app-text-muted hover:text-gold hover:bg-app-raised transition-colors cursor-pointer"
-                        aria-label="Recolher painel de capítulos"
-                        title="Recolher painel de capítulos"
+              <aside className="hidden lg:flex flex-col gap-5 shrink-0 sticky top-24 w-[250px] xl:w-[270px] max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pr-1 transition-all duration-300">
+                <ReadingChapterGridCard
+                  totalChapters={selectedBook.chapters}
+                  currentChapter={chapterNumber}
+                  onSelectChapter={(ch) => goToChapter(ch)}
+                  headerSlot={
+                    <button
+                      type="button"
+                      onClick={toggleChapterSidebar}
+                      className="p-1 rounded-md text-muted-foreground hover:text-gold transition-colors cursor-pointer"
+                      title="Recolher painel de capítulos"
+                      aria-label="Recolher painel de capítulos"
+                    >
+                      <PanelRightClose className="h-4 w-4" />
+                    </button>
+                  }
+                />
+
+                {/* Chapter Commentary Button in Sidebar */}
+                <div className={cn(
+                  "w-full rounded-2xl border backdrop-blur-md p-4 flex flex-col items-center justify-center transition-colors duration-300",
+                  isDark
+                    ? "border-[#382f23]/80 bg-[#161412]/90 shadow-2xl"
+                    : isSepia
+                      ? "border-[#d8c8b0] bg-[#ede4d4]/90 shadow-xl"
+                      : "border-neutral-200 bg-white/95 shadow-xl"
+                )}>
+                  {!isPro && freeChapterCommentaryCount === 0 && !cachedChapterCommentary ? (
+                    <div className="w-full rounded-xl border border-gold/20 bg-gold-bg/10 p-4 text-center space-y-2.5 animate-in fade-in">
+                      <div className="mx-auto w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center">
+                        <Lock className="h-4 w-4 text-gold" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-xs font-semibold text-app-text">Recurso Exclusivo PRO</h3>
+                        <p className="text-[0.7rem] text-app-text-muted leading-relaxed">
+                          Você já utilizou seus 3 comentários gratuitos de capítulos. Assine para ter acesso ilimitado a comentários.
+                        </p>
+                      </div>
+                      <Button
+                        className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold text-xs py-2 h-auto rounded-lg"
+                        onClick={() => navigate('/pro')}
                       >
-                        <PanelRightClose className="h-4 w-4" />
-                      </button>
+                        Assinar Plano Premium
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={handleChapterCommentary}
+                        disabled={isChapterCommentaryLoading}
+                        type="button"
+                        className={cn(
+                          "w-full h-auto py-2.5 px-4 text-center rounded-xl transition-all shadow-xs border-0",
+                          isChapterCommentaryLoading
+                            ? "bg-app-raised border border-border cursor-not-allowed text-app-text-muted"
+                            : "bg-gold text-black font-semibold hover:bg-gold/90"
+                        )}
+                      >
+                        {isChapterCommentaryLoading && (
+                          <Loader2 className="h-4 w-4 animate-spin text-app-text-muted mr-2 inline-block" />
+                        )}
+                        <span className={cn(
+                          "text-[0.72rem] font-medium tracking-wide leading-tight",
+                          isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
+                        )}>
+                          {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentários" : "Comentários do Capítulo"}
+                        </span>
+                      </Button>
+                      {!isPro && !cachedChapterCommentary && (
+                        <p className="text-[0.68rem] text-app-text-muted mt-2 text-center">
+                          Você tem <strong className="text-gold">{freeChapterCommentaryCount}</strong> {freeChapterCommentaryCount === 1 ? 'comentário gratuito de capítulo disponível' : 'comentários gratuitos de capítulos disponíveis'}.
+                        </p>
+                      )}
+                    </>
+                  )}
+
+                  {cachedChapterCommentary && (
+                    <div id="chapter-commentary-section" className="w-full mt-5 animate-in fade-in duration-700">
+                      <div className="flex flex-col items-center text-center gap-1.5 mb-4">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/10 text-gold shadow-sm ring-1 ring-gold/20">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <h3 className="font-serif text-[1rem] font-bold text-app-text leading-tight mt-1">Acervo Teológico</h3>
+                          <p className="text-[0.65rem] text-app-text-muted uppercase tracking-widest font-mono mt-0.5">
+                            {selectedBook?.name} {chapterNumber}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="pb-4">
+                        {isPro && <CommentaryQuota compact className="w-full mb-3 px-1" />}
+                        <BiblicalCommentary
+                          commentaries={(function () {
+                            try {
+                              const parsed = JSON.parse(cachedChapterCommentary);
+                              return Array.isArray(parsed) ? parsed : (parsed.commentaries || []);
+                            } catch {
+                              return [];
+                            }
+                          })()}
+                        />
+                      </div>
                     </div>
                   )}
-                  <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2 xl:gap-2.5 w-full justify-items-center">
-                    {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(c => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => goToChapter(c)}
-                        className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center text-[0.85rem] font-medium transition-all duration-200 cursor-pointer",
-                          c === Number(chapterNumber)
-                            ? "bg-gold text-white font-bold shadow-md shadow-gold/30 scale-110"
-                            : "text-app-text-muted hover:bg-gold-bg/60 hover:text-gold bg-app-raised/30"
-                        )}
-                        aria-label={`${t("home.chapter")} ${c}`}
-                        aria-current={c === Number(chapterNumber) ? "page" : undefined}
-                      >
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Chapter Commentary Button in Sidebar */}
-                  <div className="w-full mt-8 border-t border-border/50 pt-6 flex flex-col items-center justify-center">
-                    {!isPro && freeChapterCommentaryCount === 0 && !cachedChapterCommentary ? (
-                      <div className="w-full rounded-xl border border-gold/20 bg-gold-bg/10 p-5 text-center space-y-3 animate-in fade-in">
-                        <div className="mx-auto w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center">
-                          <Lock className="h-5 w-5 text-gold" />
-                        </div>
-                        <div className="space-y-1">
-                          <h3 className="text-xs font-semibold text-app-text">Recurso Exclusivo PRO</h3>
-                          <p className="text-[0.7rem] text-app-text-muted leading-relaxed">
-                            Você já utilizou seus 3 comentários gratuitos de capítulos. Assine para ter acesso ilimitado a comentários de capítulos e versículos por hora.
-                          </p>
-                        </div>
-                        <Button
-                          className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold text-xs py-2 h-auto"
-                          onClick={() => navigate('/pro')}
-                        >
-                          Assinar Plano Premium
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
-                        <Button
-                          onClick={handleChapterCommentary}
-                          disabled={isChapterCommentaryLoading}
-                          type="button"
-                          className={cn(
-                            "w-full h-auto py-3 px-4 text-center rounded-xl transition-all shadow-xs border-0",
-                            isChapterCommentaryLoading
-                              ? "bg-app-raised border border-border cursor-not-allowed text-app-text-muted"
-                              : "bg-gold text-black font-semibold hover:bg-gold/90"
-                          )}
-                        >
-                          {isChapterCommentaryLoading && (
-                            <Loader2 className="h-4 w-4 animate-spin text-app-text-muted mr-2 inline-block" />
-                          )}
-                          <span className={cn(
-                            "text-[0.72rem] font-medium tracking-wide leading-tight",
-                            isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
-                          )}>
-                            {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentários" : "Comentários do Capítulo"}
-                          </span>
-                        </Button>
-                        {!isPro && !cachedChapterCommentary && (
-                          <p className="text-[0.68rem] text-app-text-muted mt-2 text-center">
-                            Você tem <strong className="text-gold">{freeChapterCommentaryCount}</strong> {freeChapterCommentaryCount === 1 ? 'comentário gratuito de capítulo disponível' : 'comentários gratuitos de capítulos disponíveis'}.
-                          </p>
-                        )}
-                      </>
-                    )}
-
-                    {cachedChapterCommentary && (
-                      <div id="chapter-commentary-section" className="w-full mt-8 animate-in fade-in duration-700">
-                        <div className="flex flex-col items-center text-center gap-2 mb-6">
-                          <div className="flex justify-center w-full mt-2">
-                            <div className="h-0.5 w-12 bg-gold/30 rounded-full mb-4"></div>
-                          </div>
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold shadow-sm ring-1 ring-gold/20">
-                            <FileText className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <h3 className="font-serif text-[1.1rem] font-bold text-app-text leading-tight mt-1">Acervo Teológico</h3>
-                            <p className="text-[0.65rem] text-app-text-muted uppercase tracking-widest font-mono mt-1">
-                              {selectedBook?.name} {chapterNumber}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="pb-8">
-                          {isPro && <CommentaryQuota compact className="w-full mb-4 px-1" />}
-                          <BiblicalCommentary
-                            commentaries={(function () {
-                              try {
-                                const parsed = JSON.parse(cachedChapterCommentary);
-                                return Array.isArray(parsed) ? parsed : (parsed.commentaries || []);
-                              } catch {
-                                return [];
-                              }
-                            })()}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </aside>
             )}
+
 
             {/* Botão flutuante para reabrir painel lateral de capítulos quando colapsado */}
             {!compareEnabled && selectedBook && !isChapterSidebarOpen && !preferences.focusMode && (
@@ -2280,50 +2357,6 @@ export default function ReadingPage() {
           onClose={() => setIsAuthModalOpen(false)}
         />
 
-
-        {selectedBook && !preferences.focusMode && (
-          <footer
-            className={cn(
-              "mx-auto mt-6 mb-12 flex w-full max-w-[680px] flex-col items-center justify-center gap-4 px-4 py-8 md:px-6 transition-opacity",
-              isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
-            )}
-            role="contentinfo"
-          >
-            <div className="flex w-full items-center justify-center gap-3">
-              {prevChapterInfo && (
-                <Button
-                  className="group flex-1 max-w-[300px] h-10 text-xs sm:text-sm"
-                  onClick={() => goToChapter(prevChapterInfo.chapter, prevChapterInfo.book.slug)}
-                  type="button"
-                  variant="outline"
-                >
-                  ← {t("reading.backTo", { reference: `${prevChapterInfo.book.name} ${prevChapterInfo.chapter}` })}
-                </Button>
-              )}
-
-              {nextChapterInfo ? (
-                <Button
-                  className="group flex-1 max-w-[300px] h-10 text-xs sm:text-sm"
-                  onClick={() => goToChapter(nextChapterInfo.chapter, nextChapterInfo.book.slug)}
-                  type="button"
-                  variant="outline"
-                >
-                  {t("reading.continueTo", { reference: `${nextChapterInfo.book.name} ${nextChapterInfo.chapter}` })} →
-                </Button>
-              ) : (
-                <Button
-                  className="group flex-1 max-w-[300px] h-10 text-xs sm:text-sm"
-                  onClick={() => navigate("/")}
-                  type="button"
-                  variant="outline"
-                >
-                  Concluir Leitura ✓
-                </Button>
-              )}
-            </div>
-          </footer>
-        )}
-
         {selectedBook && preferences.focusMode && (
           <div
             className={cn(
@@ -2404,6 +2437,25 @@ export default function ReadingPage() {
           onOpenChange={(open) => setRateLimitStatus(prev => ({ ...prev, open }))}
           resetAt={rateLimitStatus.resetAt}
           limit={rateLimitStatus.limit}
+        />
+
+        {/* Modal de Escolha de Livros com busca e abas AT/NT */}
+        <BookPickerModal
+          open={isBookPickerOpen}
+          onOpenChange={setIsBookPickerOpen}
+          currentBookSlug={selectedBook?.slug}
+          onSelectBook={(slug) => {
+            navigate(`/${selectedVersion}/${slug}/1`);
+            window.scrollTo({ top: 0, behavior: "auto" });
+          }}
+        />
+
+        {/* Modal de Escolha de Versões Bíblicas */}
+        <VersionPickerModal
+          open={isVersionPickerOpen}
+          onOpenChange={setIsVersionPickerOpen}
+          currentVersion={selectedVersion}
+          onSelectVersion={handleVersionChange}
         />
 
         {/* O caderno e o botão flutuante são renderizados globalmente em GlobalNotebookContainer */}

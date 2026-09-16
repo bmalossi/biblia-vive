@@ -11,7 +11,10 @@ interface LayoutProps {
   children: ReactNode;
   hideHeader?: boolean;
   hideMobileNav?: boolean;
+  hideFooter?: boolean;
   isClausuraActive?: boolean;
+  maxWidthClassName?: string;
+  className?: string;
 }
 
 const mobileNav = [
@@ -20,12 +23,20 @@ const mobileNav = [
   { icon: Bookmark, label: "Memorial", to: "/memorial" },
 ];
 
-export default function Layout({ children, hideHeader = false, hideMobileNav = false, isClausuraActive = false }: LayoutProps) {
+export default function Layout({
+  children,
+  hideHeader = false,
+  hideMobileNav = false,
+  hideFooter = false,
+  isClausuraActive = false,
+  maxWidthClassName = "max-w-7xl",
+  className,
+}: LayoutProps) {
   const location = useLocation();
   const version = getVersion();
 
   return (
-    <div className="min-h-screen bg-app-bg text-app-text">
+    <div className={cn("min-h-screen bg-app-bg text-app-text", className)}>
       <div
         className={cn(
           "transition-opacity",
@@ -38,11 +49,11 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
       >
         <Header />
       </div>
-      <main className={`mx-auto w-full max-w-6xl px-4 md:px-6 md:pb-10 flex-grow ${hideHeader ? "pb-12 pt-3" : "pb-24 pt-[68px]"}`} id="main-content">
+      <main className={`mx-auto w-full ${maxWidthClassName} px-4 md:px-6 md:pb-10 flex-grow ${hideHeader ? "pb-12 pt-3" : "pb-24 pt-[68px]"}`} id="main-content">
         {children}
       </main>
 
-      {!hideHeader && !hideMobileNav && (
+      {!hideHeader && !hideMobileNav && !hideFooter && (
         <footer
           className={cn(
             "mt-auto border-t border-border bg-app-surface py-12 pb-28 md:pb-12 text-center md:text-left transition-opacity",
@@ -51,7 +62,7 @@ export default function Layout({ children, hideHeader = false, hideMobileNav = f
               : "opacity-100 duration-0"
           )}
         >
-          <div className="mx-auto w-full max-w-6xl px-4 md:px-6 grid gap-8 md:grid-cols-3">
+          <div className={`mx-auto w-full ${maxWidthClassName} px-4 md:px-6 grid gap-8 md:grid-cols-3`}>
             <div>
               <img
                 src="/logo_icon.png"

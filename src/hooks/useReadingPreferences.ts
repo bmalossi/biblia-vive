@@ -28,7 +28,7 @@ const DEFAULT_PREFERENCES: ReadingPreferences = {
   font: "lora",
   fontSize: 18,
   verseSpacing: 0.8,
-  columnWidth: "normal",
+  columnWidth: "wide",
   focusMode: false,
   ttsRate: 1,
   wordsOfGod: true,
@@ -40,7 +40,7 @@ const FONT_MAP: Record<ReadingFont, string> = {
   "open-dyslexic": '"OpenDyslexic", "Open Dyslexic", "Comic Sans MS", sans-serif',
 };
 
-const COLUMN_WIDTH_MAP: Record<ReadingColumnWidth, string> = {
+export const COLUMN_WIDTH_MAP: Record<ReadingColumnWidth, string> = {
   narrow: "520px",
   normal: "680px",
   wide: "860px",
@@ -102,6 +102,11 @@ export function useReadingPreferences({ rootId = "reading-root" }: UseReadingPre
       root.style.setProperty("--font-size-reading", `${next.fontSize}px`);
       root.style.setProperty("--verse-spacing", `${next.verseSpacing}rem`);
       root.style.setProperty("--column-width", COLUMN_WIDTH_MAP[next.columnWidth]);
+
+      document.documentElement.style.setProperty("--column-width", COLUMN_WIDTH_MAP[next.columnWidth]);
+      document.documentElement.style.setProperty("--font-reading", FONT_MAP[next.font]);
+      document.documentElement.style.setProperty("--font-size-reading", `${next.fontSize}px`);
+      document.documentElement.style.setProperty("--verse-spacing", `${next.verseSpacing}rem`);
     },
     [rootId],
   );
