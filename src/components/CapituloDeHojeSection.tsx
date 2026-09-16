@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useEditorialChapter } from "@/hooks/useEditorialChapter";
 import {
@@ -31,7 +31,15 @@ As narrativas bíblicas não são relíquias protegidas por vitrines antigas nem
 Permanecer diante do texto é permitir que a esperança seja renovada e que a verdade divina encontre morada viva em seu coração hoje.`;
 
   const paragraphs = introFullText.split("\n\n").filter(Boolean);
-  const previewText = paragraphs[0];
+  const rawPreview = paragraphs[0] || "";
+
+  // Delimitação estrita a no máximo 2 linhas (~18-20 palavras)
+  const previewText = useMemo(() => {
+    const clean = rawPreview.replace(/\s+/g, " ").trim();
+    const words = clean.split(" ");
+    if (words.length <= 20) return clean;
+    return words.slice(0, 20).join(" ").replace(/[,.;:—-]+$/, "") + "...";
+  }, [rawPreview]);
 
   const referenceText = chapter ? getEditorialChapterReferenceText(chapter) : "Romanos 15.4";
   const targetLink = chapter ? getEditorialChapterLink(chapter) : "/nvi/romanos/15";
@@ -94,8 +102,8 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
               {title}
             </h2>
 
-            {/* Parágrafo de Introdução / Reflexão com indicador */}
-            <p className="font-sans text-xs sm:text-[0.82rem] text-neutral-300/80 leading-relaxed mb-3 font-light max-w-lg">
+            {/* Parágrafo de Introdução / Reflexão com indicador delimitado a 2 linhas */}
+            <p className="font-sans text-xs sm:text-[0.82rem] text-neutral-300/80 leading-relaxed mb-3 font-light max-w-lg line-clamp-2">
               {previewText}
             </p>
 
