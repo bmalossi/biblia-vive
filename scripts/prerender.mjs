@@ -28,6 +28,8 @@ const __dirname  = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const DIST_DIR     = path.resolve(PROJECT_ROOT, 'dist');
 const BIBLE_BASE   = path.resolve(PROJECT_ROOT, 'public/bible');
+const HARPA_DATA_PATH = path.resolve(PROJECT_ROOT, 'src/data/harpa-hymns.json');
+const HARPA_BASE      = path.resolve(PROJECT_ROOT, 'public/bible/harpa');
 
 const CANONICAL_ORIGIN = 'https://www.bibliavive.com.br';
 
@@ -1135,6 +1137,153 @@ function harpaMetaTags() {
   return buildStaticMeta({ title, desc, url, type: 'MusicComposition', seoContent, customJsonLd: jsonLd });
 }
 
+/**
+ * Generates all <head> meta tags + SEO_CONTENT for an individual Harpa Cristã hymn.
+ * Exposes the full lyrics with strophes, highlighted chorus, credits and MusicComposition schema.
+ */
+function generateHymnMetaTags(hymnInfo, strophes, prevNum, nextNum) {
+  const url = `${CANONICAL_ORIGIN}/harpa/${hymnInfo.numero}`;
+  const title = `Hino ${hymnInfo.numero} — ${hymnInfo.tituloFormatado} — Harpa Cristã | Bíblia Vive`;
+
+  const esc = (s) => String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  function isChorus(line) {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    return trimmed === trimmed.toUpperCase() && !/^\d/.test(trimmed) && trimmed.length > 3;
+  }
+
+  // First strophe excerpt for meta description
+  const firstLines = (strophes[0]?.texto || '')
+    .split('\n')
+    .filter(l => l.trim())
+    .slice(0, 3)
+    .join(' ')
+    .replace(/^\d+\s*/, '')
+    .substring(0, 130);
+
+  const desc = `Letra completa do Hino ${hymnInfo.numero} — ${hymnInfo.tituloFormatado} da Harpa Cristã. "${firstLines}...". Leia, estude e adore na Bíblia Vive.`;
+
+  // GEO summary capsule
+  const audioInfo = hymnInfo.hasAudio ? ' com áudio de adoração disponível' : '';
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">Hino ${hymnInfo.numero} da Harpa Cristã ("${esc(hymnInfo.tituloFormatado)}"). Cântico tradicional da hinologia pentecostal brasileira composto por ${hymnInfo.estrofes} estrofes${audioInfo}. Acesse a letra completa organizada por estrofes e refrão na plataforma Bíblia Vive.</section>`;
+
+  // Strophes HTML
+  const strophesHtml = strophes.map(s => {
+    const lines = (s.texto || '').split('\n').map(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return '<br />';
+      if (isChorus(trimmed)) {
+        return `<p style="margin:0.25rem 0;font-weight:bold;color:#73541c;font-style:italic">${esc(trimmed)}</p>`;
+      }
+      return `<p style="margin:0.25rem 0;line-height:1.7">${esc(trimmed)}</p>`;
+    }).join('');
+
+    return (
+      `<section style="margin-bottom:1.75rem">` +
+      `<h2 style="font-size:1.05rem;color:#d4af37;margin-bottom:0.4rem;font-family:sans-serif">Estrofe ${s.estrofe}</h2>` +
+      `<div style="font-size:1.05rem;color:#222;font-family:serif">${lines}</div>` +
+      `</section>`
+    );
+  }).join('');
+
+  // Credits block
+  let creditsHtml = '';
+  if (hymnInfo.credits) {
+    const cr = hymnInfo.credits;
+    creditsHtml =
+      `<footer style="margin-top:2rem;padding:1rem 1.25rem;border:1px solid #e5e5e5;border-radius:8px;font-size:0.875rem;background:#faf8f2">` +
+      `<h3 style="font-size:0.85rem;text-transform:uppercase;color:#73541c;margin:0 0 0.5rem">Créditos da gravação</h3>` +
+      (cr.voice ? `<p style="margin:0.25rem 0"><strong>Voz:</strong> ${esc(cr.voice)}</p>` : '') +
+      (cr.guitar ? `<p style="margin:0.25rem 0"><strong>Violão:</strong> ${esc(cr.guitar)}</p>` : '') +
+      (cr.sourceUrl ? `<p style="margin:0.25rem 0"><a href="${esc(cr.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#73541c">Fonte da gravação</a></p>` : '') +
+      `</footer>`;
+  }
+
+  // Navigation (prev / next)
+  const prevLink = prevNum ? `<a href="/harpa/${prevNum}" style="color:#73541c">← Hino ${prevNum}</a>` : '<span></span>';
+  const nextLink = nextNum ? `<a href="/harpa/${nextNum}" style="color:#73541c">Hino ${nextNum} →</a>` : '<span></span>';
+  const navHtml =
+    `<nav style="display:flex;justify-content:space-between;align-items:center;margin:2rem 0;padding-top:1rem;border-top:1px solid #e5e5e5;font-size:0.9rem">` +
+    prevLink +
+    `<a href="/harpa" style="color:#73541c;font-weight:bold">Ver todos os hinos</a>` +
+    nextLink +
+    `</nav>`;
+
+  const seoContent =
+    `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
+    `<nav aria-label="Breadcrumb" style="font-size:0.85rem;color:#777;margin-bottom:1rem">` +
+    `<a href="/" style="color:#73541c">Início</a> › <a href="/harpa" style="color:#73541c">Harpa Cristã</a> › <span>Hino ${hymnInfo.numero}</span>` +
+    `</nav>` +
+    `<h1>Hino ${hymnInfo.numero} — ${esc(hymnInfo.tituloFormatado)}</h1>` +
+    geoSummary +
+    `<div class="hymn-lyrics" style="margin-top:1.5rem">` +
+    strophesHtml +
+    `</div>` +
+    creditsHtml +
+    navHtml +
+    `</article>`;
+
+  const fullLyricsText = strophes.map(s => `[Estrofe ${s.estrofe}]\n${s.texto}`).join('\n\n');
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Início', item: CANONICAL_ORIGIN },
+        { '@type': 'ListItem', position: 2, name: 'Harpa Cristã', item: `${CANONICAL_ORIGIN}/harpa` },
+        { '@type': 'ListItem', position: 3, name: `Hino ${hymnInfo.numero} — ${hymnInfo.tituloFormatado}`, item: url },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'MusicComposition',
+      '@id': `${url}#composition`,
+      name: `Hino ${hymnInfo.numero} — ${hymnInfo.tituloFormatado}`,
+      headline: `${hymnInfo.tituloFormatado} (Hino ${hymnInfo.numero} da Harpa Cristã)`,
+      url,
+      inLanguage: 'pt-BR',
+      isPartOf: {
+        '@type': 'MusicPlaylist',
+        '@id': `${CANONICAL_ORIGIN}/harpa#hymnal`,
+        name: 'Harpa Cristã',
+        url: `${CANONICAL_ORIGIN}/harpa`,
+      },
+      text: fullLyricsText,
+      publisher: {
+        '@type': 'Organization',
+        '@id': `${CANONICAL_ORIGIN}#organization`,
+        name: 'Bíblia Vive',
+        url: CANONICAL_ORIGIN,
+      },
+      ...(hymnInfo.hasAudio ? {
+        audio: {
+          '@type': 'AudioObject',
+          contentUrl: `${CANONICAL_ORIGIN}/audio/harpa/${hymnInfo.audioFile}`,
+          name: `Áudio do Hino ${hymnInfo.numero} — ${hymnInfo.tituloFormatado}`,
+        }
+      } : {}),
+    },
+  ];
+
+  return {
+    META_TITLE:       `<title>${title}</title>`,
+    META_DESCRIPTION: `<meta name="description" content="${esc(desc)}" />`,
+    OG_URL:           `<meta property="og:url" content="${url}" />`,
+    OG_TITLE:         `<meta property="og:title" content="${esc(title)}" />`,
+    OG_DESCRIPTION:   `<meta property="og:description" content="${esc(desc)}" />`,
+    OG_TYPE:          `<meta property="og:type" content="music.song" />`,
+    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
+    TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${esc(title)}" />\n  <meta name="twitter:description" content="${esc(desc)}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
+    JSON_LD:          `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
+    SEO_CONTENT:      seoContent,
+  };
+}
+
 function sobreMetaTags() {
   const title = 'Sobre o Bíblia Vive — Missão e Propósito | Bíblia Vive';
   const desc  = 'Entenda a missão do Bíblia Vive: fornecer estudos e leituras bíblicas com as melhores traduções mantendo altíssima fidedignidade aos textos sagrados clássicos.';
@@ -1253,6 +1402,33 @@ function sitemapUrl(loc, changefreq, priority) {
   return `  <url>\n    <loc>${loc}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>\n`;
 }
 
+// ─── IndexNow Protocol ────────────────────────────────────────────────────────
+const INDEXNOW_KEY = '4f9b8c2e7a1d3f5b8e9a0c1d2e3f4a5b';
+
+async function submitIndexNow(urlList) {
+  if (!urlList || urlList.length === 0) return;
+  console.log(`[indexnow] Submitting ${urlList.length} URLs to IndexNow (Bing / ChatGPT Search)...`);
+  const CHUNK_SIZE = 10000;
+  for (let i = 0; i < urlList.length; i += CHUNK_SIZE) {
+    const chunk = urlList.slice(i, i + CHUNK_SIZE);
+    try {
+      const res = await fetch('https://api.indexnow.org/indexnow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: JSON.stringify({
+          host: 'www.bibliavive.com.br',
+          key: INDEXNOW_KEY,
+          keyLocation: `${CANONICAL_ORIGIN}/${INDEXNOW_KEY}.txt`,
+          urlList: chunk,
+        }),
+      });
+      console.log(`[indexnow] Batch ${Math.floor(i / CHUNK_SIZE) + 1} (${chunk.length} URLs) status: ${res.status} (${res.statusText})`);
+    } catch (err) {
+      console.warn(`[indexnow] ⚠ Could not submit batch to IndexNow: ${err.message}`);
+    }
+  }
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 async function prerender() {
   console.log('[prerender] Starting full multi-version pre-render...\n');
@@ -1297,7 +1473,145 @@ async function prerender() {
   console.log(`[prerender] Found ${jornadasSeries.length} published jornadas series.\n`);
 
   let totalChapters = 0;
+  let totalHymns = 0;
   let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+  // ── Static institutional pages ──
+  console.log('[prerender] Processing static institutional pages...');
+
+  // Home — overwrites dist/index.html
+  const homeHtml = replacePlaceholders(template, homeMetaTags());
+  await fs.writeFile(templatePath, homeHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/index.html (Home)');
+
+  // /planos
+  const planosHtml = replacePlaceholders(template, planosMetaTags());
+  const planosDir  = path.join(DIST_DIR, 'planos');
+  await fs.mkdir(planosDir, { recursive: true });
+  await fs.writeFile(path.join(planosDir, 'index.html'), planosHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/planos/index.html');
+
+  // /artigos index
+  const artigosHtml = replacePlaceholders(template, artigosIndexMetaTags(articles));
+  const artigosDir  = path.join(DIST_DIR, 'artigos');
+  await fs.mkdir(artigosDir, { recursive: true });
+  await fs.writeFile(path.join(artigosDir, 'index.html'), artigosHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/artigos/index.html');
+
+  // /como-usar — full HowTo tutorial content exposed as static HTML for crawlers
+  const comoUsarHtml = replacePlaceholders(template, comoUsarMetaTags());
+  const comoUsarDir  = path.join(DIST_DIR, 'como-usar');
+  await fs.mkdir(comoUsarDir, { recursive: true });
+  await fs.writeFile(path.join(comoUsarDir, 'index.html'), comoUsarHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/como-usar/index.html');
+
+  // /harpa — Harpa Cristã index & full timeline history exposed as static HTML
+  const harpaHtml = replacePlaceholders(template, harpaMetaTags());
+  const harpaDir  = path.join(DIST_DIR, 'harpa');
+  await fs.mkdir(harpaDir, { recursive: true });
+  await fs.writeFile(path.join(harpaDir, 'index.html'), harpaHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/harpa/index.html');
+
+  // /jornadas — Sua caminhada, leituras contemplativas & séries diárias
+  const jornadasHtml = replacePlaceholders(template, jornadasMetaTags(jornadasSeries));
+  const jornadasDir  = path.join(DIST_DIR, 'jornadas');
+  await fs.mkdir(jornadasDir, { recursive: true });
+  await fs.writeFile(path.join(jornadasDir, 'index.html'), jornadasHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/jornadas/index.html');
+
+  // /sobre
+  const sobreHtml = replacePlaceholders(template, sobreMetaTags());
+  const sobreDir  = path.join(DIST_DIR, 'sobre');
+  await fs.mkdir(sobreDir, { recursive: true });
+  await fs.writeFile(path.join(sobreDir, 'index.html'), sobreHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/sobre/index.html');
+
+  // /pro
+  const proHtml = replacePlaceholders(template, proMetaTags());
+  const proDir  = path.join(DIST_DIR, 'pro');
+  await fs.mkdir(proDir, { recursive: true });
+  await fs.writeFile(path.join(proDir, 'index.html'), proHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/pro/index.html');
+
+  // /apoiar
+  const apoiarHtml = replacePlaceholders(template, apoiarMetaTags());
+  const apoiarDir  = path.join(DIST_DIR, 'apoiar');
+  await fs.mkdir(apoiarDir, { recursive: true });
+  await fs.writeFile(path.join(apoiarDir, 'index.html'), apoiarHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/apoiar/index.html');
+
+  // /termos-de-uso
+  const termosHtml = replacePlaceholders(template, termosMetaTags());
+  const termosDir  = path.join(DIST_DIR, 'termos-de-uso');
+  await fs.mkdir(termosDir, { recursive: true });
+  await fs.writeFile(path.join(termosDir, 'index.html'), termosHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/termos-de-uso/index.html');
+
+  // /memorial
+  const memorialHtml = replacePlaceholders(template, memorialMetaTags());
+  const memorialDir  = path.join(DIST_DIR, 'memorial');
+  await fs.mkdir(memorialDir, { recursive: true });
+  await fs.writeFile(path.join(memorialDir, 'index.html'), memorialHtml, 'utf-8');
+  console.log('[prerender]   ✓ dist/memorial/index.html\n');
+
+  // Static URLs in sitemap
+  const STATIC_URLS = [
+    { loc: `${CANONICAL_ORIGIN}/`,              changefreq: 'daily',   priority: '1.0' },
+    { loc: `${CANONICAL_ORIGIN}/jornadas`,      changefreq: 'daily',   priority: '0.8' },
+    { loc: `${CANONICAL_ORIGIN}/harpa`,         changefreq: 'weekly',  priority: '0.8' },
+    { loc: `${CANONICAL_ORIGIN}/planos`,        changefreq: 'weekly',  priority: '0.8' },
+    { loc: `${CANONICAL_ORIGIN}/artigos`,       changefreq: 'weekly',  priority: '0.8' },
+    { loc: `${CANONICAL_ORIGIN}/como-usar`,     changefreq: 'monthly', priority: '0.7' },
+    { loc: `${CANONICAL_ORIGIN}/memorial`,      changefreq: 'weekly',  priority: '0.7' },
+    { loc: `${CANONICAL_ORIGIN}/sobre`,         changefreq: 'monthly', priority: '0.5' },
+    { loc: `${CANONICAL_ORIGIN}/apoiar`,        changefreq: 'monthly', priority: '0.5' },
+    { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${CANONICAL_ORIGIN}/pro`,           changefreq: 'weekly',  priority: '0.8' },
+  ];
+  for (const s of STATIC_URLS) {
+    sitemapXml += sitemapUrl(s.loc, s.changefreq, s.priority);
+  }
+
+  // ── Harpa Cristã hymns (1 to 618) ──
+  console.log('[prerender] Processing Harpa Cristã hymns...');
+  try {
+    const rawHymns = await fs.readFile(HARPA_DATA_PATH, 'utf-8');
+    const hymns = JSON.parse(rawHymns);
+
+    for (let i = 0; i < hymns.length; i++) {
+      const hymn = hymns[i];
+      const prevNum = i > 0 ? hymns[i - 1].numero : null;
+      const nextNum = i < hymns.length - 1 ? hymns[i + 1].numero : null;
+
+      const strophes = [];
+      const hymnDir = path.join(HARPA_BASE, String(hymn.numero));
+      try {
+        const files = await fs.readdir(hymnDir);
+        const jsonFiles = files
+          .filter(f => f.endsWith('.json'))
+          .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+        for (const f of jsonFiles) {
+          const content = await fs.readFile(path.join(hymnDir, f), 'utf-8');
+          strophes.push(JSON.parse(content));
+        }
+      } catch (readErr) {
+        console.warn(`[prerender]   ⚠ Could not read strophes for hymn ${hymn.numero}: ${readErr.message}`);
+      }
+
+      const metaTags = generateHymnMetaTags(hymn, strophes, prevNum, nextNum);
+      const html     = replacePlaceholders(template, metaTags);
+      const outDir   = path.join(DIST_DIR, 'harpa', String(hymn.numero));
+      await fs.mkdir(outDir, { recursive: true });
+      await fs.writeFile(path.join(outDir, 'index.html'), html, 'utf-8');
+
+      sitemapXml += sitemapUrl(`${CANONICAL_ORIGIN}/harpa/${hymn.numero}`, 'monthly', '0.7');
+      totalHymns++;
+    }
+    console.log(`[prerender]   ✓ ${totalHymns} Harpa Cristã hymns generated.\n`);
+  } catch (err) {
+    console.warn(`[prerender]   ⚠ Could not prerender Harpa Cristã hymns: ${err.message}`);
+  }
 
   const bibleVersions = await discoverVersions();
 
@@ -1421,127 +1735,9 @@ async function prerender() {
   }
   console.log(`[prerender] ✓ ${totalAuthors} author profile pages generated.\n`);
 
-  // ── Static institutional pages ──
-  console.log('[prerender] Processing static pages...');
-
-  // Home — overwrites dist/index.html
-  const homeHtml = replacePlaceholders(template, homeMetaTags());
-  await fs.writeFile(templatePath, homeHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/index.html (Home)');
-
-  // /planos
-  const planosHtml = replacePlaceholders(template, planosMetaTags());
-  const planosDir  = path.join(DIST_DIR, 'planos');
-  await fs.mkdir(planosDir, { recursive: true });
-  await fs.writeFile(path.join(planosDir, 'index.html'), planosHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/planos/index.html');
-
-  // /artigos index
-  const artigosHtml = replacePlaceholders(template, artigosIndexMetaTags(articles));
-  const artigosDir  = path.join(DIST_DIR, 'artigos');
-  await fs.mkdir(artigosDir, { recursive: true });
-  await fs.writeFile(path.join(artigosDir, 'index.html'), artigosHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/artigos/index.html');
-
-  // /como-usar — full HowTo tutorial content exposed as static HTML for crawlers
-  const comoUsarHtml = replacePlaceholders(template, comoUsarMetaTags());
-  const comoUsarDir  = path.join(DIST_DIR, 'como-usar');
-  await fs.mkdir(comoUsarDir, { recursive: true });
-  await fs.writeFile(path.join(comoUsarDir, 'index.html'), comoUsarHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/como-usar/index.html');
-
-  // /harpa — Harpa Cristã index & full timeline history exposed as static HTML
-  const harpaHtml = replacePlaceholders(template, harpaMetaTags());
-  const harpaDir  = path.join(DIST_DIR, 'harpa');
-  await fs.mkdir(harpaDir, { recursive: true });
-  await fs.writeFile(path.join(harpaDir, 'index.html'), harpaHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/harpa/index.html');
-
-  // /jornadas — Sua caminhada, leituras contemplativas & séries diárias
-  const jornadasHtml = replacePlaceholders(template, jornadasMetaTags(jornadasSeries));
-  const jornadasDir  = path.join(DIST_DIR, 'jornadas');
-  await fs.mkdir(jornadasDir, { recursive: true });
-  await fs.writeFile(path.join(jornadasDir, 'index.html'), jornadasHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/jornadas/index.html');
-
-  // /sobre
-  const sobreHtml = replacePlaceholders(template, sobreMetaTags());
-  const sobreDir  = path.join(DIST_DIR, 'sobre');
-  await fs.mkdir(sobreDir, { recursive: true });
-  await fs.writeFile(path.join(sobreDir, 'index.html'), sobreHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/sobre/index.html');
-
-  // /pro
-  const proHtml = replacePlaceholders(template, proMetaTags());
-  const proDir  = path.join(DIST_DIR, 'pro');
-  await fs.mkdir(proDir, { recursive: true });
-  await fs.writeFile(path.join(proDir, 'index.html'), proHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/pro/index.html');
-
-  // /apoiar
-  const apoiarHtml = replacePlaceholders(template, apoiarMetaTags());
-  const apoiarDir  = path.join(DIST_DIR, 'apoiar');
-  await fs.mkdir(apoiarDir, { recursive: true });
-  await fs.writeFile(path.join(apoiarDir, 'index.html'), apoiarHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/apoiar/index.html');
-
-  // /termos-de-uso
-  const termosHtml = replacePlaceholders(template, termosMetaTags());
-  const termosDir  = path.join(DIST_DIR, 'termos-de-uso');
-  await fs.mkdir(termosDir, { recursive: true });
-  await fs.writeFile(path.join(termosDir, 'index.html'), termosHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/termos-de-uso/index.html');
-
-  // /memorial
-  const memorialHtml = replacePlaceholders(template, memorialMetaTags());
-  const memorialDir  = path.join(DIST_DIR, 'memorial');
-  await fs.mkdir(memorialDir, { recursive: true });
-  await fs.writeFile(path.join(memorialDir, 'index.html'), memorialHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/memorial/index.html');
-
-// ─── IndexNow Protocol ────────────────────────────────────────────────────────
-const INDEXNOW_KEY = '4f9b8c2e7a1d3f5b8e9a0c1d2e3f4a5b';
-
-async function submitIndexNow(urlList) {
-  if (!urlList || urlList.length === 0) return;
-  console.log(`[indexnow] Submitting ${urlList.length} URLs to IndexNow (Bing / ChatGPT Search)...`);
-  try {
-    const res = await fetch('https://api.indexnow.org/indexnow', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({
-        host: 'www.bibliavive.com.br',
-        key: INDEXNOW_KEY,
-        keyLocation: `${CANONICAL_ORIGIN}/${INDEXNOW_KEY}.txt`,
-        urlList: urlList.slice(0, 10000), // Max 10,000 URLs per payload
-      }),
-    });
-    console.log(`[indexnow] Response status: ${res.status} (${res.statusText})`);
-  } catch (err) {
-    console.warn(`[indexnow] ⚠ Could not submit to IndexNow: ${err.message}`);
-  }
-}
-
-  // ── Sitemap — static pages ──
-  const STATIC_URLS = [
-    { loc: `${CANONICAL_ORIGIN}/`,              changefreq: 'daily',   priority: '1.0' },
-    { loc: `${CANONICAL_ORIGIN}/jornadas`,      changefreq: 'daily',   priority: '0.8' },
-    { loc: `${CANONICAL_ORIGIN}/harpa`,         changefreq: 'weekly',  priority: '0.8' },
-    { loc: `${CANONICAL_ORIGIN}/planos`,        changefreq: 'weekly',  priority: '0.8' },
-    { loc: `${CANONICAL_ORIGIN}/artigos`,       changefreq: 'weekly',  priority: '0.8' },
-    { loc: `${CANONICAL_ORIGIN}/como-usar`,     changefreq: 'monthly', priority: '0.7' },
-    { loc: `${CANONICAL_ORIGIN}/memorial`,      changefreq: 'weekly',  priority: '0.7' },
-    { loc: `${CANONICAL_ORIGIN}/sobre`,         changefreq: 'monthly', priority: '0.5' },
-    { loc: `${CANONICAL_ORIGIN}/apoiar`,        changefreq: 'monthly', priority: '0.5' },
-    { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, changefreq: 'monthly', priority: '0.3' },
-    { loc: `${CANONICAL_ORIGIN}/pro`,           changefreq: 'weekly',  priority: '0.8' },
-  ];
-  for (const s of STATIC_URLS) {
-    sitemapXml += sitemapUrl(s.loc, s.changefreq, s.priority);
-  }
   sitemapXml += '</urlset>';
 
-  // Write sitemap-outros.xml (preserves all Bible chapters, author pages, and static pages)
+  // Write sitemap-outros.xml (preserves all Bible chapters, author pages, Harpa hymns, and static pages)
   await fs.writeFile(path.join(DIST_DIR, 'sitemap-outros.xml'), sitemapXml, 'utf-8');
   console.log('[prerender]   ✓ dist/sitemap-outros.xml generated.');
 
@@ -1574,6 +1770,7 @@ async function submitIndexNow(urlList) {
   console.log('\n════════════════════════════════════════════════');
   console.log('[prerender] ✅ Done!');
   console.log(`  Bible chapters : ${totalChapters}`);
+  console.log(`  Harpa hymns    : ${totalHymns}`);
   console.log(`  Articles       : ${totalArticles}`);
   console.log(`  Authors        : ${totalAuthors}`);
   console.log(`  Sitemap URLs   : ${allUrls.length}`);

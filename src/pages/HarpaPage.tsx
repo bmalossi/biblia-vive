@@ -1,15 +1,37 @@
+import React, { useState, useMemo } from "react";
 import Layout from "@/components/Layout";
 import hymnsData from "@/data/harpa-hymns.json";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import HarpaTimeline from "@/components/HarpaTimeline";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, X, Volume2, History } from "lucide-react";
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Search, X, BookOpen, ArrowRight } from "lucide-react";
+import HarpaHeroHeader from "@/components/harpa/HarpaHeroHeader";
+import HarpaFeaturedCard from "@/components/harpa/HarpaFeaturedCard";
+import HarpaHymnCard from "@/components/harpa/HarpaHymnCard";
+import HarpaSidebarWidgets from "@/components/harpa/HarpaSidebarWidgets";
+import HarpaCollaborationModal from "@/components/harpa/HarpaCollaborationModal";
+import HarpaHistoryModal from "@/components/harpa/HarpaHistoryModal";
+import { HarpaHymn } from "@/lib/harpaUtils";
 
 export default function HarpaPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCollabOpen, setIsCollabOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(30);
 
+  usePageMeta({
+    canonical: "/harpa",
+    description:
+      "Leia, pesquise e ouça os hinos tradicionais da Harpa Cristã. 640 hinos com busca instantânea, linha do tempo histórica e áudio de adoração.",
+    ogImage: "/og-default.png",
+    title: "Harpa Cristã — Hinos de Adoração e Louvor | Bíblia Vive",
+    ogType: "website",
+  });
+
+  // Hinos em destaque (os 5 mais amados e cantados, como na referência)
+  const featuredHymns = useMemo(() => {
+    return (hymnsData as HarpaHymn[]).filter((h) => h.numero >= 1 && h.numero <= 5);
+  }, []);
+
+  // Filtro de busca instantânea normalizado
   const filteredHymns = useMemo(() => {
     const normalizedQuery = searchQuery
       .trim()
@@ -17,9 +39,13 @@ export default function HarpaPage() {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    if (!normalizedQuery) return hymnsData;
+    if (!normalizedQuery) {
+      // Quando não há busca, a listagem geral exibe os hinos a partir do 6º
+      // (pois os hinos 1 a 5 já estão proeminentes em "Em destaque")
+      return (hymnsData as HarpaHymn[]).filter((h) => h.numero >= 6);
+    }
 
-    return hymnsData.filter((hymn) => {
+    return (hymnsData as HarpaHymn[]).filter((hymn) => {
       const numberStr = String(hymn.numero);
       const titleNorm = hymn.titulo
         .toLowerCase()
@@ -38,137 +64,173 @@ export default function HarpaPage() {
     });
   }, [searchQuery]);
 
-  usePageMeta({
-    canonical: "/harpa",
-    description:
-      "Leia, pesquise e ouça os hinos tradicionais da Harpa Cristã. 636 hinos com busca instantânea, linha do tempo histórica e áudio de adoração.",
-    ogImage: "/og-default.png",
-    title: "Harpa Cristã — Hinos de Adoração e Louvor | Bíblia Vive",
-    ogType: "website",
-  });
+  // Hinos a serem exibidos na grade numérica com paginação progressiva
+  const displayedGeneralHymns = useMemo(() => {
+    if (searchQuery) return filteredHymns;
+    return filteredHymns.slice(0, visibleCount);
+  }, [filteredHymns, visibleCount, searchQuery]);
+
+  const scrollToHymns = () => {
+    const el = document.getElementById("hinos-section");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <Layout>
-      <div className="flex flex-col">
-        {/* Search Bar & Anchor Button */}
-        <section className="mt-8">
-          <div className="mx-auto flex w-full max-w-[640px] flex-col sm:flex-row items-center gap-3">
-            <div className="relative flex-1 w-full">
-              <Search className="pointer-events-none absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
+    <Layout maxWidthClassName="max-w-7xl">
+      <div className="w-full pb-20 pt-2">
+        {/* 1. HERO SUPERIOR COM ARTE SACRA DA CRUZ E ARCOS CELESTIAIS */}
+        <HarpaHeroHeader />
+
+        {/* 2. BARRA DE AÇÃO: BUSCA + HISTÓRIA DA HARPA */}
+        <section aria-label="Busca de hinos" className="mb-8">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+            {/* Campo de Pesquisa em Pílula Arredondada */}
+            <div className="relative flex-1 w-full max-w-xl">
+              <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8272]" />
               <input
                 type="text"
-                className="h-11 w-full rounded-full border border-border bg-app-raised pl-12 pr-10 text-sm text-app-text focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 placeholder:text-app-text-muted"
+                className="h-11 w-full rounded-full border border-[#382f23]/80 bg-[#161412] pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-[#f4efea] placeholder:text-[#6e6355] shadow-inner focus:outline-none focus:border-[#e5b869] focus:ring-1 focus:ring-[#e5b869]/30 transition-all"
                 placeholder="Buscar hino por número ou título..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Buscar hino"
+                aria-label="Buscar hino por número ou título"
               />
               {searchQuery && (
                 <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text transition-colors"
-                  aria-label="Limpar busca"
                   type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8f8272] hover:text-[#f4efea] transition-colors p-1"
+                  aria-label="Limpar busca"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
 
-            <a
-              href="#historia"
-              className="inline-flex h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 text-xs font-medium text-gold hover:bg-gold hover:text-primary-foreground transition-all duration-200 shadow-sm"
+            {/* Botão História da Harpa */}
+            <button
+              type="button"
+              onClick={() => setIsHistoryOpen(true)}
+              className="inline-flex h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-full border border-[#c69a50]/40 bg-[#1e1a15]/60 px-5 text-xs font-medium text-[#e5b869] hover:bg-[#262019] hover:border-[#e5b869]/60 transition-all duration-200 shadow-sm cursor-pointer"
             >
-              <History className="h-4 w-4" />
+              <BookOpen className="h-4 w-4" />
               <span>História da Harpa</span>
-            </a>
+            </button>
           </div>
         </section>
 
-        {/* Info Banner */}
-        <section className="mt-6 mx-auto w-full max-w-[680px]">
-          <div className="rounded-xl border border-border bg-app-surface p-4 text-sm text-app-text-muted flex flex-col gap-3 md:flex-row md:items-start md:gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold ring-1 ring-gold/20">
-              <Volume2 className="h-5 w-5" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <p className="font-sans font-medium text-app-text">Hinos com Áudio e Colaboração</p>
-              <p className="text-xs leading-relaxed">
-                Os hinos que possuem gravação de áudio estão sinalizados com o ícone de alto-falante (<Volume2 className="inline-block h-3.5 w-3.5 mx-0.5 text-gold/80" />) no topo do card, facilitando a identificação.
-              </p>
-              <p className="text-xs leading-relaxed mt-1.5">
-                Caso você possua as canções de hinos que ainda não estão disponíveis no site e deseja colaborar, entre em contato enviando os arquivos ou links para o e-mail{" "}
-                <a href="mailto:suporte@bibliavive.com.br" className="text-gold hover:underline font-medium">
-                  suporte@bibliavive.com.br
-                </a>.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* 3. CARD DO HINO EM DESTAQUE ("HINO EM DESTAQUE") */}
+        {!searchQuery && (
+          <HarpaFeaturedCard hymnNumber={1} title="Chuvas de Graça" />
+        )}
 
-        <div className="my-8 border-t border-border" />
+        {/* 4. LAYOUT PRINCIPAL EM DUAS COLUNAS */}
+        <div id="hinos-section" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Coluna Esquerda: Listagens de Hinos (~75-80%) */}
+          <main className="lg:col-span-9 space-y-10">
+            {/* SEÇÃO 1: "Em destaque" (Apenas quando não há busca ativa) */}
+            {!searchQuery && (
+              <section aria-label="Hinos em destaque">
+                <div className="flex items-baseline justify-between gap-4 mb-4">
+                  <div>
+                    <h2 className="font-serif text-xl sm:text-2xl text-[#f4efea] font-normal">
+                      Em destaque
+                    </h2>
+                    <p className="font-sans text-xs text-[#8f8272] mt-0.5">
+                      Hinos mais cantados e amados da Harpa Cristã.
+                    </p>
+                  </div>
 
-        {/* Hymns Grid */}
-        <section className="mt-2">
-          <h2 className="mb-4 font-sans text-[0.65rem] uppercase tracking-[0.15em] text-gold">
-            Harpa Cristã
-            {searchQuery && filteredHymns.length > 0 && (
-              <span className="ml-2 normal-case text-app-text-muted">
-                — {filteredHymns.length} {filteredHymns.length === 1 ? "hino encontrado" : "hinos encontrados"}
-              </span>
+                  <button
+                    type="button"
+                    onClick={scrollToHymns}
+                    className="text-xs text-[#c69a50] hover:text-[#e5b869] font-medium transition-colors flex items-center gap-1 cursor-pointer shrink-0"
+                  >
+                    <span>Ver todos os destaques</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {/* Grade de 5 colunas para os hinos em destaque */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5">
+                  {featuredHymns.map((hymn) => (
+                    <HarpaHymnCard key={hymn.numero} hymn={hymn} />
+                  ))}
+                </div>
+              </section>
             )}
-          </h2>
 
-          {filteredHymns.length > 0 ? (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2 sm:grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
-              {filteredHymns.map((hymn) => (
-                <Tooltip key={hymn.numero}>
-                  <TooltipTrigger asChild>
-                    <Link
-                      className="relative rounded-lg border border-border bg-app-raised px-2 py-2 transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold group"
-                      to={`/harpa/${hymn.numero}`}
-                    >
-                      <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <p className="font-mono text-[0.6rem] text-gold opacity-70 group-hover:text-primary-foreground group-hover:opacity-80">
-                          {String(hymn.numero).padStart(3, "0")}
-                        </p>
-                        {hymn.hasAudio && (
-                          <Volume2 className="h-3.5 w-3.5 text-gold/80 group-hover:text-primary-foreground/80" />
-                        )}
-                      </div>
-                      <p className="truncate font-sans text-[0.72rem] font-medium text-app-text group-hover:text-primary-foreground">
-                        {hymn.tituloFormatado}
-                      </p>
-                      <p className="mt-1 font-sans text-[0.6rem] text-app-text-muted group-hover:text-primary-foreground/70">
-                        {hymn.estrofes} {hymn.estrofes === 1 ? "estrofe" : "estrofes"}
-                      </p>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Hino {hymn.numero} — {hymn.tituloFormatado} {hymn.hasAudio && "🔊 (Áudio disponível)"}
-                  </TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-          ) : (
-            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-border bg-app-surface/30 text-center">
-              <p className="text-sm text-app-text-muted">
-                Nenhum hino encontrado para{" "}
-                <span className="font-medium text-app-text">"{searchQuery}"</span>
-              </p>
-              <button
-                onClick={() => setSearchQuery("")}
-                className="mt-3 text-xs text-gold hover:underline"
-                type="button"
-              >
-                Limpar busca
-              </button>
-            </div>
-          )}
-        </section>
+            {/* SEÇÃO 2: "Harpa Cristã" (Ordem numérica completa) */}
+            <section aria-label="Todos os hinos da Harpa Cristã">
+              <div className="mb-4">
+                <h2 className="font-serif text-xl sm:text-2xl text-[#f4efea] font-normal">
+                  Harpa Cristã
+                </h2>
+                <p className="font-sans text-xs text-[#8f8272] mt-0.5">
+                  {searchQuery ? (
+                    <>
+                      Resultados para <span className="text-[#f4efea]">"{searchQuery}"</span> —{" "}
+                      {filteredHymns.length} {filteredHymns.length === 1 ? "hino" : "hinos"}
+                    </>
+                  ) : (
+                    "Todos os hinos em ordem numérica."
+                  )}
+                </p>
+              </div>
 
-        {/* History Timeline */}
-        <HarpaTimeline />
+              {/* Grade de Hinos em 5 Colunas */}
+              {displayedGeneralHymns.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-3.5">
+                    {displayedGeneralHymns.map((hymn) => (
+                      <HarpaHymnCard key={hymn.numero} hymn={hymn} />
+                    ))}
+                  </div>
+
+                  {/* Botão de Paginação Progressiva (Carregar Mais Hinos) */}
+                  {!searchQuery && visibleCount < filteredHymns.length && (
+                    <div className="pt-8 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setVisibleCount((prev) => prev + 30)}
+                        className="inline-flex items-center justify-center px-6 py-2.5 rounded-full border border-[#382f23] bg-[#161412] hover:bg-[#1f1a16] hover:border-[#e5b869]/50 text-xs font-medium text-[#d5c7b5] hover:text-[#e5b869] transition-all cursor-pointer shadow-md"
+                      >
+                        Carregar mais hinos ({filteredHymns.length - visibleCount} restantes)
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="rounded-2xl border border-[#382f23]/60 bg-[#161412] p-10 text-center">
+                  <p className="text-sm text-[#8f8272]">
+                    Nenhum hino encontrado para{" "}
+                    <span className="text-[#f4efea] font-medium">"{searchQuery}"</span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="mt-3 text-xs text-[#e5b869] hover:underline cursor-pointer"
+                  >
+                    Limpar pesquisa
+                  </button>
+                </div>
+              )}
+            </section>
+          </main>
+
+          {/* Coluna Direita: Widgets Informativos e de Colaboração (~20-25%) */}
+          <div className="lg:col-span-3">
+            <HarpaSidebarWidgets onCollaborateClick={() => setIsCollabOpen(true)} />
+          </div>
+        </div>
+
+        {/* 5. MODAL DE COLABORAÇÃO COM A HARPA */}
+        <HarpaCollaborationModal open={isCollabOpen} onOpenChange={setIsCollabOpen} />
+
+        {/* 6. MODAL DA HISTÓRIA DA HARPA */}
+        <HarpaHistoryModal open={isHistoryOpen} onOpenChange={setIsHistoryOpen} />
       </div>
     </Layout>
   );

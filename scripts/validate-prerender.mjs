@@ -110,8 +110,14 @@ async function validate() {
 
   // ── 6. Sitemap validation ─────────────────────────────────────────────────
   head('SITEMAP UNIFICADO');
-  const sitemap = await readFile(path.join(DIST, 'sitemap.xml'));
-  if (!sitemap) { fail('dist/sitemap.xml não encontrado'); }
+  let sitemapPath = path.join(DIST, 'sitemap.xml');
+  let sitemap = await readFile(sitemapPath);
+  if (!sitemap) {
+    sitemapPath = path.join(DIST, 'sitemap-outros.xml');
+    sitemap = await readFile(sitemapPath);
+    if (sitemap) info('Validando dist/sitemap-outros.xml (sitemap.xml servido via rota edge /api/seo?type=index)');
+  }
+  if (!sitemap) { fail('dist/sitemap.xml ou dist/sitemap-outros.xml não encontrado'); }
   else {
     const urlCount = (sitemap.match(/<url>/g) || []).length;
     ok(`Total de URLs no sitemap: ${urlCount}`);
@@ -122,6 +128,10 @@ async function validate() {
       else fail(`${ver.toUpperCase()}: apenas ${cnt} URLs no sitemap`);
     }
 
+    const harpaCnt = (sitemap.match(/\/harpa\/\d+/g) || []).length;
+    if (harpaCnt >= 600) ok(`Harpa Cristã: ${harpaCnt} hinos presentes no sitemap`);
+    else fail(`Harpa Cristã: apenas ${harpaCnt} hinos no sitemap (esperado >= 600)`);
+
     if (sitemap.includes('/artigos')) ok('Artigos presentes no sitemap');
     if (sitemap.includes('/planos')) ok('/planos presente no sitemap');
     if (sitemap.includes('/pro')) ok('/pro presente no sitemap');
@@ -129,10 +139,47 @@ async function validate() {
     if (sitemap.includes('<priority>')) ok('priority definido nas entradas');
   }
 
-  // ── 7. Static pages ───────────────────────────────────────────────────────
+  // ── 7. Harpa Cristã validation ───────────────────────────────────────────
+  head('HARPA CRISTÃ — VALIDAÇÃO DOS HINOS PRERENDERIZADOS');
+  const harpaFilesCount = await countFiles(path.join(DIST, 'harpa'));
+  if (harpaFilesCount >= 618) ok(`Harpa Cristã: ${harpaFilesCount} páginas geradas (>= 618)`);
+  else if (harpaFilesCount >= 600) info(`Harpa Cristã: ${harpaFilesCount} páginas geradas`);
+  else fail(`Harpa Cristã: apenas ${harpaFilesCount} páginas geradas (esperado >= 618)`);
+
+  const hino1 = await readFile(path.join(DIST, 'harpa/1/index.html'));
+  if (!hino1) {
+    fail('dist/harpa/1/index.html não encontrado');
+  } else {
+    if (hino1.includes('<h1>Hino 1') || hino1.includes('Chuvas de Graça')) ok('Hino 1: Título presente no HTML');
+    else fail('Hino 1: Título ausente');
+
+    if (hino1.includes('class="geo-summary"')) ok('Hino 1: Resumo factual .geo-summary presente para IAs/LLMs');
+    else fail('Hino 1: .geo-summary ausente');
+
+    if (hino1.includes('CHUVAS DE GRAÇA') || hino1.includes('CHUVAS PEDIMOS SENHOR')) ok('Hino 1: Letra e refrão presentes no HTML');
+    else fail('Hino 1: Letra ausente');
+
+    if (hino1.includes('Estrofe 1') && hino1.includes('Estrofe 4')) ok('Hino 1: Todas as 4 estrofes presentes');
+    else fail('Hino 1: Estrofes incompletas');
+
+    if (hino1.includes('MusicComposition')) ok('Hino 1: Schema.org MusicComposition presente');
+    else fail('Hino 1: Schema.org MusicComposition ausente');
+
+    if (hino1.includes('BreadcrumbList')) ok('Hino 1: Schema.org BreadcrumbList presente');
+    else fail('Hino 1: Schema.org BreadcrumbList ausente');
+
+    if (hino1.includes('rel="canonical"') && hino1.includes('/harpa/1')) ok('Hino 1: Tag canonical correta (/harpa/1)');
+    else fail('Hino 1: Tag canonical ausente ou incorreta');
+
+    if (hino1.includes('og:type') && hino1.includes('music.song')) ok('Hino 1: OpenGraph og:type="music.song" presente');
+    else fail('Hino 1: og:type incorreto');
+  }
+
+  // ── 8. Static pages ───────────────────────────────────────────────────────
   head('PÁGINAS ESTÁTICAS INSTITUCIONAIS');
   for (const [label, file] of [
     ['Home (index.html)', 'index.html'],
+    ['Harpa index', 'harpa/index.html'],
     ['Planos', 'planos/index.html'],
     ['Artigos index', 'artigos/index.html'],
   ]) {
