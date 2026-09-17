@@ -33,8 +33,8 @@ Contagem acumulada dos dias em que um Leitor completou todas as Referências de 
 _Evitar_: streak, sequência, dias consecutivos
 
 **Modo Clausura**:
-Estado de inatividade contemplativa na tela de leitura em que toda a interface periférica do usuário (header, footer, nav móvel, menus e FABs da página) desvanece suavemente após exatamente 30 segundos de inatividade total, restando apenas o container do texto bíblico. A restauração da UI é instantânea ao detectar movimento significativo do mouse (>10px), clique, toque em telas sensíveis ou pressionamento de tecla. A ação de scroll da página mantém o leitor em leitura e NÃO restaura a interface. A ativação é bloqueada se houver modais, o Painel de Estudo, a barra de ações de versículo (`VerseToolbar`) abertos ou se o tocador de áudio estiver em reprodução.
-_Evitar_: modo foco automático, auto-hide, tela cheia passiva
+Estado de contemplação na tela de leitura exclusivo para desktop, ativado e desativado manualmente pelo leitor por meio de um botão flutuante persistente posicionado no canto inferior direito (acima do botão do Caderno). Ao ser ativado, toda a interface periférica (header, footer, menus e sidebar de capítulos/comentários) desvanece suavemente, restando apenas o container do texto bíblico. O botão flutuante do Modo Clausura permanece visível e interativo durante a ativação para permitir que o leitor desative o modo a qualquer momento.
+_Evitar_: modo foco automático, auto-hide, inatividade automática
 
 ### Estudo Pessoal
 

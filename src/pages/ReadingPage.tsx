@@ -67,6 +67,7 @@ import { Switch } from "@/components/ui/switch";
 import { useReadingPreferences, COLUMN_WIDTH_MAP } from "@/hooks/useReadingPreferences";
 import { useTTS } from "@/hooks/useTTS";
 import { useInactivity } from "@/hooks/useInactivity";
+import ClausuraFloatingButton from "@/components/ClausuraFloatingButton";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "@/hooks/useToast";
 import { useVerseActions } from "@/hooks/useVerseActions";
@@ -506,25 +507,13 @@ export default function ReadingPage() {
   const tts = useTTS(preferences.ttsRate);
   const [isAudioPlayerPlaying, setIsAudioPlayerPlaying] = useState(false);
 
-  const isClausuraDisabled =
-    isNotebookOpen ||
-    isStudyPanelOpen ||
-    isNoteModalOpen ||
-    isAuthModalOpen ||
-    isCardModalOpen ||
-    isEchoModalOpen ||
-    isSettingsOpen ||
-    isChapterPickerOpen ||
-    rateLimitStatus.open ||
-    !!selectedVerse ||
-    isAudioPlayerPlaying ||
-    tts.isPlaying;
+  // Estado manual do Modo Clausura (exclusivo para desktop)
+  const [isClausuraActive, setIsClausuraActive] = useState(false);
 
-  const { isInactive: isClausuraActive } = useInactivity({
-    timeoutMs: 15000,
-    disabled: isClausuraDisabled,
-    mouseThreshold: 10,
-  });
+  // Reseta o Modo Clausura ao trocar de capítulo
+  useEffect(() => {
+    setIsClausuraActive(false);
+  }, [chapterNumber, selectedBook?.id]);
 
   // Centraliza o texto bíblico com max-w-2xl mx-auto quando a barra lateral estiver fechada, em modo foco ou em clausura
   const isCenteredLayout = (!isChapterSidebarOpen || preferences.focusMode || isClausuraActive) && !compareEnabled;
@@ -2467,6 +2456,13 @@ export default function ReadingPage() {
           onOpenChange={setIsVersionPickerOpen}
           currentVersion={selectedVersion}
           onSelectVersion={handleVersionChange}
+        />
+
+        {/* Botão Flutuante Persistente do Modo Clausura (Exclusivo Desktop) */}
+        <ClausuraFloatingButton
+          isActive={isClausuraActive}
+          onToggle={() => setIsClausuraActive((prev) => !prev)}
+          isFocusMode={preferences.focusMode}
         />
 
         {/* O caderno e o botão flutuante são renderizados globalmente em GlobalNotebookContainer */}
