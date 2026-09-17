@@ -21,15 +21,13 @@ initTheme();
 import "@/utils/cacheInspector";
 import { warmupAcfBibleCache } from "@/utils/bibleWarmup";
 
+// O vite-plugin-pwa (injectRegister: "auto") já registra o SW via /registerSW.js injetado no HTML.
+// Não fazemos um segundo registro manual — evita double-registration e o reg.update() a cada pageload
+// que gerava 1 Edge Request extra por visita.
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/sw.js").then((reg) => {
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: "SKIP_WAITING" });
-      }
-      void reg.update();
-      warmupAcfBibleCache();
-    });
+  // Aguarda o SW controlador estar pronto antes de fazer o warmup do cache
+  navigator.serviceWorker.ready.then(() => {
+    warmupAcfBibleCache();
   });
 }
 

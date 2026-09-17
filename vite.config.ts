@@ -115,13 +115,14 @@ export default defineConfig(({ mode }) => ({
       srcDir: "src",
       filename: "sw.ts",
       registerType: "autoUpdate",
-      injectRegister: "auto",
+      injectRegister: "script",   // injeta /registerSW.js explicitamente no HTML (sem duplicar registro manual)
       manifest: false, // Utiliza public/manifest.json existente
       injectManifest: {
         // globDirectory padrão = dist/ (gerado pelo vite build)
-        // Isso captura o App Shell: index.html, assets/*.js, assets/*.css
+        // Precacheia apenas o App Shell: assets/*.js e assets/*.css (têm hash imutável)
+        // index.html e as páginas prerrenderizadas ficam fora — são servidas pelo Vercel CDN
         globPatterns: [
-          "**/*.{js,css,html}",
+          "assets/**/*.{js,css}",
           "*.{ico,png,svg,webp}",
         ],
         globIgnores: ["**/node_modules/**"],
