@@ -24,7 +24,11 @@ import { exportNotesToTXT, exportNotesToPDF } from '@/lib/notesExport';
 import { findBookGlobally } from '@/lib/books';
 import AuthModal from '@/components/AuthModal';
 import MemorialEntryModal from '@/components/MemorialEntryModal';
-import MemorialHeader, { type MemorialFilterType } from '@/components/memorial/MemorialHeader';
+import MemorialHeroHeader from '@/components/memorial/MemorialHeroHeader';
+import MemorialActionBar from '@/components/memorial/MemorialActionBar';
+import MemorialFeaturedCard from '@/components/memorial/MemorialFeaturedCard';
+import MemorialSidebar from '@/components/memorial/MemorialSidebar';
+import { type MemorialFilterType } from '@/components/memorial/MemorialHeader';
 import MemorialTimeline from '@/components/memorial/MemorialTimeline';
 import MemorialCard from '@/components/memorial/MemorialCard';
 import MemorialNoteModal from '@/components/memorial/MemorialNoteModal';
@@ -48,6 +52,7 @@ export default function MemorialPage() {
     const [entries, setEntries] = useState<MemorialEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<MemorialFilterType>('all');
+    const [sortOrder, setSortOrder] = useState<'recent' | 'oldest'>('recent');
     const [searchQuery, setSearchQuery] = useState('');
     const [authOpen, setAuthOpen] = useState(false);
 
@@ -79,9 +84,9 @@ export default function MemorialPage() {
         fetchEntries();
     }, [store]);
 
-    // Filtragem em memória dos marcos
+    // Filtragem e ordenação dos marcos
     const filteredEntries = useMemo(() => {
-        return entries.filter(entry => {
+        const filtered = entries.filter(entry => {
             // Filtro de Categoria / Status
             if (activeFilter === 'reflection' && entry.type !== 'reflection') return false;
             if (activeFilter === 'prayer' && entry.type !== 'prayer') return false;
@@ -115,7 +120,21 @@ export default function MemorialPage() {
 
             return true;
         });
-    }, [entries, activeFilter, searchQuery, urlBook, urlChapter]);
+
+        // Ordenação cronológica
+        return [...filtered].sort((a, b) => {
+            const timeA = new Date(a.createdAt).getTime();
+            const timeB = new Date(b.createdAt).getTime();
+            return sortOrder === 'recent' ? timeB - timeA : timeA - timeB;
+        });
+    }, [entries, activeFilter, searchQuery, urlBook, urlChapter, sortOrder]);
+
+    // Identificação da Memória em Destaque (preferência por favorito ou primeiro da lista quando sem busca)
+    const featuredEntryId = useMemo(() => {
+        if (filteredEntries.length === 0 || searchQuery || activeFilter !== 'all') return null;
+        const fav = filteredEntries.find(e => e.favorite);
+        return fav ? fav.id : filteredEntries[0].id;
+    }, [filteredEntries, searchQuery, activeFilter]);
 
     const handleToggleFavorite = async (id: string) => {
         const newFav = await store.toggleFavorite!(id);
@@ -195,39 +214,21 @@ export default function MemorialPage() {
     }
 
     return (
-        <Layout>
-            <main className="min-h-screen bg-app-base px-4 py-8 max-w-4xl mx-auto font-sans">
-                {/* Header Superior com Navegação e Título Sóbrio */}
-                <div className="flex items-start justify-between mb-6 pb-6 border-b border-border/60">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => navigate(-1)}
-                                className="p-1 rounded-lg hover:bg-app-raised transition-colors text-app-text-muted hover:text-app-text cursor-pointer"
-                                aria-label="Voltar"
-                            >
-                                <ArrowLeft className="h-5 w-5" />
-                            </button>
-                            <h1 className="text-2xl font-semibold text-app-text font-serif tracking-tight flex items-center gap-2">
-                                <Scroll className="h-6 w-6 text-gold" />
-                                <span>Meu Memorial</span>
-                            </h1>
-                        </div>
-                        <p className="text-[0.85rem] text-app-text-muted italic pl-7">
-                            "Aqui permanecem registradas as marcas da sua caminhada."
-                        </p>
-                    </div>
-                </div>
+        <Layout maxWidthClassName="max-w-7xl">
+            <div className="w-full pb-20 pt-2 font-sans">
+                {/* 1. HERO SUPERIOR COM BÍBLIA CLÁSSICA E DEGRADÊ ESFUMAÇADO */}
+                <MemorialHeroHeader />
 
-                {/* Cabeçalho de Ebenézer, Busca, Filtros e Ações */}
-                <MemorialHeader
-                    totalEntries={entries.length}
-                    filteredCount={filteredEntries.length}
+                {/* 2. BARRA DE BUSCA UNIVERSAL, NOVA MEMÓRIA, FILTROS E ORDENAÇÃO */}
+                <MemorialActionBar
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     activeFilter={activeFilter}
                     onFilterChange={setActiveFilter}
+                    sortOrder={sortOrder}
+                    onToggleSortOrder={() =>
+                        setSortOrder((prev) => (prev === "recent" ? "oldest" : "recent"))
+                    }
                     onNewEntry={() => {
                         setSelectedEntry(null);
                         setIsEditModalOpen(true);
@@ -237,77 +238,117 @@ export default function MemorialPage() {
                         if (isPro) {
                             exportNotesToPDF(filteredEntries);
                         } else {
-                            navigate('/pro');
+                            navigate("/pro");
                         }
                     }}
                     isPro={isPro}
+                    totalFiltered={filteredEntries.length}
                 />
 
-                {/* Linha Sagrada Contínua da Caminhada (Timeline) */}
-                {loading ? (
-                    <div className="text-center py-20 text-app-text-muted text-sm animate-pulse space-y-3">
-                        <div className="h-8 w-8 rounded-full border-2 border-gold/40 border-t-gold animate-spin mx-auto" />
-                        <p className="font-serif">Carregando seu Altar de Memórias...</p>
-                    </div>
-                ) : (
-                    <MemorialTimeline
-                        entries={filteredEntries}
-                        emptyState={(function () {
-                            const emptyMessages: Record<string, { title: string; desc: string }> = {
-                                prayer: {
-                                    title: "Nenhuma oração em espera",
-                                    desc: "Apresente suas súplicas e pedidos ao Senhor. Quando Ele responder, você poderá registrar este marco.",
-                                },
-                                testimony: {
-                                    title: "Nenhum testemunho registrado ainda",
-                                    desc: "Quando Deus operar prodígios ou livramentos em sua jornada, grave sua pedra de memória aqui.",
-                                },
-                                answered: {
-                                    title: "Nenhuma oração respondida arquivada ainda",
-                                    desc: "Suas orações atendidas se transformarão em monumentos de gratidão neste Altar.",
-                                },
-                                reflection: {
-                                    title: "Nenhuma reflexão registrada",
-                                    desc: "Medite na Palavra durante sua leitura diária e registre aqui os aprendizados que o Espírito Santo lhe revelar.",
-                                },
-                                fasting: {
-                                    title: "Nenhum propósito ou jejum registrado",
-                                    desc: "Consagre seus propósitos diante de Deus para acompanhar seu progresso e fidelidade.",
-                                },
-                                favorite: {
-                                    title: "Nenhum marco favorito",
-                                    desc: "Você pode favoritar seus marcos mais marcantes tocando no menu de opções de cada card.",
-                                },
-                            };
+                {/* 3. LAYOUT PRINCIPAL EM DUAS COLUNAS (TIMELINE + SIDEBAR) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Coluna Esquerda: Linha Sagrada Contínua e Memórias (~65-70%) */}
+                    <main className="lg:col-span-8 space-y-6">
+                        {loading ? (
+                            <div className="text-center py-20 text-[#8f8272] text-sm animate-pulse space-y-3">
+                                <div className="h-8 w-8 rounded-full border-2 border-[#e5b869]/40 border-t-[#e5b869] animate-spin mx-auto" />
+                                <p className="font-serif">Carregando seu Altar de Memórias...</p>
+                            </div>
+                        ) : (
+                            <MemorialTimeline
+                                entries={filteredEntries}
+                                featuredEntryId={featuredEntryId}
+                                emptyState={(function () {
+                                    const emptyMessages: Record<string, { title: string; desc: string }> = {
+                                        prayer: {
+                                            title: "Nenhuma oração em espera",
+                                            desc: "Apresente suas súplicas e pedidos ao Senhor. Quando Ele responder, você poderá registrar este marco.",
+                                        },
+                                        testimony: {
+                                            title: "Nenhum testemunho registrado ainda",
+                                            desc: "Quando Deus operar prodígios ou livramentos em sua jornada, grave sua pedra de memória aqui.",
+                                        },
+                                        answered: {
+                                            title: "Nenhuma oração respondida arquivada ainda",
+                                            desc: "Suas orações atendidas se transformarão em monumentos de gratidão neste Altar.",
+                                        },
+                                        reflection: {
+                                            title: "Nenhuma reflexão registrada",
+                                            desc: "Medite na Palavra durante sua leitura diária e registre aqui os aprendizados que o Espírito Santo lhe revelar.",
+                                        },
+                                        fasting: {
+                                            title: "Nenhum propósito ou jejum registrado",
+                                            desc: "Consagre seus propósitos diante de Deus para acompanhar seu progresso e fidelidade.",
+                                        },
+                                        favorite: {
+                                            title: "Nenhum marco favorito",
+                                            desc: "Você pode favoritar seus marcos mais marcantes tocando no menu de opções de cada card.",
+                                        },
+                                    };
 
-                            const info = emptyMessages[activeFilter];
-                            if (!info) return undefined;
+                                    const info = emptyMessages[activeFilter];
+                                    if (!info) return undefined;
 
-                            return (
-                                <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-border space-y-3 bg-app-surface/30 max-w-xl mx-auto">
-                                    <Scroll className="h-10 w-10 text-app-text-muted/40 mx-auto" />
-                                    <p className="text-[0.95rem] font-serif text-app-text">{info.title}</p>
-                                    <p className="text-[0.8rem] text-app-text-muted max-w-sm mx-auto leading-relaxed">
-                                        {info.desc}
-                                    </p>
-                                </div>
-                            );
-                        })()}
-                        renderCard={(entry) => (
-                            <MemorialCard
-                                entry={entry}
-                                onCardClick={(e) => setExpandedNote(e)}
-                                onMarkAnswered={handleOpenAnswerModal}
-                                onToggleFavorite={(e) => handleToggleFavorite(e.id)}
-                                onEdit={(e) => {
-                                    setSelectedEntry(e);
-                                    setIsEditModalOpen(true);
+                                    return (
+                                        <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-[#382f23] space-y-3 bg-[#161412] max-w-xl mx-auto">
+                                            <Scroll className="h-10 w-10 text-[#8f8272]/40 mx-auto" />
+                                            <p className="text-[0.95rem] font-serif text-[#f4efea]">{info.title}</p>
+                                            <p className="text-[0.8rem] text-[#9b8e7e] max-w-sm mx-auto leading-relaxed">
+                                                {info.desc}
+                                            </p>
+                                        </div>
+                                    );
+                                })()}
+                                renderCard={(entry, index, isFeatured) => {
+                                    if (isFeatured && entry.id === featuredEntryId) {
+                                        return (
+                                            <MemorialFeaturedCard
+                                                key={entry.id}
+                                                entry={entry}
+                                                onCardClick={(e) => setExpandedNote(e)}
+                                                onMarkAnswered={handleOpenAnswerModal}
+                                                onToggleFavorite={(e) => handleToggleFavorite(e.id)}
+                                                onEdit={(e) => {
+                                                    setSelectedEntry(e);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                onDelete={(e) => handleDelete(e.id)}
+                                            />
+                                        );
+                                    }
+
+                                    return (
+                                        <MemorialCard
+                                            key={entry.id}
+                                            entry={entry}
+                                            onCardClick={(e) => setExpandedNote(e)}
+                                            onMarkAnswered={handleOpenAnswerModal}
+                                            onToggleFavorite={(e) => handleToggleFavorite(e.id)}
+                                            onEdit={(e) => {
+                                                setSelectedEntry(e);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            onDelete={(e) => handleDelete(e.id)}
+                                        />
+                                    );
                                 }}
-                                onDelete={(e) => handleDelete(e.id)}
                             />
                         )}
-                    />
-                )}
+                    </main>
+
+                    {/* Coluna Direita: Sidebar com 'X marcos preservados', 'Para recordar...', Citação Bíblica e CTA (~30-35%) */}
+                    <div className="lg:col-span-4">
+                        <MemorialSidebar
+                            entries={entries}
+                            totalEntries={entries.length}
+                            onNewEntry={() => {
+                                setSelectedEntry(null);
+                                setIsEditModalOpen(true);
+                            }}
+                            onOpenEntry={(entry) => setExpandedNote(entry)}
+                        />
+                    </div>
+                </div>
 
                 {/* Modal Expansivo Scale In Card (Linha Sagrada) */}
                 <MemorialNoteModal
@@ -385,7 +426,7 @@ export default function MemorialPage() {
                     onClose={() => setAuthOpen(false)}
                     hint="Entre com sua conta da Bíblia Vive para sincronizar suas memórias na nuvem."
                 />
-            </main>
+            </div>
         </Layout>
     );
 }

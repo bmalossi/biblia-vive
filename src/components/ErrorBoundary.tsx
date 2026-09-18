@@ -24,13 +24,24 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     const isChunkError =
-      error.message.includes('Failed to fetch dynamically imported module') ||
-      error.message.includes('Loading chunk') ||
-      error.message.includes('Loading CSS chunk');
+      error.message.includes("Failed to fetch dynamically imported module") ||
+      error.message.includes("error loading dynamically imported module") ||
+      error.message.includes("Loading chunk") ||
+      error.message.includes("Loading CSS chunk") ||
+      error.message.includes("Cannot read properties of undefined (reading 'default')");
 
     if (isChunkError) {
-      window.location.reload();
-      return;
+      const RELOAD_KEY = "bv_chunk_error_reload_ts";
+      const now = Date.now();
+      const lastReload = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
+
+      // Recarrega uma vez para buscar novos chunks da versão mais recente.
+      // Se já recarregou nos últimos 15 segundos, não recarrega novamente para evitar loop infinito.
+      if (now - lastReload > 15000) {
+        sessionStorage.setItem(RELOAD_KEY, String(now));
+        window.location.reload();
+        return;
+      }
     }
 
     console.error("Erro crítico capturado:", error);

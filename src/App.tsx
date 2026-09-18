@@ -59,7 +59,7 @@ const queryClient = new QueryClient({
 });
 
 const PageFallback = () => (
-  <div aria-busy="true" aria-label="Carregando..." className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+  <div aria-busy="true" aria-label="Carregando..." className="flex min-h-screen w-full flex-col items-center justify-center gap-3 bg-app-bg text-app-text">
     <Loader2 className="h-8 w-8 animate-spin text-gold" />
     <span className="font-sans text-sm tracking-wide text-app-text-muted">Carregando Bíblia Vive...</span>
   </div>

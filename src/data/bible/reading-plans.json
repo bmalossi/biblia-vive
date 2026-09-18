@@ -191,7 +191,9 @@
           "pv/31"
         ]
       }
-    ]
+    ],
+    "category": "books",
+    "isFeatured": true
   },
   {
     "id": "psalms-30-days",
@@ -499,7 +501,8 @@
           "sl/150"
         ]
       }
-    ]
+    ],
+    "category": "thematic"
   },
   {
     "id": "gospels-30-days",
@@ -746,7 +749,8 @@
           "jo/21"
         ]
       }
-    ]
+    ],
+    "category": "books"
   },
   {
     "id": "nt-90-days",
@@ -1464,7 +1468,8 @@
           "ap/22"
         ]
       }
-    ]
+    ],
+    "category": "seasonal"
   },
   {
     "id": "bible-1-year",
@@ -4483,6 +4488,903 @@
         "refs": [
           "ap/20",
           "ap/21",
+          "ap/22"
+        ]
+      }
+    ],
+    "category": "thematic"
+  },
+  {
+    "id": "genesis-30-days",
+    "name": "Gênesis em 30 dias",
+    "description": "Descubra as origens, o propósito e o começo de tudo.",
+    "totalDays": 30,
+    "category": "books",
+    "days": [
+      {
+        "day": 1,
+        "refs": [
+          "gn/1",
+          "gn/2"
+        ]
+      },
+      {
+        "day": 2,
+        "refs": [
+          "gn/3",
+          "gn/4"
+        ]
+      },
+      {
+        "day": 3,
+        "refs": [
+          "gn/5",
+          "gn/6"
+        ]
+      },
+      {
+        "day": 4,
+        "refs": [
+          "gn/7",
+          "gn/8"
+        ]
+      },
+      {
+        "day": 5,
+        "refs": [
+          "gn/9",
+          "gn/10"
+        ]
+      },
+      {
+        "day": 6,
+        "refs": [
+          "gn/11",
+          "gn/12"
+        ]
+      },
+      {
+        "day": 7,
+        "refs": [
+          "gn/13",
+          "gn/14"
+        ]
+      },
+      {
+        "day": 8,
+        "refs": [
+          "gn/15",
+          "gn/16"
+        ]
+      },
+      {
+        "day": 9,
+        "refs": [
+          "gn/17",
+          "gn/18"
+        ]
+      },
+      {
+        "day": 10,
+        "refs": [
+          "gn/19",
+          "gn/20"
+        ]
+      },
+      {
+        "day": 11,
+        "refs": [
+          "gn/21",
+          "gn/22"
+        ]
+      },
+      {
+        "day": 12,
+        "refs": [
+          "gn/23",
+          "gn/24"
+        ]
+      },
+      {
+        "day": 13,
+        "refs": [
+          "gn/25",
+          "gn/26"
+        ]
+      },
+      {
+        "day": 14,
+        "refs": [
+          "gn/27",
+          "gn/28"
+        ]
+      },
+      {
+        "day": 15,
+        "refs": [
+          "gn/29",
+          "gn/30"
+        ]
+      },
+      {
+        "day": 16,
+        "refs": [
+          "gn/31",
+          "gn/32"
+        ]
+      },
+      {
+        "day": 17,
+        "refs": [
+          "gn/33",
+          "gn/34"
+        ]
+      },
+      {
+        "day": 18,
+        "refs": [
+          "gn/35",
+          "gn/36"
+        ]
+      },
+      {
+        "day": 19,
+        "refs": [
+          "gn/37",
+          "gn/38"
+        ]
+      },
+      {
+        "day": 20,
+        "refs": [
+          "gn/39",
+          "gn/40"
+        ]
+      },
+      {
+        "day": 21,
+        "refs": [
+          "gn/41"
+        ]
+      },
+      {
+        "day": 22,
+        "refs": [
+          "gn/42"
+        ]
+      },
+      {
+        "day": 23,
+        "refs": [
+          "gn/43"
+        ]
+      },
+      {
+        "day": 24,
+        "refs": [
+          "gn/44"
+        ]
+      },
+      {
+        "day": 25,
+        "refs": [
+          "gn/45"
+        ]
+      },
+      {
+        "day": 26,
+        "refs": [
+          "gn/46"
+        ]
+      },
+      {
+        "day": 27,
+        "refs": [
+          "gn/47"
+        ]
+      },
+      {
+        "day": 28,
+        "refs": [
+          "gn/48"
+        ]
+      },
+      {
+        "day": 29,
+        "refs": [
+          "gn/49"
+        ]
+      },
+      {
+        "day": 30,
+        "refs": [
+          "gn/50"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "life-of-christ-40-days",
+    "name": "Vida de Cristo em 40 dias",
+    "description": "Acompanhe os passos de Jesus do nascimento à ressurreição.",
+    "totalDays": 40,
+    "category": "thematic",
+    "days": [
+      {
+        "day": 1,
+        "refs": [
+          "lc/1"
+        ]
+      },
+      {
+        "day": 2,
+        "refs": [
+          "mt/1",
+          "lc/2"
+        ]
+      },
+      {
+        "day": 3,
+        "refs": [
+          "mt/2"
+        ]
+      },
+      {
+        "day": 4,
+        "refs": [
+          "jo/1"
+        ]
+      },
+      {
+        "day": 5,
+        "refs": [
+          "mt/3",
+          "lc/3"
+        ]
+      },
+      {
+        "day": 6,
+        "refs": [
+          "mt/4",
+          "lc/4"
+        ]
+      },
+      {
+        "day": 7,
+        "refs": [
+          "jo/2",
+          "jo/3"
+        ]
+      },
+      {
+        "day": 8,
+        "refs": [
+          "jo/4"
+        ]
+      },
+      {
+        "day": 9,
+        "refs": [
+          "mt/5"
+        ]
+      },
+      {
+        "day": 10,
+        "refs": [
+          "mt/6"
+        ]
+      },
+      {
+        "day": 11,
+        "refs": [
+          "mt/7"
+        ]
+      },
+      {
+        "day": 12,
+        "refs": [
+          "mc/1",
+          "mc/2"
+        ]
+      },
+      {
+        "day": 13,
+        "refs": [
+          "lc/5",
+          "lc/6"
+        ]
+      },
+      {
+        "day": 14,
+        "refs": [
+          "mt/8",
+          "mt/9"
+        ]
+      },
+      {
+        "day": 15,
+        "refs": [
+          "lc/7",
+          "lc/8"
+        ]
+      },
+      {
+        "day": 16,
+        "refs": [
+          "mc/4",
+          "mc/5"
+        ]
+      },
+      {
+        "day": 17,
+        "refs": [
+          "mt/13"
+        ]
+      },
+      {
+        "day": 18,
+        "refs": [
+          "jo/5",
+          "jo/6"
+        ]
+      },
+      {
+        "day": 19,
+        "refs": [
+          "mc/6",
+          "mc/7"
+        ]
+      },
+      {
+        "day": 20,
+        "refs": [
+          "mt/16",
+          "mc/8"
+        ]
+      },
+      {
+        "day": 21,
+        "refs": [
+          "mt/17",
+          "mc/9"
+        ]
+      },
+      {
+        "day": 22,
+        "refs": [
+          "jo/7",
+          "jo/8"
+        ]
+      },
+      {
+        "day": 23,
+        "refs": [
+          "jo/9",
+          "jo/10"
+        ]
+      },
+      {
+        "day": 24,
+        "refs": [
+          "lc/10",
+          "lc/11"
+        ]
+      },
+      {
+        "day": 25,
+        "refs": [
+          "lc/12",
+          "lc/13"
+        ]
+      },
+      {
+        "day": 26,
+        "refs": [
+          "lc/14",
+          "lc/15"
+        ]
+      },
+      {
+        "day": 27,
+        "refs": [
+          "lc/16",
+          "lc/17"
+        ]
+      },
+      {
+        "day": 28,
+        "refs": [
+          "jo/11",
+          "jo/12"
+        ]
+      },
+      {
+        "day": 29,
+        "refs": [
+          "mt/21",
+          "mc/11"
+        ]
+      },
+      {
+        "day": 30,
+        "refs": [
+          "mt/22",
+          "mt/23"
+        ]
+      },
+      {
+        "day": 31,
+        "refs": [
+          "mt/24",
+          "mt/25"
+        ]
+      },
+      {
+        "day": 32,
+        "refs": [
+          "mt/26",
+          "mc/14"
+        ]
+      },
+      {
+        "day": 33,
+        "refs": [
+          "jo/13",
+          "jo/14"
+        ]
+      },
+      {
+        "day": 34,
+        "refs": [
+          "jo/15",
+          "jo/16",
+          "jo/17"
+        ]
+      },
+      {
+        "day": 35,
+        "refs": [
+          "lc/22",
+          "jo/18"
+        ]
+      },
+      {
+        "day": 36,
+        "refs": [
+          "mt/27",
+          "mc/15"
+        ]
+      },
+      {
+        "day": 37,
+        "refs": [
+          "lc/23",
+          "jo/19"
+        ]
+      },
+      {
+        "day": 38,
+        "refs": [
+          "mt/28",
+          "mc/16"
+        ]
+      },
+      {
+        "day": 39,
+        "refs": [
+          "lc/24",
+          "jo/20"
+        ]
+      },
+      {
+        "day": 40,
+        "refs": [
+          "jo/21",
+          "at/1"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "paul-letters-30-days",
+    "name": "Cartas de Paulo em 30 dias",
+    "description": "Conheça as principais cartas do apóstolo Paulo e suas mensagens para a igreja.",
+    "totalDays": 30,
+    "category": "books",
+    "days": [
+      {
+        "day": 1,
+        "refs": [
+          "rm/1",
+          "rm/2"
+        ]
+      },
+      {
+        "day": 2,
+        "refs": [
+          "rm/3",
+          "rm/4"
+        ]
+      },
+      {
+        "day": 3,
+        "refs": [
+          "rm/5",
+          "rm/6"
+        ]
+      },
+      {
+        "day": 4,
+        "refs": [
+          "rm/7",
+          "rm/8"
+        ]
+      },
+      {
+        "day": 5,
+        "refs": [
+          "rm/9",
+          "rm/10",
+          "rm/11"
+        ]
+      },
+      {
+        "day": 6,
+        "refs": [
+          "rm/12",
+          "rm/13",
+          "rm/14"
+        ]
+      },
+      {
+        "day": 7,
+        "refs": [
+          "rm/15",
+          "rm/16"
+        ]
+      },
+      {
+        "day": 8,
+        "refs": [
+          "1co/1",
+          "1co/2",
+          "1co/3"
+        ]
+      },
+      {
+        "day": 9,
+        "refs": [
+          "1co/4",
+          "1co/5",
+          "1co/6"
+        ]
+      },
+      {
+        "day": 10,
+        "refs": [
+          "1co/7",
+          "1co/8",
+          "1co/9"
+        ]
+      },
+      {
+        "day": 11,
+        "refs": [
+          "1co/10",
+          "1co/11",
+          "1co/12"
+        ]
+      },
+      {
+        "day": 12,
+        "refs": [
+          "1co/13",
+          "1co/14"
+        ]
+      },
+      {
+        "day": 13,
+        "refs": [
+          "1co/15",
+          "1co/16"
+        ]
+      },
+      {
+        "day": 14,
+        "refs": [
+          "2co/1",
+          "2co/2",
+          "2co/3"
+        ]
+      },
+      {
+        "day": 15,
+        "refs": [
+          "2co/4",
+          "2co/5",
+          "2co/6"
+        ]
+      },
+      {
+        "day": 16,
+        "refs": [
+          "2co/7",
+          "2co/8",
+          "2co/9"
+        ]
+      },
+      {
+        "day": 17,
+        "refs": [
+          "2co/10",
+          "2co/11",
+          "2co/12",
+          "2co/13"
+        ]
+      },
+      {
+        "day": 18,
+        "refs": [
+          "gl/1",
+          "gl/2",
+          "gl/3"
+        ]
+      },
+      {
+        "day": 19,
+        "refs": [
+          "gl/4",
+          "gl/5",
+          "gl/6"
+        ]
+      },
+      {
+        "day": 20,
+        "refs": [
+          "ef/1",
+          "ef/2",
+          "ef/3"
+        ]
+      },
+      {
+        "day": 21,
+        "refs": [
+          "ef/4",
+          "ef/5",
+          "ef/6"
+        ]
+      },
+      {
+        "day": 22,
+        "refs": [
+          "fp/1",
+          "fp/2"
+        ]
+      },
+      {
+        "day": 23,
+        "refs": [
+          "fp/3",
+          "fp/4"
+        ]
+      },
+      {
+        "day": 24,
+        "refs": [
+          "cl/1",
+          "cl/2"
+        ]
+      },
+      {
+        "day": 25,
+        "refs": [
+          "cl/3",
+          "cl/4"
+        ]
+      },
+      {
+        "day": 26,
+        "refs": [
+          "1ts/1",
+          "1ts/2",
+          "1ts/3",
+          "1ts/4",
+          "1ts/5"
+        ]
+      },
+      {
+        "day": 27,
+        "refs": [
+          "2ts/1",
+          "2ts/2",
+          "2ts/3"
+        ]
+      },
+      {
+        "day": 28,
+        "refs": [
+          "1tm/1",
+          "1tm/2",
+          "1tm/3",
+          "1tm/4",
+          "1tm/5",
+          "1tm/6"
+        ]
+      },
+      {
+        "day": 29,
+        "refs": [
+          "2tm/1",
+          "2tm/2",
+          "2tm/3",
+          "2tm/4"
+        ]
+      },
+      {
+        "day": 30,
+        "refs": [
+          "tt/1",
+          "tt/2",
+          "tt/3",
+          "fm/1"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "advent-25-days",
+    "name": "Esperança em Cristo",
+    "description": "Uma jornada especial para o tempo do Advento.",
+    "totalDays": 25,
+    "category": "seasonal",
+    "days": [
+      {
+        "day": 1,
+        "refs": [
+          "is/7"
+        ]
+      },
+      {
+        "day": 2,
+        "refs": [
+          "is/9"
+        ]
+      },
+      {
+        "day": 3,
+        "refs": [
+          "is/11"
+        ]
+      },
+      {
+        "day": 4,
+        "refs": [
+          "is/40"
+        ]
+      },
+      {
+        "day": 5,
+        "refs": [
+          "is/53"
+        ]
+      },
+      {
+        "day": 6,
+        "refs": [
+          "mq/5"
+        ]
+      },
+      {
+        "day": 7,
+        "refs": [
+          "jr/33"
+        ]
+      },
+      {
+        "day": 8,
+        "refs": [
+          "zc/9"
+        ]
+      },
+      {
+        "day": 9,
+        "refs": [
+          "ml/3"
+        ]
+      },
+      {
+        "day": 10,
+        "refs": [
+          "sl/2"
+        ]
+      },
+      {
+        "day": 11,
+        "refs": [
+          "sl/72"
+        ]
+      },
+      {
+        "day": 12,
+        "refs": [
+          "sl/89"
+        ]
+      },
+      {
+        "day": 13,
+        "refs": [
+          "lc/1"
+        ]
+      },
+      {
+        "day": 14,
+        "refs": [
+          "mt/1"
+        ]
+      },
+      {
+        "day": 15,
+        "refs": [
+          "lc/2"
+        ]
+      },
+      {
+        "day": 16,
+        "refs": [
+          "mt/2"
+        ]
+      },
+      {
+        "day": 17,
+        "refs": [
+          "jo/1"
+        ]
+      },
+      {
+        "day": 18,
+        "refs": [
+          "gl/4"
+        ]
+      },
+      {
+        "day": 19,
+        "refs": [
+          "fp/2"
+        ]
+      },
+      {
+        "day": 20,
+        "refs": [
+          "cl/1"
+        ]
+      },
+      {
+        "day": 21,
+        "refs": [
+          "hb/1"
+        ]
+      },
+      {
+        "day": 22,
+        "refs": [
+          "1jo/4"
+        ]
+      },
+      {
+        "day": 23,
+        "refs": [
+          "ap/12"
+        ]
+      },
+      {
+        "day": 24,
+        "refs": [
+          "ap/21"
+        ]
+      },
+      {
+        "day": 25,
+        "refs": [
           "ap/22"
         ]
       }

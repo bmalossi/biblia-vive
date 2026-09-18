@@ -12,7 +12,14 @@
 export interface ReadingPlanDay {
     day: number;
     refs: string[];
+    title?: string;
+    subtitle?: string;
+    categoryTag?: string;
+    estimatedMinutes?: number;
 }
+
+export type PlanCategory = 'thematic' | 'books' | 'seasonal';
+export type PlanCategoryFilter = 'all' | 'featured' | 'thematic' | 'books' | 'seasonal';
 
 /** Template curado com título, descrição e sequência de dias */
 export interface ReadingPlan {
@@ -21,6 +28,10 @@ export interface ReadingPlan {
     description: string;
     totalDays: number;
     days: ReadingPlanDay[];
+    category?: PlanCategory;
+    isFeatured?: boolean;
+    focus?: string;
+    dailyReadingsLabel?: string;
 }
 
 /**

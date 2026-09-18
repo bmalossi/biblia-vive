@@ -78,7 +78,7 @@ import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, Panel
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "@/i18n";
 import { exportNotesToPDF } from "@/lib/notesHighlights";
 import { cn } from "@/lib/utils";
@@ -388,10 +388,95 @@ export default function ReadingPage() {
     setIsNotebookOpen(true);
   }, [user]);
 
-  const { activePlan, todayDayIndex, todayRefs, todayReadRefs, isTodayCompleted, markRefRead } = useReadingPlan(user?.id ?? null);
+  const [searchParams] = useSearchParams();
+  const planParam = searchParams.get("plan");
+  const dayParam = searchParams.get("day");
+  const stepParam = searchParams.get("step");
+
+  const {
+    activePlan,
+    todayDayIndex,
+    todayRefs,
+    todayReadRefs,
+    isTodayCompleted,
+    markRefRead,
+    completeDayAndAdvance,
+  } = useReadingPlan(user?.id ?? null, planParam);
+
+  const planDayNumber = dayParam ? parseInt(dayParam, 10) : todayDayIndex;
+  const currentPlanDay = activePlan?.days?.find((d) => d.day === planDayNumber);
+  const currentPlanRefs = currentPlanDay?.refs ?? todayRefs;
 
   const currentRef = selectedBook ? `${selectedBook.slug}/${chapterNumber}` : "";
-  const isPartOfTodayReading = activePlan && todayRefs.includes(currentRef);
+  const isPartOfTodayReading = Boolean(activePlan && currentPlanRefs.includes(currentRef));
+  const isPlanReading = Boolean(activePlan && (Boolean(planParam) || isPartOfTodayReading));
+
+  const currentPlanStep = useMemo(() => {
+    if (stepParam !== null) {
+      const p = parseInt(stepParam, 10);
+      if (!isNaN(p) && p >= 0) return p;
+    }
+    const idx = currentPlanRefs.indexOf(currentRef);
+    return idx >= 0 ? idx : 0;
+  }, [stepParam, currentPlanRefs, currentRef]);
+
+  const hasNextPlanRef = currentPlanStep < currentPlanRefs.length - 1;
+  const nextPlanRef = hasNextPlanRef ? currentPlanRefs[currentPlanStep + 1] : null;
+  const isLastPlanRef = currentPlanStep === currentPlanRefs.length - 1;
+
+  const nextPlanChapterInfo = useMemo(() => {
+    if (!nextPlanRef) return null;
+    const [slug, chapStr] = nextPlanRef.split("/");
+    const b = findBookBySlug(slug);
+    return {
+      bookSlug: slug,
+      bookName: b?.name ?? slug.toUpperCase(),
+      chapter: parseInt(chapStr, 10),
+    };
+  }, [nextPlanRef]);
+
+  const handleAdvanceToNextPlanReading = useCallback(() => {
+    if (!nextPlanChapterInfo || !activePlan) return;
+    markRefRead(currentRef);
+    navigate(
+      `/${selectedVersion}/${nextPlanChapterInfo.bookSlug}/${nextPlanChapterInfo.chapter}?plan=${activePlan.id}&day=${planDayNumber}&step=${currentPlanStep + 1}`
+    );
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [nextPlanChapterInfo, activePlan, markRefRead, currentRef, navigate, selectedVersion, planDayNumber, currentPlanStep]);
+
+  const handleCompletePlanDay = useCallback(() => {
+    if (!activePlan) return;
+    completeDayAndAdvance(planDayNumber, currentRef);
+    toast({
+      title: "Dia concluído!",
+      description: `Parabéns! O Dia ${planDayNumber} foi concluído e o Dia ${planDayNumber + 1} foi liberado.`,
+    });
+    navigate(`/planos?id=${activePlan.id}`);
+  }, [activePlan, completeDayAndAdvance, planDayNumber, currentRef, navigate]);
+
+  const planNavInfo = useMemo(() => {
+    if (!isPlanReading || !activePlan) return null;
+    return {
+      planName: activePlan.name,
+      day: planDayNumber,
+      step: currentPlanStep,
+      totalSteps: currentPlanRefs.length,
+      nextChapterName: nextPlanChapterInfo ? `${nextPlanChapterInfo.bookName} ${nextPlanChapterInfo.chapter}` : undefined,
+      isLastStep: isLastPlanRef,
+      onAdvanceNextReading: handleAdvanceToNextPlanReading,
+      onCompleteDayAndFinish: handleCompletePlanDay,
+    };
+  }, [
+    isPlanReading,
+    activePlan,
+    planDayNumber,
+    currentPlanStep,
+    currentPlanRefs.length,
+    nextPlanChapterInfo,
+    isLastPlanRef,
+    handleAdvanceToNextPlanReading,
+    handleCompletePlanDay,
+  ]);
 
   // Load book context
   useEffect(() => {
@@ -1543,6 +1628,33 @@ export default function ReadingPage() {
                   </div>
                 </div>
               )}
+
+              {/* Banner do Modo Plano de Leitura */}
+              {isPlanReading && activePlan && (
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e5b869]/40 bg-[#1a1714]/95 px-5 py-3.5 shadow-xl backdrop-blur-md">
+                  <div className="flex items-center gap-3.5">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2a2219] border border-[#e5b869]/50 text-[#e5b869] text-xs font-bold font-mono">
+                      {planDayNumber}
+                    </span>
+                    <div>
+                      <p className="font-serif text-sm font-medium text-[#f4efea] leading-tight">
+                        Plano: {activePlan.name}
+                      </p>
+                      <p className="font-mono text-[0.72rem] text-[#e5b869] leading-tight mt-0.5">
+                        Dia {planDayNumber} • Leitura {currentPlanStep + 1} de {currentPlanRefs.length} ({selectedBook?.name} {chapterNumber})
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link
+                    to={`/planos?id=${activePlan.id}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#382f23] bg-[#221c17] px-3.5 py-1.5 text-xs font-mono text-[#a89b8c] hover:border-[#e5b869]/50 hover:text-[#e5b869] transition-all"
+                  >
+                    <span>Ver plano</span>
+                    <ChevronRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              )}
               <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex flex-col gap-2.5">
                   <Breadcrumb>
@@ -2109,18 +2221,23 @@ export default function ReadingPage() {
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   onFinish={() => navigate("/")}
+                  planNavInfo={planNavInfo}
                 />
               )}
 
-              {!loading && !error && isPartOfTodayReading && activePlan && (
+              {!loading && !error && isPlanReading && activePlan && (
                 <DailyReadingBadge
                   planName={activePlan.name}
-                  todayDayIndex={todayDayIndex}
+                  planId={activePlan.id}
+                  todayDayIndex={planDayNumber}
                   isTodayCompleted={isTodayCompleted}
                   isRefCompleted={todayReadRefs?.includes(currentRef) ?? false}
-                  totalRefs={todayRefs?.length ?? 0}
+                  totalRefs={currentPlanRefs?.length ?? 0}
                   completedRefs={todayReadRefs?.length ?? 0}
                   onMarkComplete={() => markRefRead(currentRef)}
+                  nextChapterName={nextPlanChapterInfo ? `${nextPlanChapterInfo.bookName} ${nextPlanChapterInfo.chapter}` : undefined}
+                  onAdvanceNextReading={hasNextPlanRef ? handleAdvanceToNextPlanReading : undefined}
+                  onCompleteDay={isLastPlanRef ? handleCompletePlanDay : undefined}
                 />
               )}
 

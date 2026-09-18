@@ -31,13 +31,23 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Stale deployment recovery: recarrega quando chunk não é encontrado após novo deploy (apenas se online)
-window.addEventListener('vite:preloadError', (event) => {
-  event.preventDefault()
-  if (navigator.onLine) {
-    window.location.reload()
+// Stale deployment recovery: recarrega quando chunk não é encontrado após novo deploy.
+// IMPORTANTE: NÃO chamar `event.preventDefault()`!
+// No Vite, chamar preventDefault() faz o helper de preload suprimir a rejeição da Promise
+// e resolver o módulo dinâmico como `undefined`. Isso faz o React.lazy tentar ler `undefined.default`,
+// disparando TypeError: "Cannot read properties of undefined (reading 'default')" antes do reload.
+// Sem preventDefault(), a Promise rejeita normalmente, permitindo que o ErrorBoundary
+// capture como chunk error e faça o reload sem registrar falso-positivo no Sentry.
+window.addEventListener("vite:preloadError", () => {
+  const RELOAD_KEY = "bv_stale_reload_ts";
+  const now = Date.now();
+  const lastReload = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
+
+  if (now - lastReload > 15000 && navigator.onLine) {
+    sessionStorage.setItem(RELOAD_KEY, String(now));
+    window.location.reload();
   }
-})
+});
 
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>

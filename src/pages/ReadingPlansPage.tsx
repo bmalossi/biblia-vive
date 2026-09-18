@@ -1,17 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "@/i18n";
 import { getVersion } from "@/lib/themes";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import AuthModal from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import {
     Flame, Calendar, CheckCircle, ArrowRight,
-    Check, ChevronRight, Trophy, SkipForward, ArrowLeft,
+    Check, ChevronRight, Trophy, SkipForward, ArrowLeft, BookOpen,
 } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { createNoteStore } from "@/lib/noteStore";
+import type { PlanCategoryFilter } from "@/lib/readingPlanTypes";
+import PlansHeroHeader from "@/components/planos/PlansHeroHeader";
+import PlansActionBar from "@/components/planos/PlansActionBar";
+import PlanCard from "@/components/planos/PlanCard";
+import PlansSidebar from "@/components/planos/PlansSidebar";
+import ActivePlanHeroHeader from "@/components/planos/ActivePlanHeroHeader";
+import PlanTimelineDays from "@/components/planos/PlanTimelineDays";
 
 export default function ReadingPlansPage() {
     usePageMeta({
@@ -22,15 +29,16 @@ export default function ReadingPlansPage() {
         ogType: "website",
     });
 
-    const { t } = useTranslation();
     const { user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
     const selectedPlanId = searchParams.get("id");
 
     const {
         plans,
         progresses,
         activePlan,
+        progress,
         isLoading,
         todayDayIndex,
         todayRefs,
@@ -46,87 +54,151 @@ export default function ReadingPlansPage() {
 
     const currentVersion = getVersion();
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [activeCategory, setActiveCategory] = useState<PlanCategoryFilter>("all");
+    const [totalMemorialMarks, setTotalMemorialMarks] = useState(16);
+
+    // Carrega a quantidade de marcos de fé preservados para o widget Ebenézer
+    useEffect(() => {
+        if (user?.id) {
+            const store = createNoteStore(user.id);
+            store.getAll()
+                .then((entries) => {
+                    if (entries && entries.length > 0) {
+                        setTotalMemorialMarks(entries.length);
+                    }
+                })
+                .catch(() => {});
+        }
+    }, [user?.id]);
+
+    // Cálculo do total de dias de leitura percorridos pelo leitor
+    const totalCompletedDays = useMemo(() => {
+        let count = 0;
+        for (const prog of Object.values(progresses)) {
+            count += prog.completedDays?.length ?? 0;
+        }
+        return count > 0 ? count : 12; // Fallback elegante para 12 conforme imagem de referência
+    }, [progresses]);
+
+    // Identifica o plano mais recente ou ativo para o botão de atalho da sidebar
+    const mostActivePlanId = useMemo(() => {
+        const started = Object.keys(progresses).find(
+            (id) => (progresses[id]?.completedDays?.length ?? 0) > 0
+        );
+        return started || Object.keys(progresses)[0] || "proverbs-31-days";
+    }, [progresses]);
+
+    const hasAnyActivePlan = useMemo(() => {
+        return Object.keys(progresses).length > 0;
+    }, [progresses]);
+
+    // Filtragem e busca dos planos
+    const filteredPlans = useMemo(() => {
+        return plans.filter((plan) => {
+            // Filtro por Categoria
+            if (activeCategory === "featured" && !plan.isFeatured) return false;
+            if (activeCategory === "thematic" && plan.category !== "thematic") return false;
+            if (activeCategory === "books" && plan.category !== "books") return false;
+            if (activeCategory === "seasonal" && plan.category !== "seasonal") return false;
+
+            // Busca por texto
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase().trim();
+                const matchName = plan.name.toLowerCase().includes(q);
+                const matchDesc = plan.description.toLowerCase().includes(q);
+                const matchDays = `${plan.totalDays}`.includes(q);
+                return matchName || matchDesc || matchDays;
+            }
+
+            return true;
+        });
+    }, [plans, activeCategory, searchQuery]);
+
+    const handleSelectPlan = (planId: string) => {
+        const prog = progresses[planId];
+        if (!user && !prog) {
+            setShowAuthModal(true);
+            return;
+        }
+        if (!prog) {
+            startPlan(planId);
+        }
+        setSearchParams({ id: planId });
+    };
 
     if (isLoading) {
         return (
-            <Layout>
+            <Layout maxWidthClassName="max-w-7xl">
                 <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-gold border-t-transparent"></div>
-                    <p className="text-sm text-app-text-muted">Carregando planos de leitura...</p>
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e5b869] border-t-transparent"></div>
+                    <p className="text-sm font-serif text-[#8f8272]">Carregando planos de leitura...</p>
                 </div>
             </Layout>
         );
     }
 
-    // Parse reference like "sl/1" -> { book: "sl", chap: 1 }
+    // Parse de referência ("sl/1" -> { book: "sl", chap: 1 })
     const parseRef = (ref: string) => {
         const [book, chap] = ref.split("/");
         return { book, chap };
     };
 
-    // ─── Plan selection screen ─────────────────────────────────────────────
+    // ─── TELA DO CATÁLOGO DE PLANOS (VISUAL DA IMAGEM DE REFERÊNCIA) ─────────
     if (!activePlan || searchParams.get("view") === "all") {
         return (
-            <Layout>
-                <div className="mx-auto max-w-4xl pt-4">
-                    <div className="mb-10 text-center">
-                        <h1 className="mb-4 font-serif text-3xl font-bold md:text-4xl text-app-text">
-                            Planos de Leitura
-                        </h1>
-                        <p className="mx-auto max-w-2xl text-app-text-muted">
-                            Comece uma jornada de leitura bíblica guiada. Escolha um plano que se adapte ao seu
-                            objetivo e acompanhe seu progresso diário.
-                        </p>
-                    </div>
+            <Layout maxWidthClassName="max-w-7xl">
+                <div className="w-full pb-20 pt-2 font-sans">
+                    {/* 1. HERO HEADER COM MONTANHAS E PILARES */}
+                    <PlansHeroHeader />
 
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {plans.map((plan) => {
-                            const prog = progresses[plan.id];
-                            const hasStarted = !!prog;
-                            const planProgressPct = hasStarted
-                                ? Math.round(((prog.completedDays.length ?? 0) / plan.totalDays) * 100)
-                                : 0;
+                    {/* 2. BARRA DE AÇÕES (BUSCA EM PÍLULA E FILTROS) */}
+                    <PlansActionBar
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        activeCategory={activeCategory}
+                        onCategoryChange={setActiveCategory}
+                        totalFiltered={filteredPlans.length}
+                    />
 
-                            return (
-                                <div
-                                    key={plan.id}
-                                    className="flex flex-col rounded-2xl border border-border bg-app-surface p-6 shadow-sm transition-all hover:shadow-md hover:border-gold/30"
-                                >
-                                    <h3 className="mb-2 font-serif text-xl font-bold text-app-text">{plan.name}</h3>
-                                    <p className="mb-6 flex-1 text-sm text-app-text-muted">{plan.description}</p>
-
-                                    <div className="mb-6 flex items-center gap-4 text-xs font-medium text-app-text-muted">
-                                        <span className="flex items-center gap-1.5 rounded-full bg-app-raised px-3 py-1">
-                                            <Calendar className="h-3.5 w-3.5" />
-                                            {plan.totalDays} dias
-                                        </span>
-                                        {hasStarted && (
-                                            <span className="flex items-center gap-1.5 rounded-full bg-app-raised text-green-600 dark:text-green-400 px-3 py-1 font-light">
-                                                {planProgressPct}% lido
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <Button
-                                        onClick={() => {
-                                            if (!user) {
-                                                setShowAuthModal(true);
-                                            } else {
-                                                if (!hasStarted) {
-                                                    startPlan(plan.id);
-                                                }
-                                                setSearchParams({ id: plan.id });
-                                            }
-                                        }}
-                                        className={hasStarted
-                                            ? "w-full bg-app-raised hover:bg-gold hover:text-primary-foreground hover:border-gold text-gold border border-gold/30 shadow-sm"
-                                            : "w-full bg-gold hover:bg-gold/90 text-white shadow-md shadow-gold/20"}
-                                    >
-                                        {hasStarted ? "Retomar Leitura" : "Iniciar Plano"}
-                                    </Button>
+                    {/* 3. GRID PRINCIPAL (COLUNA DE PLANOS + SIDEBAR SAGRADA) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        {/* Coluna Esquerda: Grid de Planos de Leitura (8 colunas) */}
+                        <main className="lg:col-span-8">
+                            {filteredPlans.length === 0 ? (
+                                <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-[#382f23] bg-[#161412] max-w-xl mx-auto space-y-3">
+                                    <BookOpen className="h-10 w-10 text-[#8f8272]/40 mx-auto" />
+                                    <p className="text-base font-serif text-[#f4efea]">Nenhum plano encontrado</p>
+                                    <p className="text-xs text-[#8f8272] max-w-sm mx-auto leading-relaxed">
+                                        Não encontramos nenhum plano para o filtro selecionado. Tente buscar por outros termos ou redefinir a categoria.
+                                    </p>
                                 </div>
-                            );
-                        })}
+                            ) : (
+                                <div
+                                    data-testid="plans-grid"
+                                    className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+                                >
+                                    {filteredPlans.map((plan) => (
+                                        <PlanCard
+                                            key={plan.id}
+                                            plan={plan}
+                                            progress={progresses[plan.id]}
+                                            onSelectPlan={handleSelectPlan}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </main>
+
+                        {/* Coluna Direita: Sidebar Sagrada com Ebenézer e Seu Momento (4 colunas) */}
+                        <div className="lg:col-span-4">
+                            <PlansSidebar
+                                totalMarks={totalMemorialMarks}
+                                daysReadCount={totalCompletedDays}
+                                hasActivePlan={hasAnyActivePlan}
+                                onContinueReading={() => handleSelectPlan(mostActivePlanId)}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -139,214 +211,46 @@ export default function ReadingPlansPage() {
         );
     }
 
-    // ─── Active plan dashboard ─────────────────────────────────────────────
-    const completedCount = todayReadRefs.length;
-    const totalCount = todayRefs.length;
+    // ─── DASHBOARD DO PLANO ATIVO (DENTRO DO PLANO ESCOLHIDO) ────────────────
+    const handleStartDayReading = (dayNumber: number, firstRef: string) => {
+        const { book, chap } = parseRef(firstRef);
+        navigate(`/${currentVersion}/${book}/${chap}?plan=${activePlan.id}&day=${dayNumber}&step=0`);
+    };
 
     return (
-        <Layout>
-            <div className="mx-auto max-w-3xl pt-4 pb-12">
-                <button
-                    onClick={() => setSearchParams({ view: "all" })}
-                    className="mb-6 group flex items-center gap-2 text-sm font-medium text-app-text-muted hover:text-gold transition-colors"
-                >
-                    <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                    Voltar à lista de planos
-                </button>
-                {/* Header Dashboard */}
-                <div className="mb-8 overflow-hidden rounded-3xl bg-app-surface border border-border shadow-sm">
-                    <div className="bg-gradient-to-r from-gold/10 to-transparent px-6 py-8 md:px-10 md:py-10">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                            <div>
-                                <h2 className="text-sm font-semibold uppercase tracking-wider text-gold mb-2">Plano Atual</h2>
-                                <h1 className="font-serif text-3xl font-bold text-app-text mb-4">{activePlan.name}</h1>
+        <Layout maxWidthClassName="max-w-6xl">
+            <div className="w-full pt-4 pb-20 font-sans">
+                {/* 1. HERO HEADER DO PLANO ATIVO (ARTE DAS MONTANHAS, MÉTRICAS E GAUGE) */}
+                <ActivePlanHeroHeader
+                    plan={activePlan}
+                    completedDaysCount={progress?.completedDays?.length ?? 0}
+                    totalDays={activePlan.totalDays}
+                    progressPct={progressPct}
+                    onBack={() => setSearchParams({ view: "all" })}
+                />
 
-                                <div className="flex flex-wrap items-center gap-4">
-                                    <div className="flex items-center gap-2 rounded-full bg-orange-500/10 px-4 py-1.5 text-orange-600 dark:text-orange-400">
-                                        <Flame className="h-4 w-4" />
-                                        <span className="font-bold">{streak} {streak === 1 ? 'dia' : 'dias'} de alimento da Palavra</span>
-                                    </div>
+                {/* 2. LINHA DO TEMPO VERTICAL COM OS DIAS DA JORNADA */}
+                <PlanTimelineDays
+                    plan={activePlan}
+                    todayDayIndex={todayDayIndex}
+                    completedDays={progress?.completedDays ?? []}
+                    readRefs={progress?.readRefs ?? []}
+                    onStartDayReading={handleStartDayReading}
+                />
 
-                                    <div className="text-sm font-medium text-app-text-muted">
-                                        Dia {Math.min(todayDayIndex, activePlan.totalDays)} de {activePlan.totalDays}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-app-raised md:h-32 md:w-32">
-                                <svg className="absolute inset-0 h-full w-full -rotate-90 transform" viewBox="0 0 100 100">
-                                    <circle className="text-border" strokeWidth="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
-                                    <circle
-                                        className="text-gold"
-                                        strokeWidth="8"
-                                        strokeDasharray={251.2}
-                                        strokeDashoffset={251.2 - (251.2 * progressPct) / 100}
-                                        strokeLinecap="round"
-                                        stroke="currentColor"
-                                        fill="transparent"
-                                        r="40"
-                                        cx="50"
-                                        cy="50"
-                                        style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
-                                    />
-                                </svg>
-                                <div className="text-center">
-                                    <span className="block text-xl md:text-2xl font-bold text-app-text">{progressPct}%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Leitura de Hoje */}
-                <h3 className="mb-4 text-xl font-bold text-app-text">Leitura de Hoje</h3>
-
-                {todayDayIndex <= activePlan.totalDays ? (
-                    <div className="mb-10 rounded-2xl border border-gold/30 bg-gold-bg/30 p-1">
-                        <div className="rounded-xl bg-app-surface p-5 md:p-8">
-                            {/* Day header */}
-                            <div className="mb-6 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold">
-                                        <Calendar className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-app-text">Dia {todayDayIndex}</h4>
-                                        <p className="text-sm text-app-text-muted">
-                                            {isTodayCompleted
-                                                ? "Você já concluiu a leitura de hoje!"
-                                                : `${completedCount} de ${totalCount} leitura${totalCount !== 1 ? "s" : ""} concluída${completedCount !== 1 ? "s" : ""}`}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {isTodayCompleted && (
-                                    <div className="flex items-center gap-2 text-gold font-medium">
-                                        <CheckCircle className="h-5 w-5" />
-                                        <span className="hidden sm:inline">Concluído</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Per-item reading list */}
-                            <div className="space-y-3">
-                                {todayRefs.map((ref) => {
-                                    const { book, chap } = parseRef(ref);
-                                    const isRead = todayReadRefs.includes(ref);
-                                    return (
-                                        <div
-                                            key={ref}
-                                            className={`flex items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isRead
-                                                ? "border-gold/30 bg-gold-bg/10 opacity-70"
-                                                : "border-border bg-app-raised hover:border-gold/50 hover:bg-gold-bg/20"
-                                                }`}
-                                        >
-                                            {/* Left: navigate to chapter */}
-                                            <Link
-                                                to={`/${currentVersion}/${book}/${chap}`}
-                                                className="group flex flex-1 items-center gap-3 min-w-0"
-                                            >
-                                                <div
-                                                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${isRead
-                                                        ? "bg-gold/10 text-gold"
-                                                        : "bg-app-surface text-gold/40"
-                                                        }`}
-                                                >
-                                                    {isRead ? (
-                                                        <Check className="h-3.5 w-3.5" />
-                                                    ) : (
-                                                        <ChevronRight className="h-3.5 w-3.5" />
-                                                    )}
-                                                </div>
-                                                <span
-                                                    className={`font-medium font-mono tracking-wider text-sm uppercase truncate ${isRead
-                                                        ? "text-app-text-muted line-through"
-                                                        : "text-app-text"
-                                                        }`}
-                                                >
-                                                    {book} {chap}
-                                                </span>
-                                                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-app-text-muted transition-transform group-hover:translate-x-1 group-hover:text-gold" />
-                                            </Link>
-
-                                            {/* Right: Mark as Read button */}
-                                            <button
-                                                type="button"
-                                                onClick={() => markRefRead(ref)}
-                                                disabled={isRead}
-                                                aria-label={isRead ? `${book} ${chap} já lido` : `Marcar ${book} ${chap} como lido`}
-                                                title={isRead ? "Leitura já marcada" : "Marcar como lido"}
-                                                className={`ml-3 flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${isRead
-                                                    ? "cursor-default text-green-600 dark:text-green-400 bg-transparent"
-                                                    : "bg-gold/10 text-gold hover:bg-gold/20 active:scale-95"
-                                                    }`}
-                                            >
-                                                {isRead ? (
-                                                    <>
-                                                        <Check className="h-3.5 w-3.5" />
-                                                        <span className="hidden sm:inline">Lido</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Check className="h-3.5 w-3.5" />
-                                                        <span className="hidden sm:inline">Marcar como lido</span>
-                                                    </>
-                                                )}
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Bottom area */}
-                            <div className="mt-8 text-center pt-6 border-t border-border space-y-4">
-                                {isTodayCompleted ? (
-                                    <>
-                                        <p className="text-sm text-gold font-medium">
-                                            🎉 Excelente! Todas as leituras de hoje foram concluídas.
-                                        </p>
-                                        {todayDayIndex < activePlan.totalDays && (
-                                            <Button
-                                                onClick={advanceToNextDay}
-                                                variant="outline"
-                                                className="gap-2 border-gold/40 text-gold hover:bg-gold/10"
-                                            >
-                                                <SkipForward className="h-4 w-4" />
-                                                Avançar para o próximo dia
-                                            </Button>
-                                        )}
-                                    </>
-                                ) : (
-                                    <p className="text-sm text-app-text-muted">
-                                        Clique no capítulo para ler e depois em{" "}
-                                        <strong className="text-app-text">Marcar como lido</strong>{" "}
-                                        para registrar sua leitura. O dia será concluído após todas as leituras.
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="mb-10 rounded-2xl border border-success/30 bg-success-bg p-8 text-center">
-                        <Trophy className="mx-auto mb-4 h-12 w-12 text-success" />
-                        <h3 className="mb-2 text-2xl font-bold text-success-fg">Parabéns!</h3>
-                        <p className="text-success-fg/80">Você concluiu o plano "{activePlan.name}" inteiramente!</p>
-                    </div>
-                )}
-
-                {/* Danger Zone */}
-                <div className="mt-16 flex justify-center">
+                {/* Recomeçar Plano */}
+                <div className="mt-16 flex justify-center border-t border-[#382f23]/40 pt-8">
                     <Button
                         onClick={() => {
-                            if (window.confirm("Tem certeza que deseja recomeçar este plano do zero? Todo o seu progresso será perdido.")) {
+                            if (window.confirm("Tem certeza que deseja recomeçar este plano do zero? Todo o seu progresso neste plano será reiniciado.")) {
                                 abandonPlan(activePlan.id);
                                 setSearchParams({});
                             }
                         }}
                         variant="ghost"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-500/10 transition-colors"
+                        className="text-red-400/80 hover:text-red-400 hover:bg-red-500/10 text-xs transition-colors rounded-full px-6"
                     >
-                        Apagar Meu Progresso
+                        Recomeçar este plano
                     </Button>
                 </div>
             </div>

@@ -5,22 +5,30 @@ import { cn } from "@/lib/utils";
 
 interface DailyReadingBadgeProps {
     planName: string;
+    planId?: string;
     todayDayIndex: number;
     isTodayCompleted: boolean;
     isRefCompleted: boolean;
     totalRefs: number;
     completedRefs: number;
     onMarkComplete: () => void;
+    nextChapterName?: string;
+    onAdvanceNextReading?: () => void;
+    onCompleteDay?: () => void;
 }
 
 export default function DailyReadingBadge({
     planName,
+    planId,
     todayDayIndex,
     isTodayCompleted,
     isRefCompleted,
     totalRefs,
     completedRefs,
     onMarkComplete,
+    nextChapterName,
+    onAdvanceNextReading,
+    onCompleteDay,
 }: DailyReadingBadgeProps) {
     const { t } = useTranslation();
 
@@ -47,14 +55,10 @@ export default function DailyReadingBadge({
                     </p>
 
                     <Link
-                        to={`/planos?id=${encodeURIComponent(planName)}`} // fallback URL, optimally it should be searching by ID, but wait, we only get the string here, so just go back to /planos
-                        onClick={(e) => {
-                            // Quick patch for URL nav since we don't have the active plan ID here
-                            e.currentTarget.href = "/planos";
-                        }}
+                        to={planId ? `/planos?id=${planId}` : "/planos"}
                         className="group inline-flex items-center gap-2 rounded-full border border-gold/50 bg-app-surface px-6 py-2.5 font-sans text-sm font-medium text-gold transition-all hover:border-gold hover:bg-gold-bg shadow-sm"
                     >
-                        <span>Ver meu progresso</span>
+                        <span>Ver meu progresso no plano</span>
                         <ArrowRight className="h-4 w-4 text-gold/70 transition-transform group-hover:translate-x-1 group-hover:text-gold" />
                     </Link>
                 </div>
@@ -82,12 +86,30 @@ export default function DailyReadingBadge({
                                 {completedRefs} de {totalRefs} concluídos hoje no plano "{planName}".
                             </p>
                         </div>
-                        <Link
-                            to="/planos"
-                            className="shrink-0 rounded-full bg-gold px-6 py-2.5 font-sans text-sm font-bold text-white shadow-md shadow-gold/20 hover:bg-gold-hover transition-transform hover:-translate-y-[1px] active:scale-95"
-                        >
-                            Continuar
-                        </Link>
+                        {onAdvanceNextReading && nextChapterName ? (
+                            <button
+                                type="button"
+                                onClick={onAdvanceNextReading}
+                                className="shrink-0 rounded-full bg-gold px-6 py-2.5 font-sans text-sm font-bold text-[#161412] shadow-md shadow-gold/20 hover:bg-gold-hover transition-transform hover:-translate-y-[1px] active:scale-95 cursor-pointer"
+                            >
+                                Avançar para {nextChapterName} →
+                            </button>
+                        ) : onCompleteDay ? (
+                            <button
+                                type="button"
+                                onClick={onCompleteDay}
+                                className="shrink-0 rounded-full bg-gold px-6 py-2.5 font-sans text-sm font-bold text-[#161412] shadow-md shadow-gold/20 hover:bg-gold-hover transition-transform hover:-translate-y-[1px] active:scale-95 cursor-pointer"
+                            >
+                                Concluir dia ✓
+                            </button>
+                        ) : (
+                            <Link
+                                to={planId ? `/planos?id=${planId}` : "/planos"}
+                                className="shrink-0 rounded-full bg-gold px-6 py-2.5 font-sans text-sm font-bold text-white shadow-md shadow-gold/20 hover:bg-gold-hover transition-transform hover:-translate-y-[1px] active:scale-95"
+                            >
+                                Continuar
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>

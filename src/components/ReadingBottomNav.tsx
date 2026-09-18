@@ -10,6 +10,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
+export interface PlanNavInfo {
+  planName: string;
+  day: number;
+  step: number;
+  totalSteps: number;
+  nextChapterName?: string;
+  isLastStep: boolean;
+  onAdvanceNextReading?: () => void;
+  onCompleteDayAndFinish?: () => void;
+}
+
 export interface ReadingBottomNavProps {
   currentVersion: BibleVersion;
   onVersionChange: (version: BibleVersion) => void;
@@ -25,6 +36,7 @@ export interface ReadingBottomNavProps {
   onFinish?: () => void;
   className?: string;
   onOpenVersionModal?: () => void;
+  planNavInfo?: PlanNavInfo | null;
 }
 
 /**
@@ -42,6 +54,7 @@ export const ReadingBottomNav: React.FC<ReadingBottomNavProps> = ({
   onFinish,
   className,
   onOpenVersionModal,
+  planNavInfo,
 }) => {
   const { isDark, isSepia } = useReadingTheme();
 
@@ -183,7 +196,35 @@ export const ReadingBottomNav: React.FC<ReadingBottomNavProps> = ({
           </button>
         )}
 
-        {nextChapterInfo ? (
+        {planNavInfo ? (
+          !planNavInfo.isLastStep ? (
+            <button
+              type="button"
+              onClick={planNavInfo.onAdvanceNextReading}
+              className={cn(
+                "flex items-center gap-2 rounded-full px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98]",
+                nextBtnClass
+              )}
+              aria-label={`Avançar para a próxima leitura do plano: ${planNavInfo.nextChapterName}`}
+            >
+              <span>Avançar para {planNavInfo.nextChapterName ?? "próxima leitura"}</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={planNavInfo.onCompleteDayAndFinish}
+              className={cn(
+                "flex items-center gap-2 rounded-full px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer shadow-md hover:scale-[1.02] active:scale-[0.98]",
+                nextBtnClass
+              )}
+              aria-label="Concluir leituras de hoje"
+            >
+              <span>Concluir leituras de hoje</span>
+              <Check className="h-4 w-4" />
+            </button>
+          )
+        ) : nextChapterInfo ? (
           <button
             type="button"
             onClick={() => onNavigate(nextChapterInfo.chapter, nextChapterInfo.book.slug)}

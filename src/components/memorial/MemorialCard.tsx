@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry } from "@/lib/noteStore";
-import { MEMORIAL_CATEGORY_CONFIG, getBibleLink, hasBibleReference } from "@/lib/memorialUtils";
+import { MEMORIAL_CATEGORY_CONFIG, getBibleLink, hasBibleReference, formatBibleReference } from "@/lib/memorialUtils";
 import SpotlightCard from "@/components/memorial/SpotlightCard";
 import {
   DropdownMenu,
@@ -85,55 +85,47 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
       <SpotlightCard
         data-testid="memorial-card"
         onClick={handleCardClick}
+        spotlightColor="rgba(229, 184, 105, 0.12)"
         className={cn(
-          "p-5 space-y-3 cursor-pointer shadow-xs hover:border-gold/40 hover:-translate-y-0.5 transition-all group",
+          "p-5 space-y-3 cursor-pointer rounded-2xl border border-[#382f23]/80 bg-[#161412] shadow-lg hover:border-[#c69a50]/60 hover:-translate-y-0.5 transition-all group",
           className
         )}
       >
         {/* Cabeçalho do Card */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             {/* Badge da Categoria */}
             <span
               className={cn(
-                "inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.7rem] tracking-wide",
-                catInfo.classes
+                "inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.68rem] font-mono uppercase tracking-wider",
+                category === "prayer"
+                  ? "bg-[#251e18] border-[#e5b869]/30 text-[#e5b869]"
+                  : category === "testimony"
+                  ? "bg-[#18231c] border-emerald-500/30 text-emerald-400"
+                  : category === "fasting"
+                  ? "bg-[#221c18] border-amber-500/30 text-amber-400"
+                  : "bg-[#241e18] border-[#382f23] text-[#c4b5a2]"
               )}
             >
               {catInfo.label}
             </span>
 
-            {/* Referência Bíblica (apenas se vinculada) */}
-            {hasRef && (
-              <Link
-                to={getBibleLink(entry)}
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 text-[0.78rem] font-medium text-app-text hover:text-gold transition-colors"
-                title="Ir para o texto bíblico"
-              >
-                <span>
-                  {entry.bookName} {entry.chapter}
-                  {entry.verse ? `:${entry.verse}` : ""}
-                </span>
-                <ExternalLink className="h-3 w-3 opacity-60" />
-              </Link>
-            )}
+            {/* Data do Registro */}
+            <span className="text-[0.72rem] font-sans text-[#8f8272]">
+              {formatDate(entry.createdAt)}
+            </span>
 
             {/* Indicador de Favorito */}
             {entry.favorite && (
               <span title="Marco Favorito" aria-label="Marco Favorito">
-                <Star className="h-3.5 w-3.5 text-gold fill-gold" />
+                <Star className="h-3.5 w-3.5 text-[#e5b869] fill-[#e5b869]" />
                 <span className="sr-only">Marco Favorito</span>
               </span>
             )}
           </div>
 
-          {/* Data e Menu Contextual */}
-          <div className="flex items-center gap-1.5 shrink-0 text-app-text-muted">
-            <span className="text-[0.72rem] font-sans opacity-70">
-              {formatDate(entry.createdAt)}
-            </span>
-
+          {/* Menu Contextual */}
+          <div className="flex items-center gap-1.5 shrink-0 text-[#8f8272]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -208,15 +200,30 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 
         {/* Título opcional */}
         {entry.title && (
-          <h3 className="text-[0.95rem] font-serif font-semibold text-app-text leading-snug">
+          <h3 className="text-base sm:text-[1.02rem] font-serif font-medium text-[#f4efea] leading-snug group-hover:text-[#e5b869] transition-colors">
             {entry.title}
           </h3>
         )}
 
         {/* Conteúdo do Registro */}
-        <p className="text-[0.84rem] text-app-text-muted leading-relaxed line-clamp-3">
+        <p className="text-xs sm:text-[0.82rem] text-[#9b8e7e] leading-relaxed line-clamp-3">
           {entry.content}
         </p>
+
+        {/* Referência Bíblica (apenas se vinculada) */}
+        {hasRef && (
+          <div className="pt-0.5">
+            <Link
+              to={getBibleLink(entry)}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1e1914] border border-[#c69a50]/40 text-[0.7rem] text-[#e5b869] hover:bg-[#282119] transition-colors"
+              title="Ir para o texto bíblico"
+            >
+              <span>{formatBibleReference(entry)}</span>
+              <ExternalLink className="h-2.5 w-2.5 opacity-70" />
+            </Link>
+          </div>
+        )}
 
         {/* Tags */}
         {entry.tags && entry.tags.length > 0 && (
@@ -224,9 +231,8 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
             {entry.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-app-raised border border-border text-[0.68rem] text-app-text-muted"
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#1c1813] border border-[#382f23] text-[0.65rem] text-[#8f8272]"
               >
-                <TagIcon className="h-2.5 w-2.5 opacity-60" />
                 <span>{tag}</span>
               </span>
             ))}
@@ -235,10 +241,10 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 
         {/* Área de Oração: Botão de Resposta OU Testemunho Respondido */}
         {isPrayer && (
-          <div className="pt-2 border-t border-border/40">
+          <div className="pt-2 border-t border-[#382f23]/50">
             {!isAnswered ? (
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <span className="text-[0.72rem] text-app-text-muted italic">
+                <span className="text-[0.72rem] text-[#8f8272] italic">
                   Oração em espera perante Deus
                 </span>
                 <button
@@ -247,7 +253,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                     e.stopPropagation();
                     onMarkAnswered?.(entry);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gold/40 bg-gold/10 text-gold hover:bg-gold hover:text-black transition-all text-xs font-medium cursor-pointer shadow-xs active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#e5b869]/40 bg-[#e5b869]/10 text-[#e5b869] hover:bg-[#e5b869] hover:text-[#161412] transition-all text-xs font-medium cursor-pointer shadow-xs active:scale-95"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>Marcar como respondida</span>
@@ -255,17 +261,17 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
               </div>
             ) : (
               <div className="space-y-1.5 bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 text-emerald-500 text-xs font-medium">
+                <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-medium">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                   <span>Oração Respondida</span>
                   {entry.answeredAt && (
-                    <span className="text-[0.7rem] text-app-text-muted opacity-80 ml-auto">
+                    <span className="text-[0.7rem] text-[#8f8272] opacity-80 ml-auto">
                       {formatDate(entry.answeredAt)}
                     </span>
                   )}
                 </div>
                 {entry.answeredNote && (
-                  <p className="text-xs text-app-text-muted italic leading-relaxed pl-5">
+                  <p className="text-xs text-[#9b8e7e] italic leading-relaxed pl-5">
                     "{entry.answeredNote}"
                   </p>
                 )}

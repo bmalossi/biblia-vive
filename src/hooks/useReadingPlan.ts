@@ -245,6 +245,55 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
         });
     }, [effectivePlanId, userId]);
 
+    /**
+     * Conclui atomicamente um dia de leitura e avança imediatamente para o próximo dia na sequência.
+     * Atualiza as leituras lidas, marca o dia como concluído e desbloqueia o dia seguinte.
+     */
+    const completeDayAndAdvance = useCallback(
+        (dayIndex: number, lastRef?: string) => {
+            const targetId = effectivePlanId;
+            if (!targetId) return;
+
+            setProgresses((prevRecord) => {
+                const prev = prevRecord[targetId];
+                if (!prev) return prevRecord;
+
+                const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+                const newReadRefs = lastRef && !prev.readRefs.includes(lastRef)
+                    ? [...prev.readRefs, lastRef]
+                    : prev.readRefs;
+
+                const newCompletedDays = !prev.completedDays.includes(dayIndex)
+                    ? [...prev.completedDays, dayIndex].sort((a, b) => a - b)
+                    : prev.completedDays;
+
+                // Garante que o índice do dia atual avance imediatamente para dayIndex + 1
+                const now = Date.now();
+                const currentCalendarDay = Math.floor(Math.abs(now - prev.startDate) / ONE_DAY_MS) + 1;
+                const neededShiftDays = Math.max(0, (dayIndex + 1) - currentCalendarDay);
+                const newStartDate = prev.startDate - (neededShiftDays * ONE_DAY_MS);
+
+                const updatedPlan: PlanProgress = {
+                    ...prev,
+                    startDate: newStartDate,
+                    readRefs: newReadRefs,
+                    completedDays: newCompletedDays,
+                };
+
+                const nextDict = {
+                    ...prevRecord,
+                    [targetId]: updatedPlan,
+                };
+
+                writeLocal(userId, nextDict);
+                if (userId) savePlanProgressToCloud(userId, updatedPlan).catch(console.warn);
+
+                return nextDict;
+            });
+        },
+        [effectivePlanId, userId]
+    );
+
     return {
         plans,
         progresses,
@@ -266,5 +315,6 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
         abandonPlan,
         markRefRead,
         advanceToNextDay,
+        completeDayAndAdvance,
     };
 }
