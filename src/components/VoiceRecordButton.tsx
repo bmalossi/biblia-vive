@@ -5,6 +5,8 @@ import { ensureMicrophonePermission } from "@/lib/microphonePermission";
 import { startAudioCapture, AudioCaptureController, transcribeVoiceRecording } from "@/lib/audioTranscription";
 import { createSpeechRecognitionEngine, SpeechEngineController, isSpeechRecognitionSupported } from "@/lib/speechRecognitionEngine";
 import { isWebSpeechFallbackDisabled } from "@/lib/voiceSettings";
+import { useAuth } from "@/hooks/useAuth";
+import AuthModal from "@/components/AuthModal";
 
 interface VoiceRecordButtonProps {
     /** Callback chamado a cada resultado de transcrição (live) e ao concluir */
@@ -32,6 +34,8 @@ export default function VoiceRecordButton({
     className,
     label = "Ditar por voz",
 }: VoiceRecordButtonProps) {
+    const { user } = useAuth();
+    const [authModalOpen, setAuthModalOpen] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -74,6 +78,11 @@ export default function VoiceRecordButton({
     }, [mode]);
 
     const startRecording = async () => {
+        if (!user) {
+            setAuthModalOpen(true);
+            return;
+        }
+
         setErrorMessage(null);
         startValueRef.current = currentValue || "";
         liveTextRef.current = "";
@@ -253,6 +262,12 @@ export default function VoiceRecordButton({
                     <span>{label}</span>
                 </button>
             )}
+
+            <AuthModal
+                isOpen={authModalOpen}
+                onClose={() => setAuthModalOpen(false)}
+                hint="Faça login para registrar anotações por voz."
+            />
         </div>
     );
 }

@@ -15,6 +15,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import PwaInstallCard from "@/components/PwaInstallCard";
 import QuickVoiceMemorial from "@/components/QuickVoiceMemorial";
+import AuthModal from "@/components/AuthModal";
 
 interface LastRead {
   capitulo: number;
@@ -157,6 +158,7 @@ export default function HomePage() {
   });
 
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
     <Layout>
@@ -170,10 +172,23 @@ export default function HomePage() {
             lastRead={lastRead}
             lastReadBookName={lastReadBook?.name}
             version={version}
-            onStartVoiceRecording={() => setIsVoiceModalOpen(true)}
+            onStartVoiceRecording={() => {
+              if (!user) {
+                setIsAuthModalOpen(true);
+              } else {
+                setIsVoiceModalOpen(true);
+              }
+            }}
             onOpenNotifications={() => {
               window.dispatchEvent(new CustomEvent("bv-show-notifications"));
             }}
+          />
+
+          {/* Modal de Login se o leitor não estiver autenticado */}
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            hint="Faça login ou crie sua conta para gravar sua reflexão por voz no Memorial."
           />
 
           {/* Modal de Gravação de Reflexão por Voz */}

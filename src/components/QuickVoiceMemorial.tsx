@@ -13,6 +13,7 @@ import { isWebSpeechFallbackDisabled } from "@/lib/voiceSettings";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import AuthModal from "@/components/AuthModal";
 
 const MAX_RECORDING_SECONDS = 120; // 2 minutos máximo
 const SUCCESS_HOLD_MS = 1800;
@@ -38,6 +39,7 @@ export default function QuickVoiceMemorial({ isOpen, onClose }: QuickVoiceMemori
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [showMobileTooltip, setShowMobileTooltip] = useState(false);
     const [processingStep, setProcessingStep] = useState<string>("Guardando no Memorial...");
+    const [authModalOpen, setAuthModalOpen] = useState(false);
 
     // Refs de controle de captura e reconhecimento
     const audioControllerRef = useRef<AudioCaptureController | null>(null);
@@ -158,6 +160,11 @@ export default function QuickVoiceMemorial({ isOpen, onClose }: QuickVoiceMemori
 
     // ── Iniciar gravação (Captura de Áudio HD sem ruído na tela) ─────────────
     const startRecording = async () => {
+        if (!user) {
+            setAuthModalOpen(true);
+            return;
+        }
+
         setErrorMessage(null);
         setTranscribedText(null);
         setSavedEntry(null);
@@ -500,6 +507,12 @@ export default function QuickVoiceMemorial({ isOpen, onClose }: QuickVoiceMemori
                         }}
                     />
                 )}
+
+                <AuthModal
+                    isOpen={authModalOpen}
+                    onClose={() => setAuthModalOpen(false)}
+                    hint="Faça login ou crie sua conta para gravar sua reflexão por voz no Memorial."
+                />
             </>
         );
     }
@@ -708,6 +721,12 @@ export default function QuickVoiceMemorial({ isOpen, onClose }: QuickVoiceMemori
                     }}
                 />
             )}
+
+            <AuthModal
+                isOpen={authModalOpen}
+                onClose={() => setAuthModalOpen(false)}
+                hint="Faça login ou crie sua conta para gravar sua reflexão por voz no Memorial."
+            />
 
             <div className="my-6 border-t border-border" />
         </section>
