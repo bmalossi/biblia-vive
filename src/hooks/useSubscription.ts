@@ -71,53 +71,69 @@ export function useSubscription() {
             const hasCache = !!localStorage.getItem(cacheKey);
             if (!hasCache) setLoading(true);
 
-            try {
-                // ── Garantir sessão válida antes da query (H2 fix) ───────────
-                // Se o token JWT expirou (usuário voltou após horas), a query
-                // retorna silenciosamente sem dados. Verificamos e renovamos antes.
-                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError || !sessionData.session) {
-                    const { error: refreshError } = await supabase.auth.refreshSession();
-                    if (refreshError) {
-                        console.warn("[useSubscription] Session expired and refresh failed — keeping cache.");
-                        setLoading(false);
-                        return;
+            // Reutiliza requisição em andamento ou busca recente (< 15s) para evitar duplicatas em paralelo
+            const now = Date.now();
+            if (lastSubFetchTime && now - lastSubFetchTime < 15000 && lastFetchedSubData) {
+                setSubscription(lastFetchedSubData);
+                setLoading(false);
+                return;
+            }
+
+            if (inFlightSubPromise) {
+                try {
+                    const result = await inFlightSubPromise;
+                    if (result) setSubscription(result);
+                } finally {
+                    setLoading(false);
+                }
+                return;
+            }
+
+            inFlightSubPromise = (async (): Promise<SubscriptionData | null> => {
+                try {
+                    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                    if (sessionError || !sessionData.session) {
+                        const { error: refreshError } = await supabase.auth.refreshSession();
+                        if (refreshError) {
+                            return null;
+                        }
                     }
-                }
 
-                // Single attempt with a long timeout.
-                // Without lockAcquireTimeout in the Supabase client, queries queue behind
-                // any ongoing token refresh and complete naturally (typically in 5-20s).
-                // Multiple short retries compound failures during the lock window, so one
-                // long attempt is more reliable. The cache keeps the UI correct while waiting.
-                const { data, error } = await Promise.race([
-                    supabase
-                        .from("user_subscriptions")
-                        .select("status, current_period_end, plan_type")
-                        .eq("user_id", user.id)
-                        .maybeSingle(),
-                    new Promise<{ data: any, error: any }>((_, reject) =>
-                        setTimeout(() => reject(new Error("timeout")), 60000)
-                    )
-                ]);
+                    const { data, error } = await Promise.race([
+                        supabase
+                            .from("user_subscriptions")
+                            .select("status, current_period_end, plan_type")
+                            .eq("user_id", user.id)
+                            .maybeSingle(),
+                        new Promise<{ data: any, error: any }>((_, reject) =>
+                            setTimeout(() => reject(new Error("timeout")), 30000)
+                        )
+                    ]);
 
-                if (error) {
-                    console.error("[useSubscription] DB error fetching subscription:", error);
-                    // Keep cache intact on error
-                } else if (!data) {
-                    console.log("[useSubscription] No subscription row found.");
-                    const noneState: SubscriptionData = { status: "none", current_period_end: null, plan_type: "none" };
-                    setSubscription(noneState);
-                    localStorage.setItem(cacheKey, JSON.stringify(noneState));
-                } else {
-                    console.log("[useSubscription] Fetched successfully:", data);
-                    const subData = data as SubscriptionData;
-                    setSubscription(subData);
-                    localStorage.setItem(cacheKey, JSON.stringify(subData));
+                    if (!error && data) {
+                        const subData = data as SubscriptionData;
+                        lastSubFetchTime = Date.now();
+                        lastFetchedSubData = subData;
+                        localStorage.setItem(cacheKey, JSON.stringify(subData));
+                        return subData;
+                    } else if (!data && !error) {
+                        const noneState: SubscriptionData = { status: "none", current_period_end: null, plan_type: "none" };
+                        lastSubFetchTime = Date.now();
+                        lastFetchedSubData = noneState;
+                        localStorage.setItem(cacheKey, JSON.stringify(noneState));
+                        return noneState;
+                    }
+                    return null;
+                } catch {
+                    return null;
+                } finally {
+                    inFlightSubPromise = null;
                 }
-            } catch (err: any) {
-                // Timeout or network error — keep cache intact, don't overwrite PRO state
-                console.warn("[useSubscription] Fetch failed, keeping cached state:", err.message);
+            })();
+
+            try {
+                const res = await inFlightSubPromise;
+                if (res) setSubscription(res);
             } finally {
                 setLoading(false);
             }

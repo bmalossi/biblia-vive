@@ -199,12 +199,21 @@ export async function getOriginalVerseText(bookId: string, chapter: number, vers
  * Isso garante que os dados estejam em cache quando o usuário abrir o painel.
  */
 export function prefetchLexicons(bookId: string): void {
-  if (isNewTestament(bookId)) {
-    loadGreek();
-    // Inicia silenciosamente o fetch do texto original em background
-    if (!originalGreekTextCache) { fetch('/bible/novo_testamento_grego.json').then(r => r.json()).then(d => originalGreekTextCache = d).catch(() => { }); }
-  } else {
-    loadHebrew();
-    if (!originalHebrewTextCache) { fetch('/bible/antigo_testamento_hebraico.json').then(r => r.json()).then(d => originalHebrewTextCache = d).catch(() => { }); }
+  const runPrefetch = () => {
+    if (isNewTestament(bookId)) {
+      loadGreek();
+      if (!originalGreekTextCache) { fetch('/bible/novo_testamento_grego.json').then(r => r.json()).then(d => originalGreekTextCache = d).catch(() => { }); }
+    } else {
+      loadHebrew();
+      if (!originalHebrewTextCache) { fetch('/bible/antigo_testamento_hebraico.json').then(r => r.json()).then(d => originalHebrewTextCache = d).catch(() => { }); }
+    }
+  };
+
+  if (typeof window !== "undefined") {
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(runPrefetch, { timeout: 10000 });
+    } else {
+      setTimeout(runPrefetch, 5000);
+    }
   }
 }

@@ -106,6 +106,13 @@ export default defineConfig(({ mode }) => ({
   build: {
     // public/bible tem 250k+ arquivos — copiamos separadamente após build
     copyPublicDir: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-lucide': ['lucide-react'],
+        },
+      },
+    },
   },
   plugins: [
     apiDevServerPlugin(),

@@ -231,6 +231,8 @@ function ChapterMemorialBlock({ bookId, chapter, userId }: ChapterMemorialBlockP
   );
 }
 
+let cachedBookContexts: Record<string, any> | null = null;
+
 const saveLastRead = (version: string, bookSlug: string, chapter: number, userId?: string | null) => {
   try {
     localStorage.setItem(
@@ -490,21 +492,32 @@ export default function ReadingPage() {
   useEffect(() => {
     if (!selectedBook) return;
     prefetchLexicons(selectedBook.id);
+
+    const applyContext = (data: Record<string, any>) => {
+      const bookData = data[selectedBook.id.toUpperCase()];
+      if (bookData) {
+        setBookContext({
+          name: bookData.name,
+          period: bookData.period_written,
+          author: bookData.author,
+          theme: bookData.theme,
+          summary: bookData.summary,
+        });
+      } else {
+        setBookContext(null);
+      }
+    };
+
+    if (cachedBookContexts) {
+      applyContext(cachedBookContexts);
+      return;
+    }
+
     fetch("/bible/book-contexts.json")
       .then((res) => res.json())
       .then((data: Record<string, any>) => {
-        const bookData = data[selectedBook.id.toUpperCase()];
-        if (bookData) {
-          setBookContext({
-            name: bookData.name,
-            period: bookData.period_written,
-            author: bookData.author,
-            theme: bookData.theme,
-            summary: bookData.summary,
-          });
-        } else {
-          setBookContext(null);
-        }
+        cachedBookContexts = data;
+        applyContext(data);
       })
       .catch(() => setBookContext(null));
   }, [selectedBook?.id]);
@@ -1033,15 +1046,7 @@ export default function ReadingPage() {
     };
   }, [selectedBook, chapterNumber, chapterData, echoStore, user]);
 
-  useEffect(() => {
-    if (!selectedBook) return;
-    const interval = window.setInterval(() => {
-      saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
-    }, 30000);
-
-    return () => window.clearInterval(interval);
-  }, [chapterNumber, selectedBook, selectedVersion, user?.id]);
-
+  // Salva última leitura quando o usuário rola a página ou muda de capítulo (sem loop de intervalo inativo)
   useEffect(() => {
     if (!selectedBook) return;
 
