@@ -30,6 +30,9 @@ import { useNotesHighlights } from "@/hooks/useNotesHighlights";
 import { createNoteStore, type MemorialEntry, type EchoResult } from "@/lib/noteStore";
 import EchoBanner from "@/components/EchoBanner";
 import EchoModal from "@/components/EchoModal";
+import ScriptureThreadBanner from "@/components/ScriptureThreadBanner";
+import ScriptureThreadModal from "@/components/ScriptureThreadModal";
+import { evaluateScriptureThread, type ScriptureThreadResult } from "@/lib/scriptureThread";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Breadcrumb,
@@ -339,6 +342,11 @@ export default function ReadingPage() {
   const echoEntry = echoResult?.entry ?? null;
   const echoContext = echoResult?.context ?? 'direct';
   const [isEchoModalOpen, setIsEchoModalOpen] = useState(false);
+
+  // Estados do Fio da Escritura (TypeSafe AI / JEV)
+  const [scriptureThreadResult, setScriptureThreadResult] = useState<ScriptureThreadResult | null>(null);
+  const [scriptureThreadCandidate, setScriptureThreadCandidate] = useState<MemorialEntry | null>(null);
+  const [isScriptureThreadModalOpen, setIsScriptureThreadModalOpen] = useState(false);
 
   const { t, locale } = useTranslation();
 
@@ -959,6 +967,71 @@ export default function ReadingPage() {
   useEffect(() => {
     refreshEcho();
   }, [refreshEcho]);
+
+  // Efeito assíncrono para avaliar o Fio da Escritura (TypeSafe AI / JEV)
+  useEffect(() => {
+    if (!selectedBook || !chapterData?.verses || chapterData.verses.length === 0) {
+      setScriptureThreadResult(null);
+      setScriptureThreadCandidate(null);
+      return;
+    }
+
+    let active = true;
+
+    const runEvaluation = async () => {
+      try {
+        const allNotes = await echoStore.getAll();
+        if (!active || allNotes.length === 0) {
+          if (active) {
+            setScriptureThreadResult(null);
+            setScriptureThreadCandidate(null);
+          }
+          return;
+        }
+
+        const fullText = chapterData.verses.map((v) => `${v.verse}. ${v.text}`).join(" ");
+
+        let userToken: string | null = null;
+        if (user) {
+          const sessionRes = await supabase.auth.getSession();
+          userToken = sessionRes.data.session?.access_token ?? null;
+        }
+
+        const { result, candidateNote } = await evaluateScriptureThread({
+          chapterText: fullText,
+          chapterRef: `${selectedBook.name} ${chapterNumber}`,
+          bookId: selectedBook.id,
+          chapter: chapterNumber,
+          allNotes,
+          userId: user?.id ?? null,
+          userToken,
+        });
+
+        if (active) {
+          setScriptureThreadResult(result);
+          setScriptureThreadCandidate(candidateNote);
+        }
+      } catch (err) {
+        if (active) {
+          setScriptureThreadResult(null);
+          setScriptureThreadCandidate(null);
+        }
+      }
+    };
+
+    runEvaluation();
+
+    const handleNotesVersionUpdated = () => {
+      runEvaluation();
+    };
+
+    window.addEventListener("bv-notes-version-updated", handleNotesVersionUpdated);
+
+    return () => {
+      active = false;
+      window.removeEventListener("bv-notes-version-updated", handleNotesVersionUpdated);
+    };
+  }, [selectedBook, chapterNumber, chapterData, echoStore, user]);
 
   useEffect(() => {
     if (!selectedBook) return;
@@ -2249,6 +2322,14 @@ export default function ReadingPage() {
                   userId={user?.id ?? null}
                 />
               )}
+
+              {/* Fio da Escritura (TypeSafe AI / JEV) */}
+              <ScriptureThreadBanner
+                result={scriptureThreadResult}
+                candidateNote={scriptureThreadCandidate}
+                chapterRef={selectedBook ? `${selectedBook.name} ${chapterNumber}` : undefined}
+                onOpenModal={() => setIsScriptureThreadModalOpen(true)}
+              />
             </article>
 
             {/* Column 2: Sticky Chapter Grid Card on Desktop */}
@@ -2524,6 +2605,15 @@ export default function ReadingPage() {
             onRefresh={refreshEcho}
           />
         )}
+
+        {/* Fio da Escritura — modal de expansão com Nota Candidata */}
+        <ScriptureThreadModal
+          isOpen={isScriptureThreadModalOpen}
+          onClose={() => setIsScriptureThreadModalOpen(false)}
+          result={scriptureThreadResult}
+          candidateNote={scriptureThreadCandidate}
+          chapterRef={selectedBook ? `${selectedBook.name} ${chapterNumber}` : ""}
+        />
 
         {/* Quick Look Sheet (Sheet de Revelação) */}
         <QuickLookSheet

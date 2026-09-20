@@ -284,6 +284,36 @@ _Evitar_: detalhes expandidos, painel avançado, modo especialista
 Estratégia de disponibilidade offline e gestão de cache em PWA baseada em Workbox Cache-First. Precacheia os 66 livros da versão ACF (Rocha) e o App Shell no download inicial, utiliza CacheFirst e StaleWhileRevalidate com ExpirationPlugin para dados dinâmicos e isola mídias de áudio (Pass-Through) para impedir inchaço de armazenamento.
 _Evitar_: offline genérico, cache total, PWA sem controle
 
+## Fio da Escritura (ScriptureThread)
+
+**Fio da Escritura**:
+Feature de inteligência artificial que detecta, em segundo plano após a leitura de um capítulo, conexões tipológicas e proféticas entre o capítulo lido e os Registros do Memorial do Leitor. Quando detectada com alta confiança pelo modelo JEV, manifesta-se como um Banner de Capítulo no rodapé da página de leitura. É um sistema distinto e independente do Eco do Memorial.
+_Evitar_: Eco da Escritura (colide com "Eco do Memorial"), detector de conexões, busca semântica bíblica
+
+**Eco do Memorial**:
+Sistema existente de reencontro do Leitor com Registros do Memorial antigos, baseado em regras determinísticas (vínculo direto por capítulo, aniversários históricos, seleção periódica). Aparece como banner no topo da página de leitura. Não usa IA. Distinto e independente do Fio da Escritura.
+_Evitar_: Fio do Memorial, Eco da Escritura, Eco JEV
+
+**Categoria do Fio**:
+Classificação tipológica atribuída pelo JEV a um Fio da Escritura detectado. Valores canônicos: `Cumprimento_Profetico`, `Eco_de_Linguagem`, `Contraste_de_Alianca`, `Resposta_de_Oracao`. Exibida como badge dourado no ScriptureThreadModal.
+_Evitar_: tipo de eco, categoria de conexão, label tipológico
+
+**Nota Candidata**:
+Registro do Memorial selecionado por heurística local (afinidade bíblica → data) como a nota mais provável de ter gerado o Fio da Escritura. Exibida no ScriptureThreadModal como sugestão, não como certeza. Relevante apenas na granularidade por capítulo; na granularidade por versículo, a correspondência é precisa.
+_Evitar_: nota identificada, nota correspondente, melhor resultado
+
+**Granularidade do Fio**:
+Modo de avaliação do JEV controlado via `app_config`: `"chapter"` avalia o capítulo inteiro em uma chamada (padrão inicial, mais econômico), `"verse"` avalia cada versículo individualmente (mais preciso, mais custoso). Alternável pelo administrador sem redeploy.
+_Evitar_: modo de análise, precisão do JEV, resolução
+
+**Seleção Híbrida Tripla**:
+Algoritmo de composição do conjunto de notas enviado ao JEV: 15 notas mais recentes + 10 notas favoritas + 5 notas com afinidade bíblica ao capítulo (mesmo livro ou testamento), deduplicadas até o limite configurável (padrão 30). Balanceia relevância atual com marcos permanentes da caminhada do Leitor.
+_Evitar_: seleção de notas, pool de contexto, filtragem de notas
+
+**Cache Reativo do Fio**:
+Estratégia de cache do resultado JEV em `localStorage` sob a chave `st:{bookId}:{chapter}:{userId}`. Validade indefinida enquanto `bv_notes_version` não mudar. Invalidado automaticamente sempre que o Leitor cria, edita ou apaga um Registro do Memorial no mesmo browser. Zero chamadas repetidas para Leitores em modo apenas-leitura.
+_Evitar_: cache TTL, cache com expiração, cache de 24 horas
+
 ## Flagged ambiguities
 
 - "streak" aparece no código em `useReadingPlan.ts` como nome da variável para `completedDays.length`. O conceito de domínio é **Dias Concluídos**; "streak" é apenas o nome técnico da variável.

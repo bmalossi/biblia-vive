@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { supabase } from "./supabase";
+import { bumpNotesVersion } from "./scriptureThread";
 
 export type MemorialCategory = 'reflection' | 'prayer' | 'testimony' | 'fasting';
 
@@ -186,6 +187,7 @@ export class SupabaseNoteStore implements NoteStore {
                 .eq("id", entry.id)
                 .eq("user_id", this.userId);
             if (error) throw new Error(error.message);
+            bumpNotesVersion();
             return;
         }
 
@@ -206,6 +208,7 @@ export class SupabaseNoteStore implements NoteStore {
                     .update(payload)
                     .eq("id", existing.id);
                 if (error) throw new Error(error.message);
+                bumpNotesVersion();
                 return;
             }
         }
@@ -220,6 +223,7 @@ export class SupabaseNoteStore implements NoteStore {
         });
 
         if (error) throw new Error(error.message);
+        bumpNotesVersion();
     }
 
     async delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void> {
@@ -234,6 +238,7 @@ export class SupabaseNoteStore implements NoteStore {
                 .eq("id", idOrBookId)
                 .eq("user_id", this.userId);
         }
+        bumpNotesVersion();
     }
 
     async toggleFavorite(id: string): Promise<boolean> {
@@ -253,6 +258,7 @@ export class SupabaseNoteStore implements NoteStore {
             .eq("user_id", this.userId);
 
         if (error) throw new Error(error.message);
+        bumpNotesVersion();
         return newFav;
     }
 
@@ -268,6 +274,7 @@ export class SupabaseNoteStore implements NoteStore {
             .eq("user_id", this.userId);
 
         if (error) throw new Error(error.message);
+        bumpNotesVersion();
     }
 
     async getMatchingEcho(bookId?: string, chapter?: number): Promise<EchoResult | null> {
@@ -468,6 +475,7 @@ function readLocal(): MemorialEntry[] {
 
 function writeLocal(notes: MemorialEntry[]) {
     localStorage.setItem(NT_KEY, JSON.stringify(notes));
+    bumpNotesVersion();
 }
 
 export class LocalNoteStore implements NoteStore {

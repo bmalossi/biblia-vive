@@ -32,6 +32,9 @@
         },
         "api/seo.ts": {
             "maxDuration": 15
+        },
+        "api/scripture-thread.ts": {
+            "maxDuration": 15
         }
     },
     "headers": [
