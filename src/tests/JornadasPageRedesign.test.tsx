@@ -74,15 +74,15 @@ describe("JornadasPage Redesign", () => {
     expect(lerCapituloLink).toHaveAttribute("href", "/nvi/romanos/15#v4");
   });
 
-  it("renderiza as 7 séries canônicas na seção Sua Caminhada", () => {
-    renderWithRouter(<JornadasPage />);
+  it("renderiza as 8 séries canônicas na seção Sua Caminhada sem ícones no título", () => {
+    const { container } = renderWithRouter(<JornadasPage />);
 
     expect(screen.getByText("SUA CAMINHADA")).toBeInTheDocument();
     expect(
       screen.getByText("Cada série é um passo na mesma direção: mais perto da Palavra.")
     ).toBeInTheDocument();
 
-    // 7 séries canônicas
+    // 8 séries canônicas
     expect(screen.getByText("Permanecer")).toBeInTheDocument();
     expect(screen.getByText("Cultivo")).toBeInTheDocument();
     expect(screen.getByText("Discernimento")).toBeInTheDocument();
@@ -90,6 +90,7 @@ describe("JornadasPage Redesign", () => {
     expect(screen.getByText("Formação")).toBeInTheDocument();
     expect(screen.getByText("Descanso")).toBeInTheDocument();
     expect(screen.getByText("Habitação")).toBeInTheDocument();
+    expect(screen.getByText("Transbordamento")).toBeInTheDocument();
 
     // Frases de resumo de cada série
     expect(screen.getByText("Voltar à Palavra. Criar espaço. Permanecer.")).toBeInTheDocument();
@@ -99,14 +100,15 @@ describe("JornadasPage Redesign", () => {
     expect(screen.getByText("O que foi percebido e acolhido começa a moldar o caráter.")).toBeInTheDocument();
     expect(screen.getByText("A Palavra sustenta quando as forças se esgotam.")).toBeInTheDocument();
     expect(screen.getByText("A Palavra acompanha a vida em todos os lugares.")).toBeInTheDocument();
+    expect(screen.getByText("O que foi acolhido transborda na vida e alcança outros.")).toBeInTheDocument();
   });
 
-  it("garante que nenhum card das séries possui a barra lateral esquerda (border-l)", () => {
+  it("garante que nenhum card das séries possui a barra lateral esquerda (border-l) e renderiza 8 séries", () => {
     const { container } = renderWithRouter(<JornadasPage />);
 
     // Seleciona todos os cards com aria-label de série
     const seriesCards = container.querySelectorAll('[aria-label^="Ver capítulos da série"]');
-    expect(seriesCards.length).toBe(7);
+    expect(seriesCards.length).toBe(8);
 
     seriesCards.forEach((card) => {
       const classNames = card.className;

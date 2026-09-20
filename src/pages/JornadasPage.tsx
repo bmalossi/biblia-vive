@@ -18,6 +18,7 @@ import {
   Home,
   BookOpen,
   ArrowRight,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -551,6 +552,77 @@ const CANONICAL_SERIES: CanonicalSeriesDefinition[] = [
       },
     ],
   },
+  {
+    id: "transbordamento",
+    name: "Transbordamento",
+    order: 8,
+    icon: Sparkles,
+    summary: "O que foi acolhido transborda na vida e alcança outros.",
+    fallbackChapters: [
+      {
+        chapter_number: 1,
+        title: "A Fonte Externa",
+        book_name: "João",
+        book_slug: "joa",
+        chapter: 15,
+        verse_start: 5,
+        intro_text:
+          "Muitas vezes, a gente transforma a vida cristã em um teste pesado de esforço pessoal. Acordamos prometendo que seremos mais calmos, mais pacientes e mais generosos, mas no primeiro estresse do dia, a nossa carne fala mais alto e a gente se frustra. Achamos que o problema foi a falta de disciplina.\n\nMas a imagem que Jesus usa para a nossa vida com Ele é muito mais simples e profunda. Ele diz que é a videira e nós somos apenas os ramos.\n\nNenhum fruto nasce porque o ramo se esforçou ou fez pressão. O fruto surge naturalmente quando o ramo está bem preso ao tronco, recebendo vida e alimento continuamente. O transbordamento de paciência, amor e mansidão na sua rotina não é uma meta de produtividade humana, é o resultado inevitável de quem habita na Palavra dia após dia. Desconectado da fonte, você não pode fazer nada. Permanecendo Nele, o fruto acontece.",
+      },
+      {
+        chapter_number: 2,
+        title: "A Resposta Amansa",
+        book_name: "Provérbios",
+        book_slug: "pv",
+        chapter: 15,
+        verse_start: 1,
+        intro_text:
+          "A nossa natureza quer sempre ter a última palavra. Quando alguém nos critica, nos desrespeita ou nos cobra com agressividade, o nosso primeiro impulso é levantar o tom de voz, atacar de volta e provar que estamos certos. Achamos que engolir a seco é sinal de derrota.\n\nMas a Sabedoria das Escrituras ensina um caminho totalmente diferente para quem vive na Palavra. Em Provérbios, a Bíblia ensina que a resposta calma tem o poder de desviar a fúria, enquanto a palavra dura só serve para colocar mais lenha na fogueira da ira.\n\nQuando a Palavra de Deus habita o seu coração, ela transforma a sua forma de reagir no dia comum. Você deixa de ser refém das provocações dos outros. A resposta calma não significa aceitar o erro ou ser covarde, significa ter a maturidade e o domínio próprio de quem não se deixa contaminar pelo barulho ao redor.\n\nO Fruto do Espírito na sua rotina se revela na paz que você devolve no lugar da raiva.",
+      },
+      {
+        chapter_number: 3,
+        title: "A Mão Aberta",
+        book_name: "Provérbios",
+        book_slug: "pv",
+        chapter: 11,
+        verse_start: 25,
+        intro_text:
+          "Nós vivemos em uma sociedade que ensina a acumular. Temos medo de ficar sem recursos, sem tempo ou sem energia, e por isso o nosso primeiro impulso é fechar as mãos, reter a ajuda e olhar apenas para as nossas próprias necessidades. Achamos que a generosidade é um luxo exclusivo de quem tem muito sobrando.\n\nMas a Sabedoria de Provérbios inverte totalmente a lógica do mundo. A Bíblia afirma que a pessoa generosa prosperará, e que aquele que dá de beber aos outros também será dessedentado.\n\nO transbordamento da Palavra no seu dia comum se revela quando você perde o medo de servir e repartir. Generosidade prática não é sobre grandes doações financeiras, é sobre estar atento ao necessitado na sua mesa de trabalho, na sua casa e no seu caminho. Quando você entende que é Deus quem sustenta o seu amanhã, você solta o peso da avareza e descobre a liberdade de ter as mãos abertas.",
+      },
+      {
+        chapter_number: 4,
+        title: "O Perdão Inevitável",
+        book_name: "Colossenses",
+        book_slug: "cl",
+        chapter: 3,
+        verse_start: 13,
+        intro_text:
+          "Guardar mágoas é uma das formas mais tristes de se viver. Nós remoemos ofensas passadas, alimentamos conversas imaginárias na mente e mantemos um registro detalhado dos erros que cometeram contra nós. Com o tempo, essa amargura contamina a nossa rotina, o nosso sono e a nossa comunhão com Deus.\n\nMas o apóstolo Paulo nos lembra da razão definitiva pela qual nós devemos perdoar: suportem-se uns aos outros e perdoem as queixas que tiverem, assim como o Senhor perdoou vocês.\n\nO perdão bíblico não é um sentimento fraco ou uma concordância com o erro do outro, é um ato de obediência e libertação. Quando a Palavra de Deus habita o seu coração, ela te lembra de onde você foi tirado e do tamanho do perdão que você recebeu sem merecer. Quem compreendeu a imensidão da misericórdia de Deus perde a capacidade de reter o perdão ao próximo.\n\nPerdoar é transbordar a mesma graça que te colocou de pé.",
+      },
+      {
+        chapter_number: 5,
+        title: "Serviço Silencioso",
+        book_name: "Mateus",
+        book_slug: "mt",
+        chapter: 6,
+        verse_start: 3,
+        verse_end: 4,
+        intro_text:
+          "Muitas vezes, a gente faz coisas boas esperando que as pessoas vejam e nos elogiem. A gente quer ser reconhecido no trabalho, em casa ou na igreja, e fica chateado quando ninguém nota o nosso esforço.\n\nMas Jesus ensina um jeito diferente de viver. Em Mateus, Ele diz que quando você for ajudar alguém, faça isso em segredo, de forma tão discreta que nem a sua outra mão saiba o que você fez.\n\nQuem tem a vida transformada pela Bíblia não precisa de aplausos para fazer o bem. Ajudar os outros no dia a dia é um ato simples de amor a Deus. Você não precisa provar nada para ninguém. O seu Pai do céu vê o que é feito em segredo e é Ele quem cuida da sua vida.",
+      },
+      {
+        chapter_number: 6,
+        title: "A Herança Viva",
+        book_name: "Salmos",
+        book_slug: "sl",
+        chapter: 112,
+        verse_start: 1,
+        verse_end: 2,
+        intro_text:
+          "É muito comum sentir medo sobre o amanhã da nossa família. A gente se mata de trabalhar tentando garantir dinheiro, casa e coisas para os filhos, achando que isso é a única coisa que vai dar segurança para eles no futuro.\n\nMas o Salmo 112 mostra algo muito maior. A Bíblia diz que a pessoa que ama a Deus e tem prazer nos Seus ensinamentos deixa uma família forte e abençoada.\n\nO maior bem que você pode deixar para quem você ama não é o dinheiro guardado. É o exemplo diário de alguém que confia na Palavra de Deus, que resolve as coisas com paciência e que vive com honestidade na mesa do café e no trabalho.\n\nA sua caminhada com Deus hoje prepara um chão firme para os seus filhos amanhã.",
+      },
+    ],
+  },
 ];
 
 export default function JornadasPage() {
@@ -635,7 +707,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
 
   // Mapeamento dinâmico entre o catálogo canônico e os dados do banco Supabase
   const renderedSeries = useMemo(() => {
-    return CANONICAL_SERIES.map((canonical) => {
+    const canonicalMapped = CANONICAL_SERIES.map((canonical) => {
       // Procura correspondente no Supabase por nome de série
       const dbGroup = seriesGroups.find(
         (g) => g.seriesName.trim().toLowerCase() === canonical.name.trim().toLowerCase()
@@ -661,6 +733,35 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
         chapters,
       };
     });
+
+    // Inclui dinamicamente qualquer série adicional do banco que não conste na lista estática
+    const extraDbSeries: CanonicalSeriesDefinition[] = seriesGroups
+      .filter(
+        (g) =>
+          !CANONICAL_SERIES.some(
+            (c) => c.name.trim().toLowerCase() === g.seriesName.trim().toLowerCase()
+          )
+      )
+      .map((g) => ({
+        id: g.seriesName.toLowerCase().replace(/\s+/g, "-"),
+        name: g.seriesName,
+        order: g.seriesOrder,
+        icon: Sparkles,
+        summary: "Capítulos da caminhada com a Palavra.",
+        fallbackChapters: [],
+        chapters: g.chapters.map((ch) => ({
+          chapter_number: ch.chapter_number,
+          title: ch.title,
+          book_name: ch.book_name,
+          book_slug: ch.book_slug,
+          chapter: ch.chapter,
+          verse_start: ch.verse_start ?? undefined,
+          verse_end: ch.verse_end ?? undefined,
+          intro_text: ch.intro_text,
+        })),
+      }));
+
+    return [...canonicalMapped, ...extraDbSeries].sort((a, b) => a.order - b.order);
   }, [seriesGroups]);
 
   // Deep link (?capitulo=ID)
@@ -823,7 +924,6 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
           {/* Grade Responsiva em 4 Colunas (Top: 4 cards, Bottom: 3 cards) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {renderedSeries.map((series) => {
-              const IconComponent = series.icon;
               return (
                 <div
                   key={series.id}
@@ -852,12 +952,8 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
 
                   {/* Conteúdo do Card */}
                   <div className="relative z-10">
-                    {/* Linha Superior: Ícone de Domínio Dourado + Nome da Série */}
-                    <div className="flex items-center gap-2.5 mb-3">
-                      <IconComponent
-                        className="w-5 h-5 text-[#e5b869] shrink-0 stroke-[1.5] group-hover:scale-110 transition-transform duration-200"
-                        aria-hidden="true"
-                      />
+                    {/* Linha Superior: Nome da Série */}
+                    <div className="mb-3">
                       <h2 className="font-serif text-base sm:text-lg text-[#f0e8de] font-normal tracking-wide group-hover:text-[#e5b869] transition-colors">
                         {series.name}
                       </h2>

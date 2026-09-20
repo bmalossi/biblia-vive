@@ -27,13 +27,10 @@ export function useEditorialJornadas(): UseEditorialJornadasReturn {
                 setLoading(true);
                 setError(null);
 
-                const todayStr = new Date().toISOString().split('T')[0];
-
                 const { data, error: fetchError } = await supabase
                     .from('editorial_chapters')
                     .select('*')
                     .eq('status', 'publicado')
-                    .lte('publish_date', todayStr)
                     .order('series_order', { ascending: true })
                     .order('chapter_number', { ascending: true });
 

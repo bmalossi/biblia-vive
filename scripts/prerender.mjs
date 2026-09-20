@@ -292,9 +292,8 @@ async function fetchPublishedAuthors() {
 async function fetchPublishedJornadas() {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return [];
   try {
-    const todayStr = new Date().toISOString().split('T')[0];
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/editorial_chapters?status=eq.publicado&publish_date=lte.${todayStr}&order=series_order.asc,chapter_number.asc`,
+      `${SUPABASE_URL}/rest/v1/editorial_chapters?status=eq.publicado&order=series_order.asc,chapter_number.asc`,
       {
         headers: {
           apikey: SUPABASE_SERVICE_KEY,
