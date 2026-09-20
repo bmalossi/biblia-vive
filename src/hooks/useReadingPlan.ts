@@ -91,10 +91,17 @@ export function useReadingPlan(userId: string | null = null, activePlanId: strin
             setProgresses(merged);
             writeLocal(userId, merged);
 
-            // Re-sync any local-only progress up to cloud (e.g. anonymous → logged-in)
+            // Re-sync ONLY diverged or local-only progress up to cloud
             if (userId) {
-                for (const plan of Object.values(merged)) {
-                    savePlanProgressToCloud(userId, plan).catch(console.warn);
+                for (const [planId, plan] of Object.entries(merged)) {
+                    const cloudPlan = cloudObj[planId];
+                    const hasLocalDiff = !cloudPlan ||
+                        (plan.completedDays.length > (cloudPlan.completedDays?.length ?? 0)) ||
+                        ((plan.readRefs?.length ?? 0) > (cloudPlan.readRefs?.length ?? 0));
+
+                    if (hasLocalDiff) {
+                        savePlanProgressToCloud(userId, plan).catch(console.warn);
+                    }
                 }
             }
 

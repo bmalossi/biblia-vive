@@ -13,17 +13,9 @@
 import { getVersion } from "@/lib/themes";
 import { GITHUB_VERSION_SLUGS, GITHUB_LANG_PATHS } from "@/lib/bookResolver";
 
-const ACF_LOCAL_IDS: readonly string[] = [
-  "1ch", "1co", "1jo", "1kgs", "1pe", "1sm", "1tm", "1ts",
-  "2ch", "2co", "2jo", "2kgs", "2pe", "2sm", "2tm", "2ts",
-  "3jo", "act", "am",  "cl",   "dn",  "dt",  "ec",  "eph",
-  "et",  "ex",  "ez",  "ezr",  "gl",  "gn",  "hb",  "hg",
-  "hk",  "ho",  "is",  "jd",   "jl",  "jm",  "jn",  "jo",
-  "job", "jr",  "js",  "jud",  "lk",  "lm",  "lv",  "mi",
-  "mk",  "ml",  "mt",  "na",   "ne",  "nm",  "ob",  "ph",
-  "phm", "prv", "ps",  "re",   "rm",  "rt",  "so",  "tt",
-  "zc",  "zp",
-];
+// Livros fundamentais para leitura inicial offline (5 livros em vez de 66).
+// Evita disparar 66 a 132 requisições HTTP simultâneas em background a cada visita.
+const STARTER_LOCAL_IDS: readonly string[] = ["gn", "ps", "prv", "mt", "jo"];
 
 const GITHUB_BASE = "https://raw.githubusercontent.com/MaatheusGois/bible/main";
 const BIBLE_CACHE_NAME = "bv-bible-runtime-v1";
@@ -48,42 +40,51 @@ async function isCached(url: string): Promise<boolean> {
 }
 
 /**
- * Pré-cacheia os 66 livros da versão bíblica selecionada (ACF, NVI, ARC...) em background.
+ * Pré-cacheia os livros fundamentais em background de forma controlada.
  */
 export function warmupAcfBibleCache(): void {
+  const currentVersion = getVersion() || "acf";
+  const flagKey = `bv_warmup_done_v2_${currentVersion}`;
+
+  // Se já foi feito o warmup nesta máquina para esta versão, não refazer
+  try {
+    if (localStorage.getItem(flagKey) === "true") {
+      return;
+    }
+  } catch {
+    // localStorage inacessível
+  }
+
   if (!navigator.serviceWorker?.controller) {
     navigator.serviceWorker?.ready.then(() => {
-      scheduleIdleTask(() => void runWarmup());
+      scheduleIdleTask(() => void runWarmup(flagKey));
     });
     return;
   }
 
-  scheduleIdleTask(() => void runWarmup());
+  scheduleIdleTask(() => void runWarmup(flagKey));
 }
 
-async function runWarmup(): Promise<void> {
+async function runWarmup(flagKey: string): Promise<void> {
   const currentVersion = getVersion() || "acf";
 
-  // ACF é sempre a "Rocha" — base do fallback offline.
-  // Deve ser baixada independentemente da versão atual do usuário.
-  await warmupLocalVersion("acf", "pt-br");
+  // Aquece apenas os livros essenciais da versão atual do leitor
+  const localVersions = ["acf", "arc", "nvi", "aa", "kja"];
+  if (localVersions.includes(currentVersion)) {
+    await warmupLocalVersion(currentVersion, "pt-br");
+  }
 
-  // Se o usuário está usando uma versão diferente da ACF, baixa ela também.
-  if (currentVersion !== "acf") {
-    // Versões locais (existem em public/bible/pt-br/)
-    const localVersions = ["arc", "nvi", "aa", "kja"];
-    if (localVersions.includes(currentVersion)) {
-      await warmupLocalVersion(currentVersion, "pt-br");
-    } else {
-      await warmupGithubVersion(currentVersion);
-    }
+  try {
+    localStorage.setItem(flagKey, "true");
+  } catch {
+    // ignore
   }
 }
 
 async function warmupLocalVersion(version: string, langPath: string): Promise<void> {
   const uncachedUrls: string[] = [];
 
-  for (const localId of ACF_LOCAL_IDS) {
+  for (const localId of STARTER_LOCAL_IDS) {
     const url = `/bible/${langPath}/${version}/${localId}/${localId}.json`;
     if (!(await isCached(url))) {
       uncachedUrls.push(url);
@@ -92,7 +93,7 @@ async function warmupLocalVersion(version: string, langPath: string): Promise<vo
 
   if (uncachedUrls.length === 0) return;
 
-  console.info(`[BibleWarmup] Cacheando ${uncachedUrls.length} livros de ${version.toUpperCase()} (Local)...`);
+  console.info(`[BibleWarmup] Cacheando ${uncachedUrls.length} livros iniciais de ${version.toUpperCase()} (Local)...`);
   await fetchInBatches(uncachedUrls);
 }
 

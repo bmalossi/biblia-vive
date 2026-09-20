@@ -1763,8 +1763,12 @@ async function prerender() {
   const urlMatches = sitemapXml.match(/<loc>(.*?)<\/loc>/g) || [];
   const allUrls = urlMatches.map(m => m.replace(/<\/?loc>/g, ''));
 
-  // Submit to IndexNow
-  await submitIndexNow(allUrls);
+  // Submit to IndexNow only when explicitly requested (avoids crawling 10,670 URLs on every deploy)
+  if (process.env.SUBMIT_INDEXNOW === 'true') {
+    await submitIndexNow(allUrls);
+  } else {
+    console.log(`[indexnow] Skipping mass broadcast of ${allUrls.length} URLs (set SUBMIT_INDEXNOW=true to trigger).`);
+  }
 
   // ── Summary ──
   console.log('\n════════════════════════════════════════════════');

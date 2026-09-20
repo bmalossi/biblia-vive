@@ -118,10 +118,10 @@ export default defineConfig(({ mode }) => ({
       injectRegister: "script",   // injeta /registerSW.js explicitamente no HTML (sem duplicar registro manual)
       manifest: false, // Utiliza public/manifest.json existente
       injectManifest: {
-        // globDirectory padrão = dist/ (gerado pelo vite build)
-        // Precacheia apenas o App Shell: assets/*.js e assets/*.css (têm hash imutável)
-        // index.html e as páginas prerrenderizadas ficam fora — são servidas pelo Vercel CDN
+        // Precacheia o App Shell: index.html, assets/*.js e assets/*.css
+        // As 9.512 páginas HTML de capítulos não entram (ficam fora dos globPatterns)
         globPatterns: [
+          "index.html",
           "assets/**/*.{js,css}",
           "*.{ico,png,svg,webp}",
         ],

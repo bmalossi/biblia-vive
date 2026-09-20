@@ -511,7 +511,7 @@ export default function ReadingPage() {
 
   // Load red letter verses map
   useEffect(() => {
-    fetch(`/red_letters_verses.json?v=${new Date().getTime()}`)
+    fetch("/red_letters_verses.json")
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load red letters: ${res.status}`);
         return res.json();
