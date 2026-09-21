@@ -172,9 +172,20 @@ export function useChapterViews() {
       if (key in previousRef.current) {
         return previousRef.current[key];
       }
-      // Fallback: busca remoto
+      // Lê do localStorage primeiro (sem requisição de rede)
+      const local = readLocal(bookId, chapter);
+      if (local) {
+        previousRef.current[key] = local;
+        return local;
+      }
+      // Fallback: busca remoto apenas se não tiver cache local e usuário logado
       if (user?.id) {
-        return fetchRemoteSingle(user.id, bookId, chapter);
+        const remote = await fetchRemoteSingle(user.id, bookId, chapter);
+        if (remote) {
+          writeLocal(bookId, chapter, remote);
+        }
+        previousRef.current[key] = remote;
+        return remote;
       }
       return null;
     },

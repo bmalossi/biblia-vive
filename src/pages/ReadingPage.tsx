@@ -233,7 +233,7 @@ function ChapterMemorialBlock({ bookId, chapter, userId }: ChapterMemorialBlockP
 
 let cachedBookContexts: Record<string, any> | null = null;
 
-const saveLastRead = (version: string, bookSlug: string, chapter: number, userId?: string | null) => {
+const saveLastReadLocal = (version: string, bookSlug: string, chapter: number) => {
   try {
     localStorage.setItem(
       LAST_READ_KEY,
@@ -244,21 +244,24 @@ const saveLastRead = (version: string, bookSlug: string, chapter: number, userId
         timestamp: Date.now(),
       }),
     );
+  } catch {
+    // ignore
+  }
+};
 
-    if (userId) {
-      supabase
-        .from("profiles")
-        .update({
-          last_read_book_id: bookSlug,
-          last_read_chapter: chapter,
-          last_read_at: new Date().toISOString(),
-        })
-        .eq("id", userId)
-        .then(({ error }) => {
-          if (error) {
-            console.warn("[saveLastRead] Failed to sync reading context:", error.message);
-          }
-        });
+const syncLastReadRemote = async (bookSlug: string, chapter: number, userId: string) => {
+  try {
+    const { supabase } = await import("@/lib/supabase");
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        last_read_book_id: bookSlug,
+        last_read_chapter: chapter,
+        last_read_at: new Date().toISOString(),
+      })
+      .eq("id", userId);
+    if (error) {
+      console.warn("[syncLastReadRemote] Failed to sync reading context:", error.message);
     }
   } catch {
     // ignore
@@ -911,8 +914,8 @@ export default function ReadingPage() {
 
   useEffect(() => {
     if (!selectedBook) return;
-    saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
-  }, [chapterNumber, selectedBook, selectedVersion, user?.id]);
+    saveLastReadLocal(selectedVersion, selectedBook.slug, chapterNumber);
+  }, [chapterNumber, selectedBook, selectedVersion]);
 
   // Busca data anterior imediatamente (antes de registrar a visita atual)
   useEffect(() => {
@@ -938,6 +941,8 @@ export default function ReadingPage() {
       if (recorded) return;
       recorded = true;
       chapterViews.record(selectedBook.id, chapterNumber);
+      syncLastReadRemote(selectedBook.slug, chapterNumber, user.id);
+      setPreviousViewedAt((prev) => prev || new Date());
     };
 
     // Critério 1: 60 segundos contínuos
@@ -955,7 +960,7 @@ export default function ReadingPage() {
       window.clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [chapterNumber, selectedBook?.id, user?.id]);
+  }, [chapterNumber, selectedBook?.id, selectedBook?.slug, user?.id]);
 
   // Store estável para o Eco do Memorial (evita recriar a cada render)
   const echoStore = useMemo(() => createNoteStore(user?.id ?? null), [user?.id]);
@@ -1054,7 +1059,7 @@ export default function ReadingPage() {
     const onScroll = () => {
       if (timeoutId) return;
       timeoutId = window.setTimeout(() => {
-        saveLastRead(selectedVersion, selectedBook.slug, chapterNumber, user?.id);
+        saveLastReadLocal(selectedVersion, selectedBook.slug, chapterNumber);
         timeoutId = null;
       }, 400);
     };
@@ -2028,12 +2033,14 @@ export default function ReadingPage() {
                 )}>
                   {selectedBook?.name} — {t("home.chapter")} {chapterNumber}
                 </h1>
-                <p className={cn(
-                  "mt-2 font-sans text-xs transition-colors duration-300",
-                  isDark ? "text-[#a89f91]" : isSepia ? "text-[#7d6c5d]" : "text-neutral-500"
-                )}>
-                  Última visualização: {formatViewedAt(previousViewedAt || new Date())}
-                </p>
+                {user && previousViewedAt && (
+                  <p className={cn(
+                    "mt-2 font-sans text-xs transition-colors duration-300",
+                    isDark ? "text-[#a89f91]" : isSepia ? "text-[#7d6c5d]" : "text-neutral-500"
+                  )}>
+                    Última visualização: {formatViewedAt(previousViewedAt)}
+                  </p>
+                )}
                 <div className={cn(
                   "w-full h-px mt-5 mb-6 transition-colors duration-300",
                   isDark ? "bg-[#382f23]/60" : isSepia ? "bg-[#d8c8b0]" : "bg-neutral-200"
