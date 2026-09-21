@@ -2048,6 +2048,13 @@ export default function ReadingPage() {
                   : (COLUMN_WIDTH_MAP[preferences.columnWidth] || "var(--column-width, 860px)"),
               }}
             >
+              {/* Fio da Escritura (TypeSafe AI / JEV) — Posicionado acima do título do capítulo */}
+              <ScriptureThreadBanner
+                result={scriptureThreadResult}
+                candidateNote={scriptureThreadCandidate}
+                chapterRef={selectedBook ? `${selectedBook.name} ${chapterNumber}` : undefined}
+                onOpenModal={() => setIsScriptureThreadModalOpen(true)}
+              />
 
               <div className="mb-6">
                 <h1 className={cn(
@@ -2357,14 +2364,6 @@ export default function ReadingPage() {
                   userId={user?.id ?? null}
                 />
               )}
-
-              {/* Fio da Escritura (TypeSafe AI / JEV) — Rodapé da Leitura */}
-              <ScriptureThreadBanner
-                result={scriptureThreadResult}
-                candidateNote={scriptureThreadCandidate}
-                chapterRef={selectedBook ? `${selectedBook.name} ${chapterNumber}` : undefined}
-                onOpenModal={() => setIsScriptureThreadModalOpen(true)}
-              />
             </article>
 
             {/* Column 2: Sticky Chapter Grid Card on Desktop */}
