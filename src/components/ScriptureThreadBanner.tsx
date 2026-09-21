@@ -1,12 +1,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // ScriptureThreadBanner.tsx — Bíblia Vive
 //
-// Banner discreto e nobre exibido no rodapé da leitura quando o modelo JEV
-// detecta uma conexão tipológica ou profética de alta confiança com o acervo
-// espiritual do Leitor.
+// Banner moderno e nobre exibido acima do título do capítulo na página de
+// leitura bíblica quando o modelo JEV detecta uma conexão tipológica ou
+// profética com o Memorial do leitor.
+// Design alinhado ao banner da página inicial (CapituloDeHojeSection):
+//   - Cores escuras e profundas (#1c1814 / #151311 / #100f0d)
+//   - Arcos concêntricos dourados de background à direita
+//   - Tipografia sóbria sem ícones decorativos
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Sparkles, ArrowRight, Network } from "lucide-react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import type { ScriptureThreadResult, ScriptureThreadCategory } from "@/lib/scriptureThread";
 import type { MemorialEntry } from "@/lib/noteStore";
@@ -55,64 +59,85 @@ export default function ScriptureThreadBanner({
   return (
     <aside
       aria-label="Fio da Escritura detectado"
+      onClick={onOpenModal}
       className={cn(
-        "relative overflow-hidden mt-8 mb-6 rounded-2xl bg-gradient-to-r from-app-surface via-app-surface to-gold/5 border border-gold/40 hover:border-gold/60 p-4 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)] transition-all duration-500 animate-in fade-in zoom-in-95 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group",
+        "group relative overflow-hidden rounded-xl sm:rounded-2xl border border-[#382f23]/80 bg-gradient-to-br from-[#1c1814] via-[#151311] to-[#100f0d] p-5 sm:p-6 md:p-7 shadow-xl hover:border-gold/50 hover:shadow-2xl hover:shadow-gold/5 transition-all duration-300 mb-6 cursor-pointer select-none",
         className
       )}
     >
-      {/* Brilho dourado pulsante e sutil de fundo */}
-      <div className="absolute -top-12 -left-12 w-28 h-28 bg-gold/10 rounded-full blur-2xl pointer-events-none group-hover:bg-gold/15 transition-all duration-700" />
-      <div className="absolute -bottom-10 -right-10 w-28 h-28 bg-gold/5 rounded-full blur-2xl pointer-events-none" />
+      {/* Detalhes modernos: Arcos Concêntricos Dourados no Lado Direito */}
+      <div className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 h-[150%] w-1/2 max-w-[340px] select-none overflow-hidden flex items-center justify-end">
+        <svg
+          className="h-full w-full opacity-35 transition-opacity duration-300 group-hover:opacity-50"
+          viewBox="0 0 360 280"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="scriptureThreadGoldRingGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#d4af37" stopOpacity="0.75" />
+              <stop offset="50%" stopColor="#bfa152" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#695627" stopOpacity="0.05" />
+            </linearGradient>
+          </defs>
+          <circle cx="340" cy="140" r="90" stroke="url(#scriptureThreadGoldRingGlow)" strokeWidth="1.2" />
+          <circle cx="340" cy="140" r="140" stroke="url(#scriptureThreadGoldRingGlow)" strokeWidth="1.2" />
+          <circle cx="340" cy="140" r="190" stroke="url(#scriptureThreadGoldRingGlow)" strokeWidth="1.2" />
+          <circle cx="340" cy="140" r="240" stroke="url(#scriptureThreadGoldRingGlow)" strokeWidth="1" strokeOpacity="0.5" />
+        </svg>
+      </div>
 
-      <div className="relative flex items-start gap-3">
-        {/* Caixa de Ícone Temática Dourada */}
-        <div className="mt-0.5 flex-shrink-0 text-gold p-2 rounded-xl bg-gold/10 border border-gold/20 group-hover:border-gold/40 transition-colors">
-          <Network className="h-4 w-4 text-gold" />
-        </div>
-
-        {/* Informações e Detalhes da Conexão */}
-        <div className="space-y-0.5">
-          <div className="flex flex-wrap items-center gap-1.5 mb-1">
-            <span className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-widest font-sans font-semibold text-gold border border-gold/30 bg-gold/5 px-2 py-0.5 rounded-full">
-              <Sparkles className="h-2.5 w-2.5" />
-              Fio da Escritura
-            </span>
-            <span className="text-[0.65rem] font-sans font-medium text-gold/90 uppercase tracking-wider">
-              {categoryMeta.label}
+      {/* Conteúdo Principal do Banner */}
+      <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        {/* Coluna Esquerda: Informações da Conexão */}
+        <div className="max-w-xl">
+          {/* Overline com categoria e selo */}
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <p className="font-mono text-[0.62rem] sm:text-[0.68rem] font-semibold tracking-[0.2em] uppercase text-gold/80">
+              <span>Fio da Escritura</span> &bull; <span>{categoryMeta.label}</span>
+            </p>
+            <span className="hidden sm:inline-flex items-center text-[0.65rem] text-gold/60 bg-gold/5 px-2 py-0.5 rounded-full border border-gold/20 group-hover:border-gold/40 group-hover:text-gold transition-colors">
+              Toque para ver a conexão
             </span>
           </div>
 
-          <p className="text-xs font-serif font-medium text-app-text">
-            Seu Memorial guarda uma conexão profunda com este capítulo
-            {chapterRef ? ` (${chapterRef})` : ""}.
+          {/* Título Principal em Tipografia Clássica */}
+          <h2 className="font-serif text-lg sm:text-xl md:text-2xl font-normal leading-snug tracking-tight text-[#f5f5f0] mb-2.5 text-balance group-hover:text-gold-light transition-colors">
+            {candidateNote?.title ? `"${candidateNote.title}"` : categoryMeta.label}
+          </h2>
+
+          {/* Parágrafo de Contexto e Reflexão */}
+          <p className="font-sans text-xs sm:text-[0.82rem] text-neutral-300/80 leading-relaxed mb-3 font-light max-w-lg line-clamp-2">
+            Seu Memorial guarda uma conexão profunda com este capítulo{chapterRef ? ` (${chapterRef})` : ""}. {categoryMeta.description}.
           </p>
 
-          {candidateNote?.title ? (
-            <p className="text-xs font-serif text-app-text-muted italic line-clamp-1">
-              "{candidateNote.title}"
-            </p>
-          ) : candidateNote?.content ? (
-            <p className="text-xs font-serif text-app-text-muted italic line-clamp-1">
-              "{candidateNote.content}"
-            </p>
-          ) : (
-            <p className="text-xs font-serif text-app-text-muted line-clamp-1">
-              {categoryMeta.description}
-            </p>
-          )}
+          {/* Barra inferior de tags e ação */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="inline-flex items-center rounded-full border border-neutral-700/60 bg-neutral-900/40 px-2.5 py-1 text-[0.7rem] text-neutral-300 backdrop-blur-xs">
+              <span className="font-sans font-medium tracking-wide">{chapterRef || "Este capítulo"}</span>
+            </div>
+
+            <span className="inline-flex items-center gap-1 text-[0.7rem] text-gold/90 group-hover:text-gold font-medium ml-1 transition-colors">
+              Revelar reflexão completa &rarr;
+            </span>
+          </div>
+        </div>
+
+        {/* Coluna Direita: Ações CTA */}
+        <div className="flex flex-col items-start lg:items-center justify-center shrink-0 pr-0 lg:pr-6 z-10">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenModal();
+            }}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gold px-5 py-2 text-xs font-semibold text-[#121110] shadow-sm transition-all duration-200 hover:bg-gold/90 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <span>Revelar o Fio</span>
+            <span>&rarr;</span>
+          </button>
         </div>
       </div>
-
-      {/* Botão de Ação CTA */}
-      <button
-        type="button"
-        onClick={onOpenModal}
-        className="relative flex-shrink-0 self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gold text-black font-semibold text-xs hover:bg-gold/90 transition-all duration-200 shadow-xs active:scale-95 cursor-pointer"
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        <span>Revelar o Fio</span>
-        <ArrowRight className="h-3.5 w-3.5" />
-      </button>
     </aside>
   );
 }
