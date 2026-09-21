@@ -133,7 +133,7 @@ export default async function handler(req: Request) {
         const ref = `${n.bookName || "Bíblia"} ${n.chapter || ""}${n.verse ? `:${n.verse}` : ""}`.trim();
         const title = n.title ? ` · "${n.title}"` : "";
         const cleanContent = (n.content || "").replace(/\s+/g, " ").trim().slice(0, 220);
-        return `${i + 1}. [${n.type.toUpperCase()}] ${ref}${title}\n   "${cleanContent}"`;
+        return `${i + 1}. [${(n.type || "reflexao").toUpperCase()}] ${ref}${title}\n   "${cleanContent}"`;
       })
       .join("\n\n");
 

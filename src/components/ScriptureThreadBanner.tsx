@@ -1,9 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // ScriptureThreadBanner.tsx — Bíblia Vive
 //
-// Banner discreto e nobre exibido acima do título do capítulo na página de
-// leitura quando o modelo JEV detecta uma conexão tipológica ou profética de
-// alta confiança com o acervo espiritual do Leitor.
+// Banner discreto e nobre exibido no rodapé da leitura quando o modelo JEV
+// detecta uma conexão tipológica ou profética de alta confiança com o acervo
+// espiritual do Leitor.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Sparkles, ArrowRight, Network } from "lucide-react";
@@ -56,7 +56,7 @@ export default function ScriptureThreadBanner({
     <aside
       aria-label="Fio da Escritura detectado"
       className={cn(
-        "relative overflow-hidden mb-6 rounded-2xl bg-gradient-to-r from-app-surface via-app-surface to-gold/5 border border-gold/40 hover:border-gold/60 p-4 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)] transition-all duration-500 animate-in fade-in zoom-in-95 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group",
+        "relative overflow-hidden mt-8 mb-6 rounded-2xl bg-gradient-to-r from-app-surface via-app-surface to-gold/5 border border-gold/40 hover:border-gold/60 p-4 shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.08)] transition-all duration-500 animate-in fade-in zoom-in-95 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group",
         className
       )}
     >

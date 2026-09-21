@@ -89,7 +89,7 @@ function mapRow(row: any): MemorialEntry {
         id: row.id,
         type: (row.type as MemorialCategory) || 'reflection',
         title: row.title ?? '',
-        content: row.content ?? '',
+        content: row.content ?? row.note ?? '',
         bookId: row.book_id ?? row.bookId,
         bookName: row.book_name ?? row.bookName ?? row.book_id ?? row.bookId,
         chapter: Number(row.chapter),
