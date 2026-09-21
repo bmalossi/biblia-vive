@@ -998,7 +998,10 @@ export default function ReadingPage() {
 
     const runEvaluation = async () => {
       try {
+        console.log(`[ReadingPage] Verificando acervo para o Fio da Escritura (${selectedBook.id} ${chapterNumber})...`);
         const allNotes = await echoStore.getAll();
+        console.log(`[ReadingPage] Notas recuperadas do echoStore: ${allNotes.length}`);
+
         if (!active || allNotes.length === 0) {
           if (active) {
             setScriptureThreadResult(null);
@@ -1007,12 +1010,18 @@ export default function ReadingPage() {
           return;
         }
 
-        const fullText = chapterData.verses.map((v) => `${v.verse}. ${v.text}`).join(" ");
+        const fullText = chapterData.verses
+          .map((v, i) => `${v.number ?? (i + 1)}. ${v.text || stripHtml(v.content || "")}`)
+          .join(" ");
 
         let userToken: string | null = null;
         if (user) {
-          const sessionRes = await supabase.auth.getSession();
-          userToken = sessionRes.data.session?.access_token ?? null;
+          try {
+            const sessionRes = await supabase.auth.getSession();
+            userToken = sessionRes.data.session?.access_token ?? null;
+          } catch (sessionErr) {
+            console.warn("[ReadingPage] Falha ao obter token de sessão (Supabase Web Lock):", sessionErr);
+          }
         }
 
         const { result, candidateNote } = await evaluateScriptureThread({
@@ -1026,10 +1035,12 @@ export default function ReadingPage() {
         });
 
         if (active) {
+          console.log("[ReadingPage] Fio da Escritura atualizado no estado:", { result, candidateNote });
           setScriptureThreadResult(result);
           setScriptureThreadCandidate(candidateNote);
         }
       } catch (err) {
+        console.error("[ReadingPage] Falha na avaliação do Fio da Escritura:", err);
         if (active) {
           setScriptureThreadResult(null);
           setScriptureThreadCandidate(null);

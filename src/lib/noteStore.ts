@@ -144,7 +144,11 @@ export class SupabaseNoteStore implements NoteStore {
 
         query = query.order("updated_at", { ascending: false });
 
-        const { data } = await query;
+        const { data, error } = await query;
+        if (error) {
+            console.error("[SupabaseNoteStore] Erro ao buscar notas do usuário:", error.message, error);
+            return [];
+        }
         let results = (data ?? []).map(mapRow);
 
         if (filters?.search && filters.search.trim()) {
@@ -570,6 +574,7 @@ export class LocalNoteStore implements NoteStore {
 
         notes.push(newEntry);
         writeLocal(notes);
+        bumpNotesVersion();
     }
 
     async delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void> {
@@ -579,6 +584,7 @@ export class LocalNoteStore implements NoteStore {
         } else {
             writeLocal(notes.filter(n => n.id !== idOrBookId));
         }
+        bumpNotesVersion();
     }
 
     async toggleFavorite(id: string): Promise<boolean> {
@@ -588,6 +594,7 @@ export class LocalNoteStore implements NoteStore {
         notes[idx].favorite = !notes[idx].favorite;
         notes[idx].updatedAt = new Date().toISOString();
         writeLocal(notes);
+        bumpNotesVersion();
         return notes[idx].favorite;
     }
 
@@ -600,6 +607,7 @@ export class LocalNoteStore implements NoteStore {
         notes[idx].answeredNote = answeredNote || null;
         notes[idx].updatedAt = new Date().toISOString();
         writeLocal(notes);
+        bumpNotesVersion();
     }
 
     async getMatchingEcho(bookId?: string, chapter?: number): Promise<EchoResult | null> {

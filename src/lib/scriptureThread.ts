@@ -11,6 +11,7 @@
 
 import type { MemorialEntry } from "@/lib/noteStore";
 import { findBookGlobally, getTestament } from "@/lib/books";
+import { getScriptureThreadConfig } from "./appConfig";
 
 export type ScriptureThreadCategory =
   | "Cumprimento_Profetico"
@@ -280,33 +281,38 @@ export async function evaluateScriptureThread(params: {
 }> {
   const { chapterText, chapterRef, bookId, chapter, allNotes, userId, userToken } = params;
 
-  if (!chapterText || !allNotes || allNotes.length === 0) {
-    return { result: null, candidateNote: null };
-  }
-
-  // 1. Checagem do Cache Reativo
-  const cached = getCachedThreadResult(bookId, chapter, userId);
-  if (cached) {
-    const candidate = cached.matchedNoteId
-      ? allNotes.find((n) => n.id === cached.matchedNoteId) || rankCandidateNote(allNotes, bookId)
-      : rankCandidateNote(allNotes, bookId);
-    return { result: cached, candidateNote: candidate };
-  }
-
-  // 2. Checagem rápida de configuração global
-  const { getScriptureThreadConfig } = await import("./appConfig");
-  const config = await getScriptureThreadConfig();
-  if (!config.enabled) {
-    return { result: null, candidateNote: null };
-  }
-
-  // 3. Montagem do pool híbrido de até config.maxNotes
-  const hybridPool = buildHybridNotePool(allNotes, bookId, config.maxNotes);
-  if (hybridPool.length === 0) {
-    return { result: null, candidateNote: null };
-  }
-
   try {
+    if (!chapterText || !allNotes || allNotes.length === 0) {
+      console.log("[scriptureThread] Ignorando avaliação: texto vazio ou nenhuma nota no acervo.");
+      return { result: null, candidateNote: null };
+    }
+
+    // 1. Checagem do Cache Reativo
+    const cached = getCachedThreadResult(bookId, chapter, userId);
+    if (cached) {
+      console.log(`[scriptureThread] Resultado resgatado do cache para ${bookId} ${chapter}:`, cached.category);
+      const candidate = cached.matchedNoteId
+        ? allNotes.find((n) => n.id === cached.matchedNoteId) || rankCandidateNote(allNotes, bookId)
+        : rankCandidateNote(allNotes, bookId);
+      return { result: cached, candidateNote: candidate };
+    }
+
+    // 2. Checagem rápida de configuração global
+    const config = await getScriptureThreadConfig();
+    if (!config.enabled) {
+      console.log("[scriptureThread] Recurso desativado via app_config (scripture_thread_enabled = false).");
+      return { result: null, candidateNote: null };
+    }
+
+    // 3. Montagem do pool híbrido de até config.maxNotes
+    const hybridPool = buildHybridNotePool(allNotes, bookId, config.maxNotes);
+    if (hybridPool.length === 0) {
+      console.log("[scriptureThread] Pool híbrido de notas vazio após filtragem.");
+      return { result: null, candidateNote: null };
+    }
+
+    console.log(`[scriptureThread] Avaliando capítulo ${chapterRef} com ${hybridPool.length} notas no pool híbrido...`);
+
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (userToken) {
       headers["Authorization"] = `Bearer ${userToken}`;
@@ -328,6 +334,7 @@ export async function evaluateScriptureThread(params: {
       })),
     };
 
+    console.log("[scriptureThread] Disparando POST /api/scripture-thread...");
     const res = await fetch("/api/scripture-thread", {
       method: "POST",
       headers,
@@ -335,13 +342,16 @@ export async function evaluateScriptureThread(params: {
     });
 
     if (!res.ok) {
+      console.warn(`[scriptureThread] API respondeu com erro HTTP ${res.status}: ${res.statusText}`);
       return { result: null, candidateNote: null };
     }
 
     const data = await res.json().catch(() => ({}));
+    console.log("[scriptureThread] Resposta da API recebida:", data);
     const threadData = data?.thread;
 
     if (!threadData || !threadData.category) {
+      console.log(`[scriptureThread] JEV avaliou: nenhuma conexão de alta confiança (${data?.reason || "silêncio"}).`);
       return { result: null, candidateNote: null };
     }
 
@@ -360,10 +370,11 @@ export async function evaluateScriptureThread(params: {
 
     // 5. Armazena no cache reativo
     setCachedThreadResult(bookId, chapter, userId, threadResult);
+    console.log("[scriptureThread] Conexão detectada com sucesso e cacheada:", threadResult);
 
     return { result: threadResult, candidateNote: candidate };
   } catch (err) {
-    console.warn("[scriptureThread] Falha silenciosa na avaliação:", err);
+    console.error("[scriptureThread] Erro inesperado na avaliação do Fio da Escritura:", err);
     return { result: null, candidateNote: null };
   }
 }
