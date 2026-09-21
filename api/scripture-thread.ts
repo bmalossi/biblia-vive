@@ -177,7 +177,8 @@ export default async function handler(req: Request) {
     };
 
     // Chamada à API TypeSafe AI REST
-    const evalUrl = process.env.TYPESAFE_API_URL || "https://api.typesafe.ai/v1/systemone";
+    const rawUrl = process.env.TYPESAFE_API_URL || "https://api.typesafe.ai/v1/systemone";
+    const evalUrl = rawUrl.includes("/v1/eval") ? "https://api.typesafe.ai/v1/systemone" : rawUrl;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
 
