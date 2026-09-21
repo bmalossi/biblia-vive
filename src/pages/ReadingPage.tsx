@@ -32,7 +32,7 @@ import EchoBanner from "@/components/EchoBanner";
 import EchoModal from "@/components/EchoModal";
 import ScriptureThreadBanner from "@/components/ScriptureThreadBanner";
 import ScriptureThreadModal from "@/components/ScriptureThreadModal";
-import { evaluateScriptureThread, type ScriptureThreadResult } from "@/lib/scriptureThread";
+import { evaluateScriptureThread, getNotesVersion, type ScriptureThreadResult } from "@/lib/scriptureThread";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Breadcrumb,
@@ -380,6 +380,7 @@ export default function ReadingPage() {
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
 
   const isMobile = useIsMobile();
+  const scriptureThreadEvalKeyRef = useRef<string>("");
 
   const {
     isOpen: isNotebookOpen,
@@ -997,6 +998,12 @@ export default function ReadingPage() {
     let active = true;
 
     const runEvaluation = async () => {
+      const evalKey = `${selectedBook.id}:${chapterNumber}:${getNotesVersion()}:${user?.id ?? "anon"}`;
+      if (scriptureThreadEvalKeyRef.current === evalKey) {
+        return;
+      }
+      scriptureThreadEvalKeyRef.current = evalKey;
+
       try {
         console.log(`[ReadingPage] Verificando acervo para o Fio da Escritura (${selectedBook.id} ${chapterNumber})...`);
         const allNotes = await echoStore.getAll();
@@ -1040,6 +1047,7 @@ export default function ReadingPage() {
           setScriptureThreadCandidate(candidateNote);
         }
       } catch (err) {
+        scriptureThreadEvalKeyRef.current = ""; // permite nova tentativa em caso de erro
         console.error("[ReadingPage] Falha na avaliação do Fio da Escritura:", err);
         if (active) {
           setScriptureThreadResult(null);

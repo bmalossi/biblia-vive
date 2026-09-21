@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
+export const config = {
+  runtime: "edge",
+};
+
 interface NotePayload {
   id: string;
   type: string;
@@ -151,7 +155,7 @@ export default async function handler(req: Request) {
     // Chamada à API TypeSafe AI REST
     const evalUrl = process.env.TYPESAFE_API_URL || "https://api.typesafe.ai/v1/eval";
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 9000);
+    const timeout = setTimeout(() => controller.abort(), 6000);
 
     const jevRes = await fetch(evalUrl, {
       method: "POST",
@@ -165,10 +169,13 @@ export default async function handler(req: Request) {
 
     if (!jevRes.ok) {
       console.warn("[scriptureThread] TypeSafe AI respondeu com erro HTTP:", jevRes.status);
-      return new Response(JSON.stringify({ thread: null }), {
-        status: 200,
-        headers: jsonHeaders,
-      });
+      return new Response(
+        JSON.stringify({ thread: null, reason: `typesafe_http_${jevRes.status}` }),
+        {
+          status: 200,
+          headers: jsonHeaders,
+        }
+      );
     }
 
     const jevData = await jevRes.json();
@@ -244,12 +251,16 @@ export default async function handler(req: Request) {
       }),
       { status: 200, headers: jsonHeaders }
     );
-  } catch (err) {
-    console.warn("[scriptureThread] Falha durante avaliação JEV:", err);
+  } catch (err: any) {
+    const isTimeout = err?.name === "AbortError" || err?.message?.includes("aborted");
+    console.warn("[scriptureThread] Falha durante avaliação JEV:", isTimeout ? "Timeout (6s)" : err?.message);
     // Em qualquer cenário de erro, retorna silêncio reverente (status 200, thread null)
-    return new Response(JSON.stringify({ thread: null }), {
-      status: 200,
-      headers: jsonHeaders,
-    });
+    return new Response(
+      JSON.stringify({ thread: null, reason: isTimeout ? "timeout" : "internal_error" }),
+      {
+        status: 200,
+        headers: jsonHeaders,
+      }
+    );
   }
 }
