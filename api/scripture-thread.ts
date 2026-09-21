@@ -52,6 +52,9 @@ export default async function handler(req: Request) {
       );
     }
 
+    let minNoul = 0.80;
+    let minConfidence = 0.50;
+
     // Consulta configurações globais em app_config se o Supabase estiver disponível
     if (supabaseUrl && supabaseServiceRoleKey) {
       const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
@@ -59,9 +62,23 @@ export default async function handler(req: Request) {
       const { data: configs } = await supabase
         .from("app_config")
         .select("key, value")
-        .in("key", ["scripture_thread_enabled", "scripture_thread_require_pro"]);
+        .in("key", [
+          "scripture_thread_enabled",
+          "scripture_thread_require_pro",
+          "scripture_thread_min_noul",
+          "scripture_thread_min_confidence",
+        ]);
 
       const configMap = new Map((configs || []).map((r) => [r.key, r.value]));
+
+      if (configMap.has("scripture_thread_min_noul")) {
+        const val = Number(configMap.get("scripture_thread_min_noul"));
+        if (!isNaN(val) && val > 0) minNoul = val;
+      }
+      if (configMap.has("scripture_thread_min_confidence")) {
+        const val = Number(configMap.get("scripture_thread_min_confidence"));
+        if (!isNaN(val) && val > 0) minConfidence = val;
+      }
 
       // 1. Verificação da flag de ativação global
       if (configMap.has("scripture_thread_enabled") && configMap.get("scripture_thread_enabled") === false) {
@@ -296,14 +313,16 @@ export default async function handler(req: Request) {
     }
 
     // Regra de Confidence-Gated Routing:
-    // Noul ≥ 0.80 E Confiança ≥ 0.85 — caso contrário, silêncio absoluto
-    const meetsNoulGate = noulScore >= 0.80;
-    const meetsConfidenceGate = categoryConfidence >= 0.85;
+    // Noul ≥ minNoul (padrão 0.80) E Confiança da Categoria ≥ minConfidence (padrão 0.50)
+    const meetsNoulGate = noulScore >= minNoul;
+    const meetsConfidenceGate = categoryConfidence >= minConfidence;
 
     console.log("[scriptureThread] Gating check:", {
       noulScore,
+      minNoul,
       category,
       categoryConfidence,
+      minConfidence,
       relevanceScore,
       matchedNoteId,
       meetsNoulGate,
