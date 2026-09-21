@@ -226,7 +226,8 @@ export function buildHybridNotePool(
  */
 export function rankCandidateNote(
   notes: MemorialEntry[],
-  currentBookId: string
+  currentBookId: string,
+  category?: ScriptureThreadCategory
 ): MemorialEntry | null {
   if (!notes || notes.length === 0) return null;
 
@@ -246,6 +247,21 @@ export function rankCandidateNote(
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   if (sameBook.length > 0) return sameBook[0];
 
+  // Se a categoria for Cumprimento Profético ou Contraste de Aliança e o leitor está no NT,
+  // notas do AT (especialmente favoritas ou recentes) têm altíssima relevância tipológica
+  if (category === "Cumprimento_Profetico" || category === "Contraste_de_Alianca") {
+    const crossTestamentNotes = notes
+      .filter((n) => {
+        const noteBook = findBookGlobally(n.bookId);
+        return noteBook && getTestament(noteBook) !== currentTestament;
+      })
+      .sort((a, b) => {
+        if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      });
+    if (crossTestamentNotes.length > 0) return crossTestamentNotes[0];
+  }
+
   // 2. Mesmo testamento
   const sameTestament = notes
     .filter((n) => {
@@ -255,10 +271,11 @@ export function rankCandidateNote(
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   if (sameTestament.length > 0) return sameTestament[0];
 
-  // 3. Mais recente geral
-  const mostRecent = [...notes].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  // 3. Mais recente geral (priorizando favoritas)
+  const mostRecent = [...notes].sort((a, b) => {
+    if (a.favorite !== b.favorite) return a.favorite ? -1 : 1;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
   return mostRecent[0] || null;
 }
 
@@ -356,7 +373,9 @@ export async function evaluateScriptureThread(params: {
     }
 
     // 4. Eleição da Nota Candidata
-    const candidate = rankCandidateNote(hybridPool, bookId);
+    const candidate =
+      (threadData.matchedNoteId ? hybridPool.find((n) => n.id === threadData.matchedNoteId) : null) ||
+      rankCandidateNote(hybridPool, bookId, threadData.category);
 
     const threadResult: ScriptureThreadResult = {
       category: threadData.category,

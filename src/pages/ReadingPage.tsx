@@ -25,6 +25,7 @@ import type { CardData } from "@/components/VerseCardTemplates";
 import { diffVerses, type DiffToken } from "@/lib/textDiff";
 import { useReadingPlan } from "@/hooks/useReadingPlan";
 import { useAuth } from "@/hooks/useAuth";
+import { getSession } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useNotesHighlights } from "@/hooks/useNotesHighlights";
 import { createNoteStore, type MemorialEntry, type EchoResult } from "@/lib/noteStore";
@@ -374,7 +375,7 @@ export default function ReadingPage() {
   const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const churchMode = useChurchMode();
   const { preferences, updatePreference, resetPreferences } = useReadingPreferences({ rootId: "reading-root" });
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { isPro, isTemplo } = useSubscription();
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
@@ -989,6 +990,8 @@ export default function ReadingPage() {
 
   // Efeito assíncrono para avaliar o Fio da Escritura (TypeSafe AI / JEV)
   useEffect(() => {
+    if (authLoading) return;
+
     if (!selectedBook || !chapterData?.verses || chapterData.verses.length === 0) {
       setScriptureThreadResult(null);
       setScriptureThreadCandidate(null);
@@ -1024,10 +1027,10 @@ export default function ReadingPage() {
         let userToken: string | null = null;
         if (user) {
           try {
-            const sessionRes = await supabase.auth.getSession();
-            userToken = sessionRes.data.session?.access_token ?? null;
+            const session = await getSession();
+            userToken = session?.access_token ?? null;
           } catch (sessionErr) {
-            console.warn("[ReadingPage] Falha ao obter token de sessão (Supabase Web Lock):", sessionErr);
+            console.warn("[ReadingPage] Falha ao obter token de sessão:", sessionErr);
           }
         }
 
@@ -1068,7 +1071,7 @@ export default function ReadingPage() {
       active = false;
       window.removeEventListener("bv-notes-version-updated", handleNotesVersionUpdated);
     };
-  }, [selectedBook, chapterNumber, chapterData, echoStore, user]);
+  }, [selectedBook, chapterNumber, chapterData, echoStore, user, authLoading]);
 
   // Salva última leitura quando o usuário rola a página ou muda de capítulo (sem loop de intervalo inativo)
   useEffect(() => {

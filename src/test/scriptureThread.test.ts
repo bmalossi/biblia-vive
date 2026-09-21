@@ -197,6 +197,23 @@ describe("Fio da Escritura — Heurística da Nota Candidata (rankCandidateNote)
     expect(candidate?.id).toBe("nt-1");
   });
 
+  it("prioriza notas tipológicas do Antigo Testamento quando a categoria é Cumprimento Profético no Novo Testamento", () => {
+    // Capítulo lido: Romanos (Novo Testamento)
+    // Nota 1: Marcos 6 (Novo Testamento, antiga)
+    // Nota 2: Gênesis 22 (Antigo Testamento, favorita / tipológica)
+    const notes: MemorialEntry[] = [
+      makeEntry("nt-marcos", "mr", "2026-08-16T00:00:00Z"),
+      {
+        ...makeEntry("ot-genesis", "gn", "2026-09-21T00:00:00Z"),
+        favorite: true,
+        title: "Gênesis 22:8 - O Cordeiro que tira o pecado",
+      },
+    ];
+
+    const candidate = rankCandidateNote(notes, "rm", "Cumprimento_Profetico");
+    expect(candidate?.id).toBe("ot-genesis");
+  });
+
   it("retorna null se a lista de notas fornecida for vazia", () => {
     const candidate = rankCandidateNote([], "rm");
     expect(candidate).toBeNull();
@@ -337,6 +354,70 @@ describe("Fio da Escritura — Evaluator e Confidence-Gated Routing (evaluateScr
 
     expect(secondCall.result).not.toBeNull();
     expect(threadApiCallCount).toBe(1); // Continua 1!
+  });
+
+  it("elege diretamente a nota apontada pelo servidor via matchedNoteId quando presente", async () => {
+    const { evaluateScriptureThread } = await import("@/lib/scriptureThread");
+    const originalFetch = global.fetch;
+
+    global.fetch = vi.fn().mockImplementation((input: any, init?: any) => {
+      const url = typeof input === "string" ? input : input?.url || "";
+      if (url.includes("/api/scripture-thread")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            thread: {
+              category: "Cumprimento_Profetico",
+              confidence: 0.96,
+              relevanceScore: 10,
+              matchedNoteId: "note-specific",
+              evaluatedAt: "2026-03-20T12:00:00Z",
+            },
+          }),
+        });
+      }
+      return originalFetch ? originalFetch(input, init) : Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+
+    const poolWithSpecific: MemorialEntry[] = [
+      {
+        id: "note-other",
+        type: "reflection",
+        title: "Outra nota",
+        content: "Outro conteúdo",
+        bookId: "rm",
+        bookName: "Romanos",
+        chapter: 8,
+        favorite: false,
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-01T00:00:00Z",
+      },
+      {
+        id: "note-specific",
+        type: "reflection",
+        title: "Cordeiro de Deus",
+        content: "Deus proverá para si o Cordeiro...",
+        bookId: "gn",
+        bookName: "Gênesis",
+        chapter: 22,
+        favorite: true,
+        createdAt: "2026-03-20T00:00:00Z",
+        updatedAt: "2026-03-20T00:00:00Z",
+      },
+    ];
+
+    const { result, candidateNote } = await evaluateScriptureThread({
+      chapterText: "Texto de Romanos...",
+      chapterRef: "Romanos 8",
+      bookId: "rm",
+      chapter: 8,
+      allNotes: poolWithSpecific,
+      userId: "user-test-matched",
+    });
+
+    expect(result).not.toBeNull();
+    expect(result?.matchedNoteId).toBe("note-specific");
+    expect(candidateNote?.id).toBe("note-specific");
   });
 
   it("retorna null em silêncio quando a rede ou a API falha", async () => {

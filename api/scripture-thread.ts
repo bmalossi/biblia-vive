@@ -122,40 +122,64 @@ export default async function handler(req: Request) {
 
     const state = `[CAPÍTULO BÍBLICO EM LEITURA]\nReferência: ${chapterRef || "Capítulo Atual"}\nTexto Bíblico:\n${chapterText.slice(0, 3000)}\n\n[REGISTROS DO MEMORIAL DO LEITOR]\n${formattedNotes}`;
 
-    // Definição das três Primitivas JEV em paralelo
+    // Montagem das opções de notas para a identificação da Nota Candidata pelo JEV
+    const noteCriteria: Record<string, string> = {};
+    notes.slice(0, 30).forEach((n, idx) => {
+      const num = String(idx + 1);
+      const title = n.title ? ` · "${n.title}"` : "";
+      const clean = (n.content || "").replace(/\s+/g, " ").trim().slice(0, 100);
+      noteCriteria[num] = `Nota ${num}: [${(n.type || "reflexao").toUpperCase()}] ${n.bookName || ""}${title} - ${clean}`;
+    });
+    noteCriteria["nenhuma"] = "Nenhuma das anteriores possui conexão tipológica ou espiritual relevante";
+
+    // Definição das Primitivas JEV (System One)
     const jevPayload = {
+      model: "jev-latest",
       state,
-      questions: [
-        {
-          id: "has_spiritual_echo",
+      questions: {
+        has_spiritual_echo: {
           type: "noul",
-          question:
+          instructions:
             "Existe uma conexão tipológica, profética, de cumprimento de aliança ou de resposta de oração entre o capítulo bíblico lido e algum dos Registros do Memorial apresentados?",
         },
-        {
-          id: "echo_category",
+        echo_category: {
           type: "choice",
-          question: "Qual a categoria tipológica principal desta conexão?",
-          options: [
-            "Cumprimento_Profetico",
-            "Eco_de_Linguagem",
-            "Contraste_de_Alianca",
-            "Resposta_de_Oracao",
+          instructions: "Qual a categoria tipológica principal desta conexão?",
+          criteria: {
+            Cumprimento_Profetico:
+              "Continuidade direta, profecia, prefiguração, tipo e antítipo entre as alianças (ex: sacrifício de Isaque e o sacrifício de Cristo)",
+            Eco_de_Linguagem:
+              "Ressonância temática, repetição de termos ou imagens bíblicas fundamentais",
+            Contraste_de_Alianca:
+              "Distinção reveladora entre a Antiga e a Nova Aliança, lei e graça, sombra e substância",
+            Resposta_de_Oracao:
+              "Conexão entre o texto bíblico lido e um clamor ou oração registrada pelo leitor",
+          },
+        },
+        echo_relevance: {
+          type: "score",
+          instructions:
+            "Qual a relevância e clareza espiritual desta conexão para a fé e reflexão do Leitor em uma escala de 1 a 5?",
+          criteria: [
+            "Sem conexão aparente",
+            "Conexão tênue ou indireta",
+            "Conexão moderada",
+            "Conexão clara e edificante",
+            "Conexão profunda e profética",
           ],
         },
-        {
-          id: "echo_relevance",
-          type: "score",
-          question:
-            "Qual a relevância e clareza espiritual desta conexão para a fé e reflexão do Leitor em uma escala de 1 a 10?",
+        matched_note_index: {
+          type: "choice",
+          instructions: `Qual o número do Registro do Memorial (1 a ${Math.min(notes.length, 30)}) que possui a conexão espiritual mais forte com o capítulo lido?`,
+          criteria: noteCriteria,
         },
-      ],
+      },
     };
 
     // Chamada à API TypeSafe AI REST
-    const evalUrl = process.env.TYPESAFE_API_URL || "https://api.typesafe.ai/v1/eval";
+    const evalUrl = process.env.TYPESAFE_API_URL || "https://api.typesafe.ai/v1/systemone";
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
     const jevRes = await fetch(evalUrl, {
       method: "POST",
@@ -168,7 +192,8 @@ export default async function handler(req: Request) {
     }).finally(() => clearTimeout(timeout));
 
     if (!jevRes.ok) {
-      console.warn("[scriptureThread] TypeSafe AI respondeu com erro HTTP:", jevRes.status);
+      const errText = await jevRes.text().catch(() => "");
+      console.warn("[scriptureThread] TypeSafe AI erro HTTP:", jevRes.status, errText);
       return new Response(
         JSON.stringify({ thread: null, reason: `typesafe_http_${jevRes.status}` }),
         {
@@ -179,42 +204,94 @@ export default async function handler(req: Request) {
     }
 
     const jevData = await jevRes.json();
+    console.log("[scriptureThread] Resposta bruta do TypeSafe AI:", JSON.stringify(jevData));
 
     // Extração dos resultados das primitivas (tolerante a formatos do JEV)
     let noulScore = 0;
     let category = "Cumprimento_Profetico";
     let categoryConfidence = 0;
-    let relevanceScore = 0;
+    let relevanceScore = 8;
+    let matchedNoteId: string | undefined;
+    let matchedNoteExcerpt: string | undefined;
 
-    const results = jevData.results || jevData.answers || jevData;
+    const answers = jevData.answers || jevData.results || jevData;
 
-    if (Array.isArray(results)) {
-      for (const item of results) {
-        if (item.id === "has_spiritual_echo") {
-          noulScore = typeof item.answer === "number" ? item.answer : item.answer === true ? 1 : 0;
-        } else if (item.id === "echo_category") {
-          category = item.answer || category;
-          categoryConfidence = item.confidence || 0;
-        } else if (item.id === "echo_relevance") {
-          relevanceScore = item.score || item.answer || 0;
-        }
-      }
-    } else if (typeof results === "object" && results !== null) {
-      const qNoul = results.has_spiritual_echo;
-      const qChoice = results.echo_category;
-      const qScore = results.echo_relevance;
+    if (answers && typeof answers === "object" && !Array.isArray(answers)) {
+      const qNoul = answers.has_spiritual_echo;
+      const qChoice = answers.echo_category;
+      const qScore = answers.echo_relevance;
+      const qMatched = answers.matched_note_index;
 
       if (qNoul) {
-        noulScore = typeof qNoul.answer === "number" ? qNoul.answer : qNoul.answer === true ? 1 : 0;
-        if (qNoul.confidence && !categoryConfidence) categoryConfidence = qNoul.confidence;
+        if (typeof qNoul.noul === "number") {
+          noulScore = qNoul.noul;
+        } else if (typeof qNoul.probability === "number") {
+          noulScore = qNoul.probability;
+        } else if (typeof qNoul.answer === "number") {
+          noulScore = qNoul.answer;
+        } else if (qNoul.answer === true) {
+          noulScore = 1;
+        }
       }
+
       if (qChoice) {
-        category = qChoice.answer || category;
-        categoryConfidence = qChoice.confidence || categoryConfidence;
+        if (typeof qChoice.choice === "string") {
+          category = qChoice.choice;
+        } else if (typeof qChoice.answer === "string") {
+          category = qChoice.answer;
+        }
+
+        if (typeof qChoice.confidence === "number") {
+          categoryConfidence = qChoice.confidence;
+        } else if (qChoice.probabilities && typeof qChoice.probabilities[category] === "number") {
+          categoryConfidence = qChoice.probabilities[category];
+        } else if (noulScore > 0) {
+          categoryConfidence = noulScore;
+        }
       }
+
       if (qScore) {
-        relevanceScore = qScore.score || qScore.answer || 0;
+        if (typeof qScore.score === "number") {
+          relevanceScore = qScore.score <= 5 ? Math.min(10, Math.max(2, (qScore.score + 1) * 2)) : qScore.score;
+        } else if (typeof qScore.answer === "number") {
+          relevanceScore = qScore.answer;
+        }
       }
+
+      if (qMatched) {
+        const choiceKey = qMatched.choice || qMatched.answer;
+        if (choiceKey && typeof choiceKey === "string" && choiceKey !== "nenhuma") {
+          const idx = parseInt(choiceKey, 10) - 1;
+          if (idx >= 0 && idx < notes.length) {
+            matchedNoteId = notes[idx].id;
+            matchedNoteExcerpt = notes[idx].content?.slice(0, 300);
+          }
+        }
+      }
+    } else if (Array.isArray(answers)) {
+      for (const item of answers) {
+        if (item.id === "has_spiritual_echo") {
+          noulScore = typeof item.noul === "number" ? item.noul : typeof item.answer === "number" ? item.answer : item.answer === true ? 1 : 0;
+        } else if (item.id === "echo_category") {
+          category = item.choice || item.answer || category;
+          categoryConfidence = item.confidence || categoryConfidence;
+        } else if (item.id === "echo_relevance") {
+          relevanceScore = item.score || item.answer || relevanceScore;
+        } else if (item.id === "matched_note_index") {
+          const choiceKey = item.choice || item.answer;
+          if (choiceKey && typeof choiceKey === "string" && choiceKey !== "nenhuma") {
+            const idx = parseInt(choiceKey, 10) - 1;
+            if (idx >= 0 && idx < notes.length) {
+              matchedNoteId = notes[idx].id;
+              matchedNoteExcerpt = notes[idx].content?.slice(0, 300);
+            }
+          }
+        }
+      }
+    }
+
+    if (!categoryConfidence && noulScore > 0) {
+      categoryConfidence = noulScore;
     }
 
     // Regra de Confidence-Gated Routing:
@@ -222,11 +299,28 @@ export default async function handler(req: Request) {
     const meetsNoulGate = noulScore >= 0.80;
     const meetsConfidenceGate = categoryConfidence >= 0.85;
 
+    console.log("[scriptureThread] Gating check:", {
+      noulScore,
+      category,
+      categoryConfidence,
+      relevanceScore,
+      matchedNoteId,
+      meetsNoulGate,
+      meetsConfidenceGate,
+    });
+
     if (!meetsNoulGate || !meetsConfidenceGate) {
-      return new Response(JSON.stringify({ thread: null }), {
-        status: 200,
-        headers: jsonHeaders,
-      });
+      return new Response(
+        JSON.stringify({
+          thread: null,
+          reason: "below_confidence_gate",
+          scores: { noul: noulScore, confidence: categoryConfidence },
+        }),
+        {
+          status: 200,
+          headers: jsonHeaders,
+        }
+      );
     }
 
     const validCategories = [
@@ -246,6 +340,8 @@ export default async function handler(req: Request) {
           category: safeCategory,
           confidence: categoryConfidence,
           relevanceScore,
+          matchedNoteId,
+          matchedNoteExcerpt,
           evaluatedAt: new Date().toISOString(),
         },
       }),
@@ -253,7 +349,7 @@ export default async function handler(req: Request) {
     );
   } catch (err: any) {
     const isTimeout = err?.name === "AbortError" || err?.message?.includes("aborted");
-    console.warn("[scriptureThread] Falha durante avaliação JEV:", isTimeout ? "Timeout (6s)" : err?.message);
+    console.warn("[scriptureThread] Falha durante avaliação JEV:", isTimeout ? "Timeout (8s)" : err?.message);
     // Em qualquer cenário de erro, retorna silêncio reverente (status 200, thread null)
     return new Response(
       JSON.stringify({ thread: null, reason: isTimeout ? "timeout" : "internal_error" }),
