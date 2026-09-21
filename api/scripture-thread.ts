@@ -120,7 +120,7 @@ export default async function handler(req: Request) {
       })
       .join("\n\n");
 
-    const state = `[CAPÍTULO BÍBLICO EM LEITURA]\nReferência: ${chapterRef || "Capítulo Atual"}\nTexto Bíblico:\n${chapterText.slice(0, 3000)}\n\n[REGISTROS DO MEMORIAL DO LEITOR]\n${formattedNotes}`;
+    const state = `[CAPÍTULO BÍBLICO EM LEITURA]\nReferência: ${chapterRef || "Capítulo Atual"}\nTexto Bíblico:\n${chapterText.slice(0, 12000)}\n\n[REGISTROS DO MEMORIAL DO LEITOR]\n${formattedNotes}`;
 
     // Montagem das opções de notas para a identificação da Nota Candidata pelo JEV
     const noteCriteria: Record<string, string> = {};
