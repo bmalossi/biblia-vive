@@ -16,6 +16,11 @@ interface HarpaHymnEntry {
   estrofes: number;
   hasAudio: boolean;
   audioFile: string | null;
+  credits?: {
+    voice?: string;
+    guitar?: string;
+    sourceUrl?: string;
+  };
 }
 
 function toTitleCase(title: string): string {
@@ -118,6 +123,20 @@ async function run() {
     // Sort by hymn number ascending
     tempHymns.sort((a, b) => a.numero - b.numero);
 
+    // Read existing file if present to preserve manual fields like credits
+    let existingCreditsMap = new Map<number, HarpaHymnEntry['credits']>();
+    try {
+      const existingContent = await fs.readFile(OUTPUT_FILE, 'utf-8');
+      const existingList = JSON.parse(existingContent) as HarpaHymnEntry[];
+      for (const item of existingList) {
+        if (item.credits) {
+          existingCreditsMap.set(item.numero, item.credits);
+        }
+      }
+    } catch {
+      // file might not exist yet
+    }
+
     console.log('Verifying audio availability on R2...');
     const hymns: HarpaHymnEntry[] = [];
     const concurrencyLimit = 30;
@@ -127,7 +146,13 @@ async function run() {
       const batchResults = await Promise.all(
         batch.map(async (hymn) => {
           const audioFile = await checkAudioExists(hymn.numero, hymn.titulo);
-          return { ...hymn, hasAudio: audioFile !== null, audioFile };
+          const credits = existingCreditsMap.get(hymn.numero);
+          return {
+            ...hymn,
+            hasAudio: audioFile !== null,
+            audioFile,
+            ...(credits ? { credits } : {})
+          };
         })
       );
       hymns.push(...batchResults);

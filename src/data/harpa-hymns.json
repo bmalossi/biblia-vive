@@ -29,7 +29,10 @@
     "tituloFormatado": "Deus Velará por Ti",
     "estrofes": 5,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Eliane Moraes"
+    }
   },
   {
     "numero": 5,
@@ -53,7 +56,10 @@
     "tituloFormatado": "Cristo Cura, Sim!",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 8,
@@ -61,7 +67,10 @@
     "tituloFormatado": "Cristo, o Fiel Amigo",
     "estrofes": 5,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Simião Gomes"
+    }
   },
   {
     "numero": 9,
@@ -133,7 +142,10 @@
     "tituloFormatado": "Pensando em Jesus",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Edilene Gomes"
+    }
   },
   {
     "numero": 18,
@@ -157,7 +169,10 @@
     "tituloFormatado": "Olhai p'ra o Cordeiro de Deus",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Kennedy Lacerda"
+    }
   },
   {
     "numero": 21,
@@ -197,7 +212,10 @@
     "tituloFormatado": "Jesus, Tu És Bom",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 26,
@@ -285,7 +303,10 @@
     "tituloFormatado": "O Exilado",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Simião Gomes"
+    }
   },
   {
     "numero": 37,
@@ -589,7 +610,10 @@
     "tituloFormatado": "Guarda o Contacto",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Kennedy Lacerda"
+    }
   },
   {
     "numero": 78,
@@ -669,7 +693,10 @@
     "tituloFormatado": "Revela a Nós, Senhor",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Virginia Arruda"
+    }
   },
   {
     "numero": 89,
@@ -917,7 +944,10 @@
     "tituloFormatado": "Noite de Paz",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 121,
@@ -1165,7 +1195,10 @@
     "tituloFormatado": "Fala, Jesus Querido",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Soul Livre"
+    }
   },
   {
     "numero": 152,
@@ -1189,7 +1222,10 @@
     "tituloFormatado": "Doce Nome de Jesus",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 155,
@@ -1453,7 +1489,10 @@
     "tituloFormatado": "Mais Perto, Meu Deus, de Ti!",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "David Quinlan"
+    }
   },
   {
     "numero": 188,
@@ -1493,7 +1532,10 @@
     "tituloFormatado": "Pelo Sangue",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Michele do Pandeiro"
+    }
   },
   {
     "numero": 193,
@@ -1541,7 +1583,10 @@
     "tituloFormatado": "Jesus, o Bom Amigo",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Isaías Saad"
+    }
   },
   {
     "numero": 199,
@@ -1557,7 +1602,10 @@
     "tituloFormatado": "O Bondoso Amigo",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Simião Gomes"
+    }
   },
   {
     "numero": 201,
@@ -1589,7 +1637,10 @@
     "tituloFormatado": "O Peregrino Na Terra",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Edilene Gomes"
+    }
   },
   {
     "numero": 205,
@@ -1757,7 +1808,10 @@
     "tituloFormatado": "Sê Valente",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Michele do Pandeiro"
+    }
   },
   {
     "numero": 226,
@@ -2317,7 +2371,10 @@
     "tituloFormatado": "No Jardim",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Rafael Oliveira"
+    }
   },
   {
     "numero": 297,
@@ -2674,7 +2731,10 @@
     "tituloFormatado": "Um Amigo Entre os Lírios",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 345,
@@ -2786,7 +2846,10 @@
     "tituloFormatado": "Senhor, Manda Teu Poder",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Michele do Pandeiro"
+    }
   },
   {
     "numero": 359,
@@ -3066,7 +3129,10 @@
     "tituloFormatado": "A Mão do Arado!",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Rafael Oliveira"
+    }
   },
   {
     "numero": 395,
@@ -3114,7 +3180,10 @@
     "tituloFormatado": "Em Jesus",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Simião Gomes"
+    }
   },
   {
     "numero": 401,
@@ -3186,7 +3255,10 @@
     "tituloFormatado": "Trabalhadoresdo Evangelho",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Virginia Arruda"
+    }
   },
   {
     "numero": 410,
@@ -3282,7 +3354,10 @@
     "tituloFormatado": "No Céu Não Entra Pecado",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Rafael Oliveira"
+    }
   },
   {
     "numero": 423,
@@ -3362,7 +3437,10 @@
     "tituloFormatado": "Consagrado Ao Senhor",
     "estrofes": 5,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 433,
@@ -3506,7 +3584,10 @@
     "tituloFormatado": "Meu Jesus Vem",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Edilene Gomes"
+    }
   },
   {
     "numero": 453,
@@ -3610,7 +3691,10 @@
     "tituloFormatado": "Sobre as Ondas do Mar",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Edilene Gomes"
+    }
   },
   {
     "numero": 468,
@@ -3626,7 +3710,10 @@
     "tituloFormatado": "Ao Estrugir a Trombete",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 470,
@@ -3682,7 +3769,10 @@
     "tituloFormatado": "O Cego de Jericó",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 477,
@@ -3994,7 +4084,10 @@
     "tituloFormatado": "Se Cristo Comigo Vai",
     "estrofes": 4,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Geilane Rodrigues"
+    }
   },
   {
     "numero": 516,
@@ -4082,7 +4175,10 @@
     "tituloFormatado": "Grandioso És Tu",
     "estrofes": 5,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Cláudia Canção"
+    }
   },
   {
     "numero": 527,
@@ -4154,7 +4250,10 @@
     "tituloFormatado": "Tu És Fiel, Senhor",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Soul Livre"
+    }
   },
   {
     "numero": 536,
@@ -4226,7 +4325,10 @@
     "tituloFormatado": "Porque Ele Vive",
     "estrofes": 2,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Soul Livre"
+    }
   },
   {
     "numero": 546,
@@ -4242,7 +4344,10 @@
     "tituloFormatado": "O Rei Está Voltando",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Eliane Moraes"
+    }
   },
   {
     "numero": 548,
@@ -4482,7 +4587,10 @@
     "tituloFormatado": "Em Fervente Oração",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Maria Marçal"
+    }
   },
   {
     "numero": 578,
@@ -4490,7 +4598,10 @@
     "tituloFormatado": "Sossegai!",
     "estrofes": 3,
     "hasAudio": false,
-    "audioFile": null
+    "audioFile": null,
+    "credits": {
+      "voice": "Eliane Moraes"
+    }
   },
   {
     "numero": 579,
