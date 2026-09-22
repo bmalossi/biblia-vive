@@ -157,15 +157,31 @@ describe("HarpaReadingPage Redesign", () => {
     expect(mockResume).toHaveBeenCalledTimes(1);
   });
 
-  it("renderiza os cards de Créditos da Gravação e Citação inspiradora", async () => {
-    renderComponent();
+  it("renderiza o card de Créditos da Gravação APENAS quando há créditos reais, descartando textos genéricos", async () => {
+    // Hino 322 tem créditos reais (Juscelino Duarte / Violão: Tiago)
+    renderComponent("322");
 
     expect(screen.getByText("CRÉDITOS DA GRAVAÇÃO")).toBeInTheDocument();
-    expect(screen.getByText(/Uma poderosa mensagem sonora da Harpa Cristã/i)).toBeInTheDocument();
+    expect(screen.getByText("Juscelino Duarte")).toBeInTheDocument();
+    expect(screen.getByText("Tiago")).toBeInTheDocument();
 
-    // Card de citação
+    // Textos genéricos descartados / não exibidos
+    expect(screen.queryByText(/Coral Harpa Cristã/i)).toBeNull();
+    expect(screen.queryByText(/Editora Harpa Cristã/i)).toBeNull();
+    expect(screen.queryByText(/1988/)).toBeNull();
+
+    // Card de citação inspiradora
     expect(screen.getByText(/A Palavra de Deus não é apenas para ser lida/i)).toBeInTheDocument();
     expect(screen.getByText("— Harpa Cristã")).toBeInTheDocument();
+  });
+
+  it("OMITE o card de Créditos da Gravação quando o hino não possui créditos reais", async () => {
+    // Hino 1 não possui créditos na Harpa
+    renderComponent("1");
+
+    expect(screen.queryByText("CRÉDITOS DA GRAVAÇÃO")).toBeNull();
+    expect(screen.queryByText(/Coral Harpa Cristã/i)).toBeNull();
+    expect(screen.queryByText(/Editora Harpa Cristã/i)).toBeNull();
   });
 
   it("permite alterar o tamanho da fonte (A A A) da letra", async () => {

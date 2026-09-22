@@ -30,6 +30,7 @@ import {
   Repeat,
   AlertCircle,
   Check,
+  ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -274,6 +275,29 @@ export default function HarpaReadingPage() {
 
     return { leftCol: left, rightCol: right };
   }, [strophes]);
+
+  // Validação estrita de créditos reais:
+  // Descarta créditos genéricos como "Coral Harpa Cristã", "Editora Harpa Cristã", "Ano: 1988"
+  const hasRealCredits = useMemo(() => {
+    if (!hymnInfo?.credits) return false;
+    const isGenericCredit = (val?: string) => {
+      if (!val) return true;
+      const lower = val.toLowerCase().trim();
+      return (
+        lower.includes("coral harpa cristã") ||
+        lower.includes("coral harpa crista") ||
+        lower.includes("editora harpa cristã") ||
+        lower.includes("editora harpa crista") ||
+        lower === "1988"
+      );
+    };
+
+    const hasVoice = Boolean(hymnInfo.credits.voice && !isGenericCredit(hymnInfo.credits.voice));
+    const hasGuitar = Boolean(hymnInfo.credits.guitar && !isGenericCredit(hymnInfo.credits.guitar));
+    const hasSource = Boolean(hymnInfo.credits.sourceUrl);
+
+    return hasVoice || hasGuitar || hasSource;
+  }, [hymnInfo]);
 
   if (isNaN(numero) || !hymnInfo) {
     return (
@@ -740,38 +764,52 @@ export default function HarpaReadingPage() {
               </div>
             </div>
 
-            {/* 2. CARD CRÉDITOS DA GRAVAÇÃO */}
-            <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-5 sm:p-6 shadow-xl space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
-                  <Mic className="h-3.5 w-3.5" />
-                </span>
-                <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-[#e5b869] font-medium">
-                  CRÉDITOS DA GRAVAÇÃO
-                </h3>
-              </div>
+            {/* 2. CARD CRÉDITOS DA GRAVAÇÃO — Exibido apenas quando há créditos reais confirmados */}
+            {hasRealCredits && hymnInfo.credits && (
+              <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-5 sm:p-6 shadow-xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
+                    <Mic className="h-3.5 w-3.5" />
+                  </span>
+                  <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-[#e5b869] font-medium">
+                    CRÉDITOS DA GRAVAÇÃO
+                  </h3>
+                </div>
 
-              <p className="text-xs text-[#a89b8c] leading-relaxed">
-                Uma poderosa mensagem sonora da Harpa Cristã, interpretada com excelência para
-                edificar o seu coração.
-              </p>
+                <p className="text-xs text-[#a89b8c] leading-relaxed">
+                  Uma poderosa mensagem sonora da Harpa Cristã, interpretada com excelência para
+                  edificar o seu coração.
+                </p>
 
-              <div className="pt-2 space-y-1.5 text-xs text-[#8f8272] font-sans border-t border-[#382f23]/40">
-                <p>
-                  <span className="text-[#a89b8c] font-medium">Intérprete:</span>{" "}
-                  {hymnInfo.credits?.voice || "Coral Harpa Cristã"}
-                </p>
-                <p>
-                  <span className="text-[#a89b8c] font-medium">Produção:</span>{" "}
-                  {hymnInfo.credits?.guitar
-                    ? `Violão: ${hymnInfo.credits.guitar}`
-                    : "Editora Harpa Cristã"}
-                </p>
-                <p>
-                  <span className="text-[#a89b8c] font-medium">Ano:</span> 1988
-                </p>
+                <div className="pt-2 space-y-1.5 text-xs text-[#8f8272] font-sans border-t border-[#382f23]/40">
+                  {hymnInfo.credits.voice && (
+                    <p>
+                      <span className="text-[#a89b8c] font-medium">Intérprete:</span>{" "}
+                      {hymnInfo.credits.voice}
+                    </p>
+                  )}
+                  {hymnInfo.credits.guitar && (
+                    <p>
+                      <span className="text-[#a89b8c] font-medium">Violão:</span>{" "}
+                      {hymnInfo.credits.guitar}
+                    </p>
+                  )}
+                  {hymnInfo.credits.sourceUrl && (
+                    <p className="pt-1">
+                      <a
+                        href={hymnInfo.credits.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-[0.72rem] text-[#e5b869] hover:underline transition-colors"
+                      >
+                        <span>Ouvir gravação original</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* 3. CARD CITAÇÃO INSPIRADORA */}
             <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-6 shadow-xl relative overflow-hidden flex items-start gap-4">
