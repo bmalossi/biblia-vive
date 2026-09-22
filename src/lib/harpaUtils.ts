@@ -3,6 +3,19 @@
 // Utilitários, tipagens e metadados enriquecidos para os hinos da Harpa Cristã.
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface HarpaHymnCredits {
+  /** Intérprete / voz da gravação */
+  voice?: string;
+  /** Violão ou instrumento de apoio */
+  guitar?: string;
+  /** URL externa da gravação original */
+  sourceUrl?: string;
+  /** Fonte ou origem da gravação (ex: "CD Vol. 3") */
+  source?: string;
+  /** Observações editoriais livres */
+  notes?: string;
+}
+
 export interface HarpaHymn {
   numero: number;
   titulo: string;
@@ -10,6 +23,8 @@ export interface HarpaHymn {
   estrofes: number;
   hasAudio: boolean;
   audioFile: string | null;
+  /** Créditos estáticos do JSON (fallback quando não há dados no Supabase) */
+  credits?: HarpaHymnCredits;
 }
 
 export interface HymnRatingData {

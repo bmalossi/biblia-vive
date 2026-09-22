@@ -11,6 +11,9 @@ import hymnsData from "@/data/harpa-hymns.json";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useHarpaAudio } from "@/hooks/useHarpaAudio";
 import { useHarpaPlayer } from "@/contexts/HarpaPlayerContext";
+import { useHymnCredits } from "@/hooks/useHymnCredits";
+import { useAuth } from "@/hooks/useAuth";
+import HymnCreditsModal from "@/components/harpa/HymnCreditsModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -31,8 +34,10 @@ import {
   AlertCircle,
   Check,
   ExternalLink,
+  Pencil,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 interface Strophe {
   numero: number;
@@ -104,6 +109,16 @@ export default function HarpaReadingPage() {
   const progress = isCurrentHymn ? playerState.progress : 0;
   const duration = isCurrentHymn && playerState.duration > 0 ? playerState.duration : 192; // 3:12 padrão enquanto não toca
   const currentTime = (progress / 100) * duration;
+
+  // Verificação de admin para exibir controles de edição
+  const { user } = useAuth();
+  const isAdmin = (user?.app_metadata as Record<string, unknown> | undefined)?.role === "admin";
+
+  // Créditos dinâmicos: Supabase com fallback para JSON estático
+  const { credits, hasRealCredits } = useHymnCredits(numero);
+
+  // Estado do modal de edição de créditos (visível só para admin)
+  const [creditsModalOpen, setCreditsModalOpen] = useState(false);
 
   // Carrega estado de favorito
   useEffect(() => {
@@ -276,28 +291,8 @@ export default function HarpaReadingPage() {
     return { leftCol: left, rightCol: right };
   }, [strophes]);
 
-  // Validação estrita de créditos reais:
-  // Descarta créditos genéricos como "Coral Harpa Cristã", "Editora Harpa Cristã", "Ano: 1988"
-  const hasRealCredits = useMemo(() => {
-    if (!hymnInfo?.credits) return false;
-    const isGenericCredit = (val?: string) => {
-      if (!val) return true;
-      const lower = val.toLowerCase().trim();
-      return (
-        lower.includes("coral harpa cristã") ||
-        lower.includes("coral harpa crista") ||
-        lower.includes("editora harpa cristã") ||
-        lower.includes("editora harpa crista") ||
-        lower === "1988"
-      );
-    };
-
-    const hasVoice = Boolean(hymnInfo.credits.voice && !isGenericCredit(hymnInfo.credits.voice));
-    const hasGuitar = Boolean(hymnInfo.credits.guitar && !isGenericCredit(hymnInfo.credits.guitar));
-    const hasSource = Boolean(hymnInfo.credits.sourceUrl);
-
-    return hasVoice || hasGuitar || hasSource;
-  }, [hymnInfo]);
+  // hasRealCredits e credits vêm do hook useHymnCredits (Supabase com fallback JSON)
+  // definido acima junto aos demais hooks
 
   if (isNaN(numero) || !hymnInfo) {
     return (
@@ -764,61 +759,96 @@ export default function HarpaReadingPage() {
               </div>
             </div>
 
-            {/* 2. CARD CRÉDITOS DA GRAVAÇÃO — Exibido apenas quando há créditos reais confirmados */}
-            {hasRealCredits && hymnInfo.credits && (
+            {/* 2. CARD CRÉDITOS DA GRAVAÇÃO — Dinâmico via Supabase (fallback JSON) */}
+            {(hasRealCredits || isAdmin) && (
               <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-5 sm:p-6 shadow-xl space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
-                    <Mic className="h-3.5 w-3.5" />
-                  </span>
-                  <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-[#e5b869] font-medium">
-                    CRÉDITOS DA GRAVAÇÃO
-                  </h3>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
+                      <Mic className="h-3.5 w-3.5" />
+                    </span>
+                    <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-[#e5b869] font-medium">
+                      CRÉDITOS DA GRAVAÇÃO
+                    </h3>
+                  </div>
+
+                  {/* Botão de edição — visível somente para admin */}
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setCreditsModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#382f23] bg-[#1e1a15] px-2.5 py-1 text-[0.65rem] font-mono text-[#8f8272] hover:border-[#e5b869]/50 hover:text-[#e5b869] transition-all"
+                      title="Editar créditos desta gravação"
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Editar
+                    </button>
+                  )}
                 </div>
 
-                <p className="text-xs text-[#a89b8c] leading-relaxed">
-                  Uma poderosa mensagem sonora da Harpa Cristã, interpretada com excelência para
-                  edificar o seu coração.
-                </p>
+                {hasRealCredits && credits ? (
+                  <>
+                    <p className="text-xs text-[#a89b8c] leading-relaxed">
+                      Uma poderosa mensagem sonora da Harpa Cristã, interpretada com excelência para
+                      edificar o seu coração.
+                    </p>
 
-                <div className="pt-2 space-y-1.5 text-xs text-[#8f8272] font-sans border-t border-[#382f23]/40">
-                  {hymnInfo.credits.voice && (
-                    <p>
-                      <span className="text-[#a89b8c] font-medium">Intérprete:</span>{" "}
-                      {hymnInfo.credits.voice}
-                    </p>
-                  )}
-                  {hymnInfo.credits.guitar && (
-                    <p>
-                      <span className="text-[#a89b8c] font-medium">Violão:</span>{" "}
-                      {hymnInfo.credits.guitar}
-                    </p>
-                  )}
-                  {hymnInfo.credits.sourceUrl && (
-                    <p className="pt-1">
-                      <a
-                        href={hymnInfo.credits.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-[0.72rem] text-[#e5b869] hover:underline transition-colors"
-                      >
-                        <span>Ouvir gravação original</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </p>
-                  )}
-                </div>
+                    <div className="pt-2 space-y-1.5 text-xs text-[#8f8272] font-sans border-t border-[#382f23]/40">
+                      {credits.voice && (
+                        <p>
+                          <span className="text-[#a89b8c] font-medium">Intérprete:</span>{" "}
+                          {credits.voice}
+                        </p>
+                      )}
+                      {credits.guitar && (
+                        <p>
+                          <span className="text-[#a89b8c] font-medium">Violão:</span>{" "}
+                          {credits.guitar}
+                        </p>
+                      )}
+                      {credits.source && (
+                        <p>
+                          <span className="text-[#a89b8c] font-medium">Fonte:</span>{" "}
+                          {credits.source}
+                        </p>
+                      )}
+                      {credits.notes && (
+                        <p className="pt-1 text-[#7a6e63] italic leading-relaxed">
+                          {credits.notes}
+                        </p>
+                      )}
+                      {credits.sourceUrl && (
+                        <p className="pt-1">
+                          <a
+                            href={credits.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[0.72rem] text-[#e5b869] hover:underline transition-colors"
+                          >
+                            <span>Ouvir gravação original</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  </>
+                ) : isAdmin ? (
+                  // Placeholder para admin quando não há créditos
+                  <p className="text-[0.72rem] font-mono text-[#6e6355] italic">
+                    Nenhum crédito registrado. Clique em "Editar" para adicionar.
+                  </p>
+                ) : null}
               </div>
             )}
 
             {/* 3. CARD CITAÇÃO INSPIRADORA */}
             <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-6 shadow-xl relative overflow-hidden flex items-start gap-4">
               <span className="text-3xl font-serif text-[#e5b869] leading-none select-none opacity-80">
-                “
+                "
               </span>
               <div className="space-y-2">
                 <blockquote className="font-serif italic text-sm text-[#e8dfd5] leading-relaxed">
-                  “A Palavra de Deus não é apenas para ser lida, mas para ser vivida.”
+                  "A Palavra de Deus não é apenas para ser lida, mas para ser vivida."
                 </blockquote>
                 <p className="text-[0.72rem] font-mono text-[#8f8272]">
                   — Harpa Cristã
@@ -828,6 +858,17 @@ export default function HarpaReadingPage() {
           </aside>
         </div>
       </div>
+
+      {/* Modal de edição de créditos — montado fora do layout para evitar clipping */}
+      {isAdmin && hymnInfo && (
+        <HymnCreditsModal
+          hymnNumber={numero}
+          hymnTitle={hymnInfo.tituloFormatado}
+          open={creditsModalOpen}
+          onClose={() => setCreditsModalOpen(false)}
+        />
+      )}
     </Layout>
   );
 }
+
