@@ -33,7 +33,6 @@ export default function HomePage() {
   const { isPro } = useSubscription();
   const [version, setVersion] = useState(getVersion());
   const [lastRead, setLastRead] = useState<LastRead | null>(null);
-  const [activeTestament, setActiveTestament] = useState<"AT" | "NT">("AT");
 
   const { oldTestament, newTestament } = getBooksForLocale(locale);
 
@@ -201,7 +200,7 @@ export default function HomePage() {
           <CapituloDeHojeSection />
         </div>
 
-        {/* 3. Seção "Bíblia" com Abas de Testamentos e Grade de Livros */}
+        {/* 3. Seção "Bíblia" com Antigo e Novo Testamento Lado a Lado (Zero Fricção) */}
         <section className="mt-7 sm:mt-8 space-y-3.5">
           {/* Título e Subtítulo */}
           <div className="space-y-0.5">
@@ -213,53 +212,11 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Seletor de Testamento Estilo Pílula */}
-          <div
-            role="tablist"
-            aria-label="Filtrar por testamento"
-            className="flex items-center gap-2 pt-0.5 pb-0.5"
-          >
-            <button
-              role="tab"
-              aria-selected={activeTestament === "AT"}
-              aria-controls="book-grid-panel"
-              id="tab-at"
-              onClick={() => setActiveTestament("AT")}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-medium transition-all cursor-pointer",
-                activeTestament === "AT"
-                  ? "bg-gold text-[#121110] font-semibold shadow-xs"
-                  : "bg-transparent text-app-text-muted hover:text-app-text border border-border/80"
-              )}
-            >
-              {t("home.oldTestament")}
-            </button>
-            <button
-              role="tab"
-              aria-selected={activeTestament === "NT"}
-              aria-controls="book-grid-panel"
-              id="tab-nt"
-              onClick={() => setActiveTestament("NT")}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-medium transition-all cursor-pointer",
-                activeTestament === "NT"
-                  ? "bg-gold text-[#121110] font-semibold shadow-xs"
-                  : "bg-transparent text-app-text-muted hover:text-app-text border border-border/80"
-              )}
-            >
-              {t("home.newTestament")}
-            </button>
-          </div>
-
-          {/* Grade de Livros em 6 Colunas */}
-          <div
-            id="book-grid-panel"
-            role="tabpanel"
-            aria-labelledby={activeTestament === "AT" ? "tab-at" : "tab-nt"}
-            className="pt-1"
-          >
+          {/* Grade de Livros com Antigo e Novo Testamento lado a lado */}
+          <div id="book-grid-panel" className="pt-1">
             <BookGrid
-              books={activeTestament === "AT" ? oldTestament : newTestament}
+              oldTestament={oldTestament}
+              newTestament={newTestament}
               currentReading={lastRead ? { chapter: lastRead.capitulo, slug: lastRead.livro } : null}
               version={version}
             />

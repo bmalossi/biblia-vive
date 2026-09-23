@@ -114,5 +114,34 @@ describe("HomePage Redesign Components", () => {
       const grid = container.querySelector(".lg\\:grid-cols-6");
       expect(grid).toBeInTheDocument();
     });
+
+    it("renderiza Antigo e Novo Testamento lado a lado sem necessidade de alternar abas", () => {
+      const mockAT: Book[] = [
+        { id: "gen", name: "Gênesis", slug: "genesis", chapters: 50, abbrev: "gn" },
+        { id: "exo", name: "Êxodo", slug: "exodo", chapters: 40, abbrev: "ex" },
+      ];
+      const mockNT: Book[] = [
+        { id: "mat", name: "Mateus", slug: "mateus", chapters: 28, abbrev: "mt" },
+        { id: "rev", name: "Apocalipse", slug: "apocalipse", chapters: 22, abbrev: "ap" },
+      ];
+
+      renderWithRouter(
+        <BookGrid oldTestament={mockAT} newTestament={mockNT} version="nvi" />
+      );
+
+      // Ambos os títulos devem estar visíveis simultaneamente
+      expect(screen.getByText("Antigo Testamento")).toBeInTheDocument();
+      expect(screen.getByText("Novo Testamento")).toBeInTheDocument();
+
+      // Livros de ambos os testamentos devem estar no DOM
+      expect(screen.getByText("Gênesis")).toBeInTheDocument();
+      expect(screen.getByText("Êxodo")).toBeInTheDocument();
+      expect(screen.getByText("Mateus")).toBeInTheDocument();
+      expect(screen.getByText("Apocalipse")).toBeInTheDocument();
+
+      // Links devem apontar para a versão e slug corretos
+      expect(screen.getByRole("link", { name: "Gênesis" })).toHaveAttribute("href", "/nvi/genesis");
+      expect(screen.getByRole("link", { name: "Mateus" })).toHaveAttribute("href", "/nvi/mateus");
+    });
   });
 });

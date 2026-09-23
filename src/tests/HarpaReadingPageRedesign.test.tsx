@@ -13,6 +13,22 @@ vi.mock("@/hooks/usePageMeta", () => ({
   usePageMeta: vi.fn(),
 }));
 
+vi.mock("@/hooks/useAuth", () => ({
+  useAuth: () => ({ user: null, isAuthenticated: false }),
+}));
+
+vi.mock("@/hooks/useHymnCredits", () => ({
+  useHymnCredits: (hymnNumber: number) => ({
+    credits: hymnNumber === 322
+      ? { voice: "Juscelino Duarte", guitar: "Tiago", sourceUrl: "https://www.youtube.com/watch?v=DKEtpNajY1E" }
+      : undefined,
+    hasRealCredits: hymnNumber === 322,
+    isLoading: false,
+    updateCredits: vi.fn(),
+    isUpdating: false,
+  }),
+}));
+
 const mockPlay = vi.fn();
 const mockPause = vi.fn();
 const mockResume = vi.fn();
