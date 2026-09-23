@@ -28,8 +28,8 @@
     "titulo": "DEUS VELARÁ POR TI",
     "tituloFormatado": "Deus Velará por Ti",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "004 - ELIANE MORAES - Deus Velara por Ti.mp3",
     "credits": {
       "voice": "Eliane Moraes"
     }
@@ -55,8 +55,8 @@
     "titulo": "CRISTO CURA, SIM!",
     "tituloFormatado": "Cristo Cura, Sim!",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "007 - Cláudia Canção - Cristo Cura, Sim.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -66,8 +66,8 @@
     "titulo": "CRISTO, O FIEL AMIGO",
     "tituloFormatado": "Cristo, o Fiel Amigo",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "008 - Simiao Gomes - Cristo O fiel amigo.mp3",
     "credits": {
       "voice": "Simião Gomes"
     }
@@ -141,8 +141,8 @@
     "titulo": "PENSANDO EM JESUS",
     "tituloFormatado": "Pensando em Jesus",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "017 - Edilene Gomes - Pensando em Jesus.mp3",
     "credits": {
       "voice": "Edilene Gomes"
     }
@@ -168,8 +168,8 @@
     "titulo": "OLHAI P'RA O CORDEIRO DE DEUS",
     "tituloFormatado": "Olhai p'ra o Cordeiro de Deus",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "020 - Kennedy Lacerda - Olhai pra o Cordeiro de Deus.mp3",
     "credits": {
       "voice": "Kennedy Lacerda"
     }
@@ -211,8 +211,8 @@
     "titulo": "JESUS, TU ÉS BOM",
     "tituloFormatado": "Jesus, Tu És Bom",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "025 - Cláudia Canção - Jesus, Tu És Bom.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -302,8 +302,8 @@
     "titulo": "O EXILADO",
     "tituloFormatado": "O Exilado",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "036 - Simiao Gomes - O exilado.mp3",
     "credits": {
       "voice": "Simião Gomes"
     }
@@ -313,8 +313,8 @@
     "titulo": "CRISTO P'RA MIM",
     "tituloFormatado": "Cristo p'ra Mim",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "037 - Cristo Pra Mim.mp3"
   },
   {
     "numero": 38,
@@ -401,8 +401,8 @@
     "titulo": "O DIA DO TRIUNFO DE JESUS",
     "tituloFormatado": "O Dia do Triunfo de Jesus",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "48 - O Dia do Triunfo de Jesus.mp3"
   },
   {
     "numero": 50,
@@ -481,8 +481,8 @@
     "titulo": "EXULTAÇÃO DO CRENTE",
     "tituloFormatado": "Exultação do Crente",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "60 - O Sangue de Jesus.mp3"
   },
   {
     "numero": 61,
@@ -609,8 +609,8 @@
     "titulo": "GUARDA O CONTACTO",
     "tituloFormatado": "Guarda o Contacto",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "077 - Kennedy Lacerda - Guarda o Contacto.mp3",
     "credits": {
       "voice": "Kennedy Lacerda"
     }
@@ -664,6 +664,14 @@
     "audioFile": null
   },
   {
+    "numero": 84,
+    "titulo": "O GRANDE EU SOU",
+    "tituloFormatado": "O Grande Eu Sou",
+    "estrofes": 4,
+    "hasAudio": true,
+    "audioFile": "084 - O Grande EU SOU.mp3"
+  },
+  {
     "numero": 85,
     "titulo": "DEIXAI ENTRAR O ESPÍRITO DE DEUS",
     "tituloFormatado": "Deixai Entrar o Espírito de Deus",
@@ -692,8 +700,8 @@
     "titulo": "REVELA A NÓS, SENHOR",
     "tituloFormatado": "Revela a Nós, Senhor",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "088 - Virginia Arruda - Revela a Nós, Senhor - Hc 88.mp3",
     "credits": {
       "voice": "Virginia Arruda"
     }
@@ -847,8 +855,8 @@
     "titulo": "FIRME NAS PROMESSAS",
     "tituloFormatado": "Firme Nas Promessas",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "107 - Firme nas Promessas.mp3"
   },
   {
     "numero": 108,
@@ -871,8 +879,8 @@
     "titulo": "QUE MUDANÇA!",
     "tituloFormatado": "Que Mudança!",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "111 - Que Mudança.mp3"
   },
   {
     "numero": 112,
@@ -943,8 +951,8 @@
     "titulo": "NOITE DE PAZ",
     "tituloFormatado": "Noite de Paz",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "120 - Cláudia Canção - Noite de Paz.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -1115,7 +1123,10 @@
     "tituloFormatado": "Guia-me Sempre, Meu Senhor",
     "estrofes": 3,
     "hasAudio": true,
-    "audioFile": "141 - Guia-me Sempre, Meu Senhor.mp3"
+    "audioFile": "141 - Guia-me Sempre, Meu Senhor.mp3",
+    "credits": {
+      "voice": "Guia"
+    }
   },
   {
     "numero": 142,
@@ -1194,8 +1205,8 @@
     "titulo": "FALA, JESUS QUERIDO",
     "tituloFormatado": "Fala, Jesus Querido",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "151 - SOUL LIVRE - Fala Jesus Querido.mp3",
     "credits": {
       "voice": "Soul Livre"
     }
@@ -1221,8 +1232,8 @@
     "titulo": "DOCE NOME DE JESUS",
     "tituloFormatado": "Doce Nome de Jesus",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "154 - Cláudia Canção - Doce Nome de Jesus.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -1488,8 +1499,8 @@
     "titulo": "MAIS PERTO, MEU DEUS, DE TI!",
     "tituloFormatado": "Mais Perto, Meu Deus, de Ti!",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "187 - David Quinlan - Mais Perto Quero Estar.mp3",
     "credits": {
       "voice": "David Quinlan"
     }
@@ -1531,8 +1542,8 @@
     "titulo": "PELO SANGUE",
     "tituloFormatado": "Pelo Sangue",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "192 - MICHELE DO PANDEIRO - PELO SANGUE.mp3",
     "credits": {
       "voice": "Michele do Pandeiro"
     }
@@ -1582,8 +1593,8 @@
     "titulo": "JESUS, O BOM AMIGO",
     "tituloFormatado": "Jesus, o Bom Amigo",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "198 - Isaías Saad - JESUS O BOM AMIGO.mp3",
     "credits": {
       "voice": "Isaías Saad"
     }
@@ -1601,8 +1612,8 @@
     "titulo": "O BONDOSO AMIGO",
     "tituloFormatado": "O Bondoso Amigo",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "200 - Simiao Gomes - Bondoso amigo.mp3",
     "credits": {
       "voice": "Simião Gomes"
     }
@@ -1620,8 +1631,8 @@
     "titulo": "LUGAR DE DELÍCIAS",
     "tituloFormatado": "Lugar de Delícias",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "202 - Junto ao Trono.mp3"
   },
   {
     "numero": 203,
@@ -1636,8 +1647,8 @@
     "titulo": "O PEREGRINO NA TERRA",
     "tituloFormatado": "O Peregrino Na Terra",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "204 - Edilene Gomes - O Peregrino na Terra.mp3",
     "credits": {
       "voice": "Edilene Gomes"
     }
@@ -1807,8 +1818,8 @@
     "titulo": "SÊ VALENTE",
     "tituloFormatado": "Sê Valente",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "225 - MICHELE DO PANDEIRO - SÊ VALENTE.mp3",
     "credits": {
       "voice": "Michele do Pandeiro"
     }
@@ -1858,8 +1869,8 @@
     "titulo": "NÃO FOI COM OURO",
     "tituloFormatado": "Não Foi com Ouro",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "231 - Não Foi Com Ouro.mp3"
   },
   {
     "numero": 232,
@@ -2370,8 +2381,8 @@
     "titulo": "NO JARDIM",
     "tituloFormatado": "No Jardim",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "296 - Rafael Oliveira - No Jardim.mp3",
     "credits": {
       "voice": "Rafael Oliveira"
     }
@@ -2407,6 +2418,14 @@
     "estrofes": 5,
     "hasAudio": false,
     "audioFile": null
+  },
+  {
+    "numero": 301,
+    "titulo": "VEM CEAR",
+    "tituloFormatado": "Vem Cear",
+    "estrofes": 4,
+    "hasAudio": true,
+    "audioFile": "301 - Vem Cear.mp3"
   },
   {
     "numero": 303,
@@ -2730,8 +2749,8 @@
     "titulo": "UM AMIGO ENTRE OS LÍRIOS",
     "tituloFormatado": "Um Amigo Entre os Lírios",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "344 - Cláudia Canção - Um Amigo Entre os Lírios.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -2845,8 +2864,8 @@
     "titulo": "SENHOR, MANDA TEU PODER",
     "tituloFormatado": "Senhor, Manda Teu Poder",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "358 - MICHELE DO PANDEIRO - Senhor Manda Teu Poder.mp3",
     "credits": {
       "voice": "Michele do Pandeiro"
     }
@@ -3072,8 +3091,8 @@
     "titulo": "DERRAMA TEU ESPÍRITO",
     "tituloFormatado": "Derrama Teu Espírito",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "387 - Derrama Teu Espirito.mp3"
   },
   {
     "numero": 388,
@@ -3128,8 +3147,8 @@
     "titulo": "A MÃO DO ARADO!",
     "tituloFormatado": "A Mão do Arado!",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "394-Rafael Oliveira - A MÃO DO ARADO.mp3",
     "credits": {
       "voice": "Rafael Oliveira"
     }
@@ -3179,8 +3198,8 @@
     "titulo": "EM JESUS",
     "tituloFormatado": "Em Jesus",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "400 - Simiao Gomes - Em Jesus.mp3",
     "credits": {
       "voice": "Simião Gomes"
     }
@@ -3254,8 +3273,8 @@
     "titulo": "TRABALHADORESDO EVANGELHO",
     "tituloFormatado": "Trabalhadoresdo Evangelho",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "409 - Virginia Arruda - Trabalhadores do Evangelho - Hc 409.mp3",
     "credits": {
       "voice": "Virginia Arruda"
     }
@@ -3353,8 +3372,8 @@
     "titulo": "NO CÉU NÃO ENTRA PECADO",
     "tituloFormatado": "No Céu Não Entra Pecado",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "422 - Rafael Oliveira - NO CÉU NÃO ENTRA PECADO.mp3",
     "credits": {
       "voice": "Rafael Oliveira"
     }
@@ -3583,8 +3602,8 @@
     "titulo": "MEU JESUS VEM",
     "tituloFormatado": "Meu Jesus Vem",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "451 - Edilene Gomes - Meu Jesus Vem.mp3",
     "credits": {
       "voice": "Edilene Gomes"
     }
@@ -3690,8 +3709,8 @@
     "titulo": "SOBRE AS ONDAS DO MAR",
     "tituloFormatado": "Sobre as Ondas do Mar",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "467 - Edilene Gomes - Sobre as Ondas do Mar.mp3",
     "credits": {
       "voice": "Edilene Gomes"
     }
@@ -3709,8 +3728,8 @@
     "titulo": "AO ESTRUGIR A TROMBETE",
     "tituloFormatado": "Ao Estrugir a Trombete",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "469 - Cláudia Canção - Ao Estrugir a Trombeta (Ao Vivo).mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -3768,8 +3787,8 @@
     "titulo": "O CEGO DE JERICÓ",
     "tituloFormatado": "O Cego de Jericó",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "476 - Cláudia Canção - O Cego de Jericó.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -3891,8 +3910,8 @@
     "titulo": "HÁ PODER NO SANGUE DE JESUS",
     "tituloFormatado": "Há Poder No Sangue de Jesus",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "491 - Há Poder no Sangue de Jesus.mp3"
   },
   {
     "numero": 492,
@@ -4083,8 +4102,8 @@
     "titulo": "SE CRISTO COMIGO VAI",
     "tituloFormatado": "Se Cristo Comigo Vai",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "515 - GEILANE RODRIGUES - Se Cristo Comigo Vai.mp3",
     "credits": {
       "voice": "Geilane Rodrigues"
     }
@@ -4174,8 +4193,8 @@
     "titulo": "GRANDIOSO ÉS TU",
     "tituloFormatado": "Grandioso És Tu",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "526 - Cláudia Canção - Grandioso Es Tu (Ao Vivo).mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }
@@ -4209,8 +4228,8 @@
     "titulo": "VIVIFICA A TUA IGREJA",
     "tituloFormatado": "Vivifica a Tua Igreja",
     "estrofes": 2,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "530 - Vivifica A Tua Igreja.mp3"
   },
   {
     "numero": 531,
@@ -4249,8 +4268,8 @@
     "titulo": "TU ÉS FIEL, SENHOR",
     "tituloFormatado": "Tu És Fiel, Senhor",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "535 - SOUL LIVRE - Tu és Fiel, Senhor!.mp3",
     "credits": {
       "voice": "Soul Livre"
     }
@@ -4324,8 +4343,8 @@
     "titulo": "PORQUE ELE VIVE",
     "tituloFormatado": "Porque Ele Vive",
     "estrofes": 2,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "545 - SOUL LIVRE - Porque Ele Vive.mp3",
     "credits": {
       "voice": "Soul Livre"
     }
@@ -4343,8 +4362,8 @@
     "titulo": "O REI ESTÁ VOLTANDO",
     "tituloFormatado": "O Rei Está Voltando",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "547 - ELIANE MORAES - O Rei Esta Voltando.mp3",
     "credits": {
       "voice": "Eliane Moraes"
     }
@@ -4522,8 +4541,8 @@
     "titulo": "MORRI NA CRUZ POR TI",
     "tituloFormatado": "Morri Na Cruz por Ti",
     "estrofes": 4,
-    "hasAudio": false,
-    "audioFile": null
+    "hasAudio": true,
+    "audioFile": "569 - Morri na Cruz por Ti.mp3"
   },
   {
     "numero": 570,
@@ -4586,8 +4605,8 @@
     "titulo": "EM FERVENTE ORAÇÃO",
     "tituloFormatado": "Em Fervente Oração",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "577 - Maria Marçal - Em Fervente Oração.mp3",
     "credits": {
       "voice": "Maria Marçal"
     }
@@ -4597,8 +4616,8 @@
     "titulo": "SOSSEGAI!",
     "tituloFormatado": "Sossegai!",
     "estrofes": 3,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "578 - ELIANE MORAES - Sossegai.mp3",
     "credits": {
       "voice": "Eliane Moraes"
     }

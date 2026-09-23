@@ -20,7 +20,8 @@
     "sitemap": "tsx src/scripts/generateSitemap.ts",
     "indexnow:core": "tsx scripts/indexnow-notify.ts config/indexnow-core-urls.json",
     "indexnow:sitemap": "tsx scripts/indexnow-sitemap.ts",
-    "backfill:articles": "tsx scripts/backfill-articles-r2.ts"
+    "backfill:articles": "tsx scripts/backfill-articles-r2.ts",
+    "sync:harpa": "node scripts/sync-harpa-r2.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1044.0",
