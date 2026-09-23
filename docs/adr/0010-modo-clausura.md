@@ -21,6 +21,10 @@ A Bíblia Vive busca proporcionar um ambiente de leitura pura e livre de distra�
 3. **Inexistência de Timer de Inatividade Automática:**
    - O temporizador de inatividade e os event listeners de detecção automática foram substituídos pela gestão de estado explícita do toggle, eliminando desvanecimentos involuntários.
 
+4. **Cabeçalho Fixo do Capítulo (`sticky top-0`):**
+   - Durante o Modo Clausura, o título do capítulo (`selectedBook.name — Capítulo N`) é configurado com posicionamento `sticky top-0 z-40 backdrop-blur-md`, com borda inferior sutil e fundo semi-transparente (90% de opacidade) ajustado ao tema ativo.
+   - Isso garante que o título continue visível e fixado no topo da janela durante o scroll-down, permitindo ao leitor identificar o capítulo a qualquer momento sem quebrar o estado contemplativo.
+
 ## Consequências
 
 - Controle manual imediato e previsível para o leitor de desktop.

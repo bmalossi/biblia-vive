@@ -207,6 +207,24 @@ function stripHtml(html) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function buildOgImageTags(imageUrl = `${CANONICAL_ORIGIN}/og-default.png`, alt = 'Bíblia Vive — Leia, Estude e Compartilhe a Bíblia') {
+  return `<meta property="og:image" content="${imageUrl}" />\n` +
+         `  <meta property="og:image:secure_url" content="${imageUrl}" />\n` +
+         `  <meta property="og:image:type" content="image/png" />\n` +
+         `  <meta property="og:image:width" content="1200" />\n` +
+         `  <meta property="og:image:height" content="630" />\n` +
+         `  <meta property="og:image:alt" content="${esc(alt)}" />`;
+}
+
 /**
  * Returns all book subdirectory entries for a given version base path.
  */
@@ -434,7 +452,7 @@ function generateBookMetaTags(bookName, folder, routeSlug, version, versionLabel
     OG_TITLE:         `<meta property="og:title" content="${esc(bookName)} — ${esc(versionLabel)} — Bíblia Vive" />`,
     OG_DESCRIPTION:   `<meta property="og:description" content="${esc(desc)}" />`,
     OG_TYPE:          `<meta property="og:type" content="book" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    OG_IMAGE:         buildOgImageTags(`${CANONICAL_ORIGIN}/og-default.png`, `${bookName} — ${versionLabel} — Bíblia Vive`),
     FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(bookName)} — ${esc(versionLabel)} — Bíblia Vive" />
@@ -544,7 +562,7 @@ function generateChapterMetaTags(bookName, localId, chapterNum, verses, version,
     OG_TITLE:         `<meta property="og:title" content="${title}" />`,
     OG_DESCRIPTION:   `<meta property="og:description" content="${descText}" />`,
     OG_TYPE:          `<meta property="og:type" content="website" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    OG_IMAGE:         buildOgImageTags(`${CANONICAL_ORIGIN}/og-default.png`, `${title}`),
     FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${descText}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
@@ -699,7 +717,7 @@ function generateArticleMetaTags(article) {
     OG_TITLE:         `<meta property="og:title" content="${title}" />`,
     OG_DESCRIPTION:   `<meta property="og:description" content="${description}" />`,
     OG_TYPE:          `<meta property="og:type" content="article" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${coverImage}" />`,
+    OG_IMAGE:         buildOgImageTags(coverImage, title),
     FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${description}" />\n  <meta name="twitter:image" content="${coverImage}" />`,
     CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
@@ -858,7 +876,7 @@ function homeMetaTags() {
     OG_TITLE:         `<meta property="og:title" content="${title}" />`,
     OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
     OG_TYPE:          `<meta property="og:type" content="website" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    OG_IMAGE:         buildOgImageTags(`${CANONICAL_ORIGIN}/og-default.png`, 'Bíblia Vive — Leia, Estude e Compartilhe a Bíblia'),
     FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
@@ -1274,7 +1292,7 @@ function generateHymnMetaTags(hymnInfo, strophes, prevNum, nextNum) {
     OG_TITLE:         `<meta property="og:title" content="${esc(title)}" />`,
     OG_DESCRIPTION:   `<meta property="og:description" content="${esc(desc)}" />`,
     OG_TYPE:          `<meta property="og:type" content="music.song" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    OG_IMAGE:         buildOgImageTags(`${CANONICAL_ORIGIN}/og-default.png`, `${title}`),
     FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${esc(title)}" />\n  <meta name="twitter:description" content="${esc(desc)}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,
@@ -1387,7 +1405,7 @@ function buildStaticMeta({ title, desc, url, type, seoContent, inLanguage = 'pt-
     OG_TITLE:         `<meta property="og:title" content="${title}" />`,
     OG_DESCRIPTION:   `<meta property="og:description" content="${desc}" />`,
     OG_TYPE:          `<meta property="og:type" content="website" />`,
-    OG_IMAGE:         `<meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
+    OG_IMAGE:         buildOgImageTags(`${CANONICAL_ORIGIN}/og-default.png`, title),
     FB_APP_ID:        `<meta property="fb:app_id" content="${FB_APP_ID}" />`,
     TWITTER_CARD:     `<meta name="twitter:card" content="summary_large_image" />\n  <meta name="twitter:title" content="${title}" />\n  <meta name="twitter:description" content="${desc}" />\n  <meta name="twitter:image" content="${CANONICAL_ORIGIN}/og-default.png" />`,
     CANONICAL_URL:    `<link rel="canonical" href="${url}" />`,

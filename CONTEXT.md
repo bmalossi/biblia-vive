@@ -33,7 +33,7 @@ Contagem acumulada dos dias em que um Leitor completou todas as Referências de 
 _Evitar_: streak, sequência, dias consecutivos
 
 **Modo Clausura**:
-Estado de contemplação na tela de leitura exclusivo para desktop, ativado e desativado manualmente pelo leitor por meio de um botão flutuante persistente posicionado no canto inferior direito (acima do botão do Caderno). Ao ser ativado, toda a interface periférica (header, footer, menus e sidebar de capítulos/comentários) desvanece suavemente, restando apenas o container do texto bíblico. O botão flutuante do Modo Clausura permanece visível e interativo durante a ativação para permitir que o leitor desative o modo a qualquer momento.
+Estado de contemplação na tela de leitura exclusivo para desktop, ativado e desativado manualmente pelo leitor por meio de um botão flutuante persistente posicionado no canto inferior direito (acima do botão do Caderno). Ao ser ativado, toda a interface periférica (header, footer, menus e sidebar de capítulos/comentários) desvanece suavemente, enquanto o título do capítulo permanece fixado no topo da tela (`sticky top-0`) durante o scroll, acompanhado pelo container do texto bíblico. O botão flutuante do Modo Clausura permanece visível e interativo durante a ativação para permitir que o leitor desative o modo a qualquer momento.
 _Evitar_: modo foco automático, auto-hide, inatividade automática
 
 ### Estudo Pessoal

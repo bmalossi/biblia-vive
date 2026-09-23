@@ -2056,14 +2056,27 @@ export default function ReadingPage() {
                 onOpenModal={() => setIsScriptureThreadModalOpen(true)}
               />
 
-              <div className="mb-6">
+              <div className={cn(
+                "transition-all duration-300",
+                isClausuraActive
+                  ? cn(
+                      "sticky top-0 z-40 py-3.5 mb-6 backdrop-blur-md border-b shadow-xs",
+                      isDark
+                        ? "bg-[#151311]/90 border-[#382f23]/60"
+                        : isSepia
+                          ? "bg-[#f4ede2]/90 border-[#d8c8b0]"
+                          : "bg-white/90 border-neutral-200"
+                    )
+                  : "mb-6"
+              )}>
                 <h1 className={cn(
-                  "font-serif text-3xl sm:text-4xl font-semibold tracking-tight transition-colors duration-300",
+                  "font-serif font-semibold tracking-tight transition-all duration-300",
+                  isClausuraActive ? "text-xl sm:text-2xl text-center md:text-left" : "text-3xl sm:text-4xl",
                   isDark ? "text-[#f5f5f0]" : isSepia ? "text-[#2e241d]" : "text-neutral-900"
                 )}>
                   {selectedBook?.name} — {t("home.chapter")} {chapterNumber}
                 </h1>
-                {user && previousViewedAt && (
+                {!isClausuraActive && user && previousViewedAt && (
                   <p className={cn(
                     "mt-2 font-sans text-xs transition-colors duration-300",
                     isDark ? "text-[#a89f91]" : isSepia ? "text-[#7d6c5d]" : "text-neutral-500"
@@ -2071,10 +2084,12 @@ export default function ReadingPage() {
                     Última visualização: {formatViewedAt(previousViewedAt)}
                   </p>
                 )}
-                <div className={cn(
-                  "w-full h-px mt-5 mb-6 transition-colors duration-300",
-                  isDark ? "bg-[#382f23]/60" : isSepia ? "bg-[#d8c8b0]" : "bg-neutral-200"
-                )} />
+                {!isClausuraActive && (
+                  <div className={cn(
+                    "w-full h-px mt-5 mb-6 transition-colors duration-300",
+                    isDark ? "bg-[#382f23]/60" : isSepia ? "bg-[#d8c8b0]" : "bg-neutral-200"
+                  )} />
+                )}
               </div>
               {chapterData?.fallbackNotice && (
                 <Alert className="mb-4 border-gold/40 bg-gold/10 text-gold-dark dark:text-gold-light">
