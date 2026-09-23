@@ -1,3 +1,4 @@
+import React, { Fragment } from "react";
 import Layout from "@/components/Layout";
 import GoldenAmbientMist from "@/components/GoldenAmbientMist";
 import ReadingChapterGridCard from "@/components/ReadingChapterGridCard";
@@ -77,7 +78,8 @@ import { toast } from "@/hooks/useToast";
 import { useVerseActions } from "@/hooks/useVerseActions";
 import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi";
 import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
-import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS } from "@/lib/themes";
+import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS, getVersionLanguage } from "@/lib/themes";
+import { useSectionHeadings } from "@/hooks/useSectionHeadings";
 import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen, ChevronRight } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
@@ -366,6 +368,22 @@ export default function ReadingPage() {
     selectedBook?.id,
     chapterNumber,
     currentLang
+  );
+
+  // Subtítulos de seção — coluna principal (usa idioma da versão selecionada)
+  const mainVersionLang = getVersionLanguage(selectedVersion);
+  const { getHeadingsBeforeVerse: getMainHeadings } = useSectionHeadings(
+    selectedBook?.slug,
+    chapterNumber,
+    String(mainVersionLang)
+  );
+
+  // Subtítulos de seção — coluna de comparação (usa idioma da versão comparada)
+  const compareVersionLang = getVersionLanguage(compareVersion);
+  const { getHeadingsBeforeVerse: getCompareHeadings } = useSectionHeadings(
+    selectedBook?.slug,
+    chapterNumber,
+    String(compareVersionLang)
   );
 
   const toolbarLayerRef = useRef<HTMLDivElement>(null);
@@ -2237,25 +2255,44 @@ export default function ReadingPage() {
                           </div>
                         );
 
-                        return verseNote ? (
-                          <NotePopover
-                            key={verse.id}
-                            note={verseNote}
-                            onEditClick={() => {
-                              setSelectedVerse({
-                                anchorKey,
-                                reference: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber}:${verseNumber}`,
-                                text: primaryText,
-                                verseNumber,
-                                version: selectedVersion,
-                              });
-                              setHashHighlightedVerse(null);
-                              setIsNoteModalOpen(true);
-                            }}
-                          >
-                            {verseContent}
-                          </NotePopover>
-                        ) : verseContent;
+                        // Subtítulos de seção que devem aparecer antes deste versículo
+                        const mainSectionHeadings = getMainHeadings(verse.number ?? 0);
+
+                        const verseWithHeadings = (
+                          <>
+                            {mainSectionHeadings.map((heading) => (
+                              <p
+                                key={`heading-main-${verse.number}-${heading.before_verse}-${heading.text}`}
+                                aria-hidden="true"
+                                className="mt-6 mb-1 select-none uppercase tracking-widest text-app-text-muted font-serif"
+                                style={{ fontSize: "calc(var(--font-size-reading, 1rem) * 1.05)" }}
+                              >
+                                {heading.text}
+                              </p>
+                            ))}
+                            {verseNote ? (
+                              <NotePopover
+                                key={verse.id}
+                                note={verseNote}
+                                onEditClick={() => {
+                                  setSelectedVerse({
+                                    anchorKey,
+                                    reference: `${selectedBook?.name ?? t("reading.book")} ${chapterNumber}:${verseNumber}`,
+                                    text: primaryText,
+                                    verseNumber,
+                                    version: selectedVersion,
+                                  });
+                                  setHashHighlightedVerse(null);
+                                  setIsNoteModalOpen(true);
+                                }}
+                              >
+                                {verseContent}
+                              </NotePopover>
+                            ) : verseContent}
+                          </>
+                        );
+
+                        return <React.Fragment key={verse.id}>{verseWithHeadings}</React.Fragment>;
                       })}                    </div>
                   )}
                 </section>
@@ -2288,48 +2325,62 @@ export default function ReadingPage() {
                               ? diffVerses(cleanedContent, primaryVerseText).tokensA
                               : null;
 
+                          // Subtítulos de seção para a coluna de comparação
+                          const compareSectionHeadings = getCompareHeadings(verse.number ?? (index + 1));
+
                           return (
-                            <div
-                              aria-selected={isSelected}
-                              className={`group w-full cursor-pointer rounded-md px-1 py-1 transition-colors ${highlightClass}`}
-                              data-verse-item="true"
-                              key={verse.id}
-                              onClick={() =>
-                                handleVerseClick({
-                                  anchorKey,
-                                  text: cleanedContent,
-                                  verseNumber,
-                                  version: compareVersion,
-                                })
-                              }
-                              onPointerEnter={() => setHoveredVerseNumber(verseNumber)}
-                              onPointerLeave={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
-                              onMouseEnter={() => setHoveredVerseNumber(verseNumber)}
-                              onMouseLeave={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
-                              onFocus={() => setHoveredVerseNumber(verseNumber)}
-                              onBlur={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
-                              ref={setVerseRef(anchorKey)}
-                              role="listitem"
-                              tabIndex={0}
-                              style={{ marginBottom: "var(--verse-spacing)" }}
-                            >
-                              <div className="flex items-start gap-3 sm:gap-4">
-                                <span className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none opacity-80">
-                                  {verseNumber}
-                                </span>
+                            <React.Fragment key={verse.id}>
+                              {compareSectionHeadings.map((heading) => (
                                 <p
-                                  className={cn("flex-1 text-app-text min-w-0", compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" && "font-hebrew")}
-                                  dir={compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "rtl" : undefined}
-                                  style={{
-                                    fontFamily: compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "var(--font-hebrew)" : "var(--font-reading)",
-                                    fontSize: "var(--font-size-reading)",
-                                    lineHeight: "1.85",
-                                  }}
+                                  key={`heading-compare-${verse.number}-${heading.before_verse}-${heading.text}`}
+                                  aria-hidden="true"
+                                  className="mt-6 mb-1 select-none uppercase tracking-widest text-app-text-muted font-serif"
+                                  style={{ fontSize: "calc(var(--font-size-reading, 1rem) * 1.05)" }}
                                 >
-                                  {renderVerseText(compareDiffTokens, cleanedContent, verseNumber)}
+                                  {heading.text}
                                 </p>
+                              ))}
+                              <div
+                                aria-selected={isSelected}
+                                className={`group w-full cursor-pointer rounded-md px-1 py-1 transition-colors ${highlightClass}`}
+                                data-verse-item="true"
+                                onClick={() =>
+                                  handleVerseClick({
+                                    anchorKey,
+                                    text: cleanedContent,
+                                    verseNumber,
+                                    version: compareVersion,
+                                  })
+                                }
+                                onPointerEnter={() => setHoveredVerseNumber(verseNumber)}
+                                onPointerLeave={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
+                                onMouseEnter={() => setHoveredVerseNumber(verseNumber)}
+                                onMouseLeave={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
+                                onFocus={() => setHoveredVerseNumber(verseNumber)}
+                                onBlur={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
+                                ref={setVerseRef(anchorKey)}
+                                role="listitem"
+                                tabIndex={0}
+                                style={{ marginBottom: "var(--verse-spacing)" }}
+                              >
+                                <div className="flex items-start gap-3 sm:gap-4">
+                                  <span className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none opacity-80">
+                                    {verseNumber}
+                                  </span>
+                                  <p
+                                    className={cn("flex-1 text-app-text min-w-0", compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" && "font-hebrew")}
+                                    dir={compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "rtl" : undefined}
+                                    style={{
+                                      fontFamily: compareVersion === "org" && !!selectedBook && getLanguageLabel(selectedBook.id) === "Hebraico" ? "var(--font-hebrew)" : "var(--font-reading)",
+                                      fontSize: "var(--font-size-reading)",
+                                      lineHeight: "1.85",
+                                    }}
+                                  >
+                                    {renderVerseText(compareDiffTokens, cleanedContent, verseNumber)}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
+                            </React.Fragment>
                           );
                         })}
                       </div>
