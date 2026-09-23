@@ -19,6 +19,12 @@ export interface SubscriptionData {
     plan_type: "pro" | "templo" | "none";
 }
 
+// Module-level cache to deduplicate parallel queries and prevent duplicate fetches within 15 seconds
+let inFlightSubPromise: Promise<SubscriptionData | null> | null = null;
+let lastSubFetchTime = 0;
+let lastFetchedSubData: SubscriptionData | null = null;
+let lastFetchedUserId: string | null = null;
+
 export function useSubscription() {
     const { user } = useAuth();
 
@@ -52,6 +58,11 @@ export function useSubscription() {
         if (!user) {
             setSubscription(null);
             setLoading(false);
+            if (lastFetchedUserId) {
+                lastFetchedUserId = null;
+                lastFetchedSubData = null;
+                lastSubFetchTime = 0;
+            }
             return;
         }
 
@@ -73,7 +84,7 @@ export function useSubscription() {
 
             // Reutiliza requisição em andamento ou busca recente (< 15s) para evitar duplicatas em paralelo
             const now = Date.now();
-            if (lastSubFetchTime && now - lastSubFetchTime < 15000 && lastFetchedSubData) {
+            if (lastFetchedUserId === user.id && lastSubFetchTime && now - lastSubFetchTime < 15000 && lastFetchedSubData) {
                 setSubscription(lastFetchedSubData);
                 setLoading(false);
                 return;
@@ -114,12 +125,14 @@ export function useSubscription() {
                         const subData = data as SubscriptionData;
                         lastSubFetchTime = Date.now();
                         lastFetchedSubData = subData;
+                        lastFetchedUserId = user.id;
                         localStorage.setItem(cacheKey, JSON.stringify(subData));
                         return subData;
                     } else if (!data && !error) {
                         const noneState: SubscriptionData = { status: "none", current_period_end: null, plan_type: "none" };
                         lastSubFetchTime = Date.now();
                         lastFetchedSubData = noneState;
+                        lastFetchedUserId = user.id;
                         localStorage.setItem(cacheKey, JSON.stringify(noneState));
                         return noneState;
                     }
