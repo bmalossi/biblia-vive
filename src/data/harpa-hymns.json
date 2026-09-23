@@ -3436,8 +3436,8 @@
     "titulo": "CONSAGRADO AO SENHOR",
     "tituloFormatado": "Consagrado Ao Senhor",
     "estrofes": 5,
-    "hasAudio": false,
-    "audioFile": null,
+    "hasAudio": true,
+    "audioFile": "432 - Cláudia Canção - Consagrado ao Senhor.mp3",
     "credits": {
       "voice": "Cláudia Canção"
     }

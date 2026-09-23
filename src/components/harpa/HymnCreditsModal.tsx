@@ -6,8 +6,20 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
-import { Mic, X, Save, Loader2, Check, AlertCircle } from "lucide-react";
+import { Mic, X, Save, Loader2, Check, AlertCircle, Music, Play, ExternalLink } from "lucide-react";
 import { HymnCredits, useHymnCredits } from "@/hooks/useHymnCredits";
+
+const DEFAULT_AUDIO_BASE_URL = "https://audio.bibliavive.com.br";
+
+function buildTestUrl(fileOrUrl: string): string {
+  const trimmed = fileOrUrl.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  const cleanPath = trimmed.replace(/^\/?(harpas\/)?/, "");
+  const base = import.meta.env.VITE_R2_AUDIO_URL || DEFAULT_AUDIO_BASE_URL;
+  return `${base}/harpas/${encodeURIComponent(cleanPath)}`;
+}
 
 interface HymnCreditsModalProps {
   hymnNumber: number;
@@ -24,8 +36,10 @@ export default function HymnCreditsModal({
 }: HymnCreditsModalProps) {
   const { credits, saveCredits, isSaving, saveError } = useHymnCredits(hymnNumber);
 
-  const [form, setForm] = useState<HymnCredits>({ voice: "", source: "", notes: "" });
+  const [form, setForm] = useState<HymnCredits>({ voice: "", source: "", notes: "", sourceUrl: "", audioFile: "" });
   const [saved, setSaved] = useState(false);
+  const [testingAudio, setTestingAudio] = useState(false);
+  const [audioStatus, setAudioStatus] = useState<"ok" | "not_found" | "error" | null>(null);
 
   // Sincroniza o formulário quando os créditos atuais carregam
   useEffect(() => {
@@ -35,18 +49,57 @@ export default function HymnCreditsModal({
         source: credits?.source ?? "",
         notes: credits?.notes ?? "",
         sourceUrl: credits?.sourceUrl ?? "",
+        audioFile: credits?.audioFile ?? credits?.audioUrl ?? "",
       });
       setSaved(false);
+      setAudioStatus(null);
     }
   }, [open, credits]);
 
   if (!open) return null;
 
+  async function handleTestAudio() {
+    const input = form.audioFile?.trim();
+    if (!input) return;
+
+    setTestingAudio(true);
+    setAudioStatus(null);
+
+    try {
+      const url = buildTestUrl(input);
+      const res = await fetch(url, { method: "HEAD" });
+      if (res.ok) {
+        setAudioStatus("ok");
+      } else if (res.status === 404) {
+        setAudioStatus("not_found");
+      } else {
+        setAudioStatus("error");
+      }
+    } catch {
+      setAudioStatus("error");
+    } finally {
+      setTestingAudio(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaved(false);
     try {
-      await saveCredits(form);
+      const payload: HymnCredits = {
+        ...form,
+      };
+
+      // Se o usuário digitou uma URL completa no audioFile, salva como audioUrl também
+      const audioInput = form.audioFile?.trim() || "";
+      if (audioInput.startsWith("http://") || audioInput.startsWith("https://")) {
+        payload.audioUrl = audioInput;
+        payload.audioFile = audioInput;
+      } else if (audioInput) {
+        payload.audioFile = audioInput;
+      }
+
+      await saveCredits(payload);
       setSaved(true);
       // Fecha o modal após 1.2s para o admin ver o feedback
       setTimeout(() => {
@@ -142,7 +195,7 @@ export default function HymnCreditsModal({
               htmlFor="credits-source-url"
               className="block font-mono text-[0.68rem] tracking-wider uppercase text-[#a89b8c]"
             >
-              Link da Fonte
+              Link da Fonte (Externo)
             </label>
             <input
               id="credits-source-url"
@@ -153,7 +206,72 @@ export default function HymnCreditsModal({
               className="w-full rounded-lg border border-[#382f23]/80 bg-[#1e1a15] px-3.5 py-2.5 text-sm text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all"
             />
             <p className="text-[0.62rem] text-[#6e6355]">
-              Aparece como "Ouvir gravação original" com link externo
+              Aparece como "Ouvir gravação original" no card de créditos
+            </p>
+          </div>
+
+          {/* Arquivo ou Link do Áudio no Cloudflare R2 */}
+          <div className="space-y-2 rounded-xl border border-[#382f23]/80 bg-[#1a1713] p-3.5 shadow-inner">
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="credits-audio-file"
+                className="flex items-center gap-1.5 font-mono text-[0.68rem] tracking-wider uppercase text-[#e5b869] font-medium"
+              >
+                <Music className="h-3 w-3" />
+                <span>Áudio no Cloudflare R2</span>
+              </label>
+              {form.audioFile?.trim() && (
+                <button
+                  type="button"
+                  onClick={handleTestAudio}
+                  disabled={testingAudio}
+                  className="inline-flex items-center gap-1 rounded bg-[#2a2219] border border-[#382f23] px-2 py-0.5 text-[0.65rem] font-mono text-[#e5b869] hover:bg-[#382f23] transition-colors"
+                >
+                  {testingAudio ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Testando...</span>
+                    </>
+                  ) : (
+                    <span>Testar no R2</span>
+                  )}
+                </button>
+              )}
+            </div>
+            <input
+              id="credits-audio-file"
+              type="text"
+              value={form.audioFile ?? ""}
+              onChange={(e) => {
+                handleField("audioFile", e.target.value);
+                setAudioStatus(null);
+              }}
+              placeholder="Ex: 432 - Cláudia Canção - Consagrado ao Senhor.mp3"
+              className="w-full rounded-lg border border-[#382f23]/80 bg-[#141210] px-3.5 py-2 text-xs text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all font-mono"
+            />
+
+            {/* Feedback do teste de áudio */}
+            {audioStatus === "ok" && (
+              <p className="flex items-center gap-1.5 text-[0.68rem] text-emerald-400 font-mono">
+                <Check className="h-3.5 w-3.5 shrink-0" />
+                <span>Arquivo validado no Cloudflare R2! (200 OK)</span>
+              </p>
+            )}
+            {audioStatus === "not_found" && (
+              <p className="flex items-center gap-1.5 text-[0.68rem] text-amber-400 font-mono">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>Arquivo não encontrado no R2 (404). Verifique se o nome confere exatamente com o que subiu.</span>
+              </p>
+            )}
+            {audioStatus === "error" && (
+              <p className="flex items-center gap-1.5 text-[0.68rem] text-red-400 font-mono">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>Não foi possível verificar a URL no Cloudflare R2.</span>
+              </p>
+            )}
+
+            <p className="text-[0.62rem] text-[#8f8272] leading-relaxed">
+              Cole o nome do arquivo que você subiu no bucket <code className="text-[#c69a50]">audio-biblia-cache/harpas/</code> ou a URL completa.
             </p>
           </div>
 

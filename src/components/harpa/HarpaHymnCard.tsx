@@ -12,7 +12,7 @@ interface HarpaHymnCardProps {
 
 export default function HarpaHymnCard({ hymn }: HarpaHymnCardProps) {
   const { state, play, pause, resume } = useHarpaPlayer();
-  const { audioUrl } = useHarpaAudio(hymn.numero, hymn.tituloFormatado);
+  const { audioUrl, isAvailable } = useHarpaAudio(hymn.numero, hymn.tituloFormatado);
 
   const isCurrent = state.hymnNumber === hymn.numero;
   const isPlaying = isCurrent && state.isPlaying;
@@ -24,7 +24,7 @@ export default function HarpaHymnCard({ hymn }: HarpaHymnCardProps) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!hymn.hasAudio) return;
+    if (!hymn.hasAudio && !isAvailable) return;
 
     if (isPlaying) {
       pause();
@@ -88,7 +88,7 @@ export default function HarpaHymnCard({ hymn }: HarpaHymnCardProps) {
         )}
 
         {/* Botão de Play Circular — Exclusivo para hinos com gravação de áudio real */}
-        {hymn.hasAudio && (
+        {(hymn.hasAudio || isAvailable) && (
           <button
             type="button"
             onClick={handlePlayClick}

@@ -17,6 +17,10 @@ export interface HymnCredits {
   source?: string;
   /** Observações livres do admin */
   notes?: string;
+  /** Nome do arquivo no bucket R2 (ex: "432 - Cláudia Canção - Consagrado ao Senhor.mp3") */
+  audioFile?: string;
+  /** URL direta do áudio (ex: "https://audio.bibliavive.com.br/harpas/...") */
+  audioUrl?: string;
   // Campos legados do JSON estático (mantidos para compatibilidade)
   guitar?: string;
   sourceUrl?: string;
@@ -65,7 +69,9 @@ export function useHymnCredits(hymnNumber: number) {
     credits?.source?.trim() ||
     credits?.notes?.trim() ||
     credits?.guitar?.trim() ||
-    credits?.sourceUrl?.trim()
+    credits?.sourceUrl?.trim() ||
+    credits?.audioFile?.trim() ||
+    credits?.audioUrl?.trim()
   );
 
   // ── Escrita (admin only — RLS garante no banco) ───────────────────────────
@@ -77,6 +83,8 @@ export function useHymnCredits(hymnNumber: number) {
       if (newCredits.source?.trim())    cleaned.source    = newCredits.source.trim();
       if (newCredits.notes?.trim())     cleaned.notes     = newCredits.notes.trim();
       if (newCredits.sourceUrl?.trim()) cleaned.sourceUrl = newCredits.sourceUrl.trim();
+      if (newCredits.audioFile?.trim()) cleaned.audioFile = newCredits.audioFile.trim();
+      if (newCredits.audioUrl?.trim())  cleaned.audioUrl  = newCredits.audioUrl.trim();
 
       const { error } = await supabase.from("app_config").upsert({
         key: buildKey(hymnNumber),
@@ -89,6 +97,7 @@ export function useHymnCredits(hymnNumber: number) {
     onSuccess: () => {
       // Força refetch imediato para o admin ver o resultado salvo
       queryClient.invalidateQueries({ queryKey: ["hymn_credits", hymnNumber] });
+      queryClient.invalidateQueries({ queryKey: ["harpa_audio", hymnNumber] });
     },
   });
 
