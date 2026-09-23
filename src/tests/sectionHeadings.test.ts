@@ -23,11 +23,23 @@ const MOCK_DATA = {
       { before_verse: 18, text: "O Nascimento de Jesus Cristo" },
     ],
   },
-  re: {
+  ap: {
     "22": [
       { before_verse: 1, text: "O Rio da Vida" },
       { before_verse: 7, text: "Jesus Vem em Breve" },
     ],
+  },
+  "1rs": {
+    "1": [{ before_verse: 1, text: "Adonias Declara-se Rei" }],
+  },
+  "1cr": {
+    "1": [{ before_verse: 1, text: "A Descendência de Adão" }],
+  },
+  ne: {
+    "1": [{ before_verse: 1, text: "A História de Neemias" }],
+  },
+  os: {
+    "1": [{ before_verse: 2, text: "A Mulher e os Filhos de Oseias" }],
   },
 };
 
@@ -227,15 +239,46 @@ describe("Exemplos do PRD (integração com mock JSON)", () => {
     expect(before18[0].text).toBe("O Nascimento de Jesus Cristo");
   });
 
-  it("Ap 22:1 → 'O Rio da Vida'", async () => {
-    const headings = await getHeadingsForChapter("re", 22, "pt-BR");
+  it("Ap 22:1 → 'O Rio da Vida' (slug canônico 'ap')", async () => {
+    const headings = await getHeadingsForChapter("ap", 22, "pt-BR");
     const before1 = getHeadingsBeforeVerse(headings, 1);
     expect(before1[0].text).toBe("O Rio da Vida");
   });
 
-  it("Ap 22:7 → 'Jesus Vem em Breve'", async () => {
-    const headings = await getHeadingsForChapter("re", 22, "pt-BR");
+  it("Ap 22:7 → 'Jesus Vem em Breve' (slug canônico 'ap')", async () => {
+    const headings = await getHeadingsForChapter("ap", 22, "pt-BR");
     const before7 = getHeadingsBeforeVerse(headings, 7);
     expect(before7[0].text).toBe("Jesus Vem em Breve");
   });
+
+  it("1 Reis 1:1 → 'Adonias Declara-se Rei' (slug canônico '1rs')", async () => {
+    const headings = await getHeadingsForChapter("1rs", 1, "pt-BR");
+    const before1 = getHeadingsBeforeVerse(headings, 1);
+    expect(before1[0].text).toBe("Adonias Declara-se Rei");
+  });
+
+  it("1 Reis 1:1 → resolve via ID 'kg1'", async () => {
+    const headings = await getHeadingsForChapter("kg1", 1, "pt-BR");
+    const before1 = getHeadingsBeforeVerse(headings, 1);
+    expect(before1[0].text).toBe("Adonias Declara-se Rei");
+  });
+
+  it("1 Crônicas 1:1 → 'A Descendência de Adão' (slug canônico '1cr')", async () => {
+    const headings = await getHeadingsForChapter("1cr", 1, "pt-BR");
+    const before1 = getHeadingsBeforeVerse(headings, 1);
+    expect(before1[0].text).toBe("A Descendência de Adão");
+  });
+
+  it("Neemias 1:1 → 'A História de Neemias' (slug canônico 'ne')", async () => {
+    const headings = await getHeadingsForChapter("ne", 1, "pt-BR");
+    const before1 = getHeadingsBeforeVerse(headings, 1);
+    expect(before1[0].text).toBe("A História de Neemias");
+  });
+
+  it("Oséias 1:2 → 'A Mulher e os Filhos de Oseias' (slug canônico 'os')", async () => {
+    const headings = await getHeadingsForChapter("os", 1, "pt-BR");
+    const before2 = getHeadingsBeforeVerse(headings, 2);
+    expect(before2[0].text).toBe("A Mulher e os Filhos de Oseias");
+  });
 });
+

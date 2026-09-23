@@ -2091,7 +2091,7 @@
       }
     ]
   },
-  "jd": {
+  "jz": {
     "1": [
       {
         "before_verse": 1,
@@ -2747,7 +2747,7 @@
       }
     ]
   },
-  "1kgs": {
+  "1rs": {
     "1": [
       {
         "before_verse": 1,
@@ -3001,7 +3001,7 @@
       }
     ]
   },
-  "2kgs": {
+  "2rs": {
     "1": [
       {
         "before_verse": 1,
@@ -3285,7 +3285,7 @@
       }
     ]
   },
-  "1ch": {
+  "1cr": {
     "1": [
       {
         "before_verse": 1,
@@ -3609,7 +3609,7 @@
       }
     ]
   },
-  "2ch": {
+  "2cr": {
     "1": [
       {
         "before_verse": 1,
@@ -3885,7 +3885,7 @@
       }
     ]
   },
-  "ezr": {
+  "ed": {
     "1": [
       {
         "before_verse": 1,
@@ -4143,7 +4143,7 @@
       }
     ]
   },
-  "job": {
+  "jo": {
     "1": [
       {
         "before_verse": 1,
@@ -4293,7 +4293,7 @@
       }
     ]
   },
-  "ps": {
+  "sl": {
     "41": [
       {
         "before_verse": 14,
@@ -4409,7 +4409,7 @@
       }
     ]
   },
-  "prv": {
+  "pv": {
     "1": [
       {
         "before_verse": 1,
@@ -5893,7 +5893,7 @@
       }
     ]
   },
-  "ho": {
+  "os": {
     "1": [
       {
         "before_verse": 2,
@@ -6089,7 +6089,7 @@
       }
     ]
   },
-  "jo": {
+  "jn": {
     "1": [
       {
         "before_verse": 1,
@@ -6115,7 +6115,7 @@
       }
     ]
   },
-  "mi": {
+  "mq": {
     "1": [
       {
         "before_verse": 3,
@@ -6219,7 +6219,7 @@
       }
     ]
   },
-  "hk": {
+  "hc": {
     "1": [
       {
         "before_verse": 2,
@@ -6247,7 +6247,7 @@
       }
     ]
   },
-  "zp": {
+  "sf": {
     "1": [
       {
         "before_verse": 2,
@@ -6287,7 +6287,7 @@
       }
     ]
   },
-  "hg": {
+  "ag": {
     "1": [
       {
         "before_verse": 1,
@@ -7000,6 +7000,5224 @@
       {
         "before_verse": 16,
         "text": "A Grande Comissão"
+      }
+    ]
+  },
+  "mc": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "João Batista Prepara o Caminho"
+      },
+      {
+        "before_verse": 9,
+        "text": "O Batismo e a Tentação de Jesus"
+      },
+      {
+        "before_verse": 14,
+        "text": "Jesus Chama os Primeiros Discípulos"
+      },
+      {
+        "before_verse": 21,
+        "text": "Jesus Expulsa um Espírito Imundo"
+      },
+      {
+        "before_verse": 29,
+        "text": "O Poder de Jesus sobre os Demônios e as Doenças"
+      },
+      {
+        "before_verse": 35,
+        "text": "Jesus Ora num Lugar Deserto"
+      },
+      {
+        "before_verse": 40,
+        "text": "A Cura de um Leproso"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Cura um Paralítico"
+      },
+      {
+        "before_verse": 13,
+        "text": "O Chamado de Levi"
+      },
+      {
+        "before_verse": 18,
+        "text": "Jesus é Interrogado acerca do Jejum"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Senhor do Sábado"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 7,
+        "text": "Jesus é Procurado por uma Multidão"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Escolha dos Doze Apóstolos"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Acusação contra Jesus"
+      },
+      {
+        "before_verse": 31,
+        "text": "A Mãe e os Irmãos de Jesus"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Parábola do Semeador"
+      },
+      {
+        "before_verse": 21,
+        "text": "A Candeia"
+      },
+      {
+        "before_verse": 26,
+        "text": "A Parábola da Semente"
+      },
+      {
+        "before_verse": 30,
+        "text": "A Parábola do Grão de Mostarda"
+      },
+      {
+        "before_verse": 35,
+        "text": "Jesus Acalma a Tempestade"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "A Cura de um Endemoninhado"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Poder de Jesus sobre a Doença e a Morte"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Um Profeta sem Honra"
+      },
+      {
+        "before_verse": 7,
+        "text": "Jesus Envia os Doze"
+      },
+      {
+        "before_verse": 14,
+        "text": "João Batista é Decapitado"
+      },
+      {
+        "before_verse": 30,
+        "text": "A Primeira Multiplicação dos Pães"
+      },
+      {
+        "before_verse": 45,
+        "text": "Jesus Anda sobre as Águas"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Jesus e a Tradição Judaica"
+      },
+      {
+        "before_verse": 24,
+        "text": "Uma Mulher Siro-fenícia Demonstra Fé"
+      },
+      {
+        "before_verse": 31,
+        "text": "A Cura de um Surdo e Gago"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "A Segunda Multiplicação dos Pães"
+      },
+      {
+        "before_verse": 11,
+        "text": "Os Fariseus Pedem um Sinal"
+      },
+      {
+        "before_verse": 14,
+        "text": "O Fermento dos Fariseus e de Herodes"
+      },
+      {
+        "before_verse": 22,
+        "text": "A Cura de um Cego em Betsaida"
+      },
+      {
+        "before_verse": 27,
+        "text": "A Confissão de Pedro"
+      },
+      {
+        "before_verse": 31,
+        "text": "Jesus Prediz sua Morte e Ressurreição"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 2,
+        "text": "A Transfiguração"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Cura de um Menino Endemoninhado"
+      },
+      {
+        "before_verse": 33,
+        "text": "Quem é o Maior?"
+      },
+      {
+        "before_verse": 38,
+        "text": "Quem Não é contra Nós é por Nós"
+      },
+      {
+        "before_verse": 42,
+        "text": "A Indução ao Pecado"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "A Questão do Divórcio"
+      },
+      {
+        "before_verse": 13,
+        "text": "Jesus e as Crianças"
+      },
+      {
+        "before_verse": 17,
+        "text": "O Jovem Rico"
+      },
+      {
+        "before_verse": 32,
+        "text": "Jesus Prediz Novamente sua Morte e Ressurreição"
+      },
+      {
+        "before_verse": 35,
+        "text": "O Pedido de Tiago e João"
+      },
+      {
+        "before_verse": 46,
+        "text": "O Cego Bartimeu Recupera a Visão"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "A Entrada Triunfal"
+      },
+      {
+        "before_verse": 12,
+        "text": "Jesus Purifica o Templo"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Figueira Seca"
+      },
+      {
+        "before_verse": 27,
+        "text": "A Autoridade de Jesus é Questionada"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "A Parábola dos Lavradores"
+      },
+      {
+        "before_verse": 13,
+        "text": "O Pagamento de Imposto a César"
+      },
+      {
+        "before_verse": 18,
+        "text": "A Realidade da Ressurreição"
+      },
+      {
+        "before_verse": 28,
+        "text": "O Maior Mandamento"
+      },
+      {
+        "before_verse": 35,
+        "text": "O Cristo é Senhor de Davi"
+      },
+      {
+        "before_verse": 41,
+        "text": "A Oferta da Viúva"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "O Sinal do Fim dos Tempos"
+      },
+      {
+        "before_verse": 32,
+        "text": "O Dia e a Hora São Desconhecidos"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Jesus é Ungido em Betânia"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Ceia do Senhor"
+      },
+      {
+        "before_verse": 27,
+        "text": "Jesus Prediz que Pedro o Negará"
+      },
+      {
+        "before_verse": 32,
+        "text": "Jesus no Getsêmani"
+      },
+      {
+        "before_verse": 43,
+        "text": "Jesus é Preso"
+      },
+      {
+        "before_verse": 53,
+        "text": "Jesus diante do Sinédrio"
+      },
+      {
+        "before_verse": 66,
+        "text": "Pedro Nega Jesus"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "Jesus diante de Pilatos"
+      },
+      {
+        "before_verse": 16,
+        "text": "Os Soldados Zombam de Jesus"
+      },
+      {
+        "before_verse": 21,
+        "text": "A Crucificação"
+      },
+      {
+        "before_verse": 33,
+        "text": "A Morte de Jesus"
+      },
+      {
+        "before_verse": 42,
+        "text": "O Sepultamento de Jesus"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "A Ressurreição"
+      }
+    ]
+  },
+  "lc": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Introdução"
+      },
+      {
+        "before_verse": 5,
+        "text": "O Nascimento de João Batista é Predito"
+      },
+      {
+        "before_verse": 26,
+        "text": "O Nascimento de Jesus é Predito"
+      },
+      {
+        "before_verse": 39,
+        "text": "Maria Visita Isabel"
+      },
+      {
+        "before_verse": 46,
+        "text": "O Cântico de Maria"
+      },
+      {
+        "before_verse": 57,
+        "text": "O Nascimento de João Batista"
+      },
+      {
+        "before_verse": 67,
+        "text": "O Cântico de Zacarias"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "O Nascimento de Jesus"
+      },
+      {
+        "before_verse": 8,
+        "text": "Os Pastores e os Anjos"
+      },
+      {
+        "before_verse": 21,
+        "text": "Jesus é Apresentado no Templo"
+      },
+      {
+        "before_verse": 41,
+        "text": "O Menino Jesus no Templo"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "João Batista Prepara o Caminho"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Batismo e a Genealogia de Jesus"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Tentação de Jesus"
+      },
+      {
+        "before_verse": 14,
+        "text": "Jesus é Rejeitado em Nazaré"
+      },
+      {
+        "before_verse": 31,
+        "text": "Jesus Expulsa um Espírito Imundo"
+      },
+      {
+        "before_verse": 38,
+        "text": "O Poder de Jesus sobre os Demônios e as Doenças"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Chama os Primeiros Discípulos"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Cura de um Leproso"
+      },
+      {
+        "before_verse": 17,
+        "text": "Jesus Cura um Paralítico"
+      },
+      {
+        "before_verse": 27,
+        "text": "O Chamado de Levi"
+      },
+      {
+        "before_verse": 33,
+        "text": "Jesus é Interrogado acerca do Jejum"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "O Senhor do Sábado"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Escolha dos Doze Apóstolos"
+      },
+      {
+        "before_verse": 17,
+        "text": "Bênçãos e Ais"
+      },
+      {
+        "before_verse": 27,
+        "text": "O Amor aos Inimigos"
+      },
+      {
+        "before_verse": 37,
+        "text": "O Julgamento ao Próximo"
+      },
+      {
+        "before_verse": 43,
+        "text": "A Árvore e seu Fruto"
+      },
+      {
+        "before_verse": 46,
+        "text": "O Prudente e o Insensato"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Um Centurião Demonstra Fé"
+      },
+      {
+        "before_verse": 11,
+        "text": "Jesus Ressuscita o Filho de uma Viúva"
+      },
+      {
+        "before_verse": 18,
+        "text": "Jesus e João Batista"
+      },
+      {
+        "before_verse": 36,
+        "text": "Jesus é Ungido por uma Pecadora"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "A Parábola do Semeador"
+      },
+      {
+        "before_verse": 16,
+        "text": "A Candeia"
+      },
+      {
+        "before_verse": 19,
+        "text": "A Mãe e os Irmãos de Jesus"
+      },
+      {
+        "before_verse": 22,
+        "text": "Jesus Acalma a Tempestade"
+      },
+      {
+        "before_verse": 26,
+        "text": "A Cura de um Endemoninhado"
+      },
+      {
+        "before_verse": 40,
+        "text": "O Poder de Jesus sobre a Doença e a Morte"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Envia os Doze"
+      },
+      {
+        "before_verse": 10,
+        "text": "A Primeira Multiplicação dos Pães"
+      },
+      {
+        "before_verse": 18,
+        "text": "A Confissão de Pedro"
+      },
+      {
+        "before_verse": 28,
+        "text": "A Transfiguração"
+      },
+      {
+        "before_verse": 37,
+        "text": "A Cura de um Menino Endemoninhado"
+      },
+      {
+        "before_verse": 46,
+        "text": "Quem Será o Maior?"
+      },
+      {
+        "before_verse": 51,
+        "text": "A Oposição Samaritana"
+      },
+      {
+        "before_verse": 57,
+        "text": "Quão Difícil é Seguir Jesus!"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Envia Setenta e Dois Discípulos"
+      },
+      {
+        "before_verse": 25,
+        "text": "A Parábola do Bom Samaritano"
+      },
+      {
+        "before_verse": 38,
+        "text": "Na Casa de Marta e de Maria"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "O Ensino de Jesus acerca da Oração"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Acusação contra Jesus"
+      },
+      {
+        "before_verse": 29,
+        "text": "O Sinal de Jonas"
+      },
+      {
+        "before_verse": 33,
+        "text": "A Candeia do Corpo"
+      },
+      {
+        "before_verse": 37,
+        "text": "Jesus Condena a Hipocrisia dos Fariseus e dos Peritos na Lei"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Advertências e Motivações"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Parábola do Rico Insensato"
+      },
+      {
+        "before_verse": 22,
+        "text": "As Preocupações da Vida"
+      },
+      {
+        "before_verse": 35,
+        "text": "Prontidão para o Serviço"
+      },
+      {
+        "before_verse": 49,
+        "text": "Jesus Não Traz Paz, mas Divisão"
+      },
+      {
+        "before_verse": 54,
+        "text": "Os Sinais dos Tempos"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "Arrependimento ou Morte"
+      },
+      {
+        "before_verse": 10,
+        "text": "Uma Mulher Curada no Sábado"
+      },
+      {
+        "before_verse": 18,
+        "text": "As Parábolas do Grão de Mostarda e do Fermento"
+      },
+      {
+        "before_verse": 22,
+        "text": "A Porta Estreita"
+      },
+      {
+        "before_verse": 31,
+        "text": "O Lamento Profético sobre Jerusalém"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Jesus na Casa de um Fariseu"
+      },
+      {
+        "before_verse": 15,
+        "text": "A Parábola do Grande Banquete"
+      },
+      {
+        "before_verse": 25,
+        "text": "O Preço do Discipulado"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "A Parábola da Ovelha Perdida"
+      },
+      {
+        "before_verse": 8,
+        "text": "A Parábola da Moeda Perdida"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Parábola do Filho Perdido"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "A Parábola do Administrador Astuto"
+      },
+      {
+        "before_verse": 16,
+        "text": "Outros Ensinamentos"
+      },
+      {
+        "before_verse": 19,
+        "text": "O Rico e Lázaro"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "O Pecado, a Fé e o Dever"
+      },
+      {
+        "before_verse": 11,
+        "text": "Dez Leprosos São Curados"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Vinda do Reino de Deus"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "A Parábola da Viúva Persistente"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Parábola do Fariseu e do Publicano"
+      },
+      {
+        "before_verse": 15,
+        "text": "Jesus e as Crianças"
+      },
+      {
+        "before_verse": 18,
+        "text": "Jesus e o Homem Rico"
+      },
+      {
+        "before_verse": 31,
+        "text": "Jesus Prediz Novamente sua Morte e Ressurreição"
+      },
+      {
+        "before_verse": 35,
+        "text": "Um Mendigo Cego Recupera a Visão"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Zaqueu, o Publicano"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Parábola das Dez Minas"
+      },
+      {
+        "before_verse": 28,
+        "text": "A Entrada Triunfal"
+      },
+      {
+        "before_verse": 41,
+        "text": "Lamento sobre Jerusalém"
+      },
+      {
+        "before_verse": 45,
+        "text": "Jesus Purifica o Templo"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "A Autoridade de Jesus é Questionada"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Parábola dos Lavradores"
+      },
+      {
+        "before_verse": 20,
+        "text": "O Pagamento de Imposto a César"
+      },
+      {
+        "before_verse": 27,
+        "text": "A Realidade da Ressurreição"
+      },
+      {
+        "before_verse": 41,
+        "text": "O Cristo é Senhor de Davi"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "A Oferta da Viúva"
+      },
+      {
+        "before_verse": 5,
+        "text": "O Sinal do Fim dos Tempos"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "A Conspiração"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Ceia do Senhor"
+      },
+      {
+        "before_verse": 39,
+        "text": "Jesus Ora no Monte das Oliveiras"
+      },
+      {
+        "before_verse": 47,
+        "text": "Jesus é Preso"
+      },
+      {
+        "before_verse": 54,
+        "text": "Pedro Nega Jesus"
+      },
+      {
+        "before_verse": 63,
+        "text": "Os Soldados Zombam de Jesus"
+      },
+      {
+        "before_verse": 66,
+        "text": "Jesus perante Pilatos e Herodes"
+      }
+    ],
+    "23": [
+      {
+        "before_verse": 26,
+        "text": "A Crucificação"
+      },
+      {
+        "before_verse": 44,
+        "text": "A Morte de Jesus"
+      },
+      {
+        "before_verse": 50,
+        "text": "O Sepultamento de Jesus"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 1,
+        "text": "A Ressurreição"
+      },
+      {
+        "before_verse": 13,
+        "text": "No Caminho de Emaús"
+      },
+      {
+        "before_verse": 36,
+        "text": "Jesus Aparece aos Discípulos"
+      },
+      {
+        "before_verse": 50,
+        "text": "A Ascensão"
+      }
+    ]
+  },
+  "joa": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "A Palavra Tornou-se Carne"
+      },
+      {
+        "before_verse": 19,
+        "text": "João Batista Nega Ser Ele o Cristo"
+      },
+      {
+        "before_verse": 29,
+        "text": "Jesus, o Cordeiro de Deus"
+      },
+      {
+        "before_verse": 35,
+        "text": "Os Primeiros Discípulos de Jesus"
+      },
+      {
+        "before_verse": 43,
+        "text": "Jesus Chama Filipe e Natanael"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Transforma Água em Vinho"
+      },
+      {
+        "before_verse": 12,
+        "text": "Jesus Purifica o Templo"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Encontro de Jesus com Nicodemos"
+      },
+      {
+        "before_verse": 22,
+        "text": "O Testemunho de João Batista acerca de Jesus"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Conversa com uma Samaritana"
+      },
+      {
+        "before_verse": 27,
+        "text": "Os Discípulos Voltam da Cidade"
+      },
+      {
+        "before_verse": 39,
+        "text": "Muitos Samaritanos Creem"
+      },
+      {
+        "before_verse": 43,
+        "text": "Jesus Cura o Filho de um Oficial"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "A Cura Junto ao Tanque de Betesda"
+      },
+      {
+        "before_verse": 16,
+        "text": "Vida por meio do Filho"
+      },
+      {
+        "before_verse": 31,
+        "text": "Testemunhos acerca de Jesus"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "A Primeira Multiplicação dos Pães"
+      },
+      {
+        "before_verse": 16,
+        "text": "Jesus Anda sobre as Águas"
+      },
+      {
+        "before_verse": 25,
+        "text": "Jesus, o Pão da Vida"
+      },
+      {
+        "before_verse": 60,
+        "text": "Muitos Discípulos Abandonam Jesus"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Vai à Festa das Cabanas"
+      },
+      {
+        "before_verse": 14,
+        "text": "Jesus Ensina na Festa"
+      },
+      {
+        "before_verse": 25,
+        "text": "É Jesus o Cristo?"
+      },
+      {
+        "before_verse": 45,
+        "text": "A Incredulidade dos Líderes Judeus"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 12,
+        "text": "A Validade do Testemunho de Jesus"
+      },
+      {
+        "before_verse": 31,
+        "text": "Os Filhos de Abraão e os Filhos do Diabo"
+      },
+      {
+        "before_verse": 48,
+        "text": "As Declarações de Jesus acerca de si mesmo"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Cura um Cego de Nascença"
+      },
+      {
+        "before_verse": 13,
+        "text": "Os Fariseus Investigam a Cura"
+      },
+      {
+        "before_verse": 35,
+        "text": "A Cegueira Espiritual"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Pastor e o seu Rebanho"
+      },
+      {
+        "before_verse": 22,
+        "text": "A Incredulidade dos Judeus"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "A Morte de Lázaro"
+      },
+      {
+        "before_verse": 17,
+        "text": "Jesus Conforta as Irmãs de Lázaro"
+      },
+      {
+        "before_verse": 38,
+        "text": "Jesus Ressuscita Lázaro"
+      },
+      {
+        "before_verse": 45,
+        "text": "A Conspiração para Matar Jesus"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Jesus é Ungido em Betânia"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Entrada Triunfal"
+      },
+      {
+        "before_verse": 20,
+        "text": "Jesus Prediz sua Morte"
+      },
+      {
+        "before_verse": 37,
+        "text": "A Incredulidade dos Judeus"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Lava os Pés dos Discípulos"
+      },
+      {
+        "before_verse": 18,
+        "text": "Jesus Prediz que Será Traído"
+      },
+      {
+        "before_verse": 31,
+        "text": "Jesus Prediz que Pedro o Negará"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Fortalece os seus Discípulos"
+      },
+      {
+        "before_verse": 5,
+        "text": "Jesus, o Caminho para o Pai"
+      },
+      {
+        "before_verse": 15,
+        "text": "Jesus Promete o Espírito Santo"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "A Videira e os Ramos"
+      },
+      {
+        "before_verse": 18,
+        "text": "O Mundo Odeia os Discípulos"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 5,
+        "text": "A Obra do Espírito Santo"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Tristeza dos Discípulos Será Transformada em Alegria"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "Jesus Ora por si mesmo"
+      },
+      {
+        "before_verse": 6,
+        "text": "Jesus Ora por seus Discípulos"
+      },
+      {
+        "before_verse": 20,
+        "text": "Jesus Ora por Todos os Crentes"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "Jesus é Preso"
+      },
+      {
+        "before_verse": 12,
+        "text": "Jesus é Levado a Anás"
+      },
+      {
+        "before_verse": 15,
+        "text": "Pedro Nega Jesus"
+      },
+      {
+        "before_verse": 19,
+        "text": "O Sumo Sacerdote Interroga Jesus"
+      },
+      {
+        "before_verse": 25,
+        "text": "Pedro Nega Jesus Mais Duas Vezes"
+      },
+      {
+        "before_verse": 28,
+        "text": "Jesus diante de Pilatos"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Jesus é Condenado à Crucificação"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Crucificação"
+      },
+      {
+        "before_verse": 28,
+        "text": "A Morte de Jesus"
+      },
+      {
+        "before_verse": 38,
+        "text": "O Sepultamento de Jesus"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "A Ressurreição"
+      },
+      {
+        "before_verse": 10,
+        "text": "Jesus Aparece a Maria Madalena"
+      },
+      {
+        "before_verse": 19,
+        "text": "Jesus Aparece aos Discípulos"
+      },
+      {
+        "before_verse": 24,
+        "text": "Jesus Aparece a Tomé"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "Jesus e a Pesca Maravilhosa"
+      },
+      {
+        "before_verse": 15,
+        "text": "Jesus Restaura Pedro"
+      }
+    ]
+  },
+  "atos": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "A Ascensão de Jesus"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Escolha de Matias"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Vinda do Espírito Santo no Dia de Pentecoste"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Pregação de Pedro"
+      },
+      {
+        "before_verse": 42,
+        "text": "A Comunhão dos Cristãos"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Cura de um Mendigo Aleijado"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Pregação de Pedro no Templo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Pedro e João perante o Sinédrio"
+      },
+      {
+        "before_verse": 23,
+        "text": "A Oração dos Primeiros Cristãos"
+      },
+      {
+        "before_verse": 32,
+        "text": "Os Discípulos Repartem seus Bens"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Ananias e Safira"
+      },
+      {
+        "before_verse": 12,
+        "text": "Os Apóstolos Curam Muitos Doentes"
+      },
+      {
+        "before_verse": 17,
+        "text": "Os Apóstolos São Perseguidos"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "A Escolha dos Sete"
+      },
+      {
+        "before_verse": 8,
+        "text": "A Prisão de Estêvão"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "O Discurso de Estêvão no Sinédrio"
+      },
+      {
+        "before_verse": 54,
+        "text": "O Apedrejamento de Estêvão"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 2,
+        "text": "A Perseguição e a Dispersão da Igreja"
+      },
+      {
+        "before_verse": 4,
+        "text": "Filipe em Samaria"
+      },
+      {
+        "before_verse": 9,
+        "text": "Simão, o Mago"
+      },
+      {
+        "before_verse": 26,
+        "text": "Filipe e o Etíope"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "A Conversão de Saulo"
+      },
+      {
+        "before_verse": 20,
+        "text": "Saulo em Damasco e em Jerusalém"
+      },
+      {
+        "before_verse": 32,
+        "text": "Eneias e Dorcas"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Centurião Cornélio"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Visão de Pedro"
+      },
+      {
+        "before_verse": 24,
+        "text": "Pedro na Casa de Cornélio"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "Pedro Explica-se perante a Igreja"
+      },
+      {
+        "before_verse": 19,
+        "text": "A Igreja em Antioquia"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Pedro é Milagrosamente Libertado da Prisão"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Morte de Herodes"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "A Missão de Barnabé e Saulo"
+      },
+      {
+        "before_verse": 4,
+        "text": "Em Chipre"
+      },
+      {
+        "before_verse": 13,
+        "text": "Em Antioquia da Pisídia"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Em Icônio"
+      },
+      {
+        "before_verse": 8,
+        "text": "Em Listra e em Derbe"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Retorno para Antioquia da Síria"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "O Concílio de Jerusalém"
+      },
+      {
+        "before_verse": 22,
+        "text": "A Carta do Concílio aos Cristãos Gentios"
+      },
+      {
+        "before_verse": 36,
+        "text": "O Desentendimento entre Paulo e Barnabé"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "Timóteo Acompanha Paulo e Silas"
+      },
+      {
+        "before_verse": 6,
+        "text": "A Visão de Paulo em Trôade"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Conversão de Lídia em Filipos"
+      },
+      {
+        "before_verse": 16,
+        "text": "Paulo e Silas na Prisão"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "Em Tessalônica"
+      },
+      {
+        "before_verse": 10,
+        "text": "Em Bereia"
+      },
+      {
+        "before_verse": 16,
+        "text": "Em Atenas"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "Em Corinto"
+      },
+      {
+        "before_verse": 18,
+        "text": "Priscila, Áquila e Apolo"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Paulo em Éfeso"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Tumulto em Éfeso"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Paulo Viaja pela Macedônia e pela Grécia"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Ressurreição de Êutico em Trôade"
+      },
+      {
+        "before_verse": 13,
+        "text": "Paulo Despede-se dos Presbíteros de Éfeso"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "A Caminho de Jerusalém"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Chegada de Paulo a Jerusalém"
+      },
+      {
+        "before_verse": 27,
+        "text": "A Prisão de Paulo"
+      },
+      {
+        "before_verse": 37,
+        "text": "O Discurso de Paulo"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 22,
+        "text": "Paulo, Cidadão Romano"
+      },
+      {
+        "before_verse": 30,
+        "text": "Paulo Diante do Sinédrio"
+      }
+    ],
+    "23": [
+      {
+        "before_verse": 12,
+        "text": "A Conspiração para Matar Paulo"
+      },
+      {
+        "before_verse": 23,
+        "text": "Paulo é Transferido para Cesareia"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 1,
+        "text": "O Julgamento de Paulo perante Félix"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 1,
+        "text": "O Julgamento perante Festo"
+      },
+      {
+        "before_verse": 13,
+        "text": "Festo Consulta o Rei Agripa"
+      },
+      {
+        "before_verse": 23,
+        "text": "Paulo perante Agripa"
+      }
+    ],
+    "27": [
+      {
+        "before_verse": 1,
+        "text": "A Viagem de Paulo para Roma"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Tempestade"
+      },
+      {
+        "before_verse": 27,
+        "text": "O Naufrágio"
+      }
+    ],
+    "28": [
+      {
+        "before_verse": 1,
+        "text": "Paulo na Ilha de Malta"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Chegada a Roma"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Pregação de Paulo em Roma"
+      }
+    ]
+  },
+  "rm": {
+    "1": [
+      {
+        "before_verse": 8,
+        "text": "Paulo Anseia Visitar a Igreja em Roma"
+      },
+      {
+        "before_verse": 18,
+        "text": "A Ira de Deus contra a Humanidade"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "O Justo Juízo de Deus"
+      },
+      {
+        "before_verse": 17,
+        "text": "Os Judeus e a Lei"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 9,
+        "text": "Ninguém é Justo"
+      },
+      {
+        "before_verse": 21,
+        "text": "A Justiça por meio da Fé"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Abraão Foi Justificado pela Fé"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Paz e Alegria"
+      },
+      {
+        "before_verse": 12,
+        "text": "Morte em Adão, Vida em Cristo"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Mortos para o Pecado, Vivos em Cristo"
+      },
+      {
+        "before_verse": 15,
+        "text": "Escravos da Justiça"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "A Ilustração do Casamento"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Luta contra o Pecado"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "A Vida pelo Espírito"
+      },
+      {
+        "before_verse": 18,
+        "text": "A Glória Futura"
+      },
+      {
+        "before_verse": 28,
+        "text": "Mais que Vencedores"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "A Soberania de Deus"
+      },
+      {
+        "before_verse": 30,
+        "text": "A Incredulidade de Israel"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "O Remanescente de Israel"
+      },
+      {
+        "before_verse": 11,
+        "text": "Os Ramos Enxertados"
+      },
+      {
+        "before_verse": 25,
+        "text": "Todo o Israel Será Salvo"
+      },
+      {
+        "before_verse": 33,
+        "text": "Hino de Louvor a Deus"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Sacrifícios Vivos"
+      },
+      {
+        "before_verse": 9,
+        "text": "O Amor"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "Submissão às Autoridades"
+      },
+      {
+        "before_verse": 8,
+        "text": "O Amor ao Próximo e o Fim dos Tempos"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Os Fracos e os Fortes"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 14,
+        "text": "Paulo, Ministro dos Gentios"
+      },
+      {
+        "before_verse": 23,
+        "text": "Paulo Planeja Visitar a Igreja em Roma"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "Saudações Pessoais"
+      }
+    ]
+  },
+  "1co": {
+    "1": [
+      {
+        "before_verse": 4,
+        "text": "A Gratidão de Paulo"
+      },
+      {
+        "before_verse": 10,
+        "text": "As Divisões na Igreja"
+      },
+      {
+        "before_verse": 18,
+        "text": "Cristo, Sabedoria e Poder de Deus"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 6,
+        "text": "A Sabedoria Procedente do Espírito"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "As Divisões na Igreja"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Apóstolos de Cristo"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Imoralidade na Igreja!"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 12,
+        "text": "O Perigo da Imoralidade"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Acerca do Casamento"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "A Comida Sacrificada aos Ídolos"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "Os Direitos de um Apóstolo"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "Exemplos da História de Israel"
+      },
+      {
+        "before_verse": 14,
+        "text": "As Festas Idólatras e a Ceia do Senhor"
+      },
+      {
+        "before_verse": 23,
+        "text": "A Liberdade do Cristão"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 2,
+        "text": "Instruções sobre a Adoração"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Ceia do Senhor"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Os Dons Espirituais"
+      },
+      {
+        "before_verse": 12,
+        "text": "Diversidade na Unidade"
+      },
+      {
+        "before_verse": 32,
+        "text": "O Amor"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Os Dons de Profecia e de Línguas"
+      },
+      {
+        "before_verse": 26,
+        "text": "Ordem no Culto"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "A Ressurreição de Cristo"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Ressurreição dentre os Mortos"
+      },
+      {
+        "before_verse": 35,
+        "text": "O Corpo da Ressurreição"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "A Coleta para o Povo de Deus"
+      },
+      {
+        "before_verse": 5,
+        "text": "Pedidos Pessoais"
+      },
+      {
+        "before_verse": 19,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "2co": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Deus é o Nosso Consolador"
+      },
+      {
+        "before_verse": 12,
+        "text": "Paulo Muda seus Planos"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 5,
+        "text": "Perdão para o Pecador"
+      },
+      {
+        "before_verse": 12,
+        "text": "Ministros da Nova Aliança"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 7,
+        "text": "A Glória da Nova Aliança"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Tesouros em Vasos de Barro"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Nossa Habitação Celestial"
+      },
+      {
+        "before_verse": 11,
+        "text": "O Ministério da Reconciliação"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 3,
+        "text": "Os Sofrimentos de Paulo"
+      },
+      {
+        "before_verse": 14,
+        "text": "O Problema da Associação com os Descrentes"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 2,
+        "text": "A Alegria de Paulo"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "Incentivo à Contribuição"
+      },
+      {
+        "before_verse": 16,
+        "text": "A Coleta para os Crentes da Judeia"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 6,
+        "text": "Semeando com Generosidade"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "Paulo Defende o seu Ministério"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "A Preocupação de Paulo com a Fidelidade dos Coríntios"
+      },
+      {
+        "before_verse": 16,
+        "text": "Paulo Orgulha-se dos seus Sofrimentos"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "A Visão de Paulo"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Preocupação de Paulo com os Coríntios"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "Advertências Finais"
+      },
+      {
+        "before_verse": 11,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "gl": {
+    "1": [
+      {
+        "before_verse": 6,
+        "text": "Não Há Outro Evangelho"
+      },
+      {
+        "before_verse": 11,
+        "text": "Paulo, Chamado por Deus"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Paulo é Aceito pelos Apóstolos"
+      },
+      {
+        "before_verse": 11,
+        "text": "Paulo Repreende a Pedro"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Fé ou Obediência à Lei?"
+      },
+      {
+        "before_verse": 15,
+        "text": "A Lei e a Promessa"
+      },
+      {
+        "before_verse": 26,
+        "text": "Os Filhos de Deus"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 8,
+        "text": "A Preocupação de Paulo com os Gálatas"
+      },
+      {
+        "before_verse": 21,
+        "text": "Sara e Hagar"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "A Liberdade em Cristo"
+      },
+      {
+        "before_verse": 16,
+        "text": "Vida pelo Espírito"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Façamos o Bem a Todos"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Nova Criação Substitui a Circuncisão"
+      }
+    ]
+  },
+  "ef": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "As Bênçãos Espirituais em Cristo"
+      },
+      {
+        "before_verse": 15,
+        "text": "Ação de Graças e Oração"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Nova Vida em Cristo"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Nova Humanidade em Cristo"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Apóstolo dos Gentios"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Oração de Paulo pelos Santos"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Unidade do Corpo de Cristo"
+      },
+      {
+        "before_verse": 17,
+        "text": "O Procedimento dos Filhos da Luz"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 15,
+        "text": "Vida em Comunidade"
+      },
+      {
+        "before_verse": 22,
+        "text": "Deveres Conjugais"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Deveres de Pais e Filhos"
+      },
+      {
+        "before_verse": 5,
+        "text": "Deveres de Escravos e Senhores"
+      },
+      {
+        "before_verse": 10,
+        "text": "A Armadura de Deus"
+      },
+      {
+        "before_verse": 21,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "fp": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Ação de Graças e Oração"
+      },
+      {
+        "before_verse": 12,
+        "text": "Os Sofrimentos de Paulo Contribuem para a Expansão do Evangelho"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Humildade Cristã"
+      },
+      {
+        "before_verse": 12,
+        "text": "Brilhando como Estrelas"
+      },
+      {
+        "before_verse": 19,
+        "text": "Timóteo e Epafrodito"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Plena Confiança em Cristo"
+      },
+      {
+        "before_verse": 12,
+        "text": "Prosseguindo para o Alvo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 2,
+        "text": "Exortações"
+      },
+      {
+        "before_verse": 10,
+        "text": "Agradecimentos pelas Ofertas"
+      },
+      {
+        "before_verse": 21,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "cl": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Ação de Graças"
+      },
+      {
+        "before_verse": 15,
+        "text": "A Supremacia de Cristo"
+      },
+      {
+        "before_verse": 24,
+        "text": "O Trabalho de Paulo pela Igreja"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 6,
+        "text": "Livres do Legalismo por meio de Cristo"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Instruções para um Viver Santo"
+      },
+      {
+        "before_verse": 18,
+        "text": "Responsabilidade Social"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 2,
+        "text": "Outras Instruções"
+      },
+      {
+        "before_verse": 7,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "1ts": {
+    "1": [
+      {
+        "before_verse": 2,
+        "text": "Ação de Graças pela Fé e pelo Exemplo dos Tessalonicenses"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "O Ministério de Paulo em Tessalônica"
+      },
+      {
+        "before_verse": 17,
+        "text": "Paulo Deseja Rever os Tessalonicenses"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 6,
+        "text": "As Boas Notícias Trazidas por Timóteo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Vivendo para Agradar a Deus"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Vinda do Senhor"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 12,
+        "text": "Instruções Finais"
+      }
+    ]
+  },
+  "2ts": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Ação de Graças e Oração"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "O Homem do Pecado"
+      },
+      {
+        "before_verse": 13,
+        "text": "Exortação à Perseverança"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Um Pedido de Oração"
+      },
+      {
+        "before_verse": 6,
+        "text": "Uma Advertência contra a Ociosidade"
+      },
+      {
+        "before_verse": 16,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "1tm": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Advertências contra Falsos Mestres da Lei"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Graça de Deus Concedida a Paulo"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Instruções acerca da Adoração"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Bispos e Diáconos"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Instruções a Timóteo"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Conselhos acerca de Viúvas, Líderes e Escravos"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 3,
+        "text": "O Amor ao Dinheiro"
+      },
+      {
+        "before_verse": 11,
+        "text": "Recomendação de Paulo a Timóteo"
+      }
+    ]
+  },
+  "2tm": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Um Incentivo à Fidelidade"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 14,
+        "text": "O Obreiro Aprovado por Deus"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Impiedade dos Últimos Dias"
+      },
+      {
+        "before_verse": 10,
+        "text": "A Recomendação de Paulo a Timóteo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 9,
+        "text": "Recomendações Finais"
+      },
+      {
+        "before_verse": 19,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "tt": {
+    "1": [
+      {
+        "before_verse": 5,
+        "text": "A Tarefa de Tito em Creta"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Instruções para Vários Grupos"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Conduta Cristã"
+      },
+      {
+        "before_verse": 12,
+        "text": "Observações Finais"
+      }
+    ]
+  },
+  "fm": {
+    "1": [
+      {
+        "before_verse": 4,
+        "text": "Ação de Graças e Intercessão"
+      },
+      {
+        "before_verse": 8,
+        "text": "A Intercessão de Paulo em favor de Onésimo"
+      }
+    ]
+  },
+  "hb": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "O Filho é Superior aos Anjos"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "O Perigo da Negligência"
+      },
+      {
+        "before_verse": 5,
+        "text": "Jesus é Feito Semelhante a seus Irmãos"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Jesus é Superior a Moisés"
+      },
+      {
+        "before_verse": 7,
+        "text": "Advertência contra a Incredulidade"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Um Descanso Sabático para o Povo de Deus"
+      },
+      {
+        "before_verse": 14,
+        "text": "Jesus, o Grande Sumo Sacerdote"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 11,
+        "text": "Advertência contra a Apostasia"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 13,
+        "text": "A Certeza da Promessa de Deus"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "O Sacerdote Melquisedeque"
+      },
+      {
+        "before_verse": 11,
+        "text": "Jesus é Semelhante a Melquisedeque"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "O Sumo Sacerdote de uma Nova Aliança"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "A Adoração no Tabernáculo Terreno"
+      },
+      {
+        "before_verse": 11,
+        "text": "O Sangue de Cristo"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Sacrifício de Cristo é Definitivo"
+      },
+      {
+        "before_verse": 19,
+        "text": "Um Apelo à Perseverança"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "Exemplos de Fé"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Deus Disciplina os seus Filhos"
+      },
+      {
+        "before_verse": 14,
+        "text": "Advertência contra a Rejeição de Deus"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "Exortações Finais"
+      }
+    ]
+  },
+  "tg": {
+    "1": [
+      {
+        "before_verse": 2,
+        "text": "Provas e Tentações"
+      },
+      {
+        "before_verse": 19,
+        "text": "Praticando a Palavra"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Proibida a Acepção de Pessoas"
+      },
+      {
+        "before_verse": 14,
+        "text": "Fé e Obras"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Domínio sobre a Língua"
+      },
+      {
+        "before_verse": 13,
+        "text": "Os Dois Tipos de Sabedoria"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Submissão a Deus"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Incerteza dos Planos Humanos"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Advertência aos Ricos Opressores"
+      },
+      {
+        "before_verse": 7,
+        "text": "Paciência nos Sofrimentos"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Oração da Fé"
+      }
+    ]
+  },
+  "1pe": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Louvor a Deus por uma Esperança Viva"
+      },
+      {
+        "before_verse": 13,
+        "text": "Exortação à Santidade"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 4,
+        "text": "A Pedra Viva e o Povo Escolhido"
+      },
+      {
+        "before_verse": 11,
+        "text": "Deveres Sociais dos Cristãos"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Deveres Conjugais"
+      },
+      {
+        "before_verse": 8,
+        "text": "Sofrendo por Fazer o Bem"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Vivendo para Deus"
+      },
+      {
+        "before_verse": 12,
+        "text": "Sofrendo por ser Cristão"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Aos Presbíteros e aos Jovens"
+      },
+      {
+        "before_verse": 12,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "2pe": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "A Certeza de nossa Vocação e Eleição"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Glória de Cristo e a Firmeza das Escrituras"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Os Falsos Mestres e a sua Destruição"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Dia do Senhor"
+      }
+    ]
+  },
+  "1jo": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "A Palavra da Vida"
+      },
+      {
+        "before_verse": 5,
+        "text": "Andar na Luz"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 15,
+        "text": "Não se Deve Amar o Mundo"
+      },
+      {
+        "before_verse": 18,
+        "text": "Advertência contra os Anticristos"
+      },
+      {
+        "before_verse": 28,
+        "text": "Os Filhos de Deus"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 11,
+        "text": "O Amor Fraternal"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Como Discernir os Espíritos"
+      },
+      {
+        "before_verse": 7,
+        "text": "O Amor de Deus"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "A Fé no Filho de Deus"
+      },
+      {
+        "before_verse": 13,
+        "text": "Observações Finais"
+      }
+    ]
+  },
+  "jd": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "O Pecado e o Destino dos Ímpios"
+      },
+      {
+        "before_verse": 17,
+        "text": "Um Chamado à Perseverança"
+      },
+      {
+        "before_verse": 24,
+        "text": "Doxologia"
+      }
+    ]
+  },
+  "ap": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Introdução"
+      },
+      {
+        "before_verse": 4,
+        "text": "Saudação e Doxologia"
+      },
+      {
+        "before_verse": 9,
+        "text": "Alguém Semelhante a um Filho de Homem"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Carta à Igreja de Éfeso"
+      },
+      {
+        "before_verse": 8,
+        "text": "Carta à Igreja de Esmirna"
+      },
+      {
+        "before_verse": 12,
+        "text": "Carta à Igreja de Pérgamo"
+      },
+      {
+        "before_verse": 18,
+        "text": "Carta à Igreja de Tiatira"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Carta à Igreja de Sardes"
+      },
+      {
+        "before_verse": 7,
+        "text": "Carta à Igreja de Filadélfia"
+      },
+      {
+        "before_verse": 14,
+        "text": "Carta à Igreja de Laodiceia"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "O Trono no Céu"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "O Livro e o Cordeiro"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Os Selos"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Cento e Quarenta e Quatro Mil Selados"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Grande Multidão com Vestes Brancas"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "O Sétimo Selo e o Incensário de Ouro"
+      },
+      {
+        "before_verse": 6,
+        "text": "As Trombetas"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Anjo e o Livro"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "As Duas Testemunhas"
+      },
+      {
+        "before_verse": 15,
+        "text": "A Sétima Trombeta"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "A Mulher e o Dragão"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "A Besta que Saiu do Mar"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Besta que Saiu da Terra"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "O Cordeiro e os Cento e Quarenta e Quatro Mil Selados"
+      },
+      {
+        "before_verse": 6,
+        "text": "Os Três Anjos"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Colheita da Terra"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "Os Sete Anjos e as Sete Pragas"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "As Sete Taças da Ira de Deus"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "A Mulher Montada na Besta"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "A Queda da Babilônia"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Aleluia!"
+      },
+      {
+        "before_verse": 11,
+        "text": "O Cavaleiro no Cavalo Branco"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Os Mil Anos"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Destruição de Satanás"
+      },
+      {
+        "before_verse": 11,
+        "text": "Os Mortos São Julgados"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "A Nova Jerusalém"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "O Rio da Vida"
+      },
+      {
+        "before_verse": 7,
+        "text": "Jesus Vem em Breve"
+      }
+    ]
+  },
+  "1kgs": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Adonias Declara-se Rei"
+      },
+      {
+        "before_verse": 28,
+        "text": "O Início do Reinado de Salomão"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "As Instruções de Davi a Salomão"
+      },
+      {
+        "before_verse": 13,
+        "text": "O Reinado de Salomão"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Salomão Pede Sabedoria"
+      },
+      {
+        "before_verse": 16,
+        "text": "Um Sábio Veredicto"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Os Assessores de Salomão"
+      },
+      {
+        "before_verse": 20,
+        "text": "As Provisões Diárias de Salomão"
+      },
+      {
+        "before_verse": 29,
+        "text": "A Sabedoria de Salomão"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Os Preparativos para a Construção do Templo"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "A Construção do Templo"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "A Construção do Palácio de Salomão"
+      },
+      {
+        "before_verse": 13,
+        "text": "Os Utensílios do Templo"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "O Transporte da Arca para o Templo"
+      },
+      {
+        "before_verse": 22,
+        "text": "A Oração de Dedicação"
+      },
+      {
+        "before_verse": 62,
+        "text": "A Dedicação do Templo"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "O Senhor Aparece a Salomão"
+      },
+      {
+        "before_verse": 10,
+        "text": "Outros Feitos de Salomão"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "A Rainha de Sabá Visita Salomão"
+      },
+      {
+        "before_verse": 14,
+        "text": "O Esplendor do Reino de Salomão"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "As Mulheres de Salomão"
+      },
+      {
+        "before_verse": 14,
+        "text": "Os Adversários de Salomão"
+      },
+      {
+        "before_verse": 26,
+        "text": "A Rebelião de Jeroboão contra Salomão"
+      },
+      {
+        "before_verse": 41,
+        "text": "A Morte de Salomão"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "A Revolta de Israel contra Roboão"
+      },
+      {
+        "before_verse": 25,
+        "text": "Bezerros de Ouro em Betel e em Dã"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "O Homem de Deus que Veio de Judá"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "A Profecia de Aías contra Jeroboão"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Reinado de Roboão, Rei de Judá"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Abias, Rei de Judá"
+      },
+      {
+        "before_verse": 9,
+        "text": "O Reinado de Asa, Rei de Judá"
+      },
+      {
+        "before_verse": 25,
+        "text": "O Reinado de Nadabe, Rei de Israel"
+      },
+      {
+        "before_verse": 33,
+        "text": "O Reinado de Baasa, Rei de Israel"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 8,
+        "text": "O Reinado de Elá, Rei de Israel"
+      },
+      {
+        "before_verse": 15,
+        "text": "O Reinado de Zinri, Rei de Israel"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Reinado de Onri, Rei de Israel"
+      },
+      {
+        "before_verse": 29,
+        "text": "O Reinado de Acabe, Rei de Israel"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "Elias Alimentado por Corvos"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Viúva de Sarepta"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "Elias e Obadias"
+      },
+      {
+        "before_verse": 16,
+        "text": "Elias no Monte Carmelo"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "A Fuga de Elias para Horebe"
+      },
+      {
+        "before_verse": 10,
+        "text": "O Senhor Aparece a Elias"
+      },
+      {
+        "before_verse": 19,
+        "text": "O Chamado de Eliseu"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Ben-Hadade Ataca Samaria"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Derrota de Ben-Hadade"
+      },
+      {
+        "before_verse": 35,
+        "text": "Um Profeta Condena Acabe"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "A Vinha de Nabote"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "A Profecia contra Acabe"
+      },
+      {
+        "before_verse": 29,
+        "text": "A Morte de Acabe"
+      },
+      {
+        "before_verse": 41,
+        "text": "O Reinado de Josafá, Rei de Judá"
+      },
+      {
+        "before_verse": 51,
+        "text": "O Reinado de Acazias, Rei de Israel"
+      }
+    ]
+  },
+  "2kgs": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "O Julgamento do Senhor contra Acazias"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Elias é Levado aos Céus"
+      },
+      {
+        "before_verse": 19,
+        "text": "A Purificação da Água"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Castigo dos Zombadores"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Rebelião de Moabe"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "O Milagre do Azeite"
+      },
+      {
+        "before_verse": 8,
+        "text": "A Ressurreição do Filho da Sunamita"
+      },
+      {
+        "before_verse": 38,
+        "text": "A Morte na Panela"
+      },
+      {
+        "before_verse": 42,
+        "text": "O Milagre dos Pães"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "A Cura da Lepra de Naamã"
+      },
+      {
+        "before_verse": 20,
+        "text": "O Castigo de Geazi"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Eliseu Faz Flutuar um Machado"
+      },
+      {
+        "before_verse": 8,
+        "text": "O Exército Arameu É Ferido de Cegueira"
+      },
+      {
+        "before_verse": 24,
+        "text": "Fome durante o Cerco de Samaria"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 3,
+        "text": "O Cerco"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "A Sunamita Recebe de Volta sua Propriedade"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Morte de Ben-Hadade"
+      },
+      {
+        "before_verse": 16,
+        "text": "O Reinado de Jeorão, Rei de Judá"
+      },
+      {
+        "before_verse": 25,
+        "text": "O Reinado de Acazias, Rei de Judá"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "Jeú é Consagrado Rei de Israel"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Morte de Jorão e de Acazias"
+      },
+      {
+        "before_verse": 30,
+        "text": "A Morte de Jezabel"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "A Morte da Família de Acabe"
+      },
+      {
+        "before_verse": 18,
+        "text": "A Morte dos Ministros de Baal"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "Joás Escapa de Atalia"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "A Reparação do Templo"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Jeoacaz, Rei de Israel"
+      },
+      {
+        "before_verse": 10,
+        "text": "O Reinado de Jeoás, Rei de Israel"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Amazias, Rei de Judá"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Reinado de Jeroboão, Rei de Israel"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Azarias, Rei de Judá"
+      },
+      {
+        "before_verse": 8,
+        "text": "O Reinado de Zacarias, Rei de Israel"
+      },
+      {
+        "before_verse": 13,
+        "text": "O Reinado de Salum, Rei de Israel"
+      },
+      {
+        "before_verse": 17,
+        "text": "O Reinado de Menaém, Rei de Israel"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Reinado de Pecaías, Rei de Israel"
+      },
+      {
+        "before_verse": 27,
+        "text": "O Reinado de Peca, Rei de Israel"
+      },
+      {
+        "before_verse": 32,
+        "text": "O Reinado de Jotão, Rei de Judá"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Acaz, Rei de Judá"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Oseias, o Último Rei de Israel"
+      },
+      {
+        "before_verse": 7,
+        "text": "Israel é Castigado com o Exílio"
+      },
+      {
+        "before_verse": 24,
+        "text": "O Repovoamento de Samaria"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Ezequias, Rei de Judá"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Ameaça de Senaqueribe a Jerusalém"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "A Predição da Libertação de Jerusalém"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Oração de Ezequias"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Profecia de Isaías sobre a Queda de Senaqueribe"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "A Doença de Ezequias"
+      },
+      {
+        "before_verse": 12,
+        "text": "Mensageiros da Babilônia"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Manassés, Rei de Judá"
+      },
+      {
+        "before_verse": 19,
+        "text": "O Reinado de Amom, Rei de Judá"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "O Livro da Lei é Encontrado"
+      }
+    ],
+    "23": [
+      {
+        "before_verse": 1,
+        "text": "Josias Renova a Aliança"
+      },
+      {
+        "before_verse": 31,
+        "text": "O Reinado de Jeoacaz, Rei de Judá"
+      },
+      {
+        "before_verse": 36,
+        "text": "O Reinado de Jeoaquim, Rei de Judá"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 8,
+        "text": "O Reinado de Joaquim, Rei de Judá"
+      },
+      {
+        "before_verse": 18,
+        "text": "O Reinado de Zedequias, Rei de Judá"
+      },
+      {
+        "before_verse": 21,
+        "text": "A Queda de Jerusalém"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 27,
+        "text": "Joaquim é Libertado da Prisão"
+      }
+    ]
+  },
+  "1ch": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "A Descendência de Adão"
+      },
+      {
+        "before_verse": 5,
+        "text": "Os Descendentes dos Filhos de Noé"
+      },
+      {
+        "before_verse": 24,
+        "text": "A Descendência de Sem"
+      },
+      {
+        "before_verse": 28,
+        "text": "Os Descendentes de Abraão"
+      },
+      {
+        "before_verse": 35,
+        "text": "Os Descendentes de Esaú"
+      },
+      {
+        "before_verse": 38,
+        "text": "Os Descendentes de Seir"
+      },
+      {
+        "before_verse": 43,
+        "text": "Os Reis e os Chefes de Edom"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Os Filhos de Israel"
+      },
+      {
+        "before_verse": 3,
+        "text": "Os Descendentes de Judá"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Os Filhos de Davi"
+      },
+      {
+        "before_verse": 10,
+        "text": "Os Reis de Judá"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Linhagem Real após o Exílio"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Os Outros Descendentes de Judá"
+      },
+      {
+        "before_verse": 24,
+        "text": "Os Descendentes de Simeão"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Os Descendentes de Rúben"
+      },
+      {
+        "before_verse": 11,
+        "text": "Os Descendentes de Gade"
+      },
+      {
+        "before_verse": 23,
+        "text": "Os Descendentes da Metade da Tribo de Manassés"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Os Descendentes de Levi"
+      },
+      {
+        "before_verse": 31,
+        "text": "Os Músicos do Templo"
+      },
+      {
+        "before_verse": 54,
+        "text": "As Cidades dos Levitas"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Os Descendentes de Issacar"
+      },
+      {
+        "before_verse": 6,
+        "text": "Os Descendentes de Benjamim"
+      },
+      {
+        "before_verse": 13,
+        "text": "Os Descendentes de Naftali"
+      },
+      {
+        "before_verse": 14,
+        "text": "Os Descendentes de Manassés"
+      },
+      {
+        "before_verse": 20,
+        "text": "Os Descendentes de Efraim"
+      },
+      {
+        "before_verse": 30,
+        "text": "Os Descendentes de Aser"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "Os Descendentes de Benjamim"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 2,
+        "text": "O Povo de Jerusalém"
+      },
+      {
+        "before_verse": 35,
+        "text": "A Genealogia de Saul"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Suicídio de Saul"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Davi, Rei de Israel"
+      },
+      {
+        "before_verse": 4,
+        "text": "A Conquista de Jerusalém"
+      },
+      {
+        "before_verse": 10,
+        "text": "Os Principais Guerreiros de Davi"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Os Aliados de Davi"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Crescimento do Exército de Davi"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "O Retorno da Arca"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "O Palácio e a Família de Davi"
+      },
+      {
+        "before_verse": 8,
+        "text": "Davi Derrota os Filisteus"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "A Arca é Levada para Jerusalém"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 7,
+        "text": "O Salmo de Gratidão de Davi"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "A Promessa de Deus a Davi"
+      },
+      {
+        "before_verse": 16,
+        "text": "A Oração de Davi"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "As Vitórias Militares de Davi"
+      },
+      {
+        "before_verse": 14,
+        "text": "Os Oficiais de Davi"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "A Guerra contra os Amonitas"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "A Conquista de Rabá"
+      },
+      {
+        "before_verse": 4,
+        "text": "Guerras contra os Filisteus"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "O Recenseamento e a sua Punição"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 2,
+        "text": "Preparativos para o Templo"
+      }
+    ],
+    "23": [
+      {
+        "before_verse": 1,
+        "text": "Os Levitas"
+      },
+      {
+        "before_verse": 7,
+        "text": "Os Descendentes de Gérson"
+      },
+      {
+        "before_verse": 12,
+        "text": "Os Descendentes de Coate"
+      },
+      {
+        "before_verse": 21,
+        "text": "Os Descendentes de Merari"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 1,
+        "text": "O Serviço dos Sacerdotes"
+      },
+      {
+        "before_verse": 20,
+        "text": "O Restante dos Levitas"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 1,
+        "text": "Os Músicos"
+      }
+    ],
+    "26": [
+      {
+        "before_verse": 1,
+        "text": "Os Porteiros"
+      },
+      {
+        "before_verse": 20,
+        "text": "Os Tesoureiros e Outros Oficiais"
+      }
+    ],
+    "27": [
+      {
+        "before_verse": 1,
+        "text": "As Divisões do Exército"
+      },
+      {
+        "before_verse": 16,
+        "text": "Os Líderes das Tribos"
+      },
+      {
+        "before_verse": 25,
+        "text": "Os Superintendentes do Rei"
+      }
+    ],
+    "28": [
+      {
+        "before_verse": 1,
+        "text": "O Plano de Davi para o Templo"
+      }
+    ],
+    "29": [
+      {
+        "before_verse": 1,
+        "text": "Dádivas para a Construção do Templo"
+      },
+      {
+        "before_verse": 10,
+        "text": "A Oração de Davi"
+      },
+      {
+        "before_verse": 21,
+        "text": "Salomão é Ungido Rei"
+      },
+      {
+        "before_verse": 26,
+        "text": "A Morte de Davi"
+      }
+    ]
+  },
+  "2ch": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Salomão Pede Sabedoria"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Os Preparativos para a Construção do Templo"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Construção do Templo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Os Utensílios do Templo"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 2,
+        "text": "O Transporte da Arca para o Templo"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 12,
+        "text": "A Oração de Dedicação"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "A Dedicação do Templo"
+      },
+      {
+        "before_verse": 11,
+        "text": "O Senhor Aparece a Salomão"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "Outros Feitos de Salomão"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "A Rainha de Sabá Visita Salomão"
+      },
+      {
+        "before_verse": 13,
+        "text": "O Esplendor do Reino de Salomão"
+      },
+      {
+        "before_verse": 29,
+        "text": "A Morte de Salomão"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "A Revolta de Israel contra Roboão"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 5,
+        "text": "A Fortificação das Cidades de Judá"
+      },
+      {
+        "before_verse": 18,
+        "text": "A Família de Roboão"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Sisaque Ataca Jerusalém"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Abias, Rei de Judá"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Asa, Rei de Judá"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "A Reforma Realizada por Asa"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "Os Últimos Anos de Asa"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Josafá, Rei de Judá"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "A Profecia contra Acabe"
+      },
+      {
+        "before_verse": 28,
+        "text": "A Morte de Acabe"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 4,
+        "text": "A Nomeação de Juízes"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Josafá Derrota Moabe e Amom"
+      },
+      {
+        "before_verse": 31,
+        "text": "O Final do Reinado de Josafá"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 4,
+        "text": "O Reinado de Jeorão, Rei de Judá"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Acazias, Rei de Judá"
+      },
+      {
+        "before_verse": 10,
+        "text": "Joás Escapa de Atalia"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 1,
+        "text": "As Reformas de Joás no Templo"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Impiedade de Joás"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Amazias, Rei de Judá"
+      }
+    ],
+    "26": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Uzias, Rei de Judá"
+      }
+    ],
+    "27": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Jotão, Rei de Judá"
+      }
+    ],
+    "28": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Acaz, Rei de Judá"
+      }
+    ],
+    "29": [
+      {
+        "before_verse": 1,
+        "text": "Ezequias e a Purificação do Templo"
+      }
+    ],
+    "30": [
+      {
+        "before_verse": 1,
+        "text": "A Celebração da Páscoa"
+      }
+    ],
+    "31": [
+      {
+        "before_verse": 2,
+        "text": "O Serviço do Templo é Reorganizado"
+      }
+    ],
+    "32": [
+      {
+        "before_verse": 1,
+        "text": "A Ameaça de Senaqueribe contra Judá"
+      },
+      {
+        "before_verse": 24,
+        "text": "O Orgulho e a Morte de Ezequias"
+      }
+    ],
+    "33": [
+      {
+        "before_verse": 1,
+        "text": "O Reinado de Manassés, Rei de Judá"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Reinado de Amom, Rei de Judá"
+      }
+    ],
+    "34": [
+      {
+        "before_verse": 1,
+        "text": "As Reformas de Josias"
+      },
+      {
+        "before_verse": 14,
+        "text": "O Livro da Lei é Encontrado"
+      }
+    ],
+    "35": [
+      {
+        "before_verse": 1,
+        "text": "Josias Celebra a Páscoa"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Morte de Josias"
+      }
+    ],
+    "36": [
+      {
+        "before_verse": 2,
+        "text": "O Reinado de Jeoacaz, Rei de Judá"
+      },
+      {
+        "before_verse": 5,
+        "text": "O Reinado de Jeoaquim, Rei de Judá"
+      },
+      {
+        "before_verse": 9,
+        "text": "O Reinado de Joaquim, Rei de Judá"
+      },
+      {
+        "before_verse": 11,
+        "text": "O Reinado de Zedequias, Rei de Judá"
+      },
+      {
+        "before_verse": 15,
+        "text": "A Queda de Jerusalém"
+      }
+    ]
+  },
+  "ho": {
+    "1": [
+      {
+        "before_verse": 2,
+        "text": "A Mulher e os Filhos de Oseias"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 2,
+        "text": "Castigo e Restauração de Israel"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Reconciliação de Oseias com sua Mulher"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Acusação contra Israel"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Julgamento contra Israel"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Israel Obstinado"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "O Castigo de Israel"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "O Castigo de Israel"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "O Amor de Deus por Israel"
+      },
+      {
+        "before_verse": 12,
+        "text": "O Pecado de Israel"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "A Ira do Senhor contra Israel"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "As Bênçãos do Arrependimento"
+      }
+    ]
+  },
+  "re": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Introdução"
+      },
+      {
+        "before_verse": 4,
+        "text": "Saudação e Doxologia"
+      },
+      {
+        "before_verse": 9,
+        "text": "Alguém Semelhante a um Filho de Homem"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Carta à Igreja de Éfeso"
+      },
+      {
+        "before_verse": 8,
+        "text": "Carta à Igreja de Esmirna"
+      },
+      {
+        "before_verse": 12,
+        "text": "Carta à Igreja de Pérgamo"
+      },
+      {
+        "before_verse": 18,
+        "text": "Carta à Igreja de Tiatira"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Carta à Igreja de Sardes"
+      },
+      {
+        "before_verse": 7,
+        "text": "Carta à Igreja de Filadélfia"
+      },
+      {
+        "before_verse": 14,
+        "text": "Carta à Igreja de Laodiceia"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "O Trono no Céu"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "O Livro e o Cordeiro"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Os Selos"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Cento e Quarenta e Quatro Mil Selados"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Grande Multidão com Vestes Brancas"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "O Sétimo Selo e o Incensário de Ouro"
+      },
+      {
+        "before_verse": 6,
+        "text": "As Trombetas"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Anjo e o Livro"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "As Duas Testemunhas"
+      },
+      {
+        "before_verse": 15,
+        "text": "A Sétima Trombeta"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "A Mulher e o Dragão"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "A Besta que Saiu do Mar"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Besta que Saiu da Terra"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "O Cordeiro e os Cento e Quarenta e Quatro Mil Selados"
+      },
+      {
+        "before_verse": 6,
+        "text": "Os Três Anjos"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Colheita da Terra"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "Os Sete Anjos e as Sete Pragas"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "As Sete Taças da Ira de Deus"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "A Mulher Montada na Besta"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "A Queda da Babilônia"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Aleluia!"
+      },
+      {
+        "before_verse": 11,
+        "text": "O Cavaleiro no Cavalo Branco"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Os Mil Anos"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Destruição de Satanás"
+      },
+      {
+        "before_verse": 11,
+        "text": "Os Mortos São Julgados"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "A Nova Jerusalém"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "O Rio da Vida"
+      },
+      {
+        "before_verse": 7,
+        "text": "Jesus Vem em Breve"
+      }
+    ]
+  },
+  "ps": {
+    "41": [
+      {
+        "before_verse": 14,
+        "text": "SEGUNDO LIVRO"
+      }
+    ],
+    "72": [
+      {
+        "before_verse": 21,
+        "text": "TERCEIRO LIVRO"
+      }
+    ],
+    "89": [
+      {
+        "before_verse": 53,
+        "text": "QUARTO LIVRO"
+      }
+    ],
+    "106": [
+      {
+        "before_verse": 49,
+        "text": "QUINTO LIVRO"
+      }
+    ],
+    "119": [
+      {
+        "before_verse": 1,
+        "text": "Álef"
+      },
+      {
+        "before_verse": 9,
+        "text": "Bêt"
+      },
+      {
+        "before_verse": 17,
+        "text": "Guímel"
+      },
+      {
+        "before_verse": 25,
+        "text": "Dálet"
+      },
+      {
+        "before_verse": 33,
+        "text": "He"
+      },
+      {
+        "before_verse": 41,
+        "text": "Vav"
+      },
+      {
+        "before_verse": 49,
+        "text": "Zain"
+      },
+      {
+        "before_verse": 57,
+        "text": "Hêt"
+      },
+      {
+        "before_verse": 65,
+        "text": "Tét"
+      },
+      {
+        "before_verse": 73,
+        "text": "Iode"
+      },
+      {
+        "before_verse": 81,
+        "text": "Caf"
+      },
+      {
+        "before_verse": 89,
+        "text": "Lâmed"
+      },
+      {
+        "before_verse": 97,
+        "text": "Mem"
+      },
+      {
+        "before_verse": 105,
+        "text": "Nun"
+      },
+      {
+        "before_verse": 113,
+        "text": "Sâmeq"
+      },
+      {
+        "before_verse": 121,
+        "text": "Áin"
+      },
+      {
+        "before_verse": 129,
+        "text": "Pê"
+      },
+      {
+        "before_verse": 137,
+        "text": "Tsade"
+      },
+      {
+        "before_verse": 145,
+        "text": "Cof"
+      },
+      {
+        "before_verse": 153,
+        "text": "Rêsh"
+      },
+      {
+        "before_verse": 161,
+        "text": "Shin e S"
+      },
+      {
+        "before_verse": 169,
+        "text": "Tau"
+      }
+    ]
+  },
+  "prv": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Propósito"
+      },
+      {
+        "before_verse": 8,
+        "text": "Advertências da Sabedoria"
+      },
+      {
+        "before_verse": 20,
+        "text": "Convite à Sabedoria"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "O Valor da Sabedoria"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Conselhos da Sabedoria"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Sabedoria é Suprema"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Advertência contra o Adultério"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Advertências contra a Insensatez"
+      },
+      {
+        "before_verse": 20,
+        "text": "Advertências contra o Adultério"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Advertência contra a Mulher Adúltera"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "O Chamado da Sabedoria"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "Os Convites da Sabedoria e da Insensatez"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "Provérbios de Salomão"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 17,
+        "text": "Ditados dos Sábios"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 23,
+        "text": "Outros Ditados de Sabedoria"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 1,
+        "text": "Outros Provérbios de Salomão"
+      }
+    ],
+    "30": [
+      {
+        "before_verse": 1,
+        "text": "Ditados de Agur"
+      }
+    ],
+    "31": [
+      {
+        "before_verse": 1,
+        "text": "Ditados do Rei Lemuel"
+      },
+      {
+        "before_verse": 10,
+        "text": "Epílogo: A Mulher Exemplar"
+      }
+    ]
+  },
+  "act": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "A Ascensão de Jesus"
+      },
+      {
+        "before_verse": 12,
+        "text": "A Escolha de Matias"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Vinda do Espírito Santo no Dia de Pentecoste"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Pregação de Pedro"
+      },
+      {
+        "before_verse": 42,
+        "text": "A Comunhão dos Cristãos"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Cura de um Mendigo Aleijado"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Pregação de Pedro no Templo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Pedro e João perante o Sinédrio"
+      },
+      {
+        "before_verse": 23,
+        "text": "A Oração dos Primeiros Cristãos"
+      },
+      {
+        "before_verse": 32,
+        "text": "Os Discípulos Repartem seus Bens"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Ananias e Safira"
+      },
+      {
+        "before_verse": 12,
+        "text": "Os Apóstolos Curam Muitos Doentes"
+      },
+      {
+        "before_verse": 17,
+        "text": "Os Apóstolos São Perseguidos"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "A Escolha dos Sete"
+      },
+      {
+        "before_verse": 8,
+        "text": "A Prisão de Estêvão"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "O Discurso de Estêvão no Sinédrio"
+      },
+      {
+        "before_verse": 54,
+        "text": "O Apedrejamento de Estêvão"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 2,
+        "text": "A Perseguição e a Dispersão da Igreja"
+      },
+      {
+        "before_verse": 4,
+        "text": "Filipe em Samaria"
+      },
+      {
+        "before_verse": 9,
+        "text": "Simão, o Mago"
+      },
+      {
+        "before_verse": 26,
+        "text": "Filipe e o Etíope"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "A Conversão de Saulo"
+      },
+      {
+        "before_verse": 20,
+        "text": "Saulo em Damasco e em Jerusalém"
+      },
+      {
+        "before_verse": 32,
+        "text": "Eneias e Dorcas"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "O Centurião Cornélio"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Visão de Pedro"
+      },
+      {
+        "before_verse": 24,
+        "text": "Pedro na Casa de Cornélio"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "Pedro Explica-se perante a Igreja"
+      },
+      {
+        "before_verse": 19,
+        "text": "A Igreja em Antioquia"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Pedro é Milagrosamente Libertado da Prisão"
+      },
+      {
+        "before_verse": 20,
+        "text": "A Morte de Herodes"
+      }
+    ],
+    "13": [
+      {
+        "before_verse": 1,
+        "text": "A Missão de Barnabé e Saulo"
+      },
+      {
+        "before_verse": 4,
+        "text": "Em Chipre"
+      },
+      {
+        "before_verse": 13,
+        "text": "Em Antioquia da Pisídia"
+      }
+    ],
+    "14": [
+      {
+        "before_verse": 1,
+        "text": "Em Icônio"
+      },
+      {
+        "before_verse": 8,
+        "text": "Em Listra e em Derbe"
+      },
+      {
+        "before_verse": 21,
+        "text": "O Retorno para Antioquia da Síria"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "O Concílio de Jerusalém"
+      },
+      {
+        "before_verse": 22,
+        "text": "A Carta do Concílio aos Cristãos Gentios"
+      },
+      {
+        "before_verse": 36,
+        "text": "O Desentendimento entre Paulo e Barnabé"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "Timóteo Acompanha Paulo e Silas"
+      },
+      {
+        "before_verse": 6,
+        "text": "A Visão de Paulo em Trôade"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Conversão de Lídia em Filipos"
+      },
+      {
+        "before_verse": 16,
+        "text": "Paulo e Silas na Prisão"
+      }
+    ],
+    "17": [
+      {
+        "before_verse": 1,
+        "text": "Em Tessalônica"
+      },
+      {
+        "before_verse": 10,
+        "text": "Em Bereia"
+      },
+      {
+        "before_verse": 16,
+        "text": "Em Atenas"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "Em Corinto"
+      },
+      {
+        "before_verse": 18,
+        "text": "Priscila, Áquila e Apolo"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Paulo em Éfeso"
+      },
+      {
+        "before_verse": 23,
+        "text": "O Tumulto em Éfeso"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Paulo Viaja pela Macedônia e pela Grécia"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Ressurreição de Êutico em Trôade"
+      },
+      {
+        "before_verse": 13,
+        "text": "Paulo Despede-se dos Presbíteros de Éfeso"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "A Caminho de Jerusalém"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Chegada de Paulo a Jerusalém"
+      },
+      {
+        "before_verse": 27,
+        "text": "A Prisão de Paulo"
+      },
+      {
+        "before_verse": 37,
+        "text": "O Discurso de Paulo"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 22,
+        "text": "Paulo, Cidadão Romano"
+      },
+      {
+        "before_verse": 30,
+        "text": "Paulo Diante do Sinédrio"
+      }
+    ],
+    "23": [
+      {
+        "before_verse": 12,
+        "text": "A Conspiração para Matar Paulo"
+      },
+      {
+        "before_verse": 23,
+        "text": "Paulo é Transferido para Cesareia"
+      }
+    ],
+    "24": [
+      {
+        "before_verse": 1,
+        "text": "O Julgamento de Paulo perante Félix"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 1,
+        "text": "O Julgamento perante Festo"
+      },
+      {
+        "before_verse": 13,
+        "text": "Festo Consulta o Rei Agripa"
+      },
+      {
+        "before_verse": 23,
+        "text": "Paulo perante Agripa"
+      }
+    ],
+    "27": [
+      {
+        "before_verse": 1,
+        "text": "A Viagem de Paulo para Roma"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Tempestade"
+      },
+      {
+        "before_verse": 27,
+        "text": "O Naufrágio"
+      }
+    ],
+    "28": [
+      {
+        "before_verse": 1,
+        "text": "Paulo na Ilha de Malta"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Chegada a Roma"
+      },
+      {
+        "before_verse": 17,
+        "text": "A Pregação de Paulo em Roma"
+      }
+    ]
+  },
+  "eph": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "As Bênçãos Espirituais em Cristo"
+      },
+      {
+        "before_verse": 15,
+        "text": "Ação de Graças e Oração"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Nova Vida em Cristo"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Nova Humanidade em Cristo"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Apóstolo dos Gentios"
+      },
+      {
+        "before_verse": 14,
+        "text": "A Oração de Paulo pelos Santos"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Unidade do Corpo de Cristo"
+      },
+      {
+        "before_verse": 17,
+        "text": "O Procedimento dos Filhos da Luz"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 15,
+        "text": "Vida em Comunidade"
+      },
+      {
+        "before_verse": 22,
+        "text": "Deveres Conjugais"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Deveres de Pais e Filhos"
+      },
+      {
+        "before_verse": 5,
+        "text": "Deveres de Escravos e Senhores"
+      },
+      {
+        "before_verse": 10,
+        "text": "A Armadura de Deus"
+      },
+      {
+        "before_verse": 21,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "ph": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "Ação de Graças e Oração"
+      },
+      {
+        "before_verse": 12,
+        "text": "Os Sofrimentos de Paulo Contribuem para a Expansão do Evangelho"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Humildade Cristã"
+      },
+      {
+        "before_verse": 12,
+        "text": "Brilhando como Estrelas"
+      },
+      {
+        "before_verse": 19,
+        "text": "Timóteo e Epafrodito"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "Plena Confiança em Cristo"
+      },
+      {
+        "before_verse": 12,
+        "text": "Prosseguindo para o Alvo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 2,
+        "text": "Exortações"
+      },
+      {
+        "before_verse": 10,
+        "text": "Agradecimentos pelas Ofertas"
+      },
+      {
+        "before_verse": 21,
+        "text": "Saudações Finais"
+      }
+    ]
+  },
+  "phm": {
+    "1": [
+      {
+        "before_verse": 4,
+        "text": "Ação de Graças e Intercessão"
+      },
+      {
+        "before_verse": 8,
+        "text": "A Intercessão de Paulo em favor de Onésimo"
+      }
+    ]
+  },
+  "jm": {
+    "1": [
+      {
+        "before_verse": 2,
+        "text": "Provas e Tentações"
+      },
+      {
+        "before_verse": 19,
+        "text": "Praticando a Palavra"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "Proibida a Acepção de Pessoas"
+      },
+      {
+        "before_verse": 14,
+        "text": "Fé e Obras"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Domínio sobre a Língua"
+      },
+      {
+        "before_verse": 13,
+        "text": "Os Dois Tipos de Sabedoria"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Submissão a Deus"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Incerteza dos Planos Humanos"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "Advertência aos Ricos Opressores"
+      },
+      {
+        "before_verse": 7,
+        "text": "Paciência nos Sofrimentos"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Oração da Fé"
+      }
+    ]
+  },
+  "jud": {
+    "1": [
+      {
+        "before_verse": 3,
+        "text": "O Pecado e o Destino dos Ímpios"
+      },
+      {
+        "before_verse": 17,
+        "text": "Um Chamado à Perseverança"
+      },
+      {
+        "before_verse": 24,
+        "text": "Doxologia"
+      }
+    ]
+  },
+  "ezr": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "O Decreto de Ciro"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Lista dos Exilados que Voltaram"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "A Reconstrução do Altar"
+      },
+      {
+        "before_verse": 7,
+        "text": "A Reconstrução do Templo"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "A Oposição à Obra"
+      },
+      {
+        "before_verse": 6,
+        "text": "A Oposição nos Reinados de Xerxes e Artaxerxes"
+      }
+    ],
+    "5": [
+      {
+        "before_verse": 1,
+        "text": "A Carta de Tatenai a Dario"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "O Decreto de Dario"
+      },
+      {
+        "before_verse": 13,
+        "text": "A Dedicação do Templo"
+      },
+      {
+        "before_verse": 19,
+        "text": "A Celebração da Páscoa"
+      }
+    ],
+    "7": [
+      {
+        "before_verse": 1,
+        "text": "Esdras Vai para Jerusalém"
+      },
+      {
+        "before_verse": 11,
+        "text": "A Carta do Rei Artaxerxes a Esdras"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "A Lista dos Líderes das Famílias que Voltaram"
+      },
+      {
+        "before_verse": 15,
+        "text": "O Retorno a Jerusalém"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "A Oração de Esdras"
+      }
+    ],
+    "10": [
+      {
+        "before_verse": 1,
+        "text": "A Confissão de Pecado do Povo"
+      },
+      {
+        "before_verse": 18,
+        "text": "Os Culpados de Casamento Misto"
+      }
+    ]
+  },
+  "job": {
+    "1": [
+      {
+        "before_verse": 1,
+        "text": "Introdução"
+      },
+      {
+        "before_verse": 6,
+        "text": "A Primeira Provação de Jó"
+      }
+    ],
+    "2": [
+      {
+        "before_verse": 1,
+        "text": "A Segunda Provação de Jó"
+      },
+      {
+        "before_verse": 11,
+        "text": "Os Amigos de Jó"
+      }
+    ],
+    "3": [
+      {
+        "before_verse": 1,
+        "text": "O Discurso de Jó"
+      }
+    ],
+    "4": [
+      {
+        "before_verse": 1,
+        "text": "Elifaz"
+      }
+    ],
+    "6": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "8": [
+      {
+        "before_verse": 1,
+        "text": "Bildade"
+      }
+    ],
+    "9": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "11": [
+      {
+        "before_verse": 1,
+        "text": "Zofar"
+      }
+    ],
+    "12": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "15": [
+      {
+        "before_verse": 1,
+        "text": "Elifaz"
+      }
+    ],
+    "16": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "18": [
+      {
+        "before_verse": 1,
+        "text": "Bildade"
+      }
+    ],
+    "19": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "20": [
+      {
+        "before_verse": 1,
+        "text": "Zofar"
+      }
+    ],
+    "21": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "22": [
+      {
+        "before_verse": 1,
+        "text": "Elifaz"
+      }
+    ],
+    "23": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "25": [
+      {
+        "before_verse": 1,
+        "text": "Bildade"
+      }
+    ],
+    "26": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      }
+    ],
+    "32": [
+      {
+        "before_verse": 1,
+        "text": "Eliú"
+      }
+    ],
+    "38": [
+      {
+        "before_verse": 1,
+        "text": "O Senhor Fala"
+      }
+    ],
+    "42": [
+      {
+        "before_verse": 1,
+        "text": "Jó"
+      },
+      {
+        "before_verse": 7,
+        "text": "Epílogo"
+      },
+      {
+        "before_verse": 18,
+        "text": "PRIMEIRO LIVRO"
       }
     ]
   },
@@ -7815,1991 +13033,173 @@
       }
     ]
   },
-  "jn": {
+  "hk": {
     "1": [
       {
-        "before_verse": 1,
-        "text": "A Palavra Tornou-se Carne"
+        "before_verse": 2,
+        "text": "A Primeira Queixa de Habacuque"
       },
       {
-        "before_verse": 19,
-        "text": "João Batista Nega Ser Ele o Cristo"
+        "before_verse": 5,
+        "text": "A Resposta do S"
       },
       {
-        "before_verse": 29,
-        "text": "Jesus, o Cordeiro de Deus"
-      },
-      {
-        "before_verse": 35,
-        "text": "Os Primeiros Discípulos de Jesus"
-      },
-      {
-        "before_verse": 43,
-        "text": "Jesus Chama Filipe e Natanael"
+        "before_verse": 12,
+        "text": "A Segunda Queixa de Habacuque"
       }
     ],
     "2": [
       {
-        "before_verse": 1,
-        "text": "Jesus Transforma Água em Vinho"
-      },
-      {
-        "before_verse": 12,
-        "text": "Jesus Purifica o Templo"
+        "before_verse": 2,
+        "text": "A Resposta do S"
       }
     ],
     "3": [
       {
         "before_verse": 1,
-        "text": "O Encontro de Jesus com Nicodemos"
-      },
-      {
-        "before_verse": 22,
-        "text": "O Testemunho de João Batista acerca de Jesus"
+        "text": "A Oração de Habacuque"
       }
-    ],
-    "4": [
+    ]
+  },
+  "zp": {
+    "1": [
       {
-        "before_verse": 1,
-        "text": "Jesus Conversa com uma Samaritana"
+        "before_verse": 2,
+        "text": "A Destruição Vindoura"
       },
       {
-        "before_verse": 27,
-        "text": "Os Discípulos Voltam da Cidade"
-      },
-      {
-        "before_verse": 39,
-        "text": "Muitos Samaritanos Creem"
-      },
-      {
-        "before_verse": 43,
-        "text": "Jesus Cura o Filho de um Oficial"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "A Cura Junto ao Tanque de Betesda"
-      },
-      {
-        "before_verse": 16,
-        "text": "Vida por meio do Filho"
-      },
-      {
-        "before_verse": 31,
-        "text": "Testemunhos acerca de Jesus"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 1,
-        "text": "A Primeira Multiplicação dos Pães"
-      },
-      {
-        "before_verse": 16,
-        "text": "Jesus Anda sobre as Águas"
-      },
-      {
-        "before_verse": 25,
-        "text": "Jesus, o Pão da Vida"
-      },
-      {
-        "before_verse": 60,
-        "text": "Muitos Discípulos Abandonam Jesus"
-      }
-    ],
-    "7": [
-      {
-        "before_verse": 1,
-        "text": "Jesus Vai à Festa das Cabanas"
+        "before_verse": 4,
+        "text": "O Castigo de Judá"
       },
       {
         "before_verse": 14,
-        "text": "Jesus Ensina na Festa"
-      },
-      {
-        "before_verse": 25,
-        "text": "É Jesus o Cristo?"
-      },
-      {
-        "before_verse": 45,
-        "text": "A Incredulidade dos Líderes Judeus"
+        "text": "O Grande Dia do S"
       }
     ],
-    "8": [
+    "2": [
+      {
+        "before_verse": 4,
+        "text": "O Castigo da Filístia"
+      },
+      {
+        "before_verse": 8,
+        "text": "O Castigo de Moabe e de Amom"
+      },
       {
         "before_verse": 12,
-        "text": "A Validade do Testemunho de Jesus"
-      },
-      {
-        "before_verse": 31,
-        "text": "Os Filhos de Abraão e os Filhos do Diabo"
-      },
-      {
-        "before_verse": 48,
-        "text": "As Declarações de Jesus acerca de si mesmo"
-      }
-    ],
-    "9": [
-      {
-        "before_verse": 1,
-        "text": "Jesus Cura um Cego de Nascença"
+        "text": "O Castigo da Etiópia"
       },
       {
         "before_verse": 13,
-        "text": "Os Fariseus Investigam a Cura"
-      },
-      {
-        "before_verse": 35,
-        "text": "A Cegueira Espiritual"
+        "text": "O Castigo da Assíria"
       }
     ],
-    "10": [
+    "3": [
       {
         "before_verse": 1,
-        "text": "O Pastor e o seu Rebanho"
-      },
+        "text": "O Futuro de Jerusalém"
+      }
+    ]
+  },
+  "hg": {
+    "1": [
       {
-        "before_verse": 22,
-        "text": "A Incredulidade dos Judeus"
+        "before_verse": 1,
+        "text": "A Ordem para a Reconstrução do Templo"
       }
     ],
-    "11": [
+    "2": [
       {
         "before_verse": 1,
-        "text": "A Morte de Lázaro"
+        "text": "O Esplendor do Novo Templo"
       },
       {
-        "before_verse": 17,
-        "text": "Jesus Conforta as Irmãs de Lázaro"
-      },
-      {
-        "before_verse": 38,
-        "text": "Jesus Ressuscita Lázaro"
-      },
-      {
-        "before_verse": 45,
-        "text": "A Conspiração para Matar Jesus"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "Jesus é Ungido em Betânia"
-      },
-      {
-        "before_verse": 12,
-        "text": "A Entrada Triunfal"
+        "before_verse": 10,
+        "text": "Promessa de Bênçãos"
       },
       {
         "before_verse": 20,
-        "text": "Jesus Prediz sua Morte"
-      },
-      {
-        "before_verse": 37,
-        "text": "A Incredulidade dos Judeus"
-      }
-    ],
-    "13": [
-      {
-        "before_verse": 1,
-        "text": "Jesus Lava os Pés dos Discípulos"
-      },
-      {
-        "before_verse": 18,
-        "text": "Jesus Prediz que Será Traído"
-      },
-      {
-        "before_verse": 31,
-        "text": "Jesus Prediz que Pedro o Negará"
-      }
-    ],
-    "14": [
-      {
-        "before_verse": 1,
-        "text": "Jesus Fortalece os seus Discípulos"
-      },
-      {
-        "before_verse": 5,
-        "text": "Jesus, o Caminho para o Pai"
-      },
-      {
-        "before_verse": 15,
-        "text": "Jesus Promete o Espírito Santo"
-      }
-    ],
-    "15": [
-      {
-        "before_verse": 1,
-        "text": "A Videira e os Ramos"
-      },
-      {
-        "before_verse": 18,
-        "text": "O Mundo Odeia os Discípulos"
-      }
-    ],
-    "16": [
-      {
-        "before_verse": 5,
-        "text": "A Obra do Espírito Santo"
-      },
-      {
-        "before_verse": 17,
-        "text": "A Tristeza dos Discípulos Será Transformada em Alegria"
-      }
-    ],
-    "17": [
-      {
-        "before_verse": 1,
-        "text": "Jesus Ora por si mesmo"
-      },
-      {
-        "before_verse": 6,
-        "text": "Jesus Ora por seus Discípulos"
-      },
-      {
-        "before_verse": 20,
-        "text": "Jesus Ora por Todos os Crentes"
-      }
-    ],
-    "18": [
-      {
-        "before_verse": 1,
-        "text": "Jesus é Preso"
-      },
-      {
-        "before_verse": 12,
-        "text": "Jesus é Levado a Anás"
-      },
-      {
-        "before_verse": 15,
-        "text": "Pedro Nega Jesus"
-      },
-      {
-        "before_verse": 19,
-        "text": "O Sumo Sacerdote Interroga Jesus"
-      },
-      {
-        "before_verse": 25,
-        "text": "Pedro Nega Jesus Mais Duas Vezes"
-      },
-      {
-        "before_verse": 28,
-        "text": "Jesus diante de Pilatos"
-      }
-    ],
-    "19": [
-      {
-        "before_verse": 1,
-        "text": "Jesus é Condenado à Crucificação"
-      },
-      {
-        "before_verse": 17,
-        "text": "A Crucificação"
-      },
-      {
-        "before_verse": 28,
-        "text": "A Morte de Jesus"
-      },
-      {
-        "before_verse": 38,
-        "text": "O Sepultamento de Jesus"
-      }
-    ],
-    "20": [
-      {
-        "before_verse": 1,
-        "text": "A Ressurreição"
-      },
-      {
-        "before_verse": 10,
-        "text": "Jesus Aparece a Maria Madalena"
-      },
-      {
-        "before_verse": 19,
-        "text": "Jesus Aparece aos Discípulos"
-      },
-      {
-        "before_verse": 24,
-        "text": "Jesus Aparece a Tomé"
-      }
-    ],
-    "21": [
-      {
-        "before_verse": 1,
-        "text": "Jesus e a Pesca Maravilhosa"
-      },
-      {
-        "before_verse": 15,
-        "text": "Jesus Restaura Pedro"
+        "text": "As Promessas para Zorobabel"
       }
     ]
   },
-  "act": {
+  "mi": {
     "1": [
       {
-        "before_verse": 1,
-        "text": "A Ascensão de Jesus"
+        "before_verse": 3,
+        "text": "O Julgamento de Samaria e de Jerusalém"
       },
       {
-        "before_verse": 12,
-        "text": "A Escolha de Matias"
+        "before_verse": 8,
+        "text": "O Lamento do Profeta"
       }
     ],
     "2": [
       {
         "before_verse": 1,
-        "text": "A Vinda do Espírito Santo no Dia de Pentecoste"
+        "text": "O Castigo dos Opressores"
       },
       {
-        "before_verse": 14,
-        "text": "A Pregação de Pedro"
+        "before_verse": 6,
+        "text": "Advertência contra os Falsos Profetas"
       },
       {
-        "before_verse": 42,
-        "text": "A Comunhão dos Cristãos"
+        "before_verse": 12,
+        "text": "Promessa de Livramento"
       }
     ],
     "3": [
       {
         "before_verse": 1,
-        "text": "A Cura de um Mendigo Aleijado"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Pregação de Pedro no Templo"
+        "text": "Repreensão aos Líderes e aos Profetas"
       }
     ],
     "4": [
       {
         "before_verse": 1,
-        "text": "Pedro e João perante o Sinédrio"
+        "text": "A Montanha do S"
       },
       {
-        "before_verse": 23,
-        "text": "A Oração dos Primeiros Cristãos"
-      },
-      {
-        "before_verse": 32,
-        "text": "Os Discípulos Repartem seus Bens"
+        "before_verse": 6,
+        "text": "O Plano do S"
       }
     ],
     "5": [
       {
-        "before_verse": 1,
-        "text": "Ananias e Safira"
+        "before_verse": 2,
+        "text": "O Governante que Virá de Belém"
       },
       {
-        "before_verse": 12,
-        "text": "Os Apóstolos Curam Muitos Doentes"
-      },
-      {
-        "before_verse": 17,
-        "text": "Os Apóstolos São Perseguidos"
+        "before_verse": 6,
+        "text": "Livramento e Destruição"
       }
     ],
     "6": [
       {
         "before_verse": 1,
-        "text": "A Escolha dos Sete"
+        "text": "A Acusação do S"
       },
       {
-        "before_verse": 8,
-        "text": "A Prisão de Estêvão"
+        "before_verse": 1,
+        "text": "contra Israel"
+      },
+      {
+        "before_verse": 9,
+        "text": "A Culpa e o Castigo de Israel"
       }
     ],
     "7": [
       {
         "before_verse": 1,
-        "text": "O Discurso de Estêvão no Sinédrio"
-      },
-      {
-        "before_verse": 54,
-        "text": "O Apedrejamento de Estêvão"
-      }
-    ],
-    "8": [
-      {
-        "before_verse": 2,
-        "text": "A Perseguição e a Dispersão da Igreja"
-      },
-      {
-        "before_verse": 4,
-        "text": "Filipe em Samaria"
-      },
-      {
-        "before_verse": 9,
-        "text": "Simão, o Mago"
-      },
-      {
-        "before_verse": 26,
-        "text": "Filipe e o Etíope"
-      }
-    ],
-    "9": [
-      {
-        "before_verse": 1,
-        "text": "A Conversão de Saulo"
-      },
-      {
-        "before_verse": 20,
-        "text": "Saulo em Damasco e em Jerusalém"
-      },
-      {
-        "before_verse": 32,
-        "text": "Eneias e Dorcas"
-      }
-    ],
-    "10": [
-      {
-        "before_verse": 1,
-        "text": "O Centurião Cornélio"
-      },
-      {
-        "before_verse": 9,
-        "text": "A Visão de Pedro"
-      },
-      {
-        "before_verse": 24,
-        "text": "Pedro na Casa de Cornélio"
-      }
-    ],
-    "11": [
-      {
-        "before_verse": 1,
-        "text": "Pedro Explica-se perante a Igreja"
-      },
-      {
-        "before_verse": 19,
-        "text": "A Igreja em Antioquia"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "Pedro é Milagrosamente Libertado da Prisão"
-      },
-      {
-        "before_verse": 20,
-        "text": "A Morte de Herodes"
-      }
-    ],
-    "13": [
-      {
-        "before_verse": 1,
-        "text": "A Missão de Barnabé e Saulo"
-      },
-      {
-        "before_verse": 4,
-        "text": "Em Chipre"
-      },
-      {
-        "before_verse": 13,
-        "text": "Em Antioquia da Pisídia"
-      }
-    ],
-    "14": [
-      {
-        "before_verse": 1,
-        "text": "Em Icônio"
+        "text": "A Desgraça de Israel"
       },
       {
         "before_verse": 8,
-        "text": "Em Listra e em Derbe"
-      },
-      {
-        "before_verse": 21,
-        "text": "O Retorno para Antioquia da Síria"
-      }
-    ],
-    "15": [
-      {
-        "before_verse": 1,
-        "text": "O Concílio de Jerusalém"
-      },
-      {
-        "before_verse": 22,
-        "text": "A Carta do Concílio aos Cristãos Gentios"
-      },
-      {
-        "before_verse": 36,
-        "text": "O Desentendimento entre Paulo e Barnabé"
-      }
-    ],
-    "16": [
-      {
-        "before_verse": 1,
-        "text": "Timóteo Acompanha Paulo e Silas"
-      },
-      {
-        "before_verse": 6,
-        "text": "A Visão de Paulo em Trôade"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Conversão de Lídia em Filipos"
-      },
-      {
-        "before_verse": 16,
-        "text": "Paulo e Silas na Prisão"
-      }
-    ],
-    "17": [
-      {
-        "before_verse": 1,
-        "text": "Em Tessalônica"
-      },
-      {
-        "before_verse": 10,
-        "text": "Em Bereia"
-      },
-      {
-        "before_verse": 16,
-        "text": "Em Atenas"
-      }
-    ],
-    "18": [
-      {
-        "before_verse": 1,
-        "text": "Em Corinto"
-      },
-      {
-        "before_verse": 18,
-        "text": "Priscila, Áquila e Apolo"
-      }
-    ],
-    "19": [
-      {
-        "before_verse": 1,
-        "text": "Paulo em Éfeso"
-      },
-      {
-        "before_verse": 23,
-        "text": "O Tumulto em Éfeso"
-      }
-    ],
-    "20": [
-      {
-        "before_verse": 1,
-        "text": "Paulo Viaja pela Macedônia e pela Grécia"
-      },
-      {
-        "before_verse": 7,
-        "text": "A Ressurreição de Êutico em Trôade"
-      },
-      {
-        "before_verse": 13,
-        "text": "Paulo Despede-se dos Presbíteros de Éfeso"
-      }
-    ],
-    "21": [
-      {
-        "before_verse": 1,
-        "text": "A Caminho de Jerusalém"
-      },
-      {
-        "before_verse": 17,
-        "text": "A Chegada de Paulo a Jerusalém"
-      },
-      {
-        "before_verse": 27,
-        "text": "A Prisão de Paulo"
-      },
-      {
-        "before_verse": 37,
-        "text": "O Discurso de Paulo"
-      }
-    ],
-    "22": [
-      {
-        "before_verse": 22,
-        "text": "Paulo, Cidadão Romano"
-      },
-      {
-        "before_verse": 30,
-        "text": "Paulo Diante do Sinédrio"
-      }
-    ],
-    "23": [
-      {
-        "before_verse": 12,
-        "text": "A Conspiração para Matar Paulo"
-      },
-      {
-        "before_verse": 23,
-        "text": "Paulo é Transferido para Cesareia"
-      }
-    ],
-    "24": [
-      {
-        "before_verse": 1,
-        "text": "O Julgamento de Paulo perante Félix"
-      }
-    ],
-    "25": [
-      {
-        "before_verse": 1,
-        "text": "O Julgamento perante Festo"
-      },
-      {
-        "before_verse": 13,
-        "text": "Festo Consulta o Rei Agripa"
-      },
-      {
-        "before_verse": 23,
-        "text": "Paulo perante Agripa"
-      }
-    ],
-    "27": [
-      {
-        "before_verse": 1,
-        "text": "A Viagem de Paulo para Roma"
-      },
-      {
-        "before_verse": 13,
-        "text": "A Tempestade"
-      },
-      {
-        "before_verse": 27,
-        "text": "O Naufrágio"
-      }
-    ],
-    "28": [
-      {
-        "before_verse": 1,
-        "text": "Paulo na Ilha de Malta"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Chegada a Roma"
-      },
-      {
-        "before_verse": 17,
-        "text": "A Pregação de Paulo em Roma"
-      }
-    ]
-  },
-  "rm": {
-    "1": [
-      {
-        "before_verse": 8,
-        "text": "Paulo Anseia Visitar a Igreja em Roma"
-      },
-      {
-        "before_verse": 18,
-        "text": "A Ira de Deus contra a Humanidade"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "O Justo Juízo de Deus"
-      },
-      {
-        "before_verse": 17,
-        "text": "Os Judeus e a Lei"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 9,
-        "text": "Ninguém é Justo"
-      },
-      {
-        "before_verse": 21,
-        "text": "A Justiça por meio da Fé"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Abraão Foi Justificado pela Fé"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "Paz e Alegria"
-      },
-      {
-        "before_verse": 12,
-        "text": "Morte em Adão, Vida em Cristo"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 1,
-        "text": "Mortos para o Pecado, Vivos em Cristo"
-      },
-      {
-        "before_verse": 15,
-        "text": "Escravos da Justiça"
-      }
-    ],
-    "7": [
-      {
-        "before_verse": 1,
-        "text": "A Ilustração do Casamento"
-      },
-      {
-        "before_verse": 7,
-        "text": "A Luta contra o Pecado"
-      }
-    ],
-    "8": [
-      {
-        "before_verse": 1,
-        "text": "A Vida pelo Espírito"
-      },
-      {
-        "before_verse": 18,
-        "text": "A Glória Futura"
-      },
-      {
-        "before_verse": 28,
-        "text": "Mais que Vencedores"
-      }
-    ],
-    "9": [
-      {
-        "before_verse": 1,
-        "text": "A Soberania de Deus"
-      },
-      {
-        "before_verse": 30,
-        "text": "A Incredulidade de Israel"
-      }
-    ],
-    "11": [
-      {
-        "before_verse": 1,
-        "text": "O Remanescente de Israel"
-      },
-      {
-        "before_verse": 11,
-        "text": "Os Ramos Enxertados"
-      },
-      {
-        "before_verse": 25,
-        "text": "Todo o Israel Será Salvo"
-      },
-      {
-        "before_verse": 33,
-        "text": "Hino de Louvor a Deus"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "Sacrifícios Vivos"
-      },
-      {
-        "before_verse": 9,
-        "text": "O Amor"
-      }
-    ],
-    "13": [
-      {
-        "before_verse": 1,
-        "text": "Submissão às Autoridades"
-      },
-      {
-        "before_verse": 8,
-        "text": "O Amor ao Próximo e o Fim dos Tempos"
-      }
-    ],
-    "14": [
-      {
-        "before_verse": 1,
-        "text": "Os Fracos e os Fortes"
-      }
-    ],
-    "15": [
-      {
-        "before_verse": 14,
-        "text": "Paulo, Ministro dos Gentios"
-      },
-      {
-        "before_verse": 23,
-        "text": "Paulo Planeja Visitar a Igreja em Roma"
-      }
-    ],
-    "16": [
-      {
-        "before_verse": 1,
-        "text": "Saudações Pessoais"
-      }
-    ]
-  },
-  "1co": {
-    "1": [
-      {
-        "before_verse": 4,
-        "text": "A Gratidão de Paulo"
-      },
-      {
-        "before_verse": 10,
-        "text": "As Divisões na Igreja"
-      },
-      {
-        "before_verse": 18,
-        "text": "Cristo, Sabedoria e Poder de Deus"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 6,
-        "text": "A Sabedoria Procedente do Espírito"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "As Divisões na Igreja"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Apóstolos de Cristo"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "Imoralidade na Igreja!"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 12,
-        "text": "O Perigo da Imoralidade"
-      }
-    ],
-    "7": [
-      {
-        "before_verse": 1,
-        "text": "Acerca do Casamento"
-      }
-    ],
-    "8": [
-      {
-        "before_verse": 1,
-        "text": "A Comida Sacrificada aos Ídolos"
-      }
-    ],
-    "9": [
-      {
-        "before_verse": 1,
-        "text": "Os Direitos de um Apóstolo"
-      }
-    ],
-    "10": [
-      {
-        "before_verse": 1,
-        "text": "Exemplos da História de Israel"
+        "text": "Israel se Levantará"
       },
       {
         "before_verse": 14,
-        "text": "As Festas Idólatras e a Ceia do Senhor"
-      },
-      {
-        "before_verse": 23,
-        "text": "A Liberdade do Cristão"
-      }
-    ],
-    "11": [
-      {
-        "before_verse": 2,
-        "text": "Instruções sobre a Adoração"
-      },
-      {
-        "before_verse": 17,
-        "text": "A Ceia do Senhor"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "Os Dons Espirituais"
-      },
-      {
-        "before_verse": 12,
-        "text": "Diversidade na Unidade"
-      },
-      {
-        "before_verse": 32,
-        "text": "O Amor"
-      }
-    ],
-    "14": [
-      {
-        "before_verse": 1,
-        "text": "Os Dons de Profecia e de Línguas"
-      },
-      {
-        "before_verse": 26,
-        "text": "Ordem no Culto"
-      }
-    ],
-    "15": [
-      {
-        "before_verse": 1,
-        "text": "A Ressurreição de Cristo"
-      },
-      {
-        "before_verse": 12,
-        "text": "A Ressurreição dentre os Mortos"
-      },
-      {
-        "before_verse": 35,
-        "text": "O Corpo da Ressurreição"
-      }
-    ],
-    "16": [
-      {
-        "before_verse": 1,
-        "text": "A Coleta para o Povo de Deus"
-      },
-      {
-        "before_verse": 5,
-        "text": "Pedidos Pessoais"
-      },
-      {
-        "before_verse": 19,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "2co": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Deus é o Nosso Consolador"
-      },
-      {
-        "before_verse": 12,
-        "text": "Paulo Muda seus Planos"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 5,
-        "text": "Perdão para o Pecador"
-      },
-      {
-        "before_verse": 12,
-        "text": "Ministros da Nova Aliança"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 7,
-        "text": "A Glória da Nova Aliança"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Tesouros em Vasos de Barro"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "Nossa Habitação Celestial"
-      },
-      {
-        "before_verse": 11,
-        "text": "O Ministério da Reconciliação"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 3,
-        "text": "Os Sofrimentos de Paulo"
-      },
-      {
-        "before_verse": 14,
-        "text": "O Problema da Associação com os Descrentes"
-      }
-    ],
-    "7": [
-      {
-        "before_verse": 2,
-        "text": "A Alegria de Paulo"
-      }
-    ],
-    "8": [
-      {
-        "before_verse": 1,
-        "text": "Incentivo à Contribuição"
-      },
-      {
-        "before_verse": 16,
-        "text": "A Coleta para os Crentes da Judeia"
-      }
-    ],
-    "9": [
-      {
-        "before_verse": 6,
-        "text": "Semeando com Generosidade"
-      }
-    ],
-    "10": [
-      {
-        "before_verse": 1,
-        "text": "Paulo Defende o seu Ministério"
-      }
-    ],
-    "11": [
-      {
-        "before_verse": 1,
-        "text": "A Preocupação de Paulo com a Fidelidade dos Coríntios"
-      },
-      {
-        "before_verse": 16,
-        "text": "Paulo Orgulha-se dos seus Sofrimentos"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "A Visão de Paulo"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Preocupação de Paulo com os Coríntios"
-      }
-    ],
-    "13": [
-      {
-        "before_verse": 1,
-        "text": "Advertências Finais"
-      },
-      {
-        "before_verse": 11,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "gl": {
-    "1": [
-      {
-        "before_verse": 6,
-        "text": "Não Há Outro Evangelho"
-      },
-      {
-        "before_verse": 11,
-        "text": "Paulo, Chamado por Deus"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "Paulo é Aceito pelos Apóstolos"
-      },
-      {
-        "before_verse": 11,
-        "text": "Paulo Repreende a Pedro"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Fé ou Obediência à Lei?"
-      },
-      {
-        "before_verse": 15,
-        "text": "A Lei e a Promessa"
-      },
-      {
-        "before_verse": 26,
-        "text": "Os Filhos de Deus"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 8,
-        "text": "A Preocupação de Paulo com os Gálatas"
-      },
-      {
-        "before_verse": 21,
-        "text": "Sara e Hagar"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "A Liberdade em Cristo"
-      },
-      {
-        "before_verse": 16,
-        "text": "Vida pelo Espírito"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 1,
-        "text": "Façamos o Bem a Todos"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Nova Criação Substitui a Circuncisão"
-      }
-    ]
-  },
-  "eph": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "As Bênçãos Espirituais em Cristo"
-      },
-      {
-        "before_verse": 15,
-        "text": "Ação de Graças e Oração"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "A Nova Vida em Cristo"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Nova Humanidade em Cristo"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "O Apóstolo dos Gentios"
-      },
-      {
-        "before_verse": 14,
-        "text": "A Oração de Paulo pelos Santos"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "A Unidade do Corpo de Cristo"
-      },
-      {
-        "before_verse": 17,
-        "text": "O Procedimento dos Filhos da Luz"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 15,
-        "text": "Vida em Comunidade"
-      },
-      {
-        "before_verse": 22,
-        "text": "Deveres Conjugais"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 1,
-        "text": "Deveres de Pais e Filhos"
-      },
-      {
-        "before_verse": 5,
-        "text": "Deveres de Escravos e Senhores"
-      },
-      {
-        "before_verse": 10,
-        "text": "A Armadura de Deus"
-      },
-      {
-        "before_verse": 21,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "ph": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Ação de Graças e Oração"
-      },
-      {
-        "before_verse": 12,
-        "text": "Os Sofrimentos de Paulo Contribuem para a Expansão do Evangelho"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "A Humildade Cristã"
-      },
-      {
-        "before_verse": 12,
-        "text": "Brilhando como Estrelas"
-      },
-      {
-        "before_verse": 19,
-        "text": "Timóteo e Epafrodito"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Plena Confiança em Cristo"
-      },
-      {
-        "before_verse": 12,
-        "text": "Prosseguindo para o Alvo"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 2,
-        "text": "Exortações"
-      },
-      {
-        "before_verse": 10,
-        "text": "Agradecimentos pelas Ofertas"
-      },
-      {
-        "before_verse": 21,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "cl": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Ação de Graças"
-      },
-      {
-        "before_verse": 15,
-        "text": "A Supremacia de Cristo"
-      },
-      {
-        "before_verse": 24,
-        "text": "O Trabalho de Paulo pela Igreja"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 6,
-        "text": "Livres do Legalismo por meio de Cristo"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Instruções para um Viver Santo"
-      },
-      {
-        "before_verse": 18,
-        "text": "Responsabilidade Social"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 2,
-        "text": "Outras Instruções"
-      },
-      {
-        "before_verse": 7,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "1ts": {
-    "1": [
-      {
-        "before_verse": 2,
-        "text": "Ação de Graças pela Fé e pelo Exemplo dos Tessalonicenses"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "O Ministério de Paulo em Tessalônica"
-      },
-      {
-        "before_verse": 17,
-        "text": "Paulo Deseja Rever os Tessalonicenses"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 6,
-        "text": "As Boas Notícias Trazidas por Timóteo"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Vivendo para Agradar a Deus"
-      },
-      {
-        "before_verse": 13,
-        "text": "A Vinda do Senhor"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 12,
-        "text": "Instruções Finais"
-      }
-    ]
-  },
-  "2ts": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Ação de Graças e Oração"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "O Homem do Pecado"
-      },
-      {
-        "before_verse": 13,
-        "text": "Exortação à Perseverança"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Um Pedido de Oração"
-      },
-      {
-        "before_verse": 6,
-        "text": "Uma Advertência contra a Ociosidade"
-      },
-      {
-        "before_verse": 16,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "1tm": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Advertências contra Falsos Mestres da Lei"
-      },
-      {
-        "before_verse": 12,
-        "text": "A Graça de Deus Concedida a Paulo"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "Instruções acerca da Adoração"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Bispos e Diáconos"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Instruções a Timóteo"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "Conselhos acerca de Viúvas, Líderes e Escravos"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 3,
-        "text": "O Amor ao Dinheiro"
-      },
-      {
-        "before_verse": 11,
-        "text": "Recomendação de Paulo a Timóteo"
-      }
-    ]
-  },
-  "2tm": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Um Incentivo à Fidelidade"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 14,
-        "text": "O Obreiro Aprovado por Deus"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "A Impiedade dos Últimos Dias"
-      },
-      {
-        "before_verse": 10,
-        "text": "A Recomendação de Paulo a Timóteo"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 9,
-        "text": "Recomendações Finais"
-      },
-      {
-        "before_verse": 19,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "tt": {
-    "1": [
-      {
-        "before_verse": 5,
-        "text": "A Tarefa de Tito em Creta"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "Instruções para Vários Grupos"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "A Conduta Cristã"
-      },
-      {
-        "before_verse": 12,
-        "text": "Observações Finais"
-      }
-    ]
-  },
-  "phm": {
-    "1": [
-      {
-        "before_verse": 4,
-        "text": "Ação de Graças e Intercessão"
-      },
-      {
-        "before_verse": 8,
-        "text": "A Intercessão de Paulo em favor de Onésimo"
-      }
-    ]
-  },
-  "hb": {
-    "1": [
-      {
-        "before_verse": 1,
-        "text": "O Filho é Superior aos Anjos"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "O Perigo da Negligência"
-      },
-      {
-        "before_verse": 5,
-        "text": "Jesus é Feito Semelhante a seus Irmãos"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Jesus é Superior a Moisés"
-      },
-      {
-        "before_verse": 7,
-        "text": "Advertência contra a Incredulidade"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Um Descanso Sabático para o Povo de Deus"
-      },
-      {
-        "before_verse": 14,
-        "text": "Jesus, o Grande Sumo Sacerdote"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 11,
-        "text": "Advertência contra a Apostasia"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 13,
-        "text": "A Certeza da Promessa de Deus"
-      }
-    ],
-    "7": [
-      {
-        "before_verse": 1,
-        "text": "O Sacerdote Melquisedeque"
-      },
-      {
-        "before_verse": 11,
-        "text": "Jesus é Semelhante a Melquisedeque"
-      }
-    ],
-    "8": [
-      {
-        "before_verse": 1,
-        "text": "O Sumo Sacerdote de uma Nova Aliança"
-      }
-    ],
-    "9": [
-      {
-        "before_verse": 1,
-        "text": "A Adoração no Tabernáculo Terreno"
-      },
-      {
-        "before_verse": 11,
-        "text": "O Sangue de Cristo"
-      }
-    ],
-    "10": [
-      {
-        "before_verse": 1,
-        "text": "O Sacrifício de Cristo é Definitivo"
-      },
-      {
-        "before_verse": 19,
-        "text": "Um Apelo à Perseverança"
-      }
-    ],
-    "11": [
-      {
-        "before_verse": 1,
-        "text": "Exemplos de Fé"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "Deus Disciplina os seus Filhos"
-      },
-      {
-        "before_verse": 14,
-        "text": "Advertência contra a Rejeição de Deus"
-      }
-    ],
-    "13": [
-      {
-        "before_verse": 1,
-        "text": "Exortações Finais"
-      }
-    ]
-  },
-  "jm": {
-    "1": [
-      {
-        "before_verse": 2,
-        "text": "Provas e Tentações"
-      },
-      {
-        "before_verse": 19,
-        "text": "Praticando a Palavra"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "Proibida a Acepção de Pessoas"
-      },
-      {
-        "before_verse": 14,
-        "text": "Fé e Obras"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "O Domínio sobre a Língua"
-      },
-      {
-        "before_verse": 13,
-        "text": "Os Dois Tipos de Sabedoria"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "A Submissão a Deus"
-      },
-      {
-        "before_verse": 13,
-        "text": "A Incerteza dos Planos Humanos"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "Advertência aos Ricos Opressores"
-      },
-      {
-        "before_verse": 7,
-        "text": "Paciência nos Sofrimentos"
-      },
-      {
-        "before_verse": 13,
-        "text": "A Oração da Fé"
-      }
-    ]
-  },
-  "1pe": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "Louvor a Deus por uma Esperança Viva"
-      },
-      {
-        "before_verse": 13,
-        "text": "Exortação à Santidade"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 4,
-        "text": "A Pedra Viva e o Povo Escolhido"
-      },
-      {
-        "before_verse": 11,
-        "text": "Deveres Sociais dos Cristãos"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Deveres Conjugais"
-      },
-      {
-        "before_verse": 8,
-        "text": "Sofrendo por Fazer o Bem"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Vivendo para Deus"
-      },
-      {
-        "before_verse": 12,
-        "text": "Sofrendo por ser Cristão"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "Aos Presbíteros e aos Jovens"
-      },
-      {
-        "before_verse": 12,
-        "text": "Saudações Finais"
-      }
-    ]
-  },
-  "2pe": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "A Certeza de nossa Vocação e Eleição"
-      },
-      {
-        "before_verse": 12,
-        "text": "A Glória de Cristo e a Firmeza das Escrituras"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "Os Falsos Mestres e a sua Destruição"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "O Dia do Senhor"
-      }
-    ]
-  },
-  "1jo": {
-    "1": [
-      {
-        "before_verse": 1,
-        "text": "A Palavra da Vida"
-      },
-      {
-        "before_verse": 5,
-        "text": "Andar na Luz"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 15,
-        "text": "Não se Deve Amar o Mundo"
-      },
-      {
-        "before_verse": 18,
-        "text": "Advertência contra os Anticristos"
-      },
-      {
-        "before_verse": 28,
-        "text": "Os Filhos de Deus"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 11,
-        "text": "O Amor Fraternal"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "Como Discernir os Espíritos"
-      },
-      {
-        "before_verse": 7,
-        "text": "O Amor de Deus"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "A Fé no Filho de Deus"
-      },
-      {
-        "before_verse": 13,
-        "text": "Observações Finais"
-      }
-    ]
-  },
-  "jud": {
-    "1": [
-      {
-        "before_verse": 3,
-        "text": "O Pecado e o Destino dos Ímpios"
-      },
-      {
-        "before_verse": 17,
-        "text": "Um Chamado à Perseverança"
-      },
-      {
-        "before_verse": 24,
-        "text": "Doxologia"
-      }
-    ]
-  },
-  "re": {
-    "1": [
-      {
-        "before_verse": 1,
-        "text": "Introdução"
-      },
-      {
-        "before_verse": 4,
-        "text": "Saudação e Doxologia"
-      },
-      {
-        "before_verse": 9,
-        "text": "Alguém Semelhante a um Filho de Homem"
-      }
-    ],
-    "2": [
-      {
-        "before_verse": 1,
-        "text": "Carta à Igreja de Éfeso"
-      },
-      {
-        "before_verse": 8,
-        "text": "Carta à Igreja de Esmirna"
-      },
-      {
-        "before_verse": 12,
-        "text": "Carta à Igreja de Pérgamo"
-      },
-      {
-        "before_verse": 18,
-        "text": "Carta à Igreja de Tiatira"
-      }
-    ],
-    "3": [
-      {
-        "before_verse": 1,
-        "text": "Carta à Igreja de Sardes"
-      },
-      {
-        "before_verse": 7,
-        "text": "Carta à Igreja de Filadélfia"
-      },
-      {
-        "before_verse": 14,
-        "text": "Carta à Igreja de Laodiceia"
-      }
-    ],
-    "4": [
-      {
-        "before_verse": 1,
-        "text": "O Trono no Céu"
-      }
-    ],
-    "5": [
-      {
-        "before_verse": 1,
-        "text": "O Livro e o Cordeiro"
-      }
-    ],
-    "6": [
-      {
-        "before_verse": 1,
-        "text": "Os Selos"
-      }
-    ],
-    "7": [
-      {
-        "before_verse": 1,
-        "text": "Cento e Quarenta e Quatro Mil Selados"
-      },
-      {
-        "before_verse": 9,
-        "text": "A Grande Multidão com Vestes Brancas"
-      }
-    ],
-    "8": [
-      {
-        "before_verse": 1,
-        "text": "O Sétimo Selo e o Incensário de Ouro"
-      },
-      {
-        "before_verse": 6,
-        "text": "As Trombetas"
-      }
-    ],
-    "10": [
-      {
-        "before_verse": 1,
-        "text": "O Anjo e o Livro"
-      }
-    ],
-    "11": [
-      {
-        "before_verse": 1,
-        "text": "As Duas Testemunhas"
-      },
-      {
-        "before_verse": 15,
-        "text": "A Sétima Trombeta"
-      }
-    ],
-    "12": [
-      {
-        "before_verse": 1,
-        "text": "A Mulher e o Dragão"
-      }
-    ],
-    "13": [
-      {
-        "before_verse": 1,
-        "text": "A Besta que Saiu do Mar"
-      },
-      {
-        "before_verse": 11,
-        "text": "A Besta que Saiu da Terra"
-      }
-    ],
-    "14": [
-      {
-        "before_verse": 1,
-        "text": "O Cordeiro e os Cento e Quarenta e Quatro Mil Selados"
-      },
-      {
-        "before_verse": 6,
-        "text": "Os Três Anjos"
-      },
-      {
-        "before_verse": 14,
-        "text": "A Colheita da Terra"
-      }
-    ],
-    "15": [
-      {
-        "before_verse": 1,
-        "text": "Os Sete Anjos e as Sete Pragas"
-      }
-    ],
-    "16": [
-      {
-        "before_verse": 1,
-        "text": "As Sete Taças da Ira de Deus"
-      }
-    ],
-    "17": [
-      {
-        "before_verse": 1,
-        "text": "A Mulher Montada na Besta"
-      }
-    ],
-    "18": [
-      {
-        "before_verse": 1,
-        "text": "A Queda da Babilônia"
-      }
-    ],
-    "19": [
-      {
-        "before_verse": 1,
-        "text": "Aleluia!"
-      },
-      {
-        "before_verse": 11,
-        "text": "O Cavaleiro no Cavalo Branco"
-      }
-    ],
-    "20": [
-      {
-        "before_verse": 1,
-        "text": "Os Mil Anos"
-      },
-      {
-        "before_verse": 7,
-        "text": "A Destruição de Satanás"
-      },
-      {
-        "before_verse": 11,
-        "text": "Os Mortos São Julgados"
-      }
-    ],
-    "21": [
-      {
-        "before_verse": 1,
-        "text": "A Nova Jerusalém"
-      }
-    ],
-    "22": [
-      {
-        "before_verse": 1,
-        "text": "O Rio da Vida"
-      },
-      {
-        "before_verse": 7,
-        "text": "Jesus Vem em Breve"
+        "text": "Súplica por Misericórdia"
       }
     ]
   }

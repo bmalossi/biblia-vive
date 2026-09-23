@@ -45,81 +45,111 @@ CHAPTER_SIZE = 14.0
 VERSE_NUMBER_COLOR = 16711680  # vermelho (0xFF0000)
 VERSE_NUMBER_FONTS = {'Cambria', 'ArialMT'}
 
-# Mapeamento nome do livro (PDF) → slug interno do projeto
+# Mapeamento nome do livro (PDF) → slug canônico do projeto (conforme src/data/books.json)
 BOOK_NAME_TO_SLUG = {
-    # Velho Testamento
+    # Velho Testamento (39 livros)
     "Gênesis": "gn",
     "Êxodo": "ex",
     "Levítico": "lv",
     "Números": "nm",
     "Deuteronômio": "dt",
     "Josué": "js",
-    "Juízes": "jd",
+    "Juízes": "jz",
     "Rute": "rt",
     "1 Samuel": "1sm",
     "2 Samuel": "2sm",
-    "1 Reis": "1kgs",
-    "2 Reis": "2kgs",
-    "1 Crônicas": "1ch",
-    "2 Crônicas": "2ch",
-    "Esdras": "ezr",
+    "1 Reis": "1rs",
+    "2 Reis": "2rs",
+    "1 Crônicas": "1cr",
+    "2 Crônicas": "2cr",
+    "Esdras": "ed",
     "Neemias": "ne",
     "Ester": "et",
-    "Jó": "job",
-    "Salmos": "ps",
-    "Provérbios": "prv",
+    "Jó": "jo",
+    "Salmos": "sl",
+    "Provérbios": "pv",
     "Eclesiastes": "ec",
-    "Cântico dos Cânticos": "so",
-    "Cantares": "so",          # variante usada no PDF
+    "Cânticos": "ct",
+    "Cantares": "ct",              # variante usada no PDF
+    "Cântico dos Cânticos": "ct",
     "Isaías": "is",
     "Jeremias": "jr",
     "Lamentações": "lm",
     "Ezequiel": "ez",
     "Daniel": "dn",
-    "Oséias": "ho",
-    "Oseias": "ho",            # variante usada no PDF (sem acento)
+    "Oséias": "os",
+    "Oseias": "os",                # variante usada no PDF (sem acento)
     "Joel": "jl",
     "Amós": "am",
     "Obadias": "ob",
-    "Jonas": "jo",
-    "Miquéias": "mi",
-    "Miqueias": "mi",          # variante usada no PDF (sem acento)
-
+    "Jonas": "jn",
+    "Miquéias": "mq",
+    "Miqueias": "mq",              # variante usada no PDF (sem acento)
     "Naum": "na",
-    "Habacuque": "hk",
-    "Sofonias": "zp",
-    "Ageu": "hg",
+    "Habacuque": "hc",
+    "Sofonias": "sf",
+    "Ageu": "ag",
     "Zacarias": "zc",
     "Malaquias": "ml",
-    # Novo Testamento
+
+    # Novo Testamento (27 livros)
     "Mateus": "mt",
-    "Marcos": "mk",
-    "Lucas": "lk",
-    "João": "jn",
-    "Atos": "act",
+    "Marcos": "mc",
+    "Lucas": "lc",
+    "João": "joa",
+    "Atos": "atos",
     "Romanos": "rm",
     "1 Coríntios": "1co",
     "2 Coríntios": "2co",
     "Gálatas": "gl",
-    "Efésios": "eph",
-    "Filipenses": "ph",
+    "Efésios": "ef",
+    "Filipenses": "fp",
     "Colossenses": "cl",
     "1 Tessalonicenses": "1ts",
     "2 Tessalonicenses": "2ts",
     "1 Timóteo": "1tm",
     "2 Timóteo": "2tm",
     "Tito": "tt",
-    "Filemom": "phm",
+    "Filemom": "fm",
     "Hebreus": "hb",
-    "Tiago": "jm",
+    "Tiago": "tg",
     "1 Pedro": "1pe",
     "2 Pedro": "2pe",
     "1 João": "1jo",
     "2 João": "2jo",
     "3 João": "3jo",
-    "Judas": "jud",
-    "Apocalipse": "re",
+    "Judas": "jd",
+    "Apocalipse": "ap",
 }
+
+# Aliases comuns (inglês/SBL) para retrocompatibilidade em testes e integrações
+SLUG_ALIASES = {
+    "1kgs": "1rs",
+    "2kgs": "2rs",
+    "1ch": "1cr",
+    "2ch": "2cr",
+    "ho": "os",
+    "re": "ap",
+    "ps": "sl",
+    "prv": "pv",
+    "act": "atos",
+    "eph": "ef",
+    "ph": "fp",
+    "phm": "fm",
+    "jm": "tg",
+    "jud": "jd",
+    "ezr": "ed",
+    "job": "jo",
+    "mk": "mc",
+    "lk": "lc",
+    "jn": "joa",
+    "so": "ct",
+    "hk": "hc",
+    "zp": "sf",
+    "hg": "ag",
+    "mi": "mq",
+}
+
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -283,20 +313,24 @@ def _add_heading(result: dict, book_slug: str, chapter: int, before_verse: int, 
         existing.append({"before_verse": before_verse, "text": text})
 
 
-# ─── Verificação dos exemplos do PRD ─────────────────────────────────────────
+# ─── Verificação dos exemplos do PRD e dos livros relatados ──────────────────
 
 def verify_examples(data: dict) -> bool:
-    """Verifica os 5 exemplos especificados no PRD."""
+    """Verifica exemplos especificados no PRD e livros do usuário."""
     checks = [
         ("gn", "1", 1, "O Princípio"),
         ("gn", "2", 4, "A Origem da Humanidade"),
         ("mt", "1", 1, "A Genealogia de Jesus"),
         ("mt", "1", 18, "O Nascimento de Jesus Cristo"),
-        ("re", "22", 1, "O Rio da Vida"),
+        ("ap", "22", 1, "O Rio da Vida"),
+        ("1rs", "1", 1, "Adonias Declara-se Rei"),
+        ("1cr", "1", 1, "A Descendência de Adão"),
+        ("ne", "1", 1, "A História de Neemias"),
+        ("os", "1", 2, "A Mulher e os Filhos de Oseias"),
     ]
 
     all_ok = True
-    print("\n=== VERIFICAÇÃO DOS EXEMPLOS DO PRD ===")
+    print("\n=== VERIFICAÇÃO DOS EXEMPLOS ===")
     for book, chap, bv, expected_text in checks:
         headings = data.get(book, {}).get(chap, [])
         found = any(
@@ -309,14 +343,14 @@ def verify_examples(data: dict) -> bool:
             all_ok = False
             print(f"    Headings encontrados: {headings}")
 
-    # Verifica Apocalipse 22 "Jesus Vem em Breve" (before_verse pode ser 6 ou 7)
-    re22 = data.get("re", {}).get("22", [])
-    jesus_heading = next((h for h in re22 if "Jesus" in h['text'] and "Breve" in h['text']), None)
+    # Verifica Apocalipse 22 "Jesus Vem em Breve"
+    ap22 = data.get("ap", {}).get("22", [])
+    jesus_heading = next((h for h in ap22 if "Jesus" in h['text'] and "Breve" in h['text']), None)
     if jesus_heading:
-        print(f"  ✓ re 22 → '{jesus_heading['text']}' (before_verse={jesus_heading['before_verse']})")
+        print(f"  ✓ ap 22 → '{jesus_heading['text']}' (before_verse={jesus_heading['before_verse']})")
     else:
-        print(f"  ✗ re 22 → 'Jesus Vem em Breve' NÃO encontrado")
-        print(f"    Headings: {re22}")
+        print(f"  ✗ ap 22 → 'Jesus Vem em Breve' NÃO encontrado")
+        print(f"    Headings: {ap22}")
         all_ok = False
 
     return all_ok
@@ -329,6 +363,11 @@ def main():
 
     data = extract_subtitles(PDF_PATH)
 
+    # Popula aliases para retrocompatibilidade ('1kgs' -> '1rs', 're' -> 'ap', etc.)
+    for alias, canonical in SLUG_ALIASES.items():
+        if canonical in data and alias not in data:
+            data[alias] = data[canonical]
+
     # Estatísticas
     total_books = len(data)
     total_chapters = sum(len(chapters) for chapters in data.values())
@@ -338,7 +377,7 @@ def main():
         for headings in chapters.values()
     )
     print(f"\nExtração concluída:")
-    print(f"  Livros com subtítulos: {total_books}")
+    print(f"  Chaves no JSON: {total_books}")
     print(f"  Capítulos com subtítulos: {total_chapters}")
     print(f"  Total de subtítulos: {total_headings}")
 

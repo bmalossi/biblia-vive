@@ -11,6 +11,8 @@
 //   - Cache singleton em memória — zero fetch duplicado
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { findBookGlobally } from "@/lib/books";
+
 export interface SectionHeading {
   before_verse: number;
   text: string;
@@ -76,7 +78,20 @@ export async function getHeadingsForChapter(
   if (!data) return [];
 
   const chapterKey = String(chapter);
-  return data[bookSlug]?.[chapterKey] ?? [];
+  const key = bookSlug.toLowerCase();
+
+  // 1. Tenta direto pela chave fornecida (slug canônico do books.json)
+  if (data[key]?.[chapterKey]) {
+    return data[key][chapterKey];
+  }
+
+  // 2. Se não encontrou, normaliza pelo catálogo global de livros
+  const book = findBookGlobally(bookSlug);
+  if (book && data[book.slug]?.[chapterKey]) {
+    return data[book.slug][chapterKey];
+  }
+
+  return [];
 }
 
 /**
@@ -93,7 +108,18 @@ export function getHeadingsForChapterSync(
   if (!_cache) return [];
 
   const chapterKey = String(chapter);
-  return _cache[bookSlug]?.[chapterKey] ?? [];
+  const key = bookSlug.toLowerCase();
+
+  if (_cache[key]?.[chapterKey]) {
+    return _cache[key][chapterKey];
+  }
+
+  const book = findBookGlobally(bookSlug);
+  if (book && _cache[book.slug]?.[chapterKey]) {
+    return _cache[book.slug][chapterKey];
+  }
+
+  return [];
 }
 
 // ─── Utilitário de filtro (usado pelo hook) ───────────────────────────────────
