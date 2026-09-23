@@ -90,11 +90,25 @@ registerRoute(
   new NetworkOnly()
 );
 
+// ─── 3.5. Runtime Cache: Bible Subtitles (StaleWhileRevalidate) ────────────────
+registerRoute(
+  ({ url }) => url.pathname.startsWith("/bible/subtitles/"),
+  new StaleWhileRevalidate({
+    cacheName: "bv-subtitles-runtime-v1",
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 10,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 dias
+      }),
+    ],
+  })
+);
+
 // ─── 4. Runtime Cache: Bible Versions (Local JSONs & GitHub Raw for NVI, ARC, KJA, etc.) ─
 // Intercepta rotas locais (/bible/**) e externas do GitHub Raw (MaatheusGois/bible)
 registerRoute(
   ({ url }) =>
-    url.pathname.startsWith("/bible/") ||
+    (url.pathname.startsWith("/bible/") && !url.pathname.startsWith("/bible/subtitles/")) ||
     (url.hostname === "raw.githubusercontent.com" && url.pathname.includes("/MaatheusGois/bible/")),
   new CacheFirst({
     cacheName: "bv-bible-runtime-v1",

@@ -30,13 +30,23 @@ async function loadHeadingsData(): Promise<HeadingsData | null> {
 
   _loadPromise = (async () => {
     try {
-      const res = await fetch("/bible/subtitles/nvi-pt-br.json");
-      if (!res.ok) return null;
+      const res = await fetch("/bible/subtitles/nvi-pt-br.json?v=20260923");
+      if (!res.ok) {
+        _loadPromise = null;
+        return null;
+      }
+      const contentType = res.headers && typeof res.headers.get === "function" ? res.headers.get("content-type") : "application/json";
+      if (contentType && !contentType.includes("application/json") && !contentType.includes("text/json")) {
+        console.warn("[sectionHeadings] Tipo de conteúdo inesperado (esperava JSON):", contentType);
+        _loadPromise = null;
+        return null;
+      }
       const data = (await res.json()) as HeadingsData;
       _cache = data;
       return data;
-    } catch {
-      // Falha silenciosa — offline, erro de rede, etc.
+    } catch (err) {
+      console.warn("[sectionHeadings] Falha ao carregar subtítulos:", err);
+      _loadPromise = null;
       return null;
     }
   })();
