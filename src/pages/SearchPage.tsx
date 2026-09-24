@@ -1,21 +1,30 @@
 import Layout from "@/components/Layout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchResultCard from "@/components/SearchResultCard";
 import { checkVerseExists, getFriendlyApiError, searchVerses, type Verse } from "@/lib/bibleApi";
 import { searchBibleWorker } from "@/lib/bibleSearchClient";
 import { BOOK_ALIASES, normalizeBookAlias } from "@/lib/bookAliases";
-import { ALL_BOOKS, findBookById, findBookBySlug, type Book } from "@/lib/books";
+import { ALL_BOOKS, findBookById, findBookBySlug, findBookGlobally, type Book } from "@/lib/books";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
 import { getVersion, isBibleVersion } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { ArrowRight, BookOpen, Loader2, Search, SearchX, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  ChevronDown,
+  FileText,
+  Loader2,
+  Search,
+  SearchX,
+  Sparkles,
+} from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 type SearchMode = "text" | "reference";
 
@@ -59,7 +68,7 @@ const levenshtein = (source: string, target: string) => {
       matrix[row][column] = Math.min(
         matrix[row - 1][column] + 1,
         matrix[row][column - 1] + 1,
-        matrix[row - 1][column - 1] + cost,
+        matrix[row - 1][column - 1] + cost
       );
     }
   }
@@ -72,7 +81,9 @@ const getClosestBook = (term: string) => {
   if (!normalizedTerm) return null;
 
   const ranked = ALL_BOOKS.map((book) => {
-    const candidates = [book.name, book.abbrev, book.slug, book.id].map((item) => normalizeCompact(String(item)));
+    const candidates = [book.name, book.abbrev, book.slug, book.id].map((item) =>
+      normalizeCompact(String(item))
+    );
     const score = Math.min(...candidates.map((candidate) => levenshtein(normalizedTerm, candidate)));
     return { book, score };
   }).sort((a, b) => a.score - b.score);
@@ -90,7 +101,8 @@ export default function SearchPage() {
   const params = new URLSearchParams(location.search);
   const queryParam = params.get("q") ?? "";
   const versionParam = params.get("v");
-  const selectedVersion = versionParam === "all" || isBibleVersion(versionParam) ? versionParam : getVersion();
+  const selectedVersion =
+    versionParam === "all" || isBibleVersion(versionParam) ? versionParam : getVersion();
   const modeParam = params.get("mode") === "reference" ? "reference" : "text";
 
   const [query, setQuery] = useState(queryParam);
@@ -105,7 +117,10 @@ export default function SearchPage() {
   const { t } = useTranslation();
 
   const parsedReference = useMemo(() => parseReference(query), [query]);
-  const referenceLabel = useMemo(() => (parsedReference ? formatParsedReferenceLabel(parsedReference) : ""), [parsedReference]);
+  const referenceLabel = useMemo(
+    () => (parsedReference ? formatParsedReferenceLabel(parsedReference) : ""),
+    [parsedReference]
+  );
   const queryBookMatch = useMemo(() => {
     if (!queryParam.trim() || !onlyBookText(queryParam)) return undefined;
     return getBookFromText(queryParam);
@@ -116,7 +131,9 @@ export default function SearchPage() {
     if (!normalized || normalized.length < 2) return [];
 
     return ALL_BOOKS.filter((book) => {
-      const haystack = [book.name, book.abbrev, book.slug, book.id].map((value) => normalizeCompact(String(value)));
+      const haystack = [book.name, book.abbrev, book.slug, book.id].map((value) =>
+        normalizeCompact(String(value))
+      );
       return haystack.some((value) => value.includes(normalized));
     }).slice(0, 4);
   }, [query]);
@@ -127,7 +144,6 @@ export default function SearchPage() {
     const normalized = normalizeText(query);
     const scopeMatch = normalized.match(/^(.+?)\s+(?:em|in|en)\s+([a-z0-9]+(?:\s+[a-z0-9]+)?)$/);
     let searchTerm = normalized;
-    let scopeBookSlug: string | undefined;
 
     if (scopeMatch) {
       const potentialTerm = scopeMatch[1].trim();
@@ -138,7 +154,6 @@ export default function SearchPage() {
 
       if (bookId) {
         searchTerm = potentialTerm;
-        scopeBookSlug = bookId.toLowerCase();
       }
     }
 
@@ -165,8 +180,12 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (parsedReference) {
-      checkVerseExists(selectedVersion, parsedReference.slug, parsedReference.chapter, parsedReference.verse)
-        .then(setReferenceExists);
+      checkVerseExists(
+        selectedVersion,
+        parsedReference.slug,
+        parsedReference.chapter,
+        parsedReference.verse
+      ).then(setReferenceExists);
     } else {
       setReferenceExists(null);
     }
@@ -234,7 +253,12 @@ export default function SearchPage() {
         .catch(async (apiError) => {
           if ((apiError as DOMException)?.name === "AbortError") return;
           try {
-            const fallbackData = await searchVerses(selectedVersion, queryParam, 100, controller.signal);
+            const fallbackData = await searchVerses(
+              selectedVersion,
+              queryParam,
+              100,
+              controller.signal
+            );
             setResults(fallbackData);
             setTotalCount(fallbackData.length);
           } catch {
@@ -282,20 +306,26 @@ export default function SearchPage() {
   };
 
   const getResultRoute = (verse: Verse) => {
-    const [bookId, chapterId] = (verse.chapterId || "").split(".");
-    const matchedBook = findBookBySlug(bookId) || findBookById(bookId);
+    const [rawBookId, chapterId] = (verse.chapterId || "").split(".");
+    const refBookName = verse.reference.replace(/\s+\d+:\d+.*$/, "").trim();
+    const candidateId = rawBookId || verse.bookId;
+
+    const matchedBook =
+      findBookGlobally(refBookName) ||
+      findBookBySlug(candidateId) ||
+      findBookById(candidateId) ||
+      getBookFromText(candidateId) ||
+      findBookGlobally(candidateId);
+
     const chapter = chapterId || "1";
     const verseNumber = verse.reference.match(/:(\d+)/)?.[1] ?? "1";
-    const targetVersion = (verse as any).version || (selectedVersion === "all" ? "acf" : selectedVersion);
+    const targetVersion =
+      (verse as any).version || (selectedVersion === "all" ? "acf" : selectedVersion);
     return `/${targetVersion}/${matchedBook?.slug ?? "gn"}/${chapter}#v${verseNumber}`;
   };
 
   const isExactQuery = queryParam.startsWith('"') && queryParam.endsWith('"');
-  const showApproximateNotice =
-    !isExactQuery &&
-    Boolean(queryParam.trim()) &&
-    results.length > 0 &&
-    mode === "text";
+  const cleanQueryDisplay = isExactQuery ? queryParam.slice(1, -1) : queryParam;
 
   const memoizedResults = useMemo(() => results, [results]);
   const totalPages = Math.ceil(memoizedResults.length / pageSize);
@@ -310,330 +340,506 @@ export default function SearchPage() {
     canonical: "/busca",
     description: t("search.searchDescription"),
     robots: hasQuery ? "noindex,follow" : "index,follow",
-    title: hasQuery ? `Resultados para '${queryParam}' — ${t("app.name")}` : `${t("nav.search")} | ${t("app.name")}`,
+    title: hasQuery
+      ? `Resultados para '${queryParam}' — ${t("app.name")}`
+      : `${t("nav.search")} | ${t("app.name")}`,
     ogType: "website",
   });
 
   return (
-    <Layout>
-      <h1 className="text-3xl text-app-text">{t("search.title")}</h1>
-      <p className="mt-2 font-sans text-sm text-app-text-muted">{t("search.subtitle")}</p>
+    <Layout maxWidthClassName="max-w-5xl">
+      <div className="w-full pb-20 pt-1 font-sans">
+        {/* ── BOTÃO VOLTAR PARA INÍCIO ── */}
+        <Link
+          to="/"
+          data-testid="search-back-link"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm text-app-text-muted hover:text-gold transition-colors mb-3 sm:mb-4 group"
+        >
+          <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Início</span>
+        </Link>
 
-      <form className="relative mt-6 max-w-[640px]" onSubmit={handleSubmit}>
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
-        <Input
-          aria-autocomplete="list"
-          aria-controls="search-page-suggestions"
-          aria-describedby="search-page-help"
-          aria-expanded={instantBookSuggestions.length > 0}
-          aria-label={t("nav.search")}
-          className="h-11 rounded-full border-border bg-app-raised pl-11 pr-5 text-app-text placeholder:text-app-text-muted"
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder={t("search.placeholder")}
-          role="combobox"
-          value={query}
-        />
-        <span className="sr-only" id="search-page-help">
-          {t("search.helpText")}
-        </span>
-      </form>
+        {/* ── CABEÇALHO EDITORIAL ── */}
+        <div className="space-y-1">
+          <h1 className="font-serif text-3xl sm:text-4xl text-[#F4EFEA] font-normal tracking-tight">
+            Buscar na Bíblia
+          </h1>
+          <p className="font-sans text-sm text-app-text-muted">
+            Encontre uma palavra, expressão ou referência.
+          </p>
+        </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <Tabs onValueChange={(value) => setMode(value as SearchMode)} value={mode}>
-          <TabsList className="rounded-full bg-app-raised">
-            <TabsTrigger className="rounded-full" value="text">
-              {t("search.textTab")}
-            </TabsTrigger>
-            <TabsTrigger className="rounded-full" value="reference">
-              {t("search.referenceTab")}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* ── BARRA DE BUSCA EM PÍLULA COM SELETOR DE VERSÃO INTEGRADO ── */}
+        <form onSubmit={handleSubmit} className="mt-6 sm:mt-7">
+          <div className="relative flex items-center rounded-full border border-border/80 bg-[#161412]/80 px-4 sm:px-6 py-2.5 sm:py-3 shadow-inner hover:border-gold/50 focus-within:border-gold/70 transition-all">
+            <Search className="h-5 w-5 text-app-text-muted/70 shrink-0 mr-3" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={
+                mode === "reference"
+                  ? "Ex: João 3:16, Salmo 23..."
+                  : "Ex: há grande júbilo..."
+              }
+              aria-label="Buscar na Bíblia"
+              className="w-full bg-transparent border-0 outline-hidden text-app-text placeholder:text-app-text-muted/50 text-base sm:text-lg font-sans pr-3"
+            />
 
-        {mode === "text" && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-app-text-muted">Versão:</span>
-            <select
-              aria-label="Selecionar versão bíblica para busca"
-              className="rounded-lg border border-border bg-app-raised px-2.5 py-1 text-xs text-app-text outline-none transition-colors focus:border-gold cursor-pointer"
-              value={selectedVersion}
-              onChange={(e) => {
-                const nextVersion = e.target.value;
-                navigate(`/busca?q=${encodeURIComponent(query)}&v=${nextVersion}&mode=${mode}`);
-              }}
-            >
-              <option value="all">Todas as Versões</option>
-              <option value="acf">ACF (Almeida Corrigida Fiel)</option>
-              <option value="nvi">NVI (Nova Versão Internacional)</option>
-              <option value="arc">ARC (Almeida Revista e Corrigida)</option>
-              <option value="kja">KJA (King James Atualizada)</option>
-              <option value="aa">AA (Almeida Antiga)</option>
-            </select>
+            {/* Seletor de versão dentro da pílula */}
+            <div className="relative flex items-center shrink-0 pl-3 border-l border-border/40">
+              <select
+                aria-label="Selecionar versão bíblica para busca"
+                value={selectedVersion}
+                onChange={(e) => {
+                  const nextVersion = e.target.value;
+                  navigate(`/busca?q=${encodeURIComponent(query)}&v=${nextVersion}&mode=${mode}`);
+                }}
+                className="appearance-none bg-transparent pr-5 py-1 text-xs sm:text-sm font-sans font-medium uppercase text-app-text-muted hover:text-gold cursor-pointer outline-hidden transition-colors"
+              >
+                <option value="kja" className="bg-[#1a1715] text-app-text">
+                  KJA
+                </option>
+                <option value="nvi" className="bg-[#1a1715] text-app-text">
+                  NVI
+                </option>
+                <option value="acf" className="bg-[#1a1715] text-app-text">
+                  ACF
+                </option>
+                <option value="arc" className="bg-[#1a1715] text-app-text">
+                  ARC
+                </option>
+                <option value="aa" className="bg-[#1a1715] text-app-text">
+                  AA
+                </option>
+                <option value="all" className="bg-[#1a1715] text-app-text">
+                  Todas
+                </option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-app-text-muted" />
+            </div>
           </div>
-        )}
-      </div>
+        </form>
 
-      {showApproximateNotice && (
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-gold/30 bg-gold/5 px-4 py-3 text-xs text-app-text">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-gold shrink-0" />
-            <span>
-              Exibindo resultados com correspondência flexível e tolerância tipográfica para <strong>{queryParam}</strong>.
-            </span>
-          </div>
+        {/* ── ABAS DE MODO: TEXTO / REFERÊNCIA ── */}
+        <div
+          data-testid="search-mode-tabs"
+          className="mt-5 border-b border-border/40 flex items-center gap-6"
+        >
           <button
             type="button"
-            className="shrink-0 font-medium text-gold hover:underline cursor-pointer text-left sm:text-right"
             onClick={() => {
-              const strict = `"${queryParam.replace(/"/g, "")}"`;
-              navigate(`/busca?q=${encodeURIComponent(strict)}&v=${selectedVersion}&mode=text`);
+              setMode("text");
+              navigate(`/busca?q=${encodeURIComponent(query)}&v=${selectedVersion}&mode=text`);
             }}
+            className={cn(
+              "inline-flex items-center gap-2 pb-2.5 text-sm font-medium transition-all cursor-pointer border-b-2 -mb-px",
+              mode === "text"
+                ? "border-gold text-gold"
+                : "border-transparent text-app-text-muted hover:text-app-text"
+            )}
           >
-            Buscar frase exata: "{queryParam.replace(/"/g, "")}"
+            <FileText className="h-4 w-4" />
+            <span>Texto</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMode("reference");
+              navigate(`/busca?q=${encodeURIComponent(query)}&v=${selectedVersion}&mode=reference`);
+            }}
+            className={cn(
+              "inline-flex items-center gap-2 pb-2.5 text-sm font-medium transition-all cursor-pointer border-b-2 -mb-px",
+              mode === "reference"
+                ? "border-gold text-gold"
+                : "border-transparent text-app-text-muted hover:text-app-text"
+            )}
+          >
+            <BookOpen className="h-4 w-4" />
+            <span>Referência</span>
           </button>
         </div>
-      )}
 
-      {!!query.trim() && (
-        <div className="mt-4 space-y-3">
-          {similarReference && !parsedReference && (
-            <button
-              className="flex w-full items-center justify-between rounded-xl border border-border bg-app-surface px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold"
-              onClick={() => goToBookChapter(similarReference.book, similarReference.chapter ?? 1, similarReference.verse)}
-              type="button"
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-gold" />
-                {t("search.didYouMean")} <strong>{similarReference.label}</strong>
-              </span>
-              <ArrowRight className="h-4 w-4 text-gold" />
-            </button>
-          )}
-
-          {instantBookSuggestions.length > 0 && (
-            <div className="rounded-xl border border-border bg-app-surface p-3">
-              <p className="font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">{t("search.instantSuggestions")}</p>
-              {instantBookSuggestions.map((book, index) => (
-                <div className="mt-3 rounded-lg border border-border bg-app-raised p-3" key={book.id}>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="flex items-center gap-2 font-serif text-base text-app-text">
-                      <BookOpen className="h-4 w-4 text-gold" />
-                      {book.name}
-                    </p>
-                    <Button
-                      onClick={() => navigate(`/busca?q=${encodeURIComponent(book.name)}&v=${selectedVersion}&mode=text`)}
-                      size="sm"
-                      type="button"
-                      variant="ghost"
-                    >
-                      {t("search.viewChapters")}
-                    </Button>
-                  </div>
-
-                  {index === 0 && chapterPreview.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {chapterPreview.map((chapter) => (
-                        <Button
-                          className="h-8 min-w-8"
-                          key={`${book.id}-${chapter}`}
-                          onClick={() => goToBookChapter(book, chapter)}
-                          size="sm"
-                          type="button"
-                          variant="outline"
-                        >
-                          {chapter}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {parsedReference && (
-        <button
-          className={`mt-4 flex w-full items-center justify-between rounded-xl border border-border bg-app-surface px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold ${referenceExists === false ? "opacity-90" : ""
-            }`}
-          onClick={() => {
-            if (referenceExists === false) {
-              navigate(`/${selectedVersion}/${parsedReference.slug}/${parsedReference.chapter}`);
-            } else {
-              goToReference();
-            }
-          }}
-          type="button"
-        >
-          <span className="flex items-center gap-2">
-            {referenceExists === false ? (
-              <>
-                <SearchX className="h-4 w-4 text-app-text-muted" />
-                <span>
-                  {t("search.verseNotFound", {
-                    verse: parsedReference.verse,
-                    book: findBookById(parsedReference.bookId)?.name || parsedReference.bookId,
-                    chapter: parsedReference.chapter,
-                    chapterRef: `${findBookById(parsedReference.bookId)?.name || parsedReference.bookId} ${parsedReference.chapter}`
-                  })}
-                </span>
-              </>
-            ) : (
-              <>
-                <ArrowRight className="h-4 w-4 text-gold" />
-                {t("search.goTo", { reference: referenceLabel })}
-              </>
-            )}
-          </span>
-          <ArrowRight className="h-4 w-4 text-gold" />
-        </button>
-      )}
-
-      {error && (
-        <Alert className="mt-6 border-border bg-app-surface" variant="destructive">
-          <AlertTitle>{t("search.errorTitle")}</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-          <Button className="mt-3" onClick={() => setReloadToken((value) => value + 1)} size="sm" type="button" variant="outline">
-            {t("reading.retry")}
-          </Button>
-        </Alert>
-      )}
-
-      {!queryParam && !loading && !error && (
-        <div className="mt-8 rounded-xl border border-border bg-app-surface p-4">
-          <p className="font-sans text-sm text-app-text">{t("search.popularToday")}</p>
-          <div className="mt-3 flex flex-wrap gap-2" id="search-page-suggestions" role="listbox">
-            {["João 3:16", "Salmos 23:1", "Filipenses 4:13", "Romanos 8:28", "Jeremias 29:11"].map((suggestion) => (
-              <Button
-                key={suggestion}
-                onClick={() => {
-                  setQuery(suggestion);
-                  navigate(`/busca?q=${encodeURIComponent(suggestion)}&v=${selectedVersion}&mode=text`);
-                }}
-                role="option"
-                size="sm"
+        {/* ── SUGESTÕES INSTANTÂNEAS OU "VOCÊ QUIS DIZER" ── */}
+        {!!query.trim() && (
+          <div className="mt-4 space-y-3">
+            {similarReference && !parsedReference && (
+              <button
+                className="flex w-full items-center justify-between rounded-xl border border-border/80 bg-[#161412]/80 px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold"
+                onClick={() =>
+                  goToBookChapter(
+                    similarReference.book,
+                    similarReference.chapter ?? 1,
+                    similarReference.verse
+                  )
+                }
                 type="button"
-                variant="outline"
               >
-                {suggestion}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
+                <span className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-gold" />
+                  {t("search.didYouMean")} <strong>{similarReference.label}</strong>
+                </span>
+                <ArrowRight className="h-4 w-4 text-gold" />
+              </button>
+            )}
 
-      {loading && mode === "text" && (
-        <div className="mt-8 space-y-4">
-          <div className="flex items-center gap-2 px-1 text-sm text-app-text-muted">
-            <Loader2 className="h-4 w-4 animate-spin text-gold" />
-            <span>{t("search.searching")}</span>
-          </div>
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Skeleton className="h-20 w-full bg-app-surface" key={index} />
-            ))}
-          </div>
-        </div>
-      )}
+            {instantBookSuggestions.length > 0 && (
+              <div className="rounded-xl border border-border/80 bg-[#161412]/80 p-3">
+                <p className="font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">
+                  {t("search.instantSuggestions")}
+                </p>
+                {instantBookSuggestions.map((book, index) => (
+                  <div
+                    className="mt-3 rounded-lg border border-border/60 bg-app-raised/60 p-3"
+                    key={book.id}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="flex items-center gap-2 font-serif text-base text-app-text">
+                        <BookOpen className="h-4 w-4 text-gold" />
+                        {book.name}
+                      </p>
+                      <Button
+                        onClick={() =>
+                          navigate(
+                            `/busca?q=${encodeURIComponent(book.name)}&v=${selectedVersion}&mode=text`
+                          )
+                        }
+                        size="sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        {t("search.viewChapters")}
+                      </Button>
+                    </div>
 
-      {!loading && !!queryParam && !error && mode === "text" && (
-        <div className="mt-8 space-y-3">
-          {queryBookMatch ? (
-            <div className="rounded-xl border border-border bg-app-surface p-4">
-              <p className="font-serif text-lg text-app-text">{queryBookMatch.name}</p>
-              <p className="mt-1 font-sans text-xs text-app-text-muted">{t("search.chooseChapter")}</p>
-              <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
-                {Array.from({ length: queryBookMatch.chapters }, (_, index) => index + 1).map((chapter) => (
+                    {index === 0 && chapterPreview.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {chapterPreview.map((chapter) => (
+                          <Button
+                            className="h-8 min-w-8"
+                            key={`${book.id}-${chapter}`}
+                            onClick={() => goToBookChapter(book, chapter)}
+                            size="sm"
+                            type="button"
+                            variant="outline"
+                          >
+                            {chapter}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── REFERÊNCIA PARSEADA (ATALHO DIRETO) ── */}
+        {parsedReference && (
+          <button
+            className={`mt-4 flex w-full items-center justify-between rounded-xl border border-border/80 bg-[#161412]/80 px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold ${
+              referenceExists === false ? "opacity-90" : ""
+            }`}
+            onClick={() => {
+              if (referenceExists === false) {
+                navigate(
+                  `/${selectedVersion}/${parsedReference.slug}/${parsedReference.chapter}`
+                );
+              } else {
+                goToReference();
+              }
+            }}
+            type="button"
+          >
+            <span className="flex items-center gap-2">
+              {referenceExists === false ? (
+                <>
+                  <SearchX className="h-4 w-4 text-app-text-muted" />
+                  <span>
+                    {t("search.verseNotFound", {
+                      verse: parsedReference.verse,
+                      book: findBookById(parsedReference.bookId)?.name || parsedReference.bookId,
+                      chapter: parsedReference.chapter,
+                      chapterRef: `${findBookById(parsedReference.bookId)?.name || parsedReference.bookId} ${parsedReference.chapter}`,
+                    })}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <ArrowRight className="h-4 w-4 text-gold" />
+                  {t("search.goTo", { reference: referenceLabel })}
+                </>
+              )}
+            </span>
+            <ArrowRight className="h-4 w-4 text-gold" />
+          </button>
+        )}
+
+        {/* ── ERRO DE BUSCA ── */}
+        {error && (
+          <Alert className="mt-6 border-border bg-[#161412]/80" variant="destructive">
+            <AlertTitle>{t("search.errorTitle")}</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+            <Button
+              className="mt-3"
+              onClick={() => setReloadToken((value) => value + 1)}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              {t("reading.retry")}
+            </Button>
+          </Alert>
+        )}
+
+        {/* ── SUGESTÕES POPULARES (QUANDO NÃO HÁ QUERY) ── */}
+        {!queryParam && !loading && !error && (
+          <div className="mt-8 rounded-2xl border border-border/80 bg-[#161412]/50 p-5 sm:p-6">
+            <p className="font-sans text-xs uppercase tracking-wider text-app-text-muted">
+              {t("search.popularToday")}
+            </p>
+            <div
+              className="mt-3 flex flex-wrap gap-2.5"
+              id="search-page-suggestions"
+              role="listbox"
+            >
+              {["João 3:16", "Salmos 23:1", "Filipenses 4:13", "Romanos 8:28", "Jeremias 29:11"].map(
+                (suggestion) => (
                   <Button
-                    className="h-9"
-                    key={`${queryBookMatch.id}-${chapter}`}
-                    onClick={() => goToBookChapter(queryBookMatch, chapter)}
+                    key={suggestion}
+                    onClick={() => {
+                      setQuery(suggestion);
+                      navigate(
+                        `/busca?q=${encodeURIComponent(suggestion)}&v=${selectedVersion}&mode=text`
+                      );
+                    }}
+                    role="option"
                     size="sm"
                     type="button"
                     variant="outline"
+                    className="border-border/70 hover:border-gold hover:text-gold transition-colors"
                   >
-                    {chapter}
+                    {suggestion}
                   </Button>
-                ))}
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── CARREGANDO (SKELETONS) ── */}
+        {loading && mode === "text" && (
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center gap-2 px-1 text-sm text-app-text-muted">
+              <Loader2 className="h-4 w-4 animate-spin text-gold" />
+              <span>{t("search.searching")}</span>
+            </div>
+            <div className="space-y-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="border-b border-border/30 py-6 space-y-2.5">
+                  <Skeleton className="h-5 w-32 bg-app-surface" />
+                  <Skeleton className="h-16 w-full bg-app-surface" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── RESULTADOS DA BUSCA ── */}
+        {!loading && !!queryParam && !error && mode === "text" && (
+          <div className="mt-6 space-y-2">
+            {queryBookMatch ? (
+              <div className="rounded-xl border border-border/80 bg-[#161412]/80 p-5">
+                <p className="font-serif text-xl text-app-text">{queryBookMatch.name}</p>
+                <p className="mt-1 font-sans text-xs text-app-text-muted">
+                  {t("search.chooseChapter")}
+                </p>
+                <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
+                  {Array.from({ length: queryBookMatch.chapters }, (_, index) => index + 1).map(
+                    (chapter) => (
+                      <Button
+                        className="h-9"
+                        key={`${queryBookMatch.id}-${chapter}`}
+                        onClick={() => goToBookChapter(queryBookMatch, chapter)}
+                        size="sm"
+                        type="button"
+                        variant="outline"
+                      >
+                        {chapter}
+                      </Button>
+                    )
+                  )}
+                </div>
               </div>
-            </div>
-          ) : memoizedResults.length === 0 ? (
-            <div className="flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-border bg-app-surface px-4 text-center">
-              <SearchX className="h-8 w-8 text-app-text-muted" />
-              <p className="mt-3 font-sans text-sm text-app-text-muted">{t("search.noResults", { query: queryParam })}</p>
-              <p className="mt-1 font-sans text-xs text-app-text-muted">
-                {t("search.noResultsHint")}
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-between pb-2 px-1">
-                <p className="font-sans text-[0.65rem] uppercase tracking-[0.1em] text-app-text-muted">
-                  {results.length === 1 ? t("search.resultCount") : t("search.resultsCount", { count: totalCount || results.length })}
+            ) : memoizedResults.length === 0 ? (
+              <div className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-border/80 bg-[#161412]/50 px-4 text-center">
+                <SearchX className="h-8 w-8 text-app-text-muted" />
+                <p className="mt-3 font-sans text-sm text-app-text-muted">
+                  {t("search.noResults", { query: queryParam })}
+                </p>
+                <p className="mt-1 font-sans text-xs text-app-text-muted">
+                  {t("search.noResultsHint")}
                 </p>
               </div>
-              {paginatedResults.map((verse) => (
-                <SearchResultCard key={verse.id} route={getResultRoute(verse)} query={queryParam} verse={verse} />
-              ))}
-
-              {results.length > 0 && (
-                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border pt-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-app-text-muted">Resultados por página:</span>
-                    <select
-                      className="bg-app-raised border border-border text-app-text text-sm rounded-md px-2 py-1 outline-none focus:border-gold"
-                      value={pageSize}
-                      onChange={(e) => {
-                        setPageSize(Number(e.target.value));
-                        setCurrentPage(1);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
+            ) : (
+              <>
+                {/* ── BARRA DE CONTAGEM E ALTERNADOR CORRESPONDÊNCIA / FRASE EXATA ── */}
+                <div
+                  data-testid="search-results-header"
+                  className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/40 text-xs sm:text-sm"
+                >
+                  <div>
+                    <span className="font-sans text-app-text-muted">
+                      <strong className="font-semibold text-app-text">
+                        {totalCount || results.length}
+                      </strong>{" "}
+                      {results.length === 1 ? "resultado para" : "resultados para"}{" "}
+                      <span className="text-gold font-medium">“{cleanQueryDisplay}”</span>
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs text-app-text-muted">
+                    <button
+                      type="button"
                       onClick={() => {
-                        setCurrentPage(p => Math.max(1, p - 1));
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        if (isExactQuery) {
+                          const unquoted = queryParam.replace(/^"(.*)"$/, "$1");
+                          navigate(
+                            `/busca?q=${encodeURIComponent(unquoted)}&v=${selectedVersion}&mode=text`
+                          );
+                        }
                       }}
-                      disabled={currentPage === 1}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 transition-colors cursor-pointer",
+                        !isExactQuery
+                          ? "text-app-text font-medium"
+                          : "text-app-text-muted hover:text-gold"
+                      )}
                     >
-                      Anterior
-                    </Button>
-                    <span className="text-xs text-app-text-muted">
-                      Página {currentPage} de {totalPages || 1}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
+                      <Sparkles className="h-3.5 w-3.5 text-gold/80" />
+                      <span>Correspondência flexível</span>
+                    </button>
+
+                    <span className="text-border/80">|</span>
+
+                    <button
+                      type="button"
                       onClick={() => {
-                        setCurrentPage(p => Math.min(totalPages, p + 1));
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        if (!isExactQuery) {
+                          const quoted = `"${queryParam.replace(/"/g, "")}"`;
+                          navigate(
+                            `/busca?q=${encodeURIComponent(quoted)}&v=${selectedVersion}&mode=text`
+                          );
+                        }
                       }}
-                      disabled={currentPage >= totalPages}
+                      className={cn(
+                        "inline-flex items-center gap-1 transition-colors cursor-pointer",
+                        isExactQuery
+                          ? "text-gold font-medium"
+                          : "text-app-text-muted hover:text-gold"
+                      )}
                     >
-                      Próxima
-                    </Button>
+                      <span>Frase exata</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
                   </div>
                 </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
 
-      <footer className="mt-10 border-t border-border pt-4">
-        <p className="font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">{t("search.selectedVersion")}: {selectedVersion.toUpperCase()}</p>
-      </footer>
+                {/* ── LINHAS EDITORIAIS DE RESULTADOS ── */}
+                <div className="divide-y-0">
+                  {paginatedResults.map((verse) => (
+                    <SearchResultCard
+                      key={verse.id}
+                      route={getResultRoute(verse)}
+                      query={queryParam}
+                      verse={verse}
+                    />
+                  ))}
+                </div>
+
+                {/* ── PAGINAÇÃO (SE NECESSÁRIA) ── */}
+                {results.length > 0 && (
+                  <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/40 pt-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-app-text-muted">Resultados por página:</span>
+                      <select
+                        className="bg-[#161412] border border-border text-app-text text-xs rounded-md px-2 py-1 outline-hidden focus:border-gold cursor-pointer"
+                        value={pageSize}
+                        onChange={(e) => {
+                          setPageSize(Number(e.target.value));
+                          setCurrentPage(1);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                      >
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setCurrentPage((p) => Math.max(1, p - 1));
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        disabled={currentPage === 1}
+                        className="border-border/70 hover:border-gold"
+                      >
+                        Anterior
+                      </Button>
+                      <span className="text-xs text-app-text-muted">
+                        Página {currentPage} de {totalPages || 1}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setCurrentPage((p) => Math.min(totalPages, p + 1));
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        disabled={currentPage >= totalPages}
+                        className="border-border/70 hover:border-gold"
+                      >
+                        Próxima
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── RODAPÉ SAGRADO INSPIRADOR COM SALMO 119:105 ── */}
+        <footer
+          data-testid="search-sacred-footer"
+          className="mt-16 sm:mt-20 border-t border-border/40 pt-8 pb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-xs text-app-text-muted"
+        >
+          <div className="flex items-start gap-3 max-w-md">
+            <Sparkles className="h-4 w-4 text-gold/80 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-serif italic text-app-text-muted/90 text-sm leading-relaxed">
+                “Lâmpada para os meus pés é a tua palavra, e luz para o meu caminho.”
+              </p>
+              <span className="font-serif text-xs text-app-text-muted/70 block mt-1">
+                — Salmo 119:105
+              </span>
+            </div>
+          </div>
+
+          <div className="sm:text-right">
+            <p className="font-serif italic text-app-text-muted/80 text-sm">
+              A Palavra de Deus sempre nos encontra.
+            </p>
+          </div>
+        </footer>
+      </div>
     </Layout>
   );
 }
