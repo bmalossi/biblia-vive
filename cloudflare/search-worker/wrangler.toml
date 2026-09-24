@@ -1,0 +1,10 @@
+name = "biblia-vive-search"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+
+# Cloudflare D1 Database Binding
+# Execute 'npx wrangler d1 create biblia-vive-search' e configure o database_id abaixo
+[[d1_databases]]
+binding = "DB"
+database_name = "biblia-vive-search"
+database_id = "d751c1bf-09d5-435f-88d5-dcda8bc3e932"

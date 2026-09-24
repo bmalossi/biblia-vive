@@ -7,12 +7,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/noteStore";
 import { hasBibleReference } from "@/lib/memorialUtils";
 import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 import VoiceRecordButton from "@/components/VoiceRecordButton";
+import {
+    getMemorialDraftKey,
+    saveMemorialDraft,
+    getMemorialDraft,
+    clearMemorialDraft
+} from "@/lib/memorialDraftStore";
 
 interface MemorialInlineEditorProps {
     category: MemorialCategory;
@@ -26,6 +32,9 @@ interface MemorialInlineEditorProps {
     onSave: (entryData: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }) => Promise<void>;
     onDelete?: (id: string) => Promise<void>;
     onBack: () => void;
+    activeSnapPoint?: number | string | null;
+    onSnapPointChange?: (snap: number) => void;
+    onClose?: () => void;
 }
 
 export default function MemorialInlineEditor({
@@ -40,6 +49,9 @@ export default function MemorialInlineEditor({
     onSave,
     onDelete,
     onBack,
+    activeSnapPoint,
+    onSnapPointChange,
+    onClose,
 }: MemorialInlineEditorProps) {
     const [selectedCategory, setSelectedCategory] = useState<MemorialCategory>(category);
     const [verse, setVerse] = useState<number | null>(initialVerse ?? null);
@@ -71,48 +83,157 @@ export default function MemorialInlineEditor({
     // Opção de desvincular apresentação de versículo/capítulo
     const [includeReference, setIncludeReference] = useState<boolean>(true);
 
+    const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const titleInputRef = useRef<HTMLInputElement>(null);
+    const isLoadedRef = useRef(false);
+
+    const draftKey = getMemorialDraftKey(existingEntry?.id, selectedCategory, bookId, chapter);
 
     useEffect(() => {
         const cat = existingEntry?.type || category || "reflection";
         setSelectedCategory(cat);
         setVerse(existingEntry ? existingEntry.verse ?? null : initialVerse ?? null);
-        setTitle(existingEntry?.title || "");
-        setContent(existingEntry?.content || "");
-        setTags(existingEntry?.tags?.join(", ") || "");
 
-        if (existingEntry) {
-            setIncludeReference(hasBibleReference(existingEntry));
+        // Verifica se há rascunho persistido localmente
+        const currentDraftKey = getMemorialDraftKey(existingEntry?.id, cat, bookId, chapter);
+        const draft = getMemorialDraft(currentDraftKey);
+
+        const shouldUseDraft = draft && (
+            !existingEntry || 
+            (draft.updatedAt > new Date(existingEntry.updatedAt).getTime())
+        );
+
+        if (shouldUseDraft && draft) {
+            setTitle(draft.title || "");
+            setContent(draft.content || "");
+            setTags(draft.tags || "");
+            setIncludeReference(draft.includeReference ?? true);
+            setSoapS(draft.soapS ?? (verseText || ""));
+            setSoapO(draft.soapO ?? "");
+            setSoapA(draft.soapA ?? "");
+            setSoapP(draft.soapP ?? "");
+            setMotivo(draft.motivo ?? "");
+            setPedido(draft.pedido ?? "");
+            setEntrega(draft.entrega ?? "");
+            setOQueAconteceu(draft.oQueAconteceu ?? "");
+            setComoDeusSustentou(draft.comoDeusSustentou ?? "");
+            setDataFato(draft.dataFato || new Date().toISOString().split("T")[0]);
+            setObjetivo(draft.objetivo ?? "");
+            setDataInicio(draft.dataInicio || new Date().toISOString().split("T")[0]);
+            setDataPrevista(draft.dataPrevista || "");
+            setHasRestoredDraft(true);
         } else {
-            setIncludeReference(hasBibleReference({ bookId, bookName, chapter }));
+            setTitle(existingEntry?.title || "");
+            setContent(existingEntry?.content || "");
+            setTags(existingEntry?.tags?.join(", ") || "");
+
+            if (existingEntry) {
+                setIncludeReference(hasBibleReference(existingEntry));
+            } else {
+                setIncludeReference(hasBibleReference({ bookId, bookName, chapter }));
+            }
+
+            const meta = existingEntry?.metadata || {};
+
+            // SOAP
+            setSoapS(meta.soap?.scripture || verseText || "");
+            setSoapO(meta.soap?.observation || "");
+            setSoapA(meta.soap?.application || "");
+            setSoapP(meta.soap?.prayer || "");
+
+            // Oração
+            setMotivo(meta.motivo || "");
+            setPedido(meta.pedido || "");
+            setEntrega(meta.entrega || "");
+
+            // Testemunho
+            setOQueAconteceu(meta.oQueAconteceu || "");
+            setComoDeusSustentou(meta.comoDeusSustentou || "");
+            setDataFato(meta.dataFato || new Date().toISOString().split("T")[0]);
+
+            // Propósito
+            setObjetivo(meta.objetivo || "");
+            setDataInicio(meta.dataInicio || new Date().toISOString().split("T")[0]);
+            setDataPrevista(meta.dataPrevista || "");
+            setHasRestoredDraft(false);
         }
 
-        const meta = existingEntry?.metadata || {};
-
-        // SOAP
-        setSoapS(meta.soap?.scripture || verseText || "");
-        setSoapO(meta.soap?.observation || "");
-        setSoapA(meta.soap?.application || "");
-        setSoapP(meta.soap?.prayer || "");
-
-        // Oração
-        setMotivo(meta.motivo || "");
-        setPedido(meta.pedido || "");
-        setEntrega(meta.entrega || "");
-
-        // Testemunho
-        setOQueAconteceu(meta.oQueAconteceu || "");
-        setComoDeusSustentou(meta.comoDeusSustentou || "");
-        setDataFato(meta.dataFato || new Date().toISOString().split("T")[0]);
-
-        // Propósito
-        setObjetivo(meta.objetivo || "");
-        setDataInicio(meta.dataInicio || new Date().toISOString().split("T")[0]);
-        setDataPrevista(meta.dataPrevista || "");
-
+        isLoadedRef.current = true;
         setTimeout(() => titleInputRef.current?.focus(), 80);
-    }, [existingEntry, category, initialVerse, verseText]);
+    }, [existingEntry, category, initialVerse, verseText, bookId, chapter]);
+
+    // Salvar rascunho automaticamente a cada alteração em tempo real
+    useEffect(() => {
+        if (!isLoadedRef.current) return;
+
+        const hasContent = Boolean(
+            title.trim() ||
+            content.trim() ||
+            tags.trim() ||
+            soapO.trim() ||
+            soapA.trim() ||
+            soapP.trim() ||
+            motivo.trim() ||
+            pedido.trim() ||
+            entrega.trim() ||
+            oQueAconteceu.trim() ||
+            comoDeusSustentou.trim() ||
+            objetivo.trim() ||
+            (soapS.trim() && soapS.trim() !== (verseText || "").trim())
+        );
+
+        if (hasContent) {
+            saveMemorialDraft(draftKey, {
+                category: selectedCategory,
+                title,
+                content,
+                tags,
+                includeReference,
+                soapS,
+                soapO,
+                soapA,
+                soapP,
+                motivo,
+                pedido,
+                entrega,
+                oQueAconteceu,
+                comoDeusSustentou,
+                dataFato,
+                objetivo,
+                dataInicio,
+                dataPrevista,
+                updatedAt: Date.now(),
+            });
+        }
+    }, [
+        draftKey, selectedCategory, title, content, tags, includeReference,
+        soapS, soapO, soapA, soapP,
+        motivo, pedido, entrega,
+        oQueAconteceu, comoDeusSustentou, dataFato,
+        objetivo, dataInicio, dataPrevista, verseText
+    ]);
+
+    const handleDiscardDraft = () => {
+        clearMemorialDraft(draftKey);
+        setHasRestoredDraft(false);
+        setTitle("");
+        setContent("");
+        setTags("");
+        setSoapS(verseText || "");
+        setSoapO("");
+        setSoapA("");
+        setSoapP("");
+        setMotivo("");
+        setPedido("");
+        setEntrega("");
+        setOQueAconteceu("");
+        setComoDeusSustentou("");
+        setDataFato(new Date().toISOString().split("T")[0]);
+        setObjetivo("");
+        setDataInicio(new Date().toISOString().split("T")[0]);
+        setDataPrevista("");
+    };
 
     const categoryConfigs: Record<MemorialCategory, { label: string; badgeClasses: string }> = {
         reflection: {
@@ -213,37 +334,83 @@ export default function MemorialInlineEditor({
                 metadata: metadataPayload,
             });
 
+            // Limpa o rascunho após salvar com sucesso
+            clearMemorialDraft(draftKey);
+            if (existingEntry?.id) {
+                clearMemorialDraft(getMemorialDraftKey(existingEntry.id));
+            }
+            setHasRestoredDraft(false);
+
             return true;
         } catch {
             return false;
         }
     }
 
+    const handleDelete = async () => {
+        if (!existingEntry || !onDelete) return;
+        clearMemorialDraft(draftKey);
+        if (existingEntry.id) {
+            clearMemorialDraft(getMemorialDraftKey(existingEntry.id));
+        }
+        await onDelete(existingEntry.id);
+    };
+
     return (
         <div className="flex flex-col h-full bg-app-surface text-app-text font-sans overflow-hidden">
             {/* Header de Ação / Navegação */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-app-raised/40 shrink-0">
+            <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-b border-border bg-app-raised/40 shrink-0 min-h-[48px]">
                 <button
                     type="button"
                     onClick={onBack}
-                    className="flex items-center gap-1.5 text-xs text-app-text-muted hover:text-app-text transition-colors font-medium"
+                    className="flex items-center gap-1.5 text-xs text-app-text-muted hover:text-app-text transition-colors font-medium shrink-0"
                 >
                     <ArrowLeft className="h-4 w-4" />
                     <span>Voltar</span>
                 </button>
 
-                <div className="flex items-center gap-2">
+                {/* Seletor Bíblia / Caderno quando renderizado dentro de gaveta mobile */}
+                {onSnapPointChange && (
+                    <div className="flex bg-app-surface border border-border p-0.5 rounded-lg shrink-0 mx-1">
+                        <button
+                            type="button"
+                            onClick={() => onSnapPointChange(0.35)}
+                            className={cn(
+                                "text-[0.72rem] font-medium py-1 px-2.5 rounded-md transition-colors",
+                                activeSnapPoint === 0.35
+                                    ? "bg-gold text-black font-semibold"
+                                    : "text-app-text-muted hover:text-app-text"
+                            )}
+                        >
+                            Bíblia
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onSnapPointChange(0.95)}
+                            className={cn(
+                                "text-[0.72rem] font-medium py-1 px-2.5 rounded-md transition-colors",
+                                activeSnapPoint === 0.95
+                                    ? "bg-gold text-black font-semibold"
+                                    : "text-app-text-muted hover:text-app-text"
+                            )}
+                        >
+                            Caderno
+                        </button>
+                    </div>
+                )}
+
+                <div className="flex items-center gap-1.5 shrink-0">
                     {existingEntry && onDelete && (
                         <button
                             type="button"
-                            onClick={() => onDelete(existingEntry.id)}
+                            onClick={handleDelete}
                             className="p-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
                             title="Excluir Registro"
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>
                     )}
-                    <div className="w-[120px]">
+                    <div className="w-[100px] sm:w-[120px]">
                         <SaveMemorialButton
                             idleText="Guardar"
                             savingText="Guardando..."
@@ -253,15 +420,40 @@ export default function MemorialInlineEditor({
                             onSuccessComplete={onBack}
                         />
                     </div>
+                    {onClose && (
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            aria-label="Fechar"
+                            className="h-7 w-7 flex items-center justify-center rounded-md text-app-text-muted hover:text-app-text transition-colors"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    )}
                 </div>
             </div>
 
             {/* Sub-header do Registro */}
-            <div className="px-4 py-2.5 bg-app-raised/20 border-b border-border/60 flex items-center justify-between">
-                <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.7rem] font-medium", currentConfig.badgeClasses)}>
-                    {currentConfig.label}
-                </span>
-                <span className="text-[0.75rem] font-mono text-gold font-medium truncate max-w-[180px]">
+            <div className="px-3 sm:px-4 py-2 bg-app-raised/20 border-b border-border/60 flex items-center justify-between shrink-0 min-h-[38px]">
+                <div className="flex items-center gap-2">
+                    <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full border text-[0.68rem] font-medium", currentConfig.badgeClasses)}>
+                        {currentConfig.label}
+                    </span>
+                    {hasRestoredDraft && (
+                        <div className="flex items-center gap-1 text-[0.65rem] text-gold font-medium bg-gold/10 px-2 py-0.5 rounded-md">
+                            <span>Rascunho recuperado</span>
+                            <button
+                                type="button"
+                                onClick={handleDiscardDraft}
+                                className="text-app-text-muted hover:text-destructive underline ml-1"
+                                title="Descartar rascunho recuperado"
+                            >
+                                Limpar
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <span className="text-[0.72rem] font-mono text-gold font-medium truncate max-w-[160px] sm:max-w-[200px]">
                     {referenceText}
                 </span>
             </div>

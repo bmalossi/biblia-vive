@@ -412,7 +412,7 @@ export default function NotebookWorkspace({
 
                 {mainSection === "memorial" ? (
                     isCreatingMemorial || selectedMemorialEntry !== null ? (
-                        <div className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                             <MemorialInlineEditor
                                 category={memorialCategoryForNew}
                                 bookId={selectedMemorialEntry?.bookId ?? bookId}
@@ -582,7 +582,7 @@ export default function NotebookWorkspace({
                 ) : (
                     isEditing ? (
                         // ── Modo edição de Caderno ──
-                        <div className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                             <NotebookEditor
                                 notebook={isCreatingNew
                                     ? null

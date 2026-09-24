@@ -134,8 +134,6 @@ export default function NotebookSheet({
     const noteStore = useMemo(() => createNoteStore(user?.id), [user?.id]);
 
     const [mainSection, setMainSection] = useState<"notebooks" | "memorial">("notebooks");
-    const isEditing = isCreatingNew || selectedNotebook !== null;
-    const sheetMode = isEditing ? "editor" : "list";
     const [activeSnapPoint, setActiveSnapPoint] = useState<number | string | null>(0.95);
     const [activeTab, setActiveTab] = useState<TabId>("chapter");
     const [searchQuery, setSearchQuery] = useState("");
@@ -148,6 +146,35 @@ export default function NotebookSheet({
     const [selectedMemorialEntry, setSelectedMemorialEntry] = useState<MemorialEntry | null>(null);
     const [isCreatingMemorial, setIsCreatingMemorial] = useState<boolean>(false);
     const [memorialCategoryForNew, setMemorialCategoryForNew] = useState<MemorialCategory>("reflection");
+
+    const isEditingMemorial = mainSection === "memorial" && (isCreatingMemorial || selectedMemorialEntry !== null);
+    const isEditing = isCreatingNew || selectedNotebook !== null || isEditingMemorial;
+    const sheetMode = isEditing ? "editor" : "list";
+
+    // Monitorar altura da visualViewport para manter a gaveta visível quando o teclado mobile abre
+    const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (typeof window === "undefined" || !window.visualViewport) return;
+
+        const updateHeight = () => {
+            const vv = window.visualViewport;
+            if (!vv) return;
+            // Se o visualViewport for significativamente menor que window.innerHeight, o teclado mobile está ativo
+            if (vv.height < window.innerHeight * 0.85) {
+                setViewportHeight(Math.round(vv.height));
+            } else {
+                setViewportHeight(null);
+            }
+        };
+
+        window.visualViewport.addEventListener("resize", updateHeight);
+        window.visualViewport.addEventListener("scroll", updateHeight);
+        return () => {
+            window.visualViewport?.removeEventListener("resize", updateHeight);
+            window.visualViewport?.removeEventListener("scroll", updateHeight);
+        };
+    }, []);
 
     const loadMemorialEntries = useCallback(async () => {
         try {
@@ -351,22 +378,25 @@ export default function NotebookSheet({
                 <DrawerPrimitive.Overlay 
                     onClick={() => onOpenChange(false)}
                     className={cn(
-                        "fixed inset-0 z-50 bg-black/40 transition-opacity duration-300",
+                        "fixed inset-0 z-40 bg-black/40 transition-opacity duration-300",
                         activeSnapPoint === 0.35 ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
                     )}
                 />
                 <DrawerPrimitive.Content
                     aria-label="Caderno do capítulo"
+                    style={viewportHeight ? { height: `${viewportHeight}px`, maxHeight: `${viewportHeight}px` } : undefined}
                     className={cn(
-                        "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-2xl border-t border-border bg-app-bg h-[calc(100dvh-2rem)] max-h-[92dvh]",
-                        "pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
+                        "fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-2xl border-t border-border bg-app-bg",
+                        !viewportHeight && "h-[calc(100dvh-2rem)] max-h-[92dvh]",
+                        viewportHeight ? "pb-1" : "pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
                     )}
                 >
                     {/* Handle de arraste */}
                     <div className="mx-auto mt-3 mb-1 h-1.5 w-12 rounded-full bg-border shrink-0" aria-hidden="true" />
 
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0 min-h-[52px]">
+                    {/* Header (oculto quando editando Memorial, pois MemorialInlineEditor tem seu cabeçalho próprio integrado) */}
+                    {!isEditingMemorial && (
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0 min-h-[52px]">
                         {sheetMode === "editor" ? (
                             <>
                                 {/* Esquerda: Botão Voltar */}
@@ -492,7 +522,8 @@ export default function NotebookSheet({
                                 </div>
                             </>
                         )}
-                    </div>
+                        </div>
+                    )}
 
                     {/* Abas Principais Superiores */}
                     {sheetMode !== "editor" && !selectedMemorialEntry && !isCreatingMemorial && (
@@ -529,7 +560,7 @@ export default function NotebookSheet({
                     {/* Conteúdo do sheet */}
                     {mainSection === "memorial" ? (
                         isCreatingMemorial || selectedMemorialEntry !== null ? (
-                            <div className="flex-1 min-h-0 overflow-y-auto">
+                            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                                 <MemorialInlineEditor
                                     category={memorialCategoryForNew}
                                     bookId={selectedMemorialEntry?.bookId ?? bookId}
@@ -545,6 +576,9 @@ export default function NotebookSheet({
                                         setSelectedMemorialEntry(null);
                                         setIsCreatingMemorial(false);
                                     }}
+                                    activeSnapPoint={activeSnapPoint}
+                                    onSnapPointChange={setActiveSnapPoint}
+                                    onClose={() => onOpenChange(false)}
                                 />
                             </div>
                         ) : (
@@ -697,7 +731,7 @@ export default function NotebookSheet({
                             </div>
                         )
                     ) : sheetMode === "editor" ? (
-                        <div className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                             <NotebookEditor
                                 notebook={isCreatingNew
                                     ? null

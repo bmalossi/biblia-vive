@@ -140,12 +140,47 @@ export async function checkVerseExists(
 const stripHtml = (content: string) =>
   content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
+import { searchBibleWorker } from "@/lib/bibleSearchClient";
+
 export async function searchLocalBible(
   version: string,
   query: string,
   limit = 50,
   signal?: AbortSignal
 ): Promise<{ verses: Verse[]; total: number }> {
+  // 1. Tenta consulta via Cloudflare Worker D1 FTS5 (Borda de alta performance)
+  try {
+    const workerResult = await searchBibleWorker({
+      query,
+      version: version === "all" ? "all" : version,
+      limit,
+      offset: 0,
+      signal,
+    });
+
+    if (workerResult.verses && workerResult.verses.length > 0) {
+      return {
+        verses: workerResult.verses.map((v) => ({
+          id: v.id,
+          orgId: "cloudflare-d1",
+          bookId: v.bookId,
+          chapterId: `${v.bookId}.${v.chapter}`,
+          content: v.text,
+          reference: v.reference,
+          number: v.verse,
+          text: v.text,
+        })),
+        total: workerResult.total,
+      };
+    }
+  } catch (workerErr) {
+    if ((workerErr as DOMException)?.name === "AbortError") {
+      throw workerErr;
+    }
+    console.warn("[BibleApi] Busca remota na Cloudflare indisponível:", workerErr);
+  }
+
+  // 2. Fallback offline direcionado (quando escopado por livro específico ou busca pontual)
   const normalizedQuery = query
     .toLowerCase()
     .normalize("NFD")
@@ -154,39 +189,24 @@ export async function searchLocalBible(
 
   if (!normalizedQuery) return { verses: [], total: 0 };
 
-  let scopeBookSlug: string | undefined;
-  let searchTerm = normalizedQuery;
-
   const scopeMatch = normalizedQuery.match(/^(.+?)\s+(?:em|in|en)\s+([a-z0-9]+)$/);
-  if (scopeMatch) {
-    searchTerm = scopeMatch[1].trim();
-    scopeBookSlug = scopeMatch[2].trim();
+  if (!scopeMatch) {
+    // Busca ampla offline: evita sobrecarregar com 66 fetches
+    return { verses: [], total: 0 };
   }
 
+  const searchTerm = scopeMatch[1].trim();
+  const rawScope = scopeMatch[2].trim();
+  const bookSlug = findBookGlobally(getLocalId(rawScope))?.slug || rawScope;
   const langPath = getVersionLangPath(version as any);
   const allResults: Verse[] = [];
 
-  const booksToSearch = scopeBookSlug
-    ? [findBookGlobally(getLocalId(scopeBookSlug))?.slug || scopeBookSlug]
-    : (await import("@/data/books.json")).default.old_testament
-      .concat((await import("@/data/books.json")).default.new_testament)
-      .map((b: any) => b.slug);
-
-  for (const bookSlug of booksToSearch) {
-    if (signal?.aborted) break;
-
-    try {
-      const chapter = await localAdapter.fetch(bookSlug, version, "1");
-      if (!chapter) continue;
-
-      // We need to scan all chapters — fetch book index directly
-      const localId = getLocalId(bookSlug);
-      const url = `/bible/${langPath}/${version}/${localId}/${localId}.json`;
-      const res = await fetch(url);
-      if (!res.ok) continue;
-
-      const bookData = await res.json() as { name: string; chapters: string[][] };
-
+  try {
+    const localId = getLocalId(bookSlug);
+    const url = `/bible/${langPath}/${version}/${localId}/${localId}.json`;
+    const res = await fetch(url, { signal });
+    if (res.ok) {
+      const bookData = (await res.json()) as { name: string; chapters: string[][] };
       bookData.chapters.forEach((chapterVerses, cIndex) => {
         const chapterNum = cIndex + 1;
         chapterVerses.forEach((content, vIndex) => {
@@ -210,9 +230,9 @@ export async function searchLocalBible(
           }
         });
       });
-    } catch (e) {
-      console.warn(`Search failed for book ${bookSlug}:`, e);
     }
+  } catch (e) {
+    console.warn(`Fallback search failed for book ${bookSlug}:`, e);
   }
 
   return {
@@ -227,9 +247,8 @@ export async function searchVerses(
   limit = 100,
   signal?: AbortSignal
 ): Promise<Verse[]> {
-  // NOTE: scripture.api.bible search is bypassed — local scan covers all 66 books faithfully.
-  const localResult = await searchLocalBible(version, query, limit, signal);
-  return localResult.verses;
+  const result = await searchLocalBible(version, query, limit, signal);
+  return result.verses;
 }
 
 export async function searchBible(

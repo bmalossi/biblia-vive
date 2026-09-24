@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchResultCard from "@/components/SearchResultCard";
 import { checkVerseExists, getFriendlyApiError, searchVerses, type Verse } from "@/lib/bibleApi";
+import { searchBibleWorker } from "@/lib/bibleSearchClient";
 import { BOOK_ALIASES, normalizeBookAlias } from "@/lib/bookAliases";
 import { ALL_BOOKS, findBookById, findBookBySlug, type Book } from "@/lib/books";
 import { formatParsedReferenceLabel, parseReference } from "@/lib/referenceParser";
@@ -89,7 +90,7 @@ export default function SearchPage() {
   const params = new URLSearchParams(location.search);
   const queryParam = params.get("q") ?? "";
   const versionParam = params.get("v");
-  const selectedVersion = isBibleVersion(versionParam) ? versionParam : getVersion();
+  const selectedVersion = versionParam === "all" || isBibleVersion(versionParam) ? versionParam : getVersion();
   const modeParam = params.get("mode") === "reference" ? "reference" : "text";
 
   const [query, setQuery] = useState(queryParam);
@@ -97,6 +98,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Verse[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [reloadToken, setReloadToken] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -179,7 +181,8 @@ export default function SearchPage() {
   const resolveChapterRoute = (book: Book, chapter: number, verse?: number) => {
     const safeChapter = Math.max(1, Math.min(chapter, book.chapters));
     const hash = verse ? `#v${verse}` : "";
-    return `/${selectedVersion}/${book.slug}/${safeChapter}${hash}`;
+    const versionPath = selectedVersion === "all" ? "acf" : selectedVersion;
+    return `/${versionPath}/${book.slug}/${safeChapter}${hash}`;
   };
 
   const goToBookChapter = (book: Book, chapter: number, verse?: number) => {
@@ -195,6 +198,7 @@ export default function SearchPage() {
   useEffect(() => {
     if (mode !== "text" || !queryParam.trim() || queryBookMatch) {
       setResults([]);
+      setTotalCount(0);
       setError(null);
       setLoading(false);
       return;
@@ -205,18 +209,42 @@ export default function SearchPage() {
       setLoading(true);
       setError(null);
 
-      searchVerses(selectedVersion, queryParam, 1000, controller.signal)
+      searchBibleWorker({
+        query: queryParam,
+        version: selectedVersion,
+        limit: 1000,
+        offset: 0,
+        signal: controller.signal,
+      })
         .then((data) => {
-          setResults(data);
+          const mapped: Verse[] = data.verses.map((v) => ({
+            id: v.id,
+            orgId: "cloudflare-d1",
+            bookId: v.bookId,
+            chapterId: `${v.bookId}.${v.chapter}`,
+            content: v.text,
+            reference: v.reference,
+            number: v.verse,
+            text: v.text,
+            version: v.version,
+          }));
+          setResults(mapped);
+          setTotalCount(data.total);
         })
-        .catch((apiError) => {
+        .catch(async (apiError) => {
           if ((apiError as DOMException)?.name === "AbortError") return;
-          setError(getFriendlyApiError(apiError));
+          try {
+            const fallbackData = await searchVerses(selectedVersion, queryParam, 100, controller.signal);
+            setResults(fallbackData);
+            setTotalCount(fallbackData.length);
+          } catch {
+            setError(getFriendlyApiError(apiError));
+          }
         })
         .finally(() => {
           setLoading(false);
         });
-    }, 350);
+    }, 250);
 
     return () => {
       window.clearTimeout(timer);
@@ -227,7 +255,8 @@ export default function SearchPage() {
   const goToReference = () => {
     if (!parsedReference) return;
     const hash = parsedReference.verse ? `#v${parsedReference.verse}` : "";
-    navigate(`/${selectedVersion}/${parsedReference.slug}/${parsedReference.chapter}${hash}`);
+    const versionPath = selectedVersion === "all" ? "acf" : selectedVersion;
+    navigate(`/${versionPath}/${parsedReference.slug}/${parsedReference.chapter}${hash}`);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -257,8 +286,16 @@ export default function SearchPage() {
     const matchedBook = findBookBySlug(bookId) || findBookById(bookId);
     const chapter = chapterId || "1";
     const verseNumber = verse.reference.match(/:(\d+)/)?.[1] ?? "1";
-    return `/${selectedVersion}/${matchedBook?.slug ?? "gn"}/${chapter}#v${verseNumber}`;
+    const targetVersion = (verse as any).version || (selectedVersion === "all" ? "acf" : selectedVersion);
+    return `/${targetVersion}/${matchedBook?.slug ?? "gn"}/${chapter}#v${verseNumber}`;
   };
+
+  const isExactQuery = queryParam.startsWith('"') && queryParam.endsWith('"');
+  const showApproximateNotice =
+    !isExactQuery &&
+    Boolean(queryParam.trim()) &&
+    results.length > 0 &&
+    mode === "text";
 
   const memoizedResults = useMemo(() => results, [results]);
   const totalPages = Math.ceil(memoizedResults.length / pageSize);
@@ -301,16 +338,61 @@ export default function SearchPage() {
         </span>
       </form>
 
-      <Tabs className="mt-4" onValueChange={(value) => setMode(value as SearchMode)} value={mode}>
-        <TabsList className="rounded-full bg-app-raised">
-          <TabsTrigger className="rounded-full" value="text">
-            {t("search.textTab")}
-          </TabsTrigger>
-          <TabsTrigger className="rounded-full" value="reference">
-            {t("search.referenceTab")}
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <Tabs onValueChange={(value) => setMode(value as SearchMode)} value={mode}>
+          <TabsList className="rounded-full bg-app-raised">
+            <TabsTrigger className="rounded-full" value="text">
+              {t("search.textTab")}
+            </TabsTrigger>
+            <TabsTrigger className="rounded-full" value="reference">
+              {t("search.referenceTab")}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {mode === "text" && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-app-text-muted">Versão:</span>
+            <select
+              aria-label="Selecionar versão bíblica para busca"
+              className="rounded-lg border border-border bg-app-raised px-2.5 py-1 text-xs text-app-text outline-none transition-colors focus:border-gold cursor-pointer"
+              value={selectedVersion}
+              onChange={(e) => {
+                const nextVersion = e.target.value;
+                navigate(`/busca?q=${encodeURIComponent(query)}&v=${nextVersion}&mode=${mode}`);
+              }}
+            >
+              <option value="all">Todas as Versões</option>
+              <option value="acf">ACF (Almeida Corrigida Fiel)</option>
+              <option value="nvi">NVI (Nova Versão Internacional)</option>
+              <option value="arc">ARC (Almeida Revista e Corrigida)</option>
+              <option value="kja">KJA (King James Atualizada)</option>
+              <option value="aa">AA (Almeida Antiga)</option>
+            </select>
+          </div>
+        )}
+      </div>
+
+      {showApproximateNotice && (
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-gold/30 bg-gold/5 px-4 py-3 text-xs text-app-text">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-gold shrink-0" />
+            <span>
+              Exibindo resultados com correspondência flexível e tolerância tipográfica para <strong>{queryParam}</strong>.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="shrink-0 font-medium text-gold hover:underline cursor-pointer text-left sm:text-right"
+            onClick={() => {
+              const strict = `"${queryParam.replace(/"/g, "")}"`;
+              navigate(`/busca?q=${encodeURIComponent(strict)}&v=${selectedVersion}&mode=text`);
+            }}
+          >
+            Buscar frase exata: "{queryParam.replace(/"/g, "")}"
+          </button>
+        </div>
+      )}
 
       {!!query.trim() && (
         <div className="mt-4 space-y-3">
@@ -488,7 +570,7 @@ export default function SearchPage() {
             <>
               <div className="flex items-center justify-between pb-2 px-1">
                 <p className="font-sans text-[0.65rem] uppercase tracking-[0.1em] text-app-text-muted">
-                  {results.length === 1 ? t("search.resultCount") : t("search.resultsCount", { count: results.length })}
+                  {results.length === 1 ? t("search.resultCount") : t("search.resultsCount", { count: totalCount || results.length })}
                 </p>
               </div>
               {paginatedResults.map((verse) => (

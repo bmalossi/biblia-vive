@@ -80,6 +80,36 @@ _Evitar_: Versículo do Dia, verso do dia, devoção diária, devocional
 Agrupamento editorial de capítulos do Capítulo de Hoje com tema narrativo comum (ex.: "Permanecer"). Cada capítulo pertence a exatamente uma Série e possui um número sequencial dentro dela. A Série é exibida no identificador discreto do componente (ex.: "Capítulo 1 · Permanecer"). "Jornada Narrativa de Permanência" é o nome filosófico do mecanismo como um todo — não é uma entidade de domínio.
 _Evitar_: tema, categoria, coleção, jornada (como entidade)
 
+### Busca e Navegação
+
+**Motor de Busca Bíblica**:
+Mecanismo de busca textual de alta performance executado na borda (Cloudflare D1 com FTS5), permitindo localizar versículos bíblicos por termos combinados, proximidade e tolerância a erros de digitação em qualquer Versão ativa, sem exigir download prévio de acervo pelo dispositivo do Leitor e sem onerar a cota do banco de dados principal.
+_Evitar_: busca sequencial no cliente, busca no Supabase, busca por IA como motor primário
+
+**Busca por Tokens**:
+Estratégia de correspondência onde a consulta do Leitor é decomposta em palavras individuais, exigindo a ocorrência conjunta dos termos no versículo, mesmo que intercalados por outras palavras.
+_Evitar_: busca exata rígida, substring pura, busca literal colada
+
+**Tolerância Tipográfica**:
+Capacidade do Motor de Busca Bíblica de reconhecer termos com pequenas variações ortográficas, letras trocadas ou erros comuns de digitação por meio de distância de edição.
+_Evitar_: busca aproximada cega, corretor automático invasivo
+
+**Pacote de Busca**:
+Arquivo estático consolidado e compacto gerado por Versão bíblica contendo os dados essenciais de todos os versículos canônicos, estruturado para download único e indexação ultrarrápida no navegador do Leitor.
+_Evitar_: dump bíblico, arquivo bruto, banco local completo
+
+**Realce de Termos**:
+Destaque visual dourado aplicado a cada palavra-chave individualmente no versículo retornado na busca, preservando clareza mesmo quando as palavras estão separadas no texto.
+_Evitar_: highlight corrido, marca-texto comum
+
+**Aviso de Aproximação**:
+Sinalização sutil no topo dos resultados informando ao Leitor quando a busca utilizou tolerância tipográfica para corrigir erros de digitação e encontrar os versículos pretendidos.
+_Evitar_: popup de erro, tela de bloqueio, tela vazia de você quis dizer
+
+**Endpoint de Busca Edge**:
+Serviço serverless executado diretamente na infraestrutura de borda da Cloudflare (Worker conectado ao D1), responsável por processar as consultas e devolver os versículos correspondentes sem consumir invocações de função na Vercel.
+_Evitar_: api vercel de busca, rota intermediária, proxy de busca
+
 ### Planos e Acessos
 
 **Leitor Gratuito**:
