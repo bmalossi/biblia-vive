@@ -4,13 +4,14 @@
 // com capitular (drop cap), citações bíblicas e sidebar em 3 cards sagrados.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import { linkifyScriptureReferences } from "@/lib/scriptureLinker";
 import {
   Loader2,
   Calendar,
@@ -114,6 +115,10 @@ export default function ArtigoPage() {
   const [prevArticle, setPrevArticle] = useState<AdjacentArticle | null>(null);
   const [nextArticle, setNextArticle] = useState<AdjacentArticle | null>(null);
   const [relatedArticle, setRelatedArticle] = useState<RelatedArticleItem | null>(null);
+
+  const linkedBody = useMemo(() => {
+    return article?.body ? linkifyScriptureReferences(article.body, "acf") : "";
+  }, [article?.body]);
 
   useEffect(() => {
     async function fetchArticleAndContext() {
@@ -540,19 +545,32 @@ export default function ArtigoPage() {
                     li: ({ children }) => (
                       <li className="leading-[1.85]">{children}</li>
                     ),
-                    a: ({ href, children }) => (
-                      <a
-                        href={href}
-                        className="text-gold underline underline-offset-4 hover:text-gold-light transition-colors"
-                        target={href?.startsWith("http") ? "_blank" : undefined}
-                        rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-                      >
-                        {children}
-                      </a>
-                    ),
+                    a: ({ href, children }) => {
+                      const isInternal = href && (href.startsWith("/") || href.startsWith("#"));
+                      if (isInternal) {
+                        return (
+                          <Link
+                            to={href}
+                            className="text-gold underline underline-offset-4 hover:text-gold-light transition-colors"
+                          >
+                            {children}
+                          </Link>
+                        );
+                      }
+                      return (
+                        <a
+                          href={href}
+                          className="text-gold underline underline-offset-4 hover:text-gold-light transition-colors"
+                          target={href?.startsWith("http") ? "_blank" : undefined}
+                          rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+                        >
+                          {children}
+                        </a>
+                      );
+                    },
                   }}
                 >
-                  {article.body}
+                  {linkedBody}
                 </ReactMarkdown>
               </div>
 

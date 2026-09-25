@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import { linkifyScriptureReferences } from "@/lib/scriptureLinker";
 import ImageLibraryModal from "@/components/ImageLibraryModal";
 import AdminNav from "@/components/AdminNav";
 import { usePageMeta } from "@/hooks/usePageMeta";
@@ -753,7 +754,27 @@ export default function AdminArtigosPage() {
                             <div className="space-y-4">
                                 <h3 className="font-sans text-xs uppercase tracking-widest text-gold">Preview</h3>
                                 <div className="rounded-xl border border-border bg-app-surface p-4 min-h-[400px] prose prose-sm max-w-none prose-headings:font-serif prose-a:text-gold" style={{ letterSpacing: form.letter_spacing, lineHeight: form.line_height }}>
-                                    {form.body ? <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>{form.body}</ReactMarkdown> : <p className="text-app-text-muted italic">O preview aparecerá aqui...</p>}
+                                    {form.body ? (
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkBreaks, remarkGfm]}
+                                            components={{
+                                                a: ({ href, children }) => (
+                                                    <a
+                                                        href={href}
+                                                        className="text-gold underline underline-offset-4 hover:text-gold-light"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {children}
+                                                    </a>
+                                                ),
+                                            }}
+                                        >
+                                            {linkifyScriptureReferences(form.body, "acf")}
+                                        </ReactMarkdown>
+                                    ) : (
+                                        <p className="text-app-text-muted italic">O preview aparecerá aqui...</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

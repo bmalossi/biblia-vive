@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import { linkifyScriptureReferences } from "../../src/lib/scriptureLinker";
 
 export interface ArticleAuthor {
   id?: string;
@@ -80,7 +81,8 @@ export function generateArticleHtml(article: ArticleData): string {
   let bodyHtml = "";
   if (article.body) {
     try {
-      bodyHtml = marked.parse(String(article.body), { async: false }) as string;
+      const linkedBody = linkifyScriptureReferences(String(article.body), "acf");
+      bodyHtml = marked.parse(linkedBody, { async: false }) as string;
     } catch {
       bodyHtml = `<p>${escapeHtml(article.body)}</p>`;
     }

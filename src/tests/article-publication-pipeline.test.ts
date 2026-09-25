@@ -96,6 +96,16 @@ describe("Ticket 2: Geração de HTML Semântico e Upload para R2", () => {
       expect(html).toContain("Pr. João Silva");
     });
 
+    it("deve converter citações bíblicas no corpo do artigo em links para o leitor bíblico", () => {
+      const articleWithScripture: ArticleData = {
+        ...sampleArticle,
+        body: "Veja o que diz Romanos 11:36 e também Lucas 24:27 no contexto.",
+      };
+      const html = generateArticleHtml(articleWithScripture);
+      expect(html).toContain('<a href="/acf/rm/11#v36">Romanos 11:36</a>');
+      expect(html).toContain('<a href="/acf/lc/24#v27">Lucas 24:27</a>');
+    });
+
     it("deve escapar tags perigosas em dados não confiáveis para prevenir XSS", () => {
       const untrusted: ArticleData = {
         ...sampleArticle,
