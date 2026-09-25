@@ -239,6 +239,12 @@ export function generateArticleHtml(article: ArticleData): string {
   <meta name="twitter:description" content="${escapeHtml(safeDesc)}" />
   <meta name="twitter:image" content="${escapeHtml(coverImage)}" />
   <script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>
+  <style>
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+    th, td { border: 1px solid #e5e7eb; padding: 0.75rem 1rem; text-align: left; }
+    th { background-color: #faf8f2; color: #73541c; font-weight: 600; }
+    tr:nth-child(even) { background-color: #fcfbf9; }
+  </style>
 </head>
 <body>
   <div id="root">

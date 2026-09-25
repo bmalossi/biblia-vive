@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
 import {
   Loader2,
   Calendar,
@@ -474,7 +475,7 @@ export default function ArtigoPage() {
                 }}
               >
                 <ReactMarkdown
-                  remarkPlugins={[remarkBreaks]}
+                  remarkPlugins={[remarkBreaks, remarkGfm]}
                   components={{
                     h2: ({ children }) => (
                       <h2 className="font-serif text-2xl sm:text-[1.75rem] font-normal text-[#F4EFEA] mt-10 mb-4 pt-2 tracking-tight">
@@ -493,6 +494,51 @@ export default function ArtigoPage() {
                     ),
                     p: ({ children }) => (
                       <p className="mb-5 leading-[1.85] text-[#D6D2CA]">{children}</p>
+                    ),
+                    table: ({ children }) => (
+                      <div className="my-8 overflow-x-auto rounded-xl border border-border/70 bg-[#141210]/60 shadow-xs">
+                        <table className="w-full min-w-[540px] border-collapse text-left font-serif text-sm sm:text-base">
+                          {children}
+                        </table>
+                      </div>
+                    ),
+                    thead: ({ children }) => (
+                      <thead className="border-b border-gold/30 bg-gold/10 font-sans text-xs sm:text-sm uppercase tracking-wider text-gold font-semibold">
+                        {children}
+                      </thead>
+                    ),
+                    tbody: ({ children }) => (
+                      <tbody className="divide-y divide-border/40 text-[#D6D2CA]">
+                        {children}
+                      </tbody>
+                    ),
+                    tr: ({ children }) => (
+                      <tr className="hover:bg-gold/5 transition-colors">
+                        {children}
+                      </tr>
+                    ),
+                    th: ({ children }) => (
+                      <th scope="col" className="px-4 sm:px-6 py-3.5 sm:py-4 font-semibold text-gold">
+                        {children}
+                      </th>
+                    ),
+                    td: ({ children }) => (
+                      <td className="px-4 sm:px-6 py-3.5 sm:py-4 leading-relaxed align-top">
+                        {children}
+                      </td>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="my-5 ml-6 list-disc space-y-2 text-[#D6D2CA]">
+                        {children}
+                      </ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="my-5 ml-6 list-decimal space-y-2 text-[#D6D2CA]">
+                        {children}
+                      </ol>
+                    ),
+                    li: ({ children }) => (
+                      <li className="leading-[1.85]">{children}</li>
                     ),
                     a: ({ href, children }) => (
                       <a
