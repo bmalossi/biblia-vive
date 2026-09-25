@@ -386,6 +386,19 @@ export default function SearchPage() {
               className="w-full bg-transparent border-0 outline-hidden text-app-text placeholder:text-app-text-muted/50 text-base sm:text-lg font-sans pr-3"
             />
 
+            {/* Botão de buscar exibido quando há termo digitado */}
+            {Boolean(query.trim()) && (
+              <button
+                type="submit"
+                aria-label="Buscar"
+                data-testid="search-submit-btn"
+                className="mr-3 inline-flex items-center gap-1.5 rounded-full bg-gold px-3.5 py-1 text-xs sm:text-sm font-medium text-[#121110] hover:bg-gold-light transition-all shadow-xs shrink-0 cursor-pointer animate-in fade-in zoom-in-95 duration-150"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span>Buscar</span>
+              </button>
+            )}
+
             {/* Seletor de versão dentro da pílula */}
             <div className="relative flex items-center shrink-0 pl-3 border-l border-border/40">
               <select

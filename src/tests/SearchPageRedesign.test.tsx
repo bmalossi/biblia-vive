@@ -114,6 +114,19 @@ describe("SearchPage Redesign", () => {
     expect(versionSelect).toHaveValue("kja");
   });
 
+  it("exibe o botão Buscar somente quando há termo preenchido e omite quando vazio", async () => {
+    // 1. Quando vazio na página /busca
+    const { unmount } = renderSearchPage("/busca");
+    expect(screen.queryByTestId("search-submit-btn")).not.toBeInTheDocument();
+    unmount();
+
+    // 2. Quando preenchido com termo
+    renderSearchPage("/busca?q=fé&v=kja&mode=text");
+    const submitBtn = screen.getByTestId("search-submit-btn");
+    expect(submitBtn).toBeInTheDocument();
+    expect(submitBtn).toHaveTextContent("Buscar");
+  });
+
   it("renderiza as abas de modo de busca Texto e Referência", async () => {
     renderSearchPage("/busca?q=há grande júbilo&v=kja&mode=text");
 
