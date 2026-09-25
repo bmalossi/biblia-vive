@@ -73,6 +73,8 @@ export interface NoteStore {
     getByChapter(bookId: string, chapter: number): Promise<MemorialEntry[]>;
     getAll(filters?: NoteFilterOptions): Promise<MemorialEntry[]>;
     save(entry: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<void>;
+    update?(id: string, entry: Partial<MemorialEntry>): Promise<void>;
+    create?(entry: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<void>;
     delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void>;
     toggleFavorite?(id: string): Promise<boolean>;
     markAnswered?(id: string, answeredNote?: string): Promise<void>;
@@ -228,6 +230,14 @@ export class SupabaseNoteStore implements NoteStore {
 
         if (error) throw new Error(error.message);
         bumpNotesVersion();
+    }
+
+    async update(id: string, entry: Partial<MemorialEntry>): Promise<void> {
+        return this.save({ ...entry, id } as any);
+    }
+
+    async create(entry: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<void> {
+        return this.save(entry);
     }
 
     async delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void> {
@@ -575,6 +585,14 @@ export class LocalNoteStore implements NoteStore {
         notes.push(newEntry);
         writeLocal(notes);
         bumpNotesVersion();
+    }
+
+    async update(id: string, entry: Partial<MemorialEntry>): Promise<void> {
+        return this.save({ ...entry, id } as any);
+    }
+
+    async create(entry: Omit<MemorialEntry, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<void> {
+        return this.save(entry);
     }
 
     async delete(idOrBookId: string, chapter?: number, verse?: number): Promise<void> {

@@ -398,11 +398,7 @@ export default function MemorialPage() {
                     version={selectedEntry?.version ?? 'acf'}
                     existingEntry={selectedEntry}
                     onSave={async (entryData) => {
-                        if (selectedEntry) {
-                            await store.update(selectedEntry.id, entryData);
-                        } else {
-                            await store.create(entryData);
-                        }
+                        await store.save({ ...entryData, id: selectedEntry?.id });
                         await fetchEntries();
                         setIsEditModalOpen(false);
                         setSelectedEntry(null);

@@ -13,6 +13,7 @@ import type { MemorialCategory, MemorialEntry, MemorialMetadata } from "@/lib/no
 import { hasBibleReference } from "@/lib/memorialUtils";
 import { SaveMemorialButton } from "@/components/SaveMemorialButton";
 import VoiceRecordButton from "@/components/VoiceRecordButton";
+import { toast } from "sonner";
 
 interface MemorialEntryModalProps {
     isOpen: boolean;
@@ -174,37 +175,32 @@ export default function MemorialEntryModal({
                     application: soapA,
                     prayer: soapP,
                 };
-                if (!compiledContent) {
-                    compiledContent = [soapO, soapA, soapP].filter(Boolean).join("\n\n");
-                }
+                const soapParts = [soapO, soapA, soapP].filter(Boolean).join("\n\n");
+                compiledContent = soapParts || compiledContent;
             } else if (selectedCategory === 'prayer') {
                 metadataPayload.motivo = motivo;
                 metadataPayload.pedido = pedido;
                 metadataPayload.entrega = entrega;
-                if (!compiledContent) {
-                    compiledContent = [
-                        motivo ? `Motivo: ${motivo}` : '',
-                        pedido ? `Pedido: ${pedido}` : '',
-                        entrega ? `Entrega: ${entrega}` : '',
-                    ].filter(Boolean).join("\n");
-                }
+                const prayerParts = [
+                    motivo ? `Motivo: ${motivo}` : '',
+                    pedido ? `Pedido: ${pedido}` : '',
+                    entrega ? `Entrega: ${entrega}` : '',
+                ].filter(Boolean).join("\n");
+                compiledContent = prayerParts || compiledContent;
             } else if (selectedCategory === 'testimony') {
                 metadataPayload.oQueAconteceu = oQueAconteceu;
                 metadataPayload.comoDeusSustentou = comoDeusSustentou;
                 metadataPayload.dataFato = dataFato;
-                if (!compiledContent) {
-                    compiledContent = [
-                        oQueAconteceu,
-                        comoDeusSustentou ? `Como Deus sustentou: ${comoDeusSustentou}` : '',
-                    ].filter(Boolean).join("\n\n");
-                }
+                const testimonyParts = [
+                    oQueAconteceu,
+                    comoDeusSustentou ? `Como Deus sustentou: ${comoDeusSustentou}` : '',
+                ].filter(Boolean).join("\n\n");
+                compiledContent = testimonyParts || compiledContent;
             } else if (selectedCategory === 'fasting') {
                 metadataPayload.objetivo = objetivo;
                 metadataPayload.dataInicio = dataInicio;
                 metadataPayload.dataPrevista = dataPrevista;
-                if (!compiledContent) {
-                    compiledContent = objetivo;
-                }
+                compiledContent = objetivo || compiledContent;
             }
 
             const parsedTags = tags
@@ -228,8 +224,9 @@ export default function MemorialEntryModal({
             });
 
             return true;
-        } catch (err) {
+        } catch (err: any) {
             console.error("Erro ao salvar registro no Memorial:", err);
+            toast.error(err?.message || "Erro ao salvar registro no Memorial.");
             return false;
         }
     }
