@@ -97,7 +97,7 @@ export function generateArticleHtml(article: ArticleData): string {
     : "";
 
   const pubDateBlock = article.published_at
-    ? `<time datetime="${escapeHtml(article.published_at)}" style="color:#666;font-size:0.875rem;display:block;margin-bottom:1rem">${pubDateFormatted}</time>`
+    ? `<time datetime="${escapeHtml(article.published_at)}" style="color:#a89f91;font-size:0.875rem;display:block;margin-bottom:1rem">${pubDateFormatted}</time>`
     : "";
 
   const coverBlock = article.cover_image_url
@@ -105,13 +105,13 @@ export function generateArticleHtml(article: ArticleData): string {
     : "";
 
   const subtitleBlock = article.subtitle
-    ? `<p style="font-size:1.125rem;color:#555;margin-bottom:1rem"><em>${escapeHtml(article.subtitle)}</em></p>`
+    ? `<p style="font-size:1.125rem;color:#d1c7b7;margin-bottom:1rem"><em>${escapeHtml(article.subtitle)}</em></p>`
     : "";
 
   const geoSummaryText = safeDesc.length > 60
     ? safeDesc
     : `${article.title}. ${safeDesc} — Artigo teológico publicado na Bíblia Vive.`;
-  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#444;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#faf8f2">${escapeHtml(geoSummaryText)}</section>`;
+  const geoSummary = `<section class="geo-summary" style="display:block;font-family:serif;font-size:0.9rem;color:#d1c7b7;line-height:1.6;margin:0.75rem 0 1.25rem;padding:0.75rem 1rem;border-left:3px solid #d4af37;background:#26211c">${escapeHtml(geoSummaryText)}</section>`;
 
   const dateMicrodata = (article.published_at || article.updated_at)
     ? `<div style="display:none" itemscope itemtype="https://schema.org/Article">` +
@@ -202,8 +202,8 @@ export function generateArticleHtml(article: ArticleData): string {
   };
 
   const keywordsBlock = allKeywords.length > 0
-    ? `<div class="article-keywords" style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:0.875rem;color:#6b7280">` +
-      `<strong>Tópicos:</strong> ${allKeywords.map(k => `<span style="display:inline-block;background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:9999px;margin:2px 4px;font-size:0.8rem">#${escapeHtml(k)}</span>`).join(" ")}` +
+    ? `<div class="article-keywords" style="margin-top:2rem;padding-top:1rem;border-top:1px solid #3d352e;font-size:0.875rem;color:#a89f91">` +
+      `<strong>Tópicos:</strong> ${allKeywords.map(k => `<span style="display:inline-block;background:#26211c;color:#d4af37;padding:2px 8px;border-radius:9999px;margin:2px 4px;font-size:0.8rem">#${escapeHtml(k)}</span>`).join(" ")}` +
       `</div>`
     : "";
 
@@ -242,10 +242,20 @@ export function generateArticleHtml(article: ArticleData): string {
   <meta name="twitter:image" content="${escapeHtml(coverImage)}" />
   <script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>
   <style>
+    :root { color-scheme: dark; }
+    body { background-color: #1d1a16; color: #ede8df; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.7; }
+    article { max-width: 780px; margin: 0 auto; padding: 2rem 1rem; }
+    h1 { font-size: 2rem; line-height: 1.3; color: #ede8df; margin-bottom: 1rem; }
+    h2 { font-size: 1.5rem; color: #ede8df; margin-top: 2rem; }
+    h3 { font-size: 1.25rem; color: #ede8df; margin-top: 1.5rem; }
+    p { margin: 1rem 0; color: #d1c7b7; font-size: 1.05rem; }
+    a { color: #d4af37; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    blockquote { border-left: 3px solid #d4af37; margin: 1.5rem 0; padding: 0.5rem 1rem; color: #e5dfd3; font-style: italic; background: #26211c; border-radius: 0 4px 4px 0; }
     table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
-    th, td { border: 1px solid #e5e7eb; padding: 0.75rem 1rem; text-align: left; }
-    th { background-color: #faf8f2; color: #73541c; font-weight: 600; }
-    tr:nth-child(even) { background-color: #fcfbf9; }
+    th, td { border: 1px solid #3d352e; padding: 0.75rem 1rem; text-align: left; }
+    th { background-color: #26211c; color: #d4af37; font-weight: 600; }
+    tr:nth-child(even) { background-color: #221d18; }
   </style>
 </head>
 <body>
@@ -277,8 +287,8 @@ export function generateArticlesIndexHtml(articles: ArticleData[]): string {
     const authorName = a.author?.name ? ` por ${escapeHtml(a.author.name)}` : "";
     return `<li style="margin-bottom:1.25rem">
       <h2 style="font-size:1.25rem;margin:0 0 0.25rem"><a href="${escapeHtml(aUrl)}" style="color:#d4af37;text-decoration:none">${escapeHtml(a.title)}</a></h2>
-      <p style="font-size:0.875rem;color:#666;margin:0 0 0.5rem">${pubDate}${authorName}</p>
-      <p style="font-size:0.95rem;color:#333;margin:0">${escapeHtml(a.meta_description || stripHtml(a.body).substring(0, 160))}</p>
+      <p style="font-size:0.875rem;color:#a89f91;margin:0 0 0.5rem">${pubDate}${authorName}</p>
+      <p style="font-size:0.95rem;color:#d1c7b7;margin:0">${escapeHtml(a.meta_description || stripHtml(a.body).substring(0, 160))}</p>
     </li>`;
   }).join("\n");
 
@@ -313,6 +323,16 @@ export function generateArticlesIndexHtml(articles: ArticleData[]): string {
   <meta property="og:type" content="website" />
   <meta property="og:image" content="${CANONICAL_ORIGIN}/og-default.png" />
   <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+  <style>
+    :root { color-scheme: dark; }
+    body { background-color: #1d1a16; color: #ede8df; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.7; }
+    main { max-width: 780px; margin: 0 auto; padding: 2rem 1rem; }
+    h1 { font-size: 2rem; line-height: 1.3; color: #ede8df; margin-bottom: 1rem; }
+    h2 { font-size: 1.35rem; color: #ede8df; margin: 0 0 0.25rem; }
+    p { margin: 0.5rem 0; color: #d1c7b7; font-size: 1rem; }
+    a { color: #d4af37; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
   <div id="root">

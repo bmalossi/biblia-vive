@@ -7,6 +7,62 @@ export const config = {
 const DEFAULT_CACHE_DOMAIN = "midia.bibliavive.com.br";
 const FETCH_TIMEOUT_MS = 3500;
 
+/**
+ * Lista de identificadores comuns de robôs de busca, rastreadores e geradores de preview de redes sociais.
+ * O HTML estático do R2 é otimizado com Schema.org, OpenGraph e metadados semânticos exatamente para esses agentes.
+ * Navegadores reais (Chrome, Safari, Firefox, Edge, etc.) recebem passthrough (next) para a SPA React completa com estilos e tema.
+ */
+export const BOT_PATTERNS = [
+  "googlebot",
+  "bingbot",
+  "bingpreview",
+  "msnbot",
+  "yandex",
+  "baiduspider",
+  "duckduckbot",
+  "slurp",
+  "yahoo",
+  "twitterbot",
+  "facebookexternalhit",
+  "facebot",
+  "linkedinbot",
+  "whatsapp",
+  "telegrambot",
+  "discordbot",
+  "pinterest",
+  "slackbot",
+  "applebot",
+  "ia_archiver",
+  "archive.org_bot",
+  "chatgpt-user",
+  "gptbot",
+  "claudebot",
+  "anthropic",
+  "cohere",
+  "bytespider",
+  "perplexity",
+  "semrushbot",
+  "ahrefsbot",
+  "dotbot",
+  "rogerbot",
+  "screaming frog",
+  "petalbot",
+  "qwantify",
+  "coccocbot",
+  "sogou",
+  "youbot",
+  "headlesschrome",
+  "crawler",
+  "spider",
+  "bot",
+];
+
+export function isCrawler(userAgent: string | null | undefined): boolean {
+  if (!userAgent) return true; // Requisições sem User-Agent (ex: curl, testes básicos, ferramentas CLI) são tratadas como crawler
+  const ua = userAgent.toLowerCase();
+  return BOT_PATTERNS.some((pattern) => ua.includes(pattern));
+}
+
 export default async function middleware(request: Request) {
   try {
     const url = new URL(request.url);
@@ -14,6 +70,14 @@ export default async function middleware(request: Request) {
 
     // Apenas requisições GET ou HEAD devem ser atendidas pelo cache de HTML
     if (request.method !== "GET" && request.method !== "HEAD") {
+      return next();
+    }
+
+    // Se a requisição for de um navegador real (humano), repassar diretamente para a SPA
+    // Isso garante que o usuário receba a aplicação completa com CSS, tema escuro, layout e scripts,
+    // evitando a exibição de HTML estático sem estilização ao usar CTRL+F5 ou acessar diretamente via URL.
+    const userAgent = request.headers.get("user-agent");
+    if (!isCrawler(userAgent)) {
       return next();
     }
 
