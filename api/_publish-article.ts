@@ -20,7 +20,7 @@ export default async function handler(req: Request) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
         const body = await req.json();
-        const { id, title, slug, body: articleBody, status, meta_title, meta_description, cover_image_url, featured } = body;
+        const { id, title, slug, body: articleBody, status, meta_title, meta_description, cover_image_url, featured, primary_keyword, secondary_keywords } = body;
 
         if (!title || !slug) {
             return new Response(
@@ -36,6 +36,8 @@ export default async function handler(req: Request) {
             status: status || "rascunho",
             meta_title: meta_title || null,
             meta_description: meta_description || null,
+            primary_keyword: primary_keyword || null,
+            secondary_keywords: Array.isArray(secondary_keywords) ? secondary_keywords : (secondary_keywords ? [secondary_keywords] : []),
             cover_image_url: cover_image_url || null,
             featured: featured || false,
             published_at: status === "publicado" ? new Date().toISOString() : null,

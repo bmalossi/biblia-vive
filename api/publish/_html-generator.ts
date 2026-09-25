@@ -24,6 +24,8 @@ export interface ArticleData {
   status: "rascunho" | "publicado";
   meta_title?: string | null;
   meta_description?: string | null;
+  primary_keyword?: string | null;
+  secondary_keywords?: string[] | null;
   cover_image_url?: string | null;
   featured?: boolean;
   created_at?: string;
@@ -67,6 +69,13 @@ export function generateArticleHtml(article: ArticleData): string {
   const safeDesc = rawDesc.substring(0, 160);
   const url = `${CANONICAL_ORIGIN}/artigos/${article.slug}`;
   const coverImage = article.cover_image_url || `${CANONICAL_ORIGIN}/og-default.png`;
+  const allKeywords = [
+    article.primary_keyword,
+    ...(article.secondary_keywords || []),
+  ]
+    .map((k) => (typeof k === "string" ? k.trim() : ""))
+    .filter(Boolean);
+  const keywordsString = allKeywords.join(", ");
 
   let bodyHtml = "";
   if (article.body) {
@@ -169,6 +178,7 @@ export function generateArticleHtml(article: ArticleData): string {
       ],
     },
     inLanguage: "pt-BR",
+    ...(allKeywords.length > 0 ? { keywords: keywordsString } : {}),
     ...(ytId
       ? {
           video: {
@@ -189,6 +199,12 @@ export function generateArticleHtml(article: ArticleData): string {
       : {}),
   };
 
+  const keywordsBlock = allKeywords.length > 0
+    ? `<div class="article-keywords" style="margin-top:2rem;padding-top:1rem;border-top:1px solid #e5e7eb;font-size:0.875rem;color:#6b7280">` +
+      `<strong>Tópicos:</strong> ${allKeywords.map(k => `<span style="display:inline-block;background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:9999px;margin:2px 4px;font-size:0.8rem">#${escapeHtml(k)}</span>`).join(" ")}` +
+      `</div>`
+    : "";
+
   const articleContent =
     `<article style="font-family:serif;max-width:780px;margin:0 auto;padding:1rem">` +
     `<h1>${escapeHtml(article.title)}</h1>` +
@@ -198,6 +214,7 @@ export function generateArticleHtml(article: ArticleData): string {
     dateMicrodata +
     coverBlock +
     bodyHtml +
+    keywordsBlock +
     `</article>`;
 
   return `<!doctype html>
@@ -207,7 +224,7 @@ export function generateArticleHtml(article: ArticleData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>${escapeHtml(safeTitle)}</title>
   <meta name="description" content="${escapeHtml(safeDesc)}" />
-  <meta name="author" content="${escapeHtml(article.author?.name || 'Bíblia Vive')}" />
+  ${allKeywords.length > 0 ? `<meta name="keywords" content="${escapeHtml(keywordsString)}" />\n  ` : ""}<meta name="author" content="${escapeHtml(article.author?.name || 'Bíblia Vive')}" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="${escapeHtml(url)}" />
   <link rel="alternate" type="application/rss+xml" title="Bíblia Vive" href="${CANONICAL_ORIGIN}/feed.xml" />

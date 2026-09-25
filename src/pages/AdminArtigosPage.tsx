@@ -32,6 +32,8 @@ interface Article {
     published_at: string | null;
     author_id?: string | null;
     reviewed_by?: string | null;
+    primary_keyword?: string | null;
+    secondary_keywords?: string[] | null;
 }
 
 interface Author {
@@ -45,6 +47,8 @@ interface ArticleFormData {
     body: string;
     meta_title: string;
     meta_description: string;
+    primary_keyword: string;
+    secondary_keywords: string;
     cover_image_url: string;
     featured: boolean;
     line_height: string;
@@ -59,6 +63,8 @@ const EMPTY_FORM: ArticleFormData = {
     body: "",
     meta_title: "",
     meta_description: "",
+    primary_keyword: "",
+    secondary_keywords: "",
     cover_image_url: "",
     featured: false,
     line_height: "1.75",
@@ -172,6 +178,13 @@ export default function AdminArtigosPage() {
 
         const currentArticle = editingId ? articles.find(a => a.id === editingId) : null;
 
+        const secondaryKeywordsArray = form.secondary_keywords
+            ? form.secondary_keywords
+                .split(",")
+                .map(k => k.trim())
+                .filter(k => k.length > 0)
+            : [];
+
         const payload = {
             title: form.title,
             slug: form.slug,
@@ -179,6 +192,8 @@ export default function AdminArtigosPage() {
             status: publish ? "publicado" : "rascunho",
             meta_title: form.meta_title || null,
             meta_description: form.meta_description || null,
+            primary_keyword: form.primary_keyword.trim() || null,
+            secondary_keywords: secondaryKeywordsArray,
             cover_image_url: form.cover_image_url || null,
             featured: form.featured,
             published_at: publish
@@ -341,6 +356,10 @@ export default function AdminArtigosPage() {
             body: article.body,
             meta_title: article.meta_title ?? "",
             meta_description: article.meta_description ?? "",
+            primary_keyword: article.primary_keyword ?? "",
+            secondary_keywords: Array.isArray(article.secondary_keywords)
+                ? article.secondary_keywords.join(", ")
+                : "",
             cover_image_url: article.cover_image_url ?? "",
             featured: article.featured,
             line_height: (article as Article & { line_height?: string }).line_height ?? "1.75",
@@ -574,25 +593,101 @@ export default function AdminArtigosPage() {
                                     {uploadError && <p className="mt-1 text-xs text-red-400 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {uploadError}</p>}
                                     {form.cover_image_url && !uploading && !uploadError && <p className="mt-1 text-xs text-green-400 flex items-center gap-1"><Check className="h-3 w-3" /> Imagem selecionada</p>}
                                 </div>
-                                <div>
-                                    <label className="block text-xs text-app-text-muted mb-1">Meta Title (SEO)</label>
-                                    <input
-                                        type="text"
-                                        value={form.meta_title}
-                                        onChange={e => setForm(f => ({ ...f, meta_title: e.target.value }))}
-                                        className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
-                                        placeholder="Título para SEO"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs text-app-text-muted mb-1">Meta Description (SEO)</label>
-                                    <textarea
-                                        value={form.meta_description}
-                                        onChange={e => setForm(f => ({ ...f, meta_description: e.target.value }))}
-                                        rows={2}
-                                        className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold resize-none"
-                                        placeholder="Descrição para SEO"
-                                    />
+                                {/* Otimização SEO & GEO (Palavras-chave e Metadados) */}
+                                <div className="rounded-xl border border-gold/30 bg-gold/5 p-4 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-gold">
+                                            <Sparkles className="h-4 w-4" />
+                                            <span className="text-xs font-semibold uppercase tracking-wider">Otimização SEO & GEO (Buscas e IAs)</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="block text-xs font-medium text-app-text">Palavra-chave Foco (Principal)</label>
+                                            <span className="text-[10px] text-app-text-muted">Essencial para Title, URL e 1º parágrafo</span>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={form.primary_keyword}
+                                            onChange={e => setForm(f => ({ ...f, primary_keyword: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold placeholder:text-app-text-muted/60"
+                                            placeholder="Ex: oração matinal, salmo 23, graça salvadora"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="block text-xs font-medium text-app-text">Palavras-chave Secundárias & Entidades</label>
+                                            <span className="text-[10px] text-app-text-muted">Separadas por vírgula (RAG & AEO)</span>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={form.secondary_keywords}
+                                            onChange={e => setForm(f => ({ ...f, secondary_keywords: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold placeholder:text-app-text-muted/60"
+                                            placeholder="Ex: comunhão, intercessão bíblica, Mateus 6, vigília"
+                                        />
+                                    </div>
+
+                                    {/* Checklist / Assistente SEO em tempo real */}
+                                    {form.primary_keyword.trim() && (
+                                        <div className="rounded-lg bg-app-bg/80 border border-border/80 p-3 space-y-2 text-xs">
+                                            <span className="text-[11px] font-medium text-app-text-muted uppercase tracking-wider block">
+                                                Validação da Palavra-chave Foco:
+                                            </span>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {(() => {
+                                                    const pk = form.primary_keyword.trim().toLowerCase();
+                                                    const inTitle = form.title.toLowerCase().includes(pk);
+                                                    const inSlug = form.slug.toLowerCase().includes(generateSlug(pk));
+                                                    const inDesc = form.meta_description.toLowerCase().includes(pk);
+                                                    const inBody = form.body.toLowerCase().includes(pk);
+
+                                                    const items = [
+                                                        { label: "No Título", ok: inTitle },
+                                                        { label: "Na URL (Slug)", ok: inSlug },
+                                                        { label: "Na Meta Description", ok: inDesc },
+                                                        { label: "No Conteúdo", ok: inBody },
+                                                    ];
+
+                                                    return items.map((it, idx) => (
+                                                        <div key={idx} className="flex items-center gap-1.5">
+                                                            {it.ok ? (
+                                                                <Check className="h-3.5 w-3.5 text-green-400 shrink-0" />
+                                                            ) : (
+                                                                <AlertCircle className="h-3.5 w-3.5 text-amber-400/80 shrink-0" />
+                                                            )}
+                                                            <span className={it.ok ? "text-green-400 font-medium" : "text-app-text-muted"}>
+                                                                {it.label}
+                                                            </span>
+                                                        </div>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1">Meta Title (SEO)</label>
+                                        <input
+                                            type="text"
+                                            value={form.meta_title}
+                                            onChange={e => setForm(f => ({ ...f, meta_title: e.target.value }))}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold"
+                                            placeholder="Título para SEO (ideal: 50 a 60 caracteres)"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-app-text-muted mb-1">Meta Description (SEO)</label>
+                                        <textarea
+                                            value={form.meta_description}
+                                            onChange={e => setForm(f => ({ ...f, meta_description: e.target.value }))}
+                                            rows={2}
+                                            className="w-full rounded-xl border border-border bg-app-bg px-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold resize-none"
+                                            placeholder="Descrição para SEO e Answer Capsule (ideal: 140 a 160 caracteres)"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <input

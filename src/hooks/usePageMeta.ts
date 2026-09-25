@@ -15,6 +15,7 @@ export interface PageMetaOptions {
   articleAuthor?: string;
   fbAppId?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  keywords?: string | string[];
   // Backward compatibility mappings
   image?: string;
   type?: string;
@@ -61,6 +62,7 @@ export function usePageMeta({
   articleAuthor,
   fbAppId,
   jsonLd,
+  keywords,
   image,
   type,
 }: PageMetaOptions) {
@@ -108,6 +110,7 @@ export function usePageMeta({
       removeMeta("article:published_time", true);
       removeMeta("article:modified_time", true);
       removeMeta("article:author", true);
+      removeMeta("keywords");
     } else {
       // Upsert Open Graph tags
       upsertMeta("og:type", finalType, true);
@@ -186,6 +189,19 @@ export function usePageMeta({
         removeMeta("article:modified_time", true);
         removeMeta("article:author", true);
       }
+      // Keywords meta tag
+      if (keywords) {
+        const kwStr = Array.isArray(keywords)
+          ? keywords.map(k => k.trim()).filter(Boolean).join(", ")
+          : keywords.trim();
+        if (kwStr) {
+          upsertMeta("keywords", kwStr);
+        } else {
+          removeMeta("keywords");
+        }
+      } else {
+        removeMeta("keywords");
+      }
     }
 
     // Canonical tag logic
@@ -228,5 +244,6 @@ export function usePageMeta({
     jsonLd,
     image,
     type,
+    keywords,
   ]);
 }

@@ -107,6 +107,32 @@ describe("Ticket 2: Geração de HTML Semântico e Upload para R2", () => {
       expect(html).not.toContain("<script>alert('xss')</script>");
       expect(html).toContain("&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;");
     });
+
+    it("deve incluir palavras-chave primárias e secundárias no JSON-LD, meta tag e tags visuais", () => {
+      const articleWithKeywords: ArticleData = {
+        ...sampleArticle,
+        primary_keyword: "oração matinal",
+        secondary_keywords: ["intimidade com Deus", "intercessão", "Mateus 6"],
+      };
+
+      const html = generateArticleHtml(articleWithKeywords);
+
+      // 1. Meta tag
+      expect(html).toContain('<meta name="keywords" content="oração matinal, intimidade com Deus, intercessão, Mateus 6" />');
+
+      // 2. JSON-LD
+      const jsonMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+      expect(jsonMatch).toBeTruthy();
+      const schema = JSON.parse(jsonMatch![1]);
+      expect(schema.keywords).toBe("oração matinal, intimidade com Deus, intercessão, Mateus 6");
+
+      // 3. Tags no corpo do artigo
+      expect(html).toContain('class="article-keywords"');
+      expect(html).toContain("#oração matinal");
+      expect(html).toContain("#intimidade com Deus");
+      expect(html).toContain("#intercessão");
+      expect(html).toContain("#Mateus 6");
+    });
   });
 
   describe("generateArticlesIndexHtml", () => {

@@ -54,6 +54,8 @@ interface Article {
   letter_spacing?: string;
   author_id?: string | null;
   reviewed_by?: string | null;
+  primary_keyword?: string | null;
+  secondary_keywords?: string[] | null;
   author?: Author | null;
   youtube_id?: string | null;
   youtubeId?: string | null;
@@ -207,6 +209,13 @@ export default function ArtigoPage() {
     }
   };
 
+  const allKeywords = [
+    article?.primary_keyword,
+    ...(article?.secondary_keywords || []),
+  ]
+    .map((k) => (typeof k === "string" ? k.trim() : ""))
+    .filter(Boolean);
+
   let title = "Carregando artigo... | Bíblia Vive";
   let description = "Carregando artigo da Bíblia Vive...";
   let robots = "noindex, follow";
@@ -234,6 +243,8 @@ export default function ArtigoPage() {
         /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/
       )?.[1];
 
+    const keywordsString = allKeywords.join(", ");
+
     jsonLd = {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -243,6 +254,7 @@ export default function ArtigoPage() {
       image: article.cover_image_url || "https://www.bibliavive.com.br/og-default.png",
       datePublished: article.published_at || article.created_at || undefined,
       dateModified: article.published_at || article.created_at || undefined,
+      ...(allKeywords.length > 0 ? { keywords: keywordsString } : {}),
       author: {
         "@type": "Person",
         name: article.author ? article.author.name : "Bruno Malossi",
@@ -292,6 +304,7 @@ export default function ArtigoPage() {
     robots,
     canonical,
     jsonLd,
+    keywords: allKeywords,
     ogImage: article?.cover_image_url || "/images/article-hero-bible.jpg",
     ogType: "article",
     articlePublishedTime: article?.published_at || article?.created_at || undefined,
@@ -496,6 +509,32 @@ export default function ArtigoPage() {
                   {article.body}
                 </ReactMarkdown>
               </div>
+
+              {/* ── TÓPICOS E PALAVRAS-CHAVE ── */}
+              {allKeywords.length > 0 && (
+                <div
+                  data-testid="article-keywords"
+                  className="pt-6 mt-8 border-t border-border/40"
+                >
+                  <span className="font-mono text-[10px] tracking-wider text-gold/80 uppercase font-semibold block mb-3">
+                    Tópicos & Palavras-chave
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {allKeywords.map((kw, i) => (
+                      <span
+                        key={i}
+                        className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                          i === 0 && article.primary_keyword
+                            ? "border-gold/50 bg-gold/10 text-gold font-medium"
+                            : "border-border/60 bg-app-surface/60 text-app-text-muted hover:border-gold/30 hover:text-app-text"
+                        }`}
+                      >
+                        #{kw}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* ── ASSINATURA EDITORIAL BÍBLIA VIVE ── */}
               <div
