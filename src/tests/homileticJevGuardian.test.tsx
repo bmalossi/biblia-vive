@@ -211,4 +211,85 @@ describe("Ticket 8: Guardião do Evangelho (Gálatas 1:8) e Teste de Ortodoxia v
       });
     });
   });
+
+  describe("Heurística Local Offline do JEV (evaluateLocalHomileticHeuristic)", () => {
+    it("detecta texto sem sentido/gibberish no Tópico 2 e gera alerta de inconsistência com desvio", async () => {
+      const { evaluateLocalHomileticHeuristic } = await vi.importActual<
+        typeof import("@/lib/jevHomileticService")
+      >("@/lib/jevHomileticService");
+
+      const payload = {
+        sermonId: "sermon-gibberish-test",
+        biblical_passage_text: "Lucas 24:27",
+        sermon_initial_spark: "Jesus explicando as Escrituras no caminho de Emaús.",
+        sermon_intended_outcome: "[CONVERSÃO] Olhos abertos para Cristo ressurreto.",
+        sermon_block_1_exegesis: "Jesus repassa Moisés e todos os profetas expondo o que dele se achava.",
+        sermon_block_2_topics: [
+          {
+            id: "top-1",
+            title: "O Ponto de Partida",
+            steps: {
+              stepA_fato: "Jesus caminha incógnito.",
+              stepB_porque: "Para revelar a incredulidade dos corações.",
+              stepC_contraste: "Eles esperavam um libertador político terreno.",
+              stepD_tensao: "Você crê no que os profetas disseram?",
+            },
+          },
+          {
+            id: "top-2",
+            title: "Tópico 2 com Gibberish",
+            steps: {
+              stepA_fato: "dasdsadsadsad",
+              stepB_porque: "asdsadsad",
+              stepC_contraste: "sadsadsad",
+              stepD_tensao: "dasdasdsad",
+            },
+          },
+        ],
+        sermon_block_3_application: "Permita que Cristo queime seu coração com as Escrituras.",
+      };
+
+      const result = evaluateLocalHomileticHeuristic(payload);
+
+      expect(result.is_grace_centered).toBe(false);
+      expect(result.theological_deviation).toBe("Humanismo_SelfHelp");
+      expect(result.confidence).toBeGreaterThanOrEqual(0.9);
+      expect(result.reasoning).toContain("Alerta de Inconsistência Homilética");
+      expect(result.reasoning).toContain("Tópico 2");
+    });
+
+    it("aprova sermão bíblico com tópicos coerentes e centralizados em Cristo", async () => {
+      const { evaluateLocalHomileticHeuristic } = await vi.importActual<
+        typeof import("@/lib/jevHomileticService")
+      >("@/lib/jevHomileticService");
+
+      const payload = {
+        sermonId: "sermon-orthodox-test",
+        biblical_passage_text: "Lucas 24:27",
+        sermon_initial_spark: "Jesus no caminho de Emaús.",
+        sermon_intended_outcome: "[CONSOLAÇÃO] O coração aquece ao ouvir a voz de Cristo.",
+        sermon_block_1_exegesis: "Exposição canônica de Gênesis a Malaquias centrada no Messias prometido.",
+        sermon_block_2_topics: [
+          {
+            id: "top-1",
+            title: "A Cegueira Espiritual",
+            steps: {
+              stepA_fato: "Os discípulos estavam com olhos vendados pela desilusão.",
+              stepB_porque: "Ignoravam o plano eterno da redenção através do sofrimento.",
+              stepC_contraste: "O mundo busca vitória sem dor; Deus revela triunfo na cruz.",
+              stepD_tensao: "Você busca a Cristo por quem Ele é ou pelo que Ele pode fazer na carne?",
+            },
+          },
+        ],
+        sermon_block_3_application: "Volte às Escrituras com coração contrito e rendido.",
+      };
+
+      const result = evaluateLocalHomileticHeuristic(payload);
+
+      expect(result.is_grace_centered).toBe(true);
+      expect(result.theological_deviation).toBe("Fiel_Ao_Texto");
+      expect(result.confidence).toBe(0.95);
+    });
+  });
 });
+
