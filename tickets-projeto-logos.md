@@ -42,12 +42,12 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#27](https://github.com/bmalossi/biblia-vive/issues/27)
 
-- [ ] Interface do Bloco 1 com campos de contexto histórico, propósito da perícope bíblica e detalhes exegéticos.
-- [ ] Trava Anti-Esegese implementada como campo reflexivo compulsório ao final do Bloco 1, exigindo pelo menos 1 frase com a intenção do autor bíblico original.
-- [ ] Bloco 2 permanece bloqueado enquanto a pergunta de intenção original não estiver respondida.
-- [ ] Resposta da intenção original é exibida como cabeçalho contextual de ancoragem do Bloco 1 no esboço final.
-- [ ] Estado do Bloco 1 e a resposta da trava persistem no Cloudflare D1 via Worker.
-- [ ] Testes de integração cobrindo a validação do campo reflexivo, desbloqueio do Bloco 2 e persistência.
+- [x] Interface do Bloco 1 com campos de contexto histórico, propósito da perícope bíblica e detalhes exegéticos.
+- [x] Trava Anti-Esegese implementada como campo reflexivo compulsório ao final do Bloco 1, exigindo pelo menos 1 frase com a intenção do autor bíblico original.
+- [x] Bloco 2 permanece bloqueado enquanto a pergunta de intenção original não estiver respondida.
+- [x] Resposta da intenção original é exibida como cabeçalho contextual de ancoragem do Bloco 1 no esboço final.
+- [x] Estado do Bloco 1 e a resposta da trava persistem no Cloudflare D1 via Worker.
+- [x] Testes de integração cobrindo a validação do campo reflexivo, desbloqueio do Bloco 2 e persistência.
 
 ---
 

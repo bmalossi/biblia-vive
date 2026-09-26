@@ -10,6 +10,8 @@ import {
   Target,
   CheckCircle2,
   Save,
+  ShieldAlert,
+  ScrollText,
 } from "lucide-react";
 import {
   getSermon,
@@ -65,8 +67,17 @@ export default function SermonStudioPage() {
 
   // Estados dos blocos homiléticos
   const [bloco1Exegese, setBloco1Exegese] = useState("");
+  const [bloco1IntencaoOriginal, setBloco1IntencaoOriginal] = useState("");
+  const [isSavingBloco1, setIsSavingBloco1] = useState(false);
   const [bloco3Aplicacao, setBloco3Aplicacao] = useState("");
   const [introducao, setIntroducao] = useState("");
+
+  const isBloco2Unlocked =
+    isUnlocked &&
+    Boolean(
+      sermon?.bloco1IntencaoOriginal &&
+        sermon.bloco1IntencaoOriginal.trim().length >= 5
+    );
 
   useEffect(() => {
     if (!sermonId) return;
@@ -79,6 +90,7 @@ export default function SermonStudioPage() {
           setDesfechoTipo(data.desfechoTipo || null);
           setDesfechoTexto(data.desfechoTexto || "");
           setBloco1Exegese(data.bloco1Exegese || "");
+          setBloco1IntencaoOriginal(data.bloco1IntencaoOriginal || "");
           setBloco3Aplicacao(data.bloco3Aplicacao || "");
           setIntroducao(data.introducao || "");
           const unlocked = Boolean(data.desfechoTipo && data.desfechoTexto?.trim());
@@ -114,6 +126,32 @@ export default function SermonStudioPage() {
       toast.error("Erro ao salvar desfecho.");
     } finally {
       setIsSavingDesfecho(false);
+    }
+  };
+
+  const handleSaveBloco1 = async () => {
+    if (!sermon) return;
+    if (!bloco1IntencaoOriginal.trim() || bloco1IntencaoOriginal.trim().length < 5) {
+      toast.error(
+        "Por favor, responda à pergunta reflexiva obrigatória (mínimo de 1 frase) sobre a intenção do autor sagrado."
+      );
+      return;
+    }
+
+    setIsSavingBloco1(true);
+    try {
+      const updated = await saveSermon({
+        id: sermon.id,
+        bloco1Exegese: bloco1Exegese.trim(),
+        bloco1IntencaoOriginal: bloco1IntencaoOriginal.trim(),
+      });
+      setSermon(updated);
+      toast.success("Ancoradouro Histórico fixado com sucesso! Bloco 2 desbloqueado.");
+    } catch (err) {
+      console.error("Erro ao salvar Bloco 1:", err);
+      toast.error("Erro ao salvar Bloco 1.");
+    } finally {
+      setIsSavingBloco1(false);
     }
   };
 
@@ -335,7 +373,30 @@ export default function SermonStudioPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          {/* Ancoradouro Histórico Header se já preenchido */}
+          {sermon?.bloco1IntencaoOriginal && (
+            <div
+              data-testid="ancoradouro-historico-header"
+              className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 flex items-start gap-3"
+            >
+              <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-500 mt-0.5 shrink-0">
+                <ScrollText className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[0.68rem] font-mono uppercase tracking-wider text-amber-500 font-semibold flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> Ancoradouro Histórico: Intenção Original
+                </span>
+                <p className="text-xs sm:text-sm font-serif italic text-app-text leading-relaxed">
+                  "{sermon.bloco1IntencaoOriginal}"
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label className="text-[0.75rem] font-sans text-gold font-medium">
+              Notas Exegéticas e Contexto Histórico
+            </label>
             <textarea
               value={bloco1Exegese}
               onChange={(e) => setBloco1Exegese(e.target.value)}
@@ -344,27 +405,74 @@ export default function SermonStudioPage() {
               className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
             />
           </div>
+
+          {/* Trava Anti-Esegese: Pergunta Reflexiva Obrigatória */}
+          <div className="space-y-2 pt-2 border-t border-border/40">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-gold flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                Trava Anti-Esegese: Qual era a intenção do autor sagrado para os primeiros ouvintes deste texto?
+              </label>
+              <span className="text-[0.68rem] font-mono text-app-text-muted">
+                Obrigatório (mínimo 1 frase)
+              </span>
+            </div>
+            <p className="text-[0.72rem] text-app-text-muted leading-relaxed">
+              Para proteger a fidelidade bíblica e evitar impor nossos pensamentos sobre a Escritura, ancore aqui o propósito original antes de construir os tópicos.
+            </p>
+            <textarea
+              value={bloco1IntencaoOriginal}
+              onChange={(e) => setBloco1IntencaoOriginal(e.target.value)}
+              placeholder="O que o autor bíblico pretendia comunicar aos seus ouvintes originais? Qual era o problema pastoral ou teológico endereçado?"
+              rows={3}
+              className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+            />
+            <div className="flex justify-end pt-1">
+              <Button
+                type="button"
+                onClick={handleSaveBloco1}
+                disabled={isSavingBloco1 || !bloco1IntencaoOriginal.trim()}
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+              >
+                <Save className="w-3.5 h-3.5 mr-1" />
+                <span>{isSavingBloco1 ? "Salvando..." : "Fixar Ancoradouro"}</span>
+              </Button>
+            </div>
+          </div>
         </section>
 
         {/* Bloco 2: Pregar a Inspiração (Tópicos em Degraus) */}
         <section
           data-testid="bloco-2-container"
-          data-locked={!isUnlocked ? "true" : "false"}
+          data-locked={!isBloco2Unlocked ? "true" : "false"}
           className={cn(
             "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
-            !isUnlocked
+            !isBloco2Unlocked
               ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
               : "border-border/80 bg-app-surface shadow-xs"
           )}
         >
-          {!isUnlocked && (
+          {!isUnlocked ? (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
               <Lock className="w-6 h-6 text-gold mb-2" />
               <p className="text-xs font-semibold text-app-text">
                 Bloqueado pelo Método da Marcha-Ré
               </p>
+              <p className="text-[0.72rem] text-app-text-muted max-w-xs mt-1">
+                Defina e fixe o Desfecho da mensagem acima para iniciar a preparação.
+              </p>
             </div>
-          )}
+          ) : !isBloco2Unlocked ? (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <ShieldAlert className="w-6 h-6 text-amber-500 mb-2" />
+              <p className="text-xs font-semibold text-app-text">
+                Trava Anti-Esegese Ativa
+              </p>
+              <p className="text-[0.72rem] text-app-text-muted max-w-xs mt-1">
+                Responda à pergunta reflexiva obrigatória no Bloco 1 ("Qual era a intenção do autor sagrado para os primeiros ouvintes deste texto?") para liberar o desenvolvimento dos tópicos no Bloco 2.
+              </p>
+            </div>
+          ) : null}
 
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div>
