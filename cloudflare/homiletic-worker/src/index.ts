@@ -109,9 +109,20 @@ export default {
       });
     }
 
-    // 2. Health check
-    if (url.pathname === "/health") {
-      return jsonResponse({ status: "ok", service: "homiletic-worker", timestamp: new Date().toISOString() });
+    // 2. Health check & Root info
+    if (url.pathname === "/health" || url.pathname === "/" || url.pathname === "") {
+      return jsonResponse({
+        status: "ok",
+        service: "biblia-vive-homiletic-worker",
+        timestamp: new Date().toISOString(),
+        endpoints: [
+          "/health",
+          "/api/sermons",
+          "/api/sermons/:id",
+          "/api/sermons/:id/preaching-logs",
+          "/api/preaching-logs",
+        ],
+      });
     }
 
     // 3. Autenticação unificada via Supabase JWT
@@ -188,9 +199,9 @@ export default {
         // GET /api/sermons/:id
         if (request.method === "GET") {
           const row = await env.DB.prepare(
-            "SELECT * FROM sermons WHERE id = ? AND user_id = ?"
+            "SELECT * FROM sermons WHERE id = ?"
           )
-            .bind(sermonId, userId)
+            .bind(sermonId)
             .first();
 
           if (!row) {
@@ -204,40 +215,82 @@ export default {
           const body = (await request.json()) as any;
           const now = new Date().toISOString();
 
-          await env.DB.prepare(
-            `UPDATE sermons SET
-              title = COALESCE(?, title),
-              desfecho_tipo = COALESCE(?, desfecho_tipo),
-              desfecho_texto = COALESCE(?, desfecho_texto),
-              bloco_1_exegese = COALESCE(?, bloco_1_exegese),
-              bloco_1_intencao_original = COALESCE(?, bloco_1_intencao_original),
-              bloco_2_topicos = COALESCE(?, bloco_2_topicos),
-              bloco_3_aplicacao = COALESCE(?, bloco_3_aplicacao),
-              introducao = COALESCE(?, introducao),
-              status = COALESCE(?, status),
-              updated_at = ?
-            WHERE id = ? AND user_id = ?`
+          // Verifica se o sermão já existe no D1
+          const existing = await env.DB.prepare(
+            "SELECT id FROM sermons WHERE id = ?"
           )
-            .bind(
-              body.title ?? null,
-              body.desfechoTipo ?? null,
-              body.desfechoTexto ?? null,
-              body.bloco1Exegese ?? null,
-              body.bloco1IntencaoOriginal ?? null,
-              body.bloco2Topicos ? JSON.stringify(body.bloco2Topicos) : null,
-              body.bloco3Aplicacao ?? null,
-              body.introducao ?? null,
-              body.status ?? null,
-              now,
-              sermonId,
-              userId
+            .bind(sermonId)
+            .first();
+
+          if (!existing) {
+            // Upsert: rascunho originado offline em localStorage sendo sincronizado com D1
+            await env.DB.prepare(
+              `INSERT INTO sermons (
+                id, user_id, inspiration_note_id, title, book_id, book_name,
+                chapter, verse, version, spark_text, status,
+                desfecho_tipo, desfecho_texto, bloco_1_exegese, bloco_1_intencao_original,
+                bloco_2_topicos, bloco_3_aplicacao, introducao,
+                created_at, updated_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
             )
-            .run();
+              .bind(
+                sermonId,
+                userId,
+                body.inspirationNoteId || null,
+                body.title || "Novo Sermão",
+                body.bookId || null,
+                body.bookName || null,
+                body.chapter || null,
+                body.verse || null,
+                body.version || "acf",
+                body.sparkText || null,
+                body.status || "draft",
+                body.desfechoTipo || null,
+                body.desfechoTexto || null,
+                body.bloco1Exegese || null,
+                body.bloco1IntencaoOriginal || null,
+                body.bloco2Topicos ? JSON.stringify(body.bloco2Topicos) : null,
+                body.bloco3Aplicacao || null,
+                body.introducao || null,
+                body.createdAt || now,
+                now
+              )
+              .run();
+          } else {
+            await env.DB.prepare(
+              `UPDATE sermons SET
+                title = COALESCE(?, title),
+                desfecho_tipo = COALESCE(?, desfecho_tipo),
+                desfecho_texto = COALESCE(?, desfecho_texto),
+                bloco_1_exegese = COALESCE(?, bloco_1_exegese),
+                bloco_1_intencao_original = COALESCE(?, bloco_1_intencao_original),
+                bloco_2_topicos = COALESCE(?, bloco_2_topicos),
+                bloco_3_aplicacao = COALESCE(?, bloco_3_aplicacao),
+                introducao = COALESCE(?, introducao),
+                status = COALESCE(?, status),
+                updated_at = ?
+              WHERE id = ?`
+            )
+              .bind(
+                body.title ?? null,
+                body.desfechoTipo ?? null,
+                body.desfechoTexto ?? null,
+                body.bloco1Exegese ?? null,
+                body.bloco1IntencaoOriginal ?? null,
+                body.bloco2Topicos ? JSON.stringify(body.bloco2Topicos) : null,
+                body.bloco3Aplicacao ?? null,
+                body.introducao ?? null,
+                body.status ?? null,
+                now,
+                sermonId
+              )
+              .run();
+          }
 
           const updated = await env.DB.prepare(
-            "SELECT * FROM sermons WHERE id = ? AND user_id = ?"
+            "SELECT * FROM sermons WHERE id = ?"
           )
-            .bind(sermonId, userId)
+            .bind(sermonId)
             .first();
 
           return jsonResponse({ sermon: formatSermonRow(updated) });
