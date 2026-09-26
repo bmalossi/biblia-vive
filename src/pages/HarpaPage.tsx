@@ -88,10 +88,10 @@ export default function HarpaPage() {
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
             {/* Campo de Pesquisa em Pílula Arredondada */}
             <div className="relative flex-1 w-full max-w-xl">
-              <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8272]" />
+              <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
               <input
                 type="text"
-                className="h-11 w-full rounded-full border border-[#382f23]/80 bg-[#161412] pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-[#f4efea] placeholder:text-[#6e6355] shadow-inner focus:outline-none focus:border-[#e5b869] focus:ring-1 focus:ring-[#e5b869]/30 transition-all"
+                className="h-11 w-full rounded-full border border-border/80 bg-app-surface pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-app-text placeholder:text-app-text-muted/60 shadow-inner focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
                 placeholder="Buscar hino por número ou título..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -101,7 +101,7 @@ export default function HarpaPage() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8f8272] hover:text-[#f4efea] transition-colors p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text transition-colors p-1"
                   aria-label="Limpar busca"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -113,7 +113,7 @@ export default function HarpaPage() {
             <button
               type="button"
               onClick={() => setIsHistoryOpen(true)}
-              className="inline-flex h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-full border border-[#c69a50]/40 bg-[#1e1a15]/60 px-5 text-xs font-medium text-[#e5b869] hover:bg-[#262019] hover:border-[#e5b869]/60 transition-all duration-200 shadow-sm cursor-pointer"
+              className="inline-flex h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-full border border-gold/40 bg-app-surface px-5 text-xs font-medium text-gold hover:bg-gold/10 hover:border-gold transition-all duration-200 shadow-sm cursor-pointer"
             >
               <BookOpen className="h-4 w-4" />
               <span>História da Harpa</span>
@@ -135,10 +135,10 @@ export default function HarpaPage() {
               <section aria-label="Hinos em destaque">
                 <div className="flex items-baseline justify-between gap-4 mb-4">
                   <div>
-                    <h2 className="font-serif text-xl sm:text-2xl text-[#f4efea] font-normal">
+                    <h2 className="font-serif text-xl sm:text-2xl text-app-text font-normal">
                       Em destaque
                     </h2>
-                    <p className="font-sans text-xs text-[#8f8272] mt-0.5">
+                    <p className="font-sans text-xs text-app-text-muted mt-0.5">
                       Hinos mais cantados e amados da Harpa Cristã.
                     </p>
                   </div>
@@ -146,7 +146,7 @@ export default function HarpaPage() {
                   <button
                     type="button"
                     onClick={scrollToHymns}
-                    className="text-xs text-[#c69a50] hover:text-[#e5b869] font-medium transition-colors flex items-center gap-1 cursor-pointer shrink-0"
+                    className="text-xs text-gold hover:underline font-medium transition-colors flex items-center gap-1 cursor-pointer shrink-0"
                   >
                     <span>Ver todos os destaques</span>
                     <ArrowRight className="w-3 h-3" />
@@ -165,13 +165,13 @@ export default function HarpaPage() {
             {/* SEÇÃO 2: "Harpa Cristã" (Ordem numérica completa) */}
             <section aria-label="Todos os hinos da Harpa Cristã">
               <div className="mb-4">
-                <h2 className="font-serif text-xl sm:text-2xl text-[#f4efea] font-normal">
+                <h2 className="font-serif text-xl sm:text-2xl text-app-text font-normal">
                   Harpa Cristã
                 </h2>
-                <p className="font-sans text-xs text-[#8f8272] mt-0.5">
+                <p className="font-sans text-xs text-app-text-muted mt-0.5">
                   {searchQuery ? (
                     <>
-                      Resultados para <span className="text-[#f4efea]">"{searchQuery}"</span> —{" "}
+                      Resultados para <span className="text-app-text">"{searchQuery}"</span> —{" "}
                       {filteredHymns.length} {filteredHymns.length === 1 ? "hino" : "hinos"}
                     </>
                   ) : (
@@ -195,7 +195,7 @@ export default function HarpaPage() {
                       <button
                         type="button"
                         onClick={() => setVisibleCount((prev) => prev + 30)}
-                        className="inline-flex items-center justify-center px-6 py-2.5 rounded-full border border-[#382f23] bg-[#161412] hover:bg-[#1f1a16] hover:border-[#e5b869]/50 text-xs font-medium text-[#d5c7b5] hover:text-[#e5b869] transition-all cursor-pointer shadow-md"
+                        className="inline-flex items-center justify-center px-6 py-2.5 rounded-full border border-border bg-app-surface hover:bg-app-raised hover:border-gold/50 text-xs font-medium text-app-text hover:text-gold transition-all cursor-pointer shadow-md"
                       >
                         Carregar mais hinos ({filteredHymns.length - visibleCount} restantes)
                       </button>
@@ -203,15 +203,15 @@ export default function HarpaPage() {
                   )}
                 </>
               ) : (
-                <div className="rounded-2xl border border-[#382f23]/60 bg-[#161412] p-10 text-center">
-                  <p className="text-sm text-[#8f8272]">
+                <div className="rounded-2xl border border-border/60 bg-app-surface p-10 text-center">
+                  <p className="text-sm text-app-text-muted">
                     Nenhum hino encontrado para{" "}
-                    <span className="text-[#f4efea] font-medium">"{searchQuery}"</span>
+                    <span className="text-app-text font-medium">"{searchQuery}"</span>
                   </p>
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="mt-3 text-xs text-[#e5b869] hover:underline cursor-pointer"
+                    className="mt-3 text-xs text-gold hover:underline cursor-pointer"
                   >
                     Limpar pesquisa
                   </button>

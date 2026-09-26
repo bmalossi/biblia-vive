@@ -385,18 +385,18 @@ export default function ArtigoPage() {
         {/* ── 1. HERO BANNER IMERSIVO COM FOTOGRAFIA & GRADIENTE ── */}
         <section
           data-testid="article-hero-banner"
-          className="relative overflow-hidden rounded-3xl border border-[#382f23]/60 bg-[#161412] min-h-[380px] sm:min-h-[420px] md:min-h-[460px] flex items-center shadow-2xl"
+          className="relative overflow-hidden rounded-3xl border border-border/80 bg-app-surface min-h-[380px] sm:min-h-[420px] md:min-h-[460px] flex items-center shadow-xl transition-colors duration-300"
         >
           {/* Imagem de Fundo Fotográfica */}
           <img
             src={article.cover_image_url || "/images/article-hero-bible.jpg"}
             alt={article.title}
-            className="absolute inset-0 w-full h-full object-cover object-center lg:object-right select-none opacity-50 sm:opacity-60 md:opacity-70 transition-opacity duration-300"
+            className="absolute inset-0 w-full h-full object-cover object-center lg:object-right select-none opacity-40 sm:opacity-50 md:opacity-60 transition-opacity duration-300"
           />
 
-          {/* Gradientes Suaves Escuros para Máximo Contraste Editorial */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#121110] via-[#121110]/95 to-[#121110]/40 sm:to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#121110] via-transparent to-transparent opacity-90" />
+          {/* Gradientes Suaves Integrados ao Tema (Dark / Sepia / White) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-app-surface via-app-surface/95 to-app-surface/40 sm:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-app-surface via-transparent to-transparent opacity-90" />
 
           {/* Conteúdo Textual do Hero */}
           <div className="relative z-10 max-w-2xl px-6 py-10 sm:px-10 sm:py-14 md:py-16 space-y-4">
@@ -409,13 +409,13 @@ export default function ArtigoPage() {
             </div>
 
             {/* Título Principal em Serif Nobre */}
-            <h1 className="font-serif text-2xl sm:text-4xl md:text-[2.65rem] lg:text-[2.85rem] font-normal leading-[1.15] text-[#F7F4EE] tracking-tight">
+            <h1 className="font-serif text-2xl sm:text-4xl md:text-[2.65rem] lg:text-[2.85rem] font-normal leading-[1.15] text-app-text tracking-tight">
               {article.title}
             </h1>
 
             {/* Subtítulo / Lead em Itálico */}
             {leadSubtitle && (
-              <p className="font-serif italic text-sm sm:text-base md:text-lg text-app-text-muted/95 leading-relaxed pt-1">
+              <p className="font-serif italic text-sm sm:text-base md:text-lg text-app-text-muted leading-relaxed pt-1">
                 {leadSubtitle}
               </p>
             )}
@@ -425,7 +425,7 @@ export default function ArtigoPage() {
         {/* ── 2. FAIXA DE METADADOS ── */}
         <section
           data-testid="article-meta-bar"
-          className="mt-4 sm:mt-5 border-y border-border/70 bg-[#161412]/60 py-3 sm:py-3.5 px-4 sm:px-6 rounded-xl flex flex-wrap items-center justify-between gap-y-3 text-xs sm:text-sm text-app-text-muted"
+          className="mt-4 sm:mt-5 border-y border-border/70 bg-app-surface/90 py-3 sm:py-3.5 px-4 sm:px-6 rounded-xl flex flex-wrap items-center justify-between gap-y-3 text-xs sm:text-sm text-app-text-muted shadow-xs transition-colors duration-300"
         >
           {/* Lado Esquerdo: Data, Categoria e Tempo de Leitura */}
           <div className="flex flex-wrap items-center gap-x-5 sm:gap-x-7 gap-y-2">
@@ -469,11 +469,11 @@ export default function ArtigoPage() {
         <div className="mt-8 sm:mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* ── COLUNA ESQUERDA: CORPO DO ARTIGO (8 COLUNAS) ── */}
           <article className="lg:col-span-8 space-y-8">
-            <div className="rounded-2xl border border-border/80 bg-[#161412]/50 p-6 sm:p-8 md:p-10 shadow-xs">
+            <div className="rounded-2xl border border-border/80 bg-app-surface p-6 sm:p-8 md:p-10 shadow-xs transition-colors duration-300">
               {/* Conteúdo Markdown com Capitular na Primeira Letra */}
               <div
                 data-testid="article-markdown-body"
-                className="article-content font-serif text-[#D6D2CA] text-base sm:text-lg leading-[1.85] space-y-6 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:text-5xl sm:[&>p:first-of-type]:first-letter:text-6xl [&>p:first-of-type]:first-letter:font-serif [&>p:first-of-type]:first-letter:font-normal [&>p:first-of-type]:first-letter:text-gold [&>p:first-of-type]:first-letter:mr-3.5 [&>p:first-of-type]:first-letter:leading-none [&>p:first-of-type]:first-letter:pt-1"
+                className="article-content font-serif text-app-text text-base sm:text-lg leading-[1.85] space-y-6 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:text-5xl sm:[&>p:first-of-type]:first-letter:text-6xl [&>p:first-of-type]:first-letter:font-serif [&>p:first-of-type]:first-letter:font-normal [&>p:first-of-type]:first-letter:text-gold [&>p:first-of-type]:first-letter:mr-3.5 [&>p:first-of-type]:first-letter:leading-none [&>p:first-of-type]:first-letter:pt-1"
                 style={{
                   letterSpacing: article.letter_spacing || "0em",
                   lineHeight: article.line_height || "1.85",
@@ -483,25 +483,25 @@ export default function ArtigoPage() {
                   remarkPlugins={[remarkBreaks, remarkGfm]}
                   components={{
                     h2: ({ children }) => (
-                      <h2 className="font-serif text-2xl sm:text-[1.75rem] font-normal text-[#F4EFEA] mt-10 mb-4 pt-2 tracking-tight">
+                      <h2 className="font-serif text-2xl sm:text-[1.75rem] font-normal text-app-text mt-10 mb-4 pt-2 tracking-tight">
                         {children}
                       </h2>
                     ),
                     h3: ({ children }) => (
-                      <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#F4EFEA] mt-8 mb-3 pt-1 tracking-tight">
+                      <h3 className="font-serif text-xl sm:text-2xl font-normal text-app-text mt-8 mb-3 pt-1 tracking-tight">
                         {children}
                       </h3>
                     ),
                     blockquote: ({ children }) => (
-                      <blockquote className="my-6 border-l-2 border-gold pl-5 sm:pl-6 py-1 italic font-serif text-lg sm:text-xl text-[#EDE8DF] space-y-1 bg-transparent">
+                      <blockquote className="my-6 border-l-2 border-gold pl-5 sm:pl-6 py-2 italic font-serif text-lg sm:text-xl text-app-text space-y-1 bg-gold/5 rounded-r-lg">
                         {children}
                       </blockquote>
                     ),
                     p: ({ children }) => (
-                      <p className="mb-5 leading-[1.85] text-[#D6D2CA]">{children}</p>
+                      <p className="mb-5 leading-[1.85] text-app-text">{children}</p>
                     ),
                     table: ({ children }) => (
-                      <div className="my-8 overflow-x-auto rounded-xl border border-border/70 bg-[#141210]/60 shadow-xs">
+                      <div className="my-8 overflow-x-auto rounded-xl border border-border/70 bg-app-raised/40 shadow-xs">
                         <table className="w-full min-w-[540px] border-collapse text-left font-serif text-sm sm:text-base">
                           {children}
                         </table>
@@ -513,7 +513,7 @@ export default function ArtigoPage() {
                       </thead>
                     ),
                     tbody: ({ children }) => (
-                      <tbody className="divide-y divide-border/40 text-[#D6D2CA]">
+                      <tbody className="divide-y divide-border/40 text-app-text">
                         {children}
                       </tbody>
                     ),
@@ -533,12 +533,12 @@ export default function ArtigoPage() {
                       </td>
                     ),
                     ul: ({ children }) => (
-                      <ul className="my-5 ml-6 list-disc space-y-2 text-[#D6D2CA]">
+                      <ul className="my-5 ml-6 list-disc space-y-2 text-app-text">
                         {children}
                       </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="my-5 ml-6 list-decimal space-y-2 text-[#D6D2CA]">
+                      <ol className="my-5 ml-6 list-decimal space-y-2 text-app-text">
                         {children}
                       </ol>
                     ),
@@ -609,7 +609,7 @@ export default function ArtigoPage() {
                   <BookOpen className="h-5 w-5 text-gold" />
                 </div>
                 <div>
-                  <p className="font-serif font-medium text-base text-[#F4EFEA]">Bíblia Vive</p>
+                  <p className="font-serif font-medium text-base text-app-text">Bíblia Vive</p>
                   <p className="font-serif italic text-xs text-app-text-muted">
                     Mais que uma leitura, um encontro com Deus.
                   </p>
@@ -662,7 +662,7 @@ export default function ArtigoPage() {
             {/* ── CARD 1: SOBRE O AUTOR ── */}
             <div
               data-testid="sidebar-card-author"
-              className="rounded-2xl border border-border/80 bg-[#161412]/80 p-5 sm:p-6 backdrop-blur-xs shadow-xs space-y-4"
+              className="rounded-2xl border border-border/80 bg-app-surface p-5 sm:p-6 shadow-xs space-y-4 transition-colors duration-300"
             >
               <div className="flex items-center gap-3.5">
                 {author.avatar_url ? (
@@ -717,7 +717,7 @@ export default function ArtigoPage() {
             {/* ── CARD 2: LEITURAS RELACIONADAS ── */}
             <div
               data-testid="sidebar-card-related"
-              className="rounded-2xl border border-border/80 bg-[#161412]/80 p-5 sm:p-6 backdrop-blur-xs shadow-xs space-y-4"
+              className="rounded-2xl border border-border/80 bg-app-surface p-5 sm:p-6 shadow-xs space-y-4 transition-colors duration-300"
             >
               <div className="flex items-center gap-2 pb-1 border-b border-border/40">
                 <BookOpen className="h-4 w-4 text-gold" />
@@ -804,12 +804,12 @@ export default function ArtigoPage() {
             {/* ── CARD 3: CITAÇÃO EM DESTAQUE ── */}
             <div
               data-testid="sidebar-card-quote"
-              className="rounded-2xl border border-border/80 bg-[#161412]/80 p-5 sm:p-6 backdrop-blur-xs shadow-xs space-y-3"
+              className="rounded-2xl border border-border/80 bg-app-surface p-5 sm:p-6 shadow-xs space-y-3 transition-colors duration-300"
             >
               <span className="font-serif text-3xl sm:text-4xl text-gold/90 leading-none block select-none">
                 “
               </span>
-              <blockquote className="font-serif italic text-xs sm:text-sm text-[#E2DDD5] leading-relaxed">
+              <blockquote className="font-serif italic text-xs sm:text-sm text-app-text leading-relaxed">
                 {featuredQuote.text}
               </blockquote>
               <p className="font-serif text-xs text-app-text-muted/80 text-right pt-1">

@@ -35,21 +35,21 @@ export default function PlansActionBar({
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 w-full">
         {/* Campo de Busca em Pílula */}
         <div className="relative flex-1 w-full max-w-xl">
-          <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8272]" />
+          <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Buscar por plano, livro, tema ou palavra..."
             aria-label="Buscar planos de leitura"
-            className="h-11 w-full rounded-full border border-[#382f23]/80 bg-[#161412] pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-[#f4efea] placeholder:text-[#6e6355] shadow-inner focus:outline-none focus:border-[#e5b869] focus:ring-1 focus:ring-[#e5b869]/30 transition-all"
+            className="h-11 w-full rounded-full border border-border/80 bg-app-surface pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-app-text placeholder:text-app-text-muted/60 shadow-inner focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
           />
           {searchQuery.trim().length > 0 && (
             <button
               type="button"
               onClick={() => onSearchChange("")}
               aria-label="Limpar busca"
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#8f8272] hover:text-[#f4efea] hover:bg-[#241e18] transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-app-text-muted hover:text-app-text hover:bg-app-raised transition-colors"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -73,8 +73,8 @@ export default function PlansActionBar({
                 className={cn(
                   "px-4 sm:px-5 py-2 rounded-full text-xs font-medium cursor-pointer transition-all duration-200 shrink-0 select-none",
                   isActive
-                    ? "bg-[#e5b869] text-[#161412] font-semibold shadow-md active:scale-95"
-                    : "bg-[#161412] border border-[#382f23] text-[#9b8e7e] hover:text-[#f4efea] hover:border-[#e5b869]/40 hover:bg-[#1d1814]"
+                    ? "bg-gold text-primary-foreground font-semibold shadow-md active:scale-95"
+                    : "bg-app-surface border border-border text-app-text-muted hover:text-app-text hover:border-gold/40 hover:bg-app-raised"
                 )}
               >
                 {cat.label}

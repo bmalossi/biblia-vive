@@ -250,8 +250,8 @@ export default function MemorialPage() {
                     {/* Coluna Esquerda: Linha Sagrada Contínua e Memórias (~65-70%) */}
                     <main className="lg:col-span-8 space-y-6">
                         {loading ? (
-                            <div className="text-center py-20 text-[#8f8272] text-sm animate-pulse space-y-3">
-                                <div className="h-8 w-8 rounded-full border-2 border-[#e5b869]/40 border-t-[#e5b869] animate-spin mx-auto" />
+                            <div className="text-center py-20 text-app-text-muted text-sm animate-pulse space-y-3">
+                                <div className="h-8 w-8 rounded-full border-2 border-gold/40 border-t-gold animate-spin mx-auto" />
                                 <p className="font-serif">Carregando seu Altar de Memórias...</p>
                             </div>
                         ) : (
@@ -290,10 +290,10 @@ export default function MemorialPage() {
                                     if (!info) return undefined;
 
                                     return (
-                                        <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-[#382f23] space-y-3 bg-[#161412] max-w-xl mx-auto">
-                                            <Scroll className="h-10 w-10 text-[#8f8272]/40 mx-auto" />
-                                            <p className="text-[0.95rem] font-serif text-[#f4efea]">{info.title}</p>
-                                            <p className="text-[0.8rem] text-[#9b8e7e] max-w-sm mx-auto leading-relaxed">
+                                        <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-border space-y-3 bg-app-surface max-w-xl mx-auto">
+                                            <Scroll className="h-10 w-10 text-app-text-muted/40 mx-auto" />
+                                            <p className="text-[0.95rem] font-serif text-app-text">{info.title}</p>
+                                            <p className="text-[0.8rem] text-app-text-muted max-w-sm mx-auto leading-relaxed">
                                                 {info.desc}
                                             </p>
                                         </div>

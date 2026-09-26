@@ -51,10 +51,10 @@ export default function MemorialActionBar({
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
         {/* Campo de Busca em Pílula Arredondada */}
         <div className="relative flex-1 w-full">
-          <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8272]" />
+          <Search className="pointer-events-none absolute left-4 sm:left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-text-muted" />
           <input
             type="text"
-            className="h-11 w-full rounded-full border border-[#382f23]/80 bg-[#161412] pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-[#f4efea] placeholder:text-[#6e6355] shadow-inner focus:outline-none focus:border-[#e5b869] focus:ring-1 focus:ring-[#e5b869]/30 transition-all"
+            className="h-11 w-full rounded-full border border-border/80 bg-app-surface pl-11 sm:pl-12 pr-10 text-xs sm:text-sm text-app-text placeholder:text-app-text-muted/60 shadow-inner focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
             placeholder="Buscar por texto, título, livro, capítulo ou tags..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -64,7 +64,7 @@ export default function MemorialActionBar({
             <button
               type="button"
               onClick={() => onSearchChange("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8f8272] hover:text-[#f4efea] transition-colors p-1 cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text transition-colors p-1 cursor-pointer"
               aria-label="Limpar busca"
             >
               <X className="h-3.5 w-3.5" />
@@ -76,7 +76,7 @@ export default function MemorialActionBar({
         <button
           type="button"
           onClick={onNewEntry}
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#e5b869] hover:bg-[#d8a855] text-[#161412] px-6 text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
+          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-gold hover:bg-gold/90 text-primary-foreground px-6 text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Nova memória</span>
@@ -103,8 +103,8 @@ export default function MemorialActionBar({
                 className={cn(
                   "shrink-0 px-4 py-1.5 rounded-full text-xs font-sans transition-all duration-200 border cursor-pointer select-none",
                   isActive
-                    ? "bg-[#e5b869] text-[#161412] font-semibold border-[#e5b869] shadow-sm"
-                    : "bg-[#161412] text-[#8f8272] border-[#382f23]/80 hover:text-[#f4efea] hover:border-[#c69a50]/40"
+                    ? "bg-gold text-primary-foreground font-semibold border-gold shadow-sm"
+                    : "bg-app-surface text-app-text-muted border-border/80 hover:text-app-text hover:border-gold/40 hover:bg-app-raised"
                 )}
               >
                 {tab.label}
@@ -119,10 +119,10 @@ export default function MemorialActionBar({
           <button
             type="button"
             onClick={onToggleSortOrder}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#382f23]/80 bg-[#161412] text-[#8f8272] hover:text-[#f4efea] hover:border-[#c69a50]/40 transition-colors cursor-pointer select-none"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/80 bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 hover:bg-app-raised transition-colors cursor-pointer select-none"
             title="Alternar ordem cronológica"
           >
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#c69a50]" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-gold" />
             <span>{sortOrder === "recent" ? "Mais recentes ▾" : "Mais antigos ▾"}</span>
           </button>
 
@@ -131,7 +131,7 @@ export default function MemorialActionBar({
             type="button"
             onClick={onExportTXT}
             disabled={totalFiltered === 0}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#382f23]/80 bg-[#161412] text-[#8f8272] hover:text-[#f4efea] hover:border-[#c69a50]/40 disabled:opacity-40 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border/80 bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 hover:bg-app-raised disabled:opacity-40 transition-colors cursor-pointer"
             title="Exportar memórias para TXT"
           >
             <FileText className="w-3.5 h-3.5" />
@@ -146,8 +146,8 @@ export default function MemorialActionBar({
             className={cn(
               "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border transition-colors cursor-pointer disabled:opacity-40",
               isPro
-                ? "border-[#c69a50]/40 bg-[#c69a50]/10 text-[#e5b869] hover:bg-[#c69a50]/20"
-                : "border-[#382f23]/80 bg-[#161412] text-[#8f8272] hover:text-[#f4efea] hover:border-[#c69a50]/40"
+                ? "border-gold/40 bg-gold/10 text-gold hover:bg-gold/20"
+                : "border-border/80 bg-app-surface text-app-text-muted hover:text-app-text hover:border-gold/40 hover:bg-app-raised"
             )}
             title={isPro ? "Exportar para PDF" : "Recurso Pro — Exportar PDF"}
           >

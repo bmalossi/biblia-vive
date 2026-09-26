@@ -87,7 +87,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
         onClick={handleCardClick}
         spotlightColor="rgba(229, 184, 105, 0.12)"
         className={cn(
-          "p-5 space-y-3 cursor-pointer rounded-2xl border border-[#382f23]/80 bg-[#161412] shadow-lg hover:border-[#c69a50]/60 hover:-translate-y-0.5 transition-all group",
+          "p-5 space-y-3 cursor-pointer rounded-2xl border border-border/80 bg-app-surface shadow-md hover:border-gold/60 hover:-translate-y-0.5 transition-all group",
           className
         )}
       >
@@ -99,33 +99,33 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
               className={cn(
                 "inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.68rem] font-mono uppercase tracking-wider",
                 category === "prayer"
-                  ? "bg-[#251e18] border-[#e5b869]/30 text-[#e5b869]"
+                  ? "bg-app-raised border-gold/30 text-gold"
                   : category === "testimony"
-                  ? "bg-[#18231c] border-emerald-500/30 text-emerald-400"
+                  ? "bg-emerald-950/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                   : category === "fasting"
-                  ? "bg-[#221c18] border-amber-500/30 text-amber-400"
-                  : "bg-[#241e18] border-[#382f23] text-[#c4b5a2]"
+                  ? "bg-amber-950/20 border-amber-500/30 text-amber-600 dark:text-amber-400"
+                  : "bg-app-raised border-border text-app-text-muted"
               )}
             >
               {catInfo.label}
             </span>
 
             {/* Data do Registro */}
-            <span className="text-[0.72rem] font-sans text-[#8f8272]">
+            <span className="text-[0.72rem] font-sans text-app-text-muted">
               {formatDate(entry.createdAt)}
             </span>
 
             {/* Indicador de Favorito */}
             {entry.favorite && (
               <span title="Marco Favorito" aria-label="Marco Favorito">
-                <Star className="h-3.5 w-3.5 text-[#e5b869] fill-[#e5b869]" />
+                <Star className="h-3.5 w-3.5 text-gold fill-gold" />
                 <span className="sr-only">Marco Favorito</span>
               </span>
             )}
           </div>
 
           {/* Menu Contextual */}
-          <div className="flex items-center gap-1.5 shrink-0 text-[#8f8272]">
+          <div className="flex items-center gap-1.5 shrink-0 text-app-text-muted">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -200,13 +200,13 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 
         {/* Título opcional */}
         {entry.title && (
-          <h3 className="text-base sm:text-[1.02rem] font-serif font-medium text-[#f4efea] leading-snug group-hover:text-[#e5b869] transition-colors">
+          <h3 className="text-base sm:text-[1.02rem] font-serif font-medium text-app-text leading-snug group-hover:text-gold transition-colors">
             {entry.title}
           </h3>
         )}
 
         {/* Conteúdo do Registro */}
-        <p className="text-xs sm:text-[0.82rem] text-[#9b8e7e] leading-relaxed line-clamp-3">
+        <p className="text-xs sm:text-[0.82rem] text-app-text-muted leading-relaxed line-clamp-3">
           {entry.content}
         </p>
 
@@ -216,7 +216,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
             <Link
               to={getBibleLink(entry)}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#1e1914] border border-[#c69a50]/40 text-[0.7rem] text-[#e5b869] hover:bg-[#282119] transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-app-raised border border-gold/40 text-[0.7rem] text-gold hover:bg-gold/10 transition-colors"
               title="Ir para o texto bíblico"
             >
               <span>{formatBibleReference(entry)}</span>
@@ -231,7 +231,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
             {entry.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#1c1813] border border-[#382f23] text-[0.65rem] text-[#8f8272]"
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-app-raised border border-border text-[0.65rem] text-app-text-muted"
               >
                 <span>{tag}</span>
               </span>
@@ -241,10 +241,10 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 
         {/* Área de Oração: Botão de Resposta OU Testemunho Respondido */}
         {isPrayer && (
-          <div className="pt-2 border-t border-[#382f23]/50">
+          <div className="pt-2 border-t border-border/50">
             {!isAnswered ? (
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <span className="text-[0.72rem] text-[#8f8272] italic">
+                <span className="text-[0.72rem] text-app-text-muted italic">
                   Oração em espera perante Deus
                 </span>
                 <button
@@ -253,7 +253,7 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                     e.stopPropagation();
                     onMarkAnswered?.(entry);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#e5b869]/40 bg-[#e5b869]/10 text-[#e5b869] hover:bg-[#e5b869] hover:text-[#161412] transition-all text-xs font-medium cursor-pointer shadow-xs active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gold/40 bg-gold/10 text-gold hover:bg-gold hover:text-primary-foreground transition-all text-xs font-medium cursor-pointer shadow-xs active:scale-95"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>Marcar como respondida</span>
@@ -261,17 +261,17 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
               </div>
             ) : (
               <div className="space-y-1.5 bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-medium">
+                <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                   <span>Oração Respondida</span>
                   {entry.answeredAt && (
-                    <span className="text-[0.7rem] text-[#8f8272] opacity-80 ml-auto">
+                    <span className="text-[0.7rem] text-app-text-muted opacity-80 ml-auto">
                       {formatDate(entry.answeredAt)}
                     </span>
                   )}
                 </div>
                 {entry.answeredNote && (
-                  <p className="text-xs text-[#9b8e7e] italic leading-relaxed pl-5">
+                  <p className="text-xs text-app-text-muted italic leading-relaxed pl-5">
                     "{entry.answeredNote}"
                   </p>
                 )}

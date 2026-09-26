@@ -125,18 +125,18 @@ export default function HymnCreditsModal({
       aria-label={`Editar créditos — Hino ${hymnNumber}`}
     >
       {/* Painel */}
-      <div className="w-full max-w-md rounded-2xl border border-[#382f23]/80 bg-[#161412] shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-border/80 bg-app-surface shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b border-[#382f23]/60 px-5 py-4">
+        <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-app-raised border border-border text-gold">
               <Mic className="h-3.5 w-3.5" />
             </span>
             <div>
-              <p className="font-mono text-[0.65rem] tracking-[0.18em] uppercase text-[#e5b869]">
+              <p className="font-mono text-[0.65rem] tracking-[0.18em] uppercase text-gold">
                 Admin · Créditos da Gravação
               </p>
-              <p className="text-xs text-[#a89b8c] truncate max-w-[240px]">
+              <p className="text-xs text-app-text-muted truncate max-w-[240px]">
                 Hino {hymnNumber} — {hymnTitle}
               </p>
             </div>
@@ -144,7 +144,7 @@ export default function HymnCreditsModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-[#6e6355] hover:text-[#f4efea] transition-colors p-1"
+            className="text-app-text-muted hover:text-app-text transition-colors p-1"
             aria-label="Fechar"
           >
             <X className="h-4 w-4" />
@@ -157,7 +157,7 @@ export default function HymnCreditsModal({
           <div className="space-y-1.5">
             <label
               htmlFor="credits-voice"
-              className="block font-mono text-[0.68rem] tracking-wider uppercase text-[#a89b8c]"
+              className="block font-mono text-[0.68rem] tracking-wider uppercase text-app-text-muted"
             >
               Intérprete / Voz
             </label>
@@ -167,7 +167,7 @@ export default function HymnCreditsModal({
               value={form.voice ?? ""}
               onChange={(e) => handleField("voice", e.target.value)}
               placeholder="Ex: Coral Luz da Vida"
-              className="w-full rounded-lg border border-[#382f23]/80 bg-[#1e1a15] px-3.5 py-2.5 text-sm text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all"
+              className="w-full rounded-lg border border-border/80 bg-app-bg px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/20 transition-all"
             />
           </div>
 
@@ -175,7 +175,7 @@ export default function HymnCreditsModal({
           <div className="space-y-1.5">
             <label
               htmlFor="credits-source"
-              className="block font-mono text-[0.68rem] tracking-wider uppercase text-[#a89b8c]"
+              className="block font-mono text-[0.68rem] tracking-wider uppercase text-app-text-muted"
             >
               Fonte / Origem
             </label>
@@ -185,7 +185,7 @@ export default function HymnCreditsModal({
               value={form.source ?? ""}
               onChange={(e) => handleField("source", e.target.value)}
               placeholder="Ex: CD Harpa Cristã Vol. 3"
-              className="w-full rounded-lg border border-[#382f23]/80 bg-[#1e1a15] px-3.5 py-2.5 text-sm text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all"
+              className="w-full rounded-lg border border-border/80 bg-app-bg px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/20 transition-all"
             />
           </div>
 
@@ -193,7 +193,7 @@ export default function HymnCreditsModal({
           <div className="space-y-1.5">
             <label
               htmlFor="credits-source-url"
-              className="block font-mono text-[0.68rem] tracking-wider uppercase text-[#a89b8c]"
+              className="block font-mono text-[0.68rem] tracking-wider uppercase text-app-text-muted"
             >
               Link da Fonte (Externo)
             </label>
@@ -203,19 +203,19 @@ export default function HymnCreditsModal({
               value={form.sourceUrl ?? ""}
               onChange={(e) => handleField("sourceUrl", e.target.value)}
               placeholder="https://youtube.com/watch?v=..."
-              className="w-full rounded-lg border border-[#382f23]/80 bg-[#1e1a15] px-3.5 py-2.5 text-sm text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all"
+              className="w-full rounded-lg border border-border/80 bg-app-bg px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/20 transition-all"
             />
-            <p className="text-[0.62rem] text-[#6e6355]">
+            <p className="text-[0.62rem] text-app-text-muted">
               Aparece como "Ouvir gravação original" no card de créditos
             </p>
           </div>
 
           {/* Arquivo ou Link do Áudio no Cloudflare R2 */}
-          <div className="space-y-2 rounded-xl border border-[#382f23]/80 bg-[#1a1713] p-3.5 shadow-inner">
+          <div className="space-y-2 rounded-xl border border-border/80 bg-app-raised/60 p-3.5 shadow-inner">
             <div className="flex items-center justify-between">
               <label
                 htmlFor="credits-audio-file"
-                className="flex items-center gap-1.5 font-mono text-[0.68rem] tracking-wider uppercase text-[#e5b869] font-medium"
+                className="flex items-center gap-1.5 font-mono text-[0.68rem] tracking-wider uppercase text-gold font-medium"
               >
                 <Music className="h-3 w-3" />
                 <span>Áudio no Cloudflare R2</span>
@@ -225,7 +225,7 @@ export default function HymnCreditsModal({
                   type="button"
                   onClick={handleTestAudio}
                   disabled={testingAudio}
-                  className="inline-flex items-center gap-1 rounded bg-[#2a2219] border border-[#382f23] px-2 py-0.5 text-[0.65rem] font-mono text-[#e5b869] hover:bg-[#382f23] transition-colors"
+                  className="inline-flex items-center gap-1 rounded bg-app-surface border border-border px-2 py-0.5 text-[0.65rem] font-mono text-gold hover:bg-gold/10 transition-colors"
                 >
                   {testingAudio ? (
                     <>
@@ -247,31 +247,31 @@ export default function HymnCreditsModal({
                 setAudioStatus(null);
               }}
               placeholder="Ex: 432 - Cláudia Canção - Consagrado ao Senhor.mp3"
-              className="w-full rounded-lg border border-[#382f23]/80 bg-[#141210] px-3.5 py-2 text-xs text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all font-mono"
+              className="w-full rounded-lg border border-border/80 bg-app-bg px-3.5 py-2 text-xs text-app-text placeholder:text-app-text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/20 transition-all font-mono"
             />
 
             {/* Feedback do teste de áudio */}
             {audioStatus === "ok" && (
-              <p className="flex items-center gap-1.5 text-[0.68rem] text-emerald-400 font-mono">
+              <p className="flex items-center gap-1.5 text-[0.68rem] text-emerald-500 dark:text-emerald-400 font-mono">
                 <Check className="h-3.5 w-3.5 shrink-0" />
                 <span>Arquivo validado no Cloudflare R2! (200 OK)</span>
               </p>
             )}
             {audioStatus === "not_found" && (
-              <p className="flex items-center gap-1.5 text-[0.68rem] text-amber-400 font-mono">
+              <p className="flex items-center gap-1.5 text-[0.68rem] text-amber-500 dark:text-amber-400 font-mono">
                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                 <span>Arquivo não encontrado no R2 (404). Verifique se o nome confere exatamente com o que subiu.</span>
               </p>
             )}
             {audioStatus === "error" && (
-              <p className="flex items-center gap-1.5 text-[0.68rem] text-red-400 font-mono">
+              <p className="flex items-center gap-1.5 text-[0.68rem] text-red-500 dark:text-red-400 font-mono">
                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                 <span>Não foi possível verificar a URL no Cloudflare R2.</span>
               </p>
             )}
 
-            <p className="text-[0.62rem] text-[#8f8272] leading-relaxed">
-              Cole o nome do arquivo que você subiu no bucket <code className="text-[#c69a50]">audio-biblia-cache/harpas/</code> ou a URL completa.
+            <p className="text-[0.62rem] text-app-text-muted leading-relaxed">
+              Cole o nome do arquivo que você subiu no bucket <code className="text-gold">audio-biblia-cache/harpas/</code> ou a URL completa.
             </p>
           </div>
 
@@ -279,7 +279,7 @@ export default function HymnCreditsModal({
           <div className="space-y-1.5">
             <label
               htmlFor="credits-notes"
-              className="block font-mono text-[0.68rem] tracking-wider uppercase text-[#a89b8c]"
+              className="block font-mono text-[0.68rem] tracking-wider uppercase text-app-text-muted"
             >
               Observações
             </label>
@@ -289,13 +289,13 @@ export default function HymnCreditsModal({
               value={form.notes ?? ""}
               onChange={(e) => handleField("notes", e.target.value)}
               placeholder="Notas editoriais, contexto da gravação..."
-              className="w-full resize-none rounded-lg border border-[#382f23]/80 bg-[#1e1a15] px-3.5 py-2.5 text-sm text-[#f4efea] placeholder:text-[#6e6355] focus:border-[#e5b869]/60 focus:outline-none focus:ring-1 focus:ring-[#e5b869]/20 transition-all"
+              className="w-full resize-none rounded-lg border border-border/80 bg-app-bg px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/20 transition-all"
             />
           </div>
 
           {/* Feedback de erro */}
           {saveError && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-400">
+            <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-500 dark:text-red-400">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
               <span>{saveError}</span>
             </div>
@@ -306,7 +306,7 @@ export default function HymnCreditsModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-xs font-medium text-[#8f8272] hover:text-[#f4efea] transition-colors"
+              className="rounded-lg px-4 py-2 text-xs font-medium text-app-text-muted hover:text-app-text transition-colors"
             >
               Cancelar
             </button>
@@ -316,7 +316,7 @@ export default function HymnCreditsModal({
               className={`inline-flex items-center gap-2 rounded-lg px-5 py-2 text-xs font-medium transition-all ${
                 saved
                   ? "bg-emerald-600 text-white"
-                  : "bg-[#e5b869] text-[#121110] hover:bg-[#d4a758] disabled:opacity-60 disabled:cursor-not-allowed"
+                  : "bg-gold text-primary-foreground hover:bg-gold/90 disabled:opacity-60 disabled:cursor-not-allowed"
               }`}
             >
               {isSaving ? (
@@ -340,8 +340,8 @@ export default function HymnCreditsModal({
         </form>
 
         {/* Rodapé informativo */}
-        <div className="border-t border-[#382f23]/40 px-5 py-3">
-          <p className="text-[0.65rem] text-[#6e6355]">
+        <div className="border-t border-border/40 px-5 py-3">
+          <p className="text-[0.65rem] text-app-text-muted">
             Salvo no Supabase · Cache público de 5 min · Visível a todos os leitores
           </p>
         </div>

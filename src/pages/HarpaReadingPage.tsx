@@ -49,7 +49,7 @@ interface Strophe {
 const LoadingLines = () => (
   <div className="min-h-[420px] space-y-4 pt-2">
     {[100, 92, 96, 85, 90, 94, 80, 88, 95, 84].map((width, index) => (
-      <Skeleton className="h-6 bg-[#2a2219]/60" key={index} style={{ width: `${width}%` }} />
+      <Skeleton className="h-6 bg-app-raised/60" key={index} style={{ width: `${width}%` }} />
     ))}
   </div>
 );
@@ -298,15 +298,15 @@ export default function HarpaReadingPage() {
     return (
       <Layout>
         <div className="mx-auto flex min-h-[360px] w-full max-w-[680px] flex-col items-center justify-center px-4 text-center md:px-6">
-          <Alert className="w-full border-[#382f23] bg-[#161412] text-[#f4efea]">
-            <AlertCircle className="h-4 w-4 text-[#e5b869]" />
-            <AlertTitle className="text-[#f4efea]">Hino não encontrado</AlertTitle>
-            <AlertDescription className="text-[#a89b8c]">
+          <Alert className="w-full border-border bg-app-surface text-app-text">
+            <AlertCircle className="h-4 w-4 text-gold" />
+            <AlertTitle className="text-app-text">Hino não encontrado</AlertTitle>
+            <AlertDescription className="text-app-text-muted">
               O número de hino informado não existe na Harpa Cristã.
             </AlertDescription>
           </Alert>
           <button
-            className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#e5b869]/50 bg-[#241e18] px-5 py-2 font-mono text-xs text-[#e5b869] hover:bg-[#e5b869] hover:text-[#121110] transition-all cursor-pointer"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/50 bg-app-surface px-5 py-2 font-mono text-xs text-gold hover:bg-gold hover:text-primary-foreground transition-all cursor-pointer"
             onClick={() => navigate("/harpa")}
             type="button"
           >
@@ -333,7 +333,7 @@ export default function HarpaReadingPage() {
           return (
             <div key={pIdx} className="space-y-1.5">
               {/* Overline do Bloco: ESTROFE X ou CORO */}
-              <p className="font-mono text-[0.68rem] font-semibold tracking-[0.18em] uppercase text-[#e5b869]">
+              <p className="font-mono text-[0.68rem] font-semibold tracking-[0.18em] uppercase text-gold">
                 {isChorus ? "CORO" : `ESTROFE ${strophe.estrofe}`}
               </p>
 
@@ -344,7 +344,7 @@ export default function HarpaReadingPage() {
                   fontSize === "sm" && "text-xs sm:text-sm",
                   fontSize === "base" && "text-sm sm:text-base",
                   fontSize === "lg" && "text-base sm:text-lg",
-                  isChorus ? "text-[#e5b869] italic font-medium" : "text-[#f4efea]"
+                  isChorus ? "text-gold italic font-medium" : "text-app-text"
                 )}
               >
                 {lines.map((line, lIdx) => (
@@ -366,12 +366,12 @@ export default function HarpaReadingPage() {
         {/* ─── 1. HERO HEADER COMPACTO COM FOTO DO LIVRO DA HARPA ─── */}
         <section
           aria-label="Apresentação da Harpa Cristã"
-          className="relative mb-6 w-full overflow-hidden rounded-2xl border border-[#382f23]/60 bg-[#161412] shadow-xl"
+          className="relative mb-6 w-full overflow-hidden rounded-2xl border border-border/80 bg-app-surface shadow-xl"
         >
           {/* Arte Fotográfica da Harpa Cristã com Degradê Multicamadas */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
             <div
-              className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 bg-cover bg-center md:bg-right opacity-35 mix-blend-luminosity"
+              className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 bg-cover bg-center md:bg-right opacity-30 dark:opacity-40 mix-blend-luminosity"
               style={{
                 backgroundImage: "url('/images/harpa-hero-book.jpg')",
                 maskImage:
@@ -382,11 +382,11 @@ export default function HarpaReadingPage() {
             />
 
             {/* Glow Dourado Ambiente */}
-            <div className="absolute right-1/4 top-1/2 -translate-y-1/2 h-40 w-40 rounded-full bg-[#e5b869]/10 blur-2xl pointer-events-none" />
+            <div className="absolute right-1/4 top-1/2 -translate-y-1/2 h-40 w-40 rounded-full bg-gold/10 blur-2xl pointer-events-none" />
 
             {/* Degradês Escuros de Integração */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#161412] via-[#161412]/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#161412] via-[#161412]/85 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-app-surface via-app-surface/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-app-surface via-app-surface/85 to-transparent" />
           </div>
 
           {/* Conteúdo do Hero Header Reduzido pela Metade */}
@@ -395,13 +395,13 @@ export default function HarpaReadingPage() {
             <div className="flex items-center justify-between gap-4 mb-2">
               <Link
                 to="/harpa"
-                className="group inline-flex items-center gap-1.5 font-mono text-[0.7rem] uppercase tracking-wider text-[#8f8272] transition-colors hover:text-[#e5b869] cursor-pointer"
+                className="group inline-flex items-center gap-1.5 font-mono text-[0.7rem] uppercase tracking-wider text-app-text-muted transition-colors hover:text-gold cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
                 <span>Voltar à lista da Harpa</span>
               </Link>
 
-              <span className="font-mono text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.22em] text-[#e5b869] font-medium">
+              <span className="font-mono text-[0.65rem] sm:text-[0.7rem] uppercase tracking-[0.22em] text-gold font-medium">
                 HARPA CRISTÃ
               </span>
             </div>
@@ -409,10 +409,10 @@ export default function HarpaReadingPage() {
             {/* Linha Principal: Título + 3 Pilares lado a lado */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-6">
               <div>
-                <h1 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-[#f4efea] tracking-tight leading-tight">
+                <h1 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-app-text tracking-tight leading-tight">
                   Hinos que alimentam a alma.
                 </h1>
-                <p className="mt-0.5 text-xs text-[#a89b8c] font-sans leading-relaxed max-w-xl">
+                <p className="mt-0.5 text-xs text-app-text-muted font-sans leading-relaxed max-w-xl">
                   Louve a Deus com o coração. A Harpa Cristã é um convite constante à adoração e comunhão com o Senhor.
                 </p>
               </div>
@@ -421,48 +421,48 @@ export default function HarpaReadingPage() {
               <div className="flex flex-wrap items-center gap-3 sm:gap-4.5 text-left shrink-0 pt-1 lg:pt-0">
                 {/* Pilar 1: 640 hinos */}
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#241e18] border border-[#382f23] text-[#e5b869]">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-app-raised border border-border text-gold">
                     <Music2 className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <p className="font-sans text-xs sm:text-sm font-semibold text-[#f4efea] leading-tight">
+                    <p className="font-sans text-xs sm:text-sm font-semibold text-app-text leading-tight">
                       640 hinos
                     </p>
-                    <p className="text-[0.65rem] text-[#8f8272] font-mono leading-tight">
+                    <p className="text-[0.65rem] text-app-text-muted font-mono leading-tight">
                       Harpa Cristã
                     </p>
                   </div>
                 </div>
 
-                <div className="hidden sm:block h-6 w-[1px] bg-[#382f23]" />
+                <div className="hidden sm:block h-6 w-[1px] bg-border" />
 
                 {/* Pilar 2: Organizada por temas */}
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#241e18] border border-[#382f23] text-[#e5b869]">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-app-raised border border-border text-gold">
                     <BookOpen className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <p className="font-sans text-xs sm:text-sm font-semibold text-[#f4efea] leading-tight">
+                    <p className="font-sans text-xs sm:text-sm font-semibold text-app-text leading-tight">
                       Organizada por temas
                     </p>
-                    <p className="text-[0.65rem] text-[#8f8272] font-mono leading-tight">
+                    <p className="text-[0.65rem] text-app-text-muted font-mono leading-tight">
                       e índices
                     </p>
                   </div>
                 </div>
 
-                <div className="hidden sm:block h-6 w-[1px] bg-[#382f23]" />
+                <div className="hidden sm:block h-6 w-[1px] bg-border" />
 
                 {/* Pilar 3: Adoração e culto */}
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#241e18] border border-[#382f23] text-[#e5b869]">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-app-raised border border-border text-gold">
                     <Heart className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <p className="font-sans text-xs sm:text-sm font-semibold text-[#f4efea] leading-tight">
+                    <p className="font-sans text-xs sm:text-sm font-semibold text-app-text leading-tight">
                       Ideal para momentos
                     </p>
-                    <p className="text-[0.65rem] text-[#8f8272] font-mono leading-tight">
+                    <p className="text-[0.65rem] text-app-text-muted font-mono leading-tight">
                       de adoração e culto
                     </p>
                   </div>
@@ -478,24 +478,24 @@ export default function HarpaReadingPage() {
           <article
             aria-busy={loading}
             aria-live="polite"
-            className="lg:col-span-8 rounded-2xl border border-[#382f23]/80 bg-[#161412] p-6 sm:p-8 md:p-10 shadow-xl relative"
+            className="lg:col-span-8 rounded-2xl border border-border/80 bg-app-surface p-6 sm:p-8 md:p-10 shadow-xl relative"
           >
             {/* Cabeçalho do Card */}
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-[#382f23]/60">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-border/60">
               <div className="space-y-1">
                 <Link
                   to="/harpa"
-                  className="group inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-[#8f8272] hover:text-[#e5b869] transition-colors mb-1"
+                  className="group inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-app-text-muted hover:text-gold transition-colors mb-1"
                 >
                   <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
                   <span>Hino {numero}</span>
                 </Link>
 
-                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-[#f4efea] tracking-tight">
+                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-app-text tracking-tight">
                   {hymnInfo.tituloFormatado}
                 </h2>
 
-                <p className="text-xs text-[#8f8272] font-mono">
+                <p className="text-xs text-app-text-muted font-mono">
                   Harpa Cristã · Hino {numero}
                 </p>
               </div>
@@ -504,7 +504,7 @@ export default function HarpaReadingPage() {
               <div className="flex items-center gap-1.5 sm:self-center">
                 {/* Feedback de Cópia */}
                 {copiedFeedback && (
-                  <span className="inline-flex items-center gap-1 text-[0.72rem] font-mono text-[#e5b869] bg-[#241e18] border border-[#e5b869]/40 px-2.5 py-1 rounded-full animate-in fade-in">
+                  <span className="inline-flex items-center gap-1 text-[0.72rem] font-mono text-gold bg-app-raised border border-gold/40 px-2.5 py-1 rounded-full animate-in fade-in">
                     <Check className="h-3 w-3" />
                     {copiedFeedback}
                   </span>
@@ -516,10 +516,10 @@ export default function HarpaReadingPage() {
                   onClick={toggleFavorite}
                   title={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}
                   aria-label={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}
-                  className="p-2 rounded-lg text-[#8f8272] hover:text-[#e5b869] hover:bg-[#241e18] border border-transparent hover:border-[#382f23] transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
                 >
                   <Bookmark
-                    className={cn("h-4 w-4", isFavorite && "fill-[#e5b869] text-[#e5b869]")}
+                    className={cn("h-4 w-4", isFavorite && "fill-gold text-gold")}
                   />
                 </button>
 
@@ -529,7 +529,7 @@ export default function HarpaReadingPage() {
                   onClick={handleShare}
                   title="Compartilhar hino"
                   aria-label="Compartilhar hino"
-                  className="p-2 rounded-lg text-[#8f8272] hover:text-[#e5b869] hover:bg-[#241e18] border border-transparent hover:border-[#382f23] transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>
@@ -540,21 +540,21 @@ export default function HarpaReadingPage() {
                   onClick={handleCopyLyrics}
                   title="Copiar letra completa"
                   aria-label="Copiar letra completa"
-                  className="p-2 rounded-lg text-[#8f8272] hover:text-[#e5b869] hover:bg-[#241e18] border border-transparent hover:border-[#382f23] transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </button>
 
                 {/* Seletor de Tamanho de Fonte A A A */}
-                <div className="flex items-center border border-[#382f23] rounded-lg bg-[#221c17] p-0.5 ml-1">
+                <div className="flex items-center border border-border rounded-lg bg-app-raised p-0.5 ml-1">
                   <button
                     type="button"
                     onClick={() => setFontSize("sm")}
                     className={cn(
                       "px-2 py-0.5 text-xs font-serif rounded transition-colors cursor-pointer",
                       fontSize === "sm"
-                        ? "bg-[#2a2219] text-[#e5b869] font-bold"
-                        : "text-[#8f8272] hover:text-[#f4efea]"
+                        ? "bg-app-surface text-gold font-bold"
+                        : "text-app-text-muted hover:text-app-text"
                     )}
                     title="Fonte menor"
                   >
@@ -566,8 +566,8 @@ export default function HarpaReadingPage() {
                     className={cn(
                       "px-2 py-0.5 text-sm font-serif rounded transition-colors cursor-pointer",
                       fontSize === "base"
-                        ? "bg-[#2a2219] text-[#e5b869] font-bold"
-                        : "text-[#8f8272] hover:text-[#f4efea]"
+                        ? "bg-app-surface text-gold font-bold"
+                        : "text-app-text-muted hover:text-app-text"
                     )}
                     title="Fonte padrão"
                   >
@@ -579,8 +579,8 @@ export default function HarpaReadingPage() {
                     className={cn(
                       "px-2 py-0.5 text-base font-serif rounded transition-colors cursor-pointer",
                       fontSize === "lg"
-                        ? "bg-[#2a2219] text-[#e5b869] font-bold"
-                        : "text-[#8f8272] hover:text-[#f4efea]"
+                        ? "bg-app-surface text-gold font-bold"
+                        : "text-app-text-muted hover:text-app-text"
                     )}
                     title="Fonte maior"
                   >
@@ -598,13 +598,13 @@ export default function HarpaReadingPage() {
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-                  <Alert className="w-full border-[#382f23] bg-[#241e18] text-[#f4efea]">
-                    <AlertCircle className="h-4 w-4 text-[#e5b869]" />
+                  <Alert className="w-full border-border bg-app-raised text-app-text">
+                    <AlertCircle className="h-4 w-4 text-gold" />
                     <AlertTitle>Não foi possível carregar este hino.</AlertTitle>
-                    <AlertDescription className="text-[#a89b8c]">{error}</AlertDescription>
+                    <AlertDescription className="text-app-text-muted">{error}</AlertDescription>
                   </Alert>
                   <button
-                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#e5b869]/50 bg-[#241e18] px-4 py-1.5 text-xs font-mono text-[#e5b869] hover:bg-[#e5b869] hover:text-[#121110] transition-all cursor-pointer"
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-gold/50 bg-app-raised px-4 py-1.5 text-xs font-mono text-gold hover:bg-gold hover:text-primary-foreground transition-all cursor-pointer"
                     onClick={() => window.location.reload()}
                     type="button"
                   >
@@ -625,18 +625,18 @@ export default function HarpaReadingPage() {
             </div>
 
             {/* Rodapé do Card com Navegação Anterior / Próximo */}
-            <div className="mt-12 pt-6 border-t border-[#382f23]/60 flex flex-wrap items-center justify-between gap-4">
+            <div className="mt-12 pt-6 border-t border-border/60 flex flex-wrap items-center justify-between gap-4">
               <button
                 type="button"
                 disabled={prevNumber === null}
                 onClick={() => prevNumber !== null && navigate(`/harpa/${prevNumber}`)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#382f23] bg-[#221c17] text-xs font-mono text-[#a89b8c] hover:border-[#e5b869]/50 hover:text-[#e5b869] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-app-raised text-xs font-mono text-app-text-muted hover:border-gold/50 hover:text-gold disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Hino anterior</span>
               </button>
 
-              <span className="font-mono text-xs text-[#8f8272]">
+              <span className="font-mono text-xs text-app-text-muted">
                 Hino {numero} de {hymnsData.length}
               </span>
 
@@ -644,7 +644,7 @@ export default function HarpaReadingPage() {
                 type="button"
                 disabled={nextNumber === null}
                 onClick={() => nextNumber !== null && navigate(`/harpa/${nextNumber}`)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#382f23] bg-[#221c17] text-xs font-mono text-[#a89b8c] hover:border-[#e5b869]/50 hover:text-[#e5b869] disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-app-raised text-xs font-mono text-app-text-muted hover:border-gold/50 hover:text-gold disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
               >
                 <span>Próximo hino</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -655,13 +655,13 @@ export default function HarpaReadingPage() {
           {/* COLUNA DIREITA: SIDEBAR COM OUVIR HINO, CRÉDITOS E CITAÇÃO */}
           <aside className="lg:col-span-4 space-y-6">
             {/* 1. CARD OUVIR HINO */}
-            <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-5 sm:p-6 shadow-xl space-y-4">
+            <div className="rounded-2xl border border-border/80 bg-app-surface p-5 sm:p-6 shadow-xl space-y-4">
               {/* Header do Player */}
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-app-raised border border-border text-gold">
                   <Music2 className="h-3.5 w-3.5" />
                 </span>
-                <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-[#e5b869] font-medium">
+                <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-gold font-medium">
                   OUVIR HINO
                 </h3>
               </div>
@@ -676,7 +676,7 @@ export default function HarpaReadingPage() {
                     onClick={handlePlayPause}
                     aria-label={isPlaying ? "Pausar hino" : "Ouvir hino"}
                     className={cn(
-                      "h-12 w-12 shrink-0 rounded-full border border-[#e5b869] bg-[#241e18] text-[#e5b869] flex items-center justify-center hover:bg-[#e5b869] hover:text-[#121110] transition-all shadow-md active:scale-95",
+                      "h-12 w-12 shrink-0 rounded-full border border-gold bg-app-raised text-gold flex items-center justify-center hover:bg-gold hover:text-primary-foreground transition-all shadow-md active:scale-95",
                       !isAvailable ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
                     )}
                   >
@@ -691,7 +691,7 @@ export default function HarpaReadingPage() {
                   <div className="flex-1 space-y-1.5">
                     <div
                       className={cn(
-                        "h-1.5 w-full bg-[#2a2219] rounded-full overflow-hidden relative",
+                        "h-1.5 w-full bg-app-raised rounded-full overflow-hidden relative",
                         isAvailable && isCurrentHymn ? "cursor-pointer" : "cursor-default"
                       )}
                       onClick={handleSeek}
@@ -701,12 +701,12 @@ export default function HarpaReadingPage() {
                       aria-valuemax={100}
                     >
                       <div
-                        className="h-full bg-[#e5b869] rounded-full transition-all duration-100"
+                        className="h-full bg-gold rounded-full transition-all duration-100"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
 
-                    <div className="flex justify-between text-[0.68rem] font-mono text-[#8f8272]">
+                    <div className="flex justify-between text-[0.68rem] font-mono text-app-text-muted">
                       <span>{formatTime(currentTime)}</span>
                       <span>{formatTime(duration)}</span>
                     </div>
@@ -714,12 +714,12 @@ export default function HarpaReadingPage() {
                 </div>
 
                 {/* Informações da Faixa e Ações Secundárias */}
-                <div className="flex items-center justify-between pt-2 border-t border-[#382f23]/40">
+                <div className="flex items-center justify-between pt-2 border-t border-border/40">
                   <div className="min-w-0 pr-2">
-                    <p className="font-serif text-sm font-medium text-[#f4efea] truncate">
+                    <p className="font-serif text-sm font-medium text-app-text truncate">
                       {hymnInfo.tituloFormatado}
                     </p>
-                    <p className="text-[0.7rem] font-mono text-[#8f8272]">
+                    <p className="text-[0.7rem] font-mono text-app-text-muted">
                       Harpa Cristã · Hino {numero}
                     </p>
                   </div>
@@ -729,7 +729,7 @@ export default function HarpaReadingPage() {
                       type="button"
                       onClick={toggleMute}
                       title="Mutar/Desmutar"
-                      className="text-[#8f8272] hover:text-[#e5b869] transition-colors p-1"
+                      className="text-app-text-muted hover:text-gold transition-colors p-1"
                     >
                       {playerState.isMuted ? (
                         <VolumeX className="h-4 w-4" />
@@ -743,7 +743,7 @@ export default function HarpaReadingPage() {
                       title={playerState.loopMode ? "Desativar repetição" : "Repetir hino"}
                       className={cn(
                         "transition-colors p-1",
-                        playerState.loopMode ? "text-[#e5b869]" : "text-[#8f8272] hover:text-[#e5b869]"
+                        playerState.loopMode ? "text-gold" : "text-app-text-muted hover:text-gold"
                       )}
                     >
                       <Repeat className="h-3.5 w-3.5" />
@@ -752,7 +752,7 @@ export default function HarpaReadingPage() {
                 </div>
 
                 {!isAvailable && (
-                  <p className="text-[0.68rem] font-mono text-[#8f8272] pt-1">
+                  <p className="text-[0.68rem] font-mono text-app-text-muted pt-1">
                     Áudio ainda não disponível para este hino.
                   </p>
                 )}
@@ -761,13 +761,13 @@ export default function HarpaReadingPage() {
 
             {/* 2. CARD CRÉDITOS DA GRAVAÇÃO — Dinâmico via Supabase (fallback JSON) */}
             {(hasRealCredits || isAdmin) && (
-              <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-5 sm:p-6 shadow-xl space-y-3">
+              <div className="rounded-2xl border border-border/80 bg-app-surface p-5 sm:p-6 shadow-xl space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2a2219] border border-[#382f23] text-[#e5b869]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-app-raised border border-border text-gold">
                       <Mic className="h-3.5 w-3.5" />
                     </span>
-                    <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-[#e5b869] font-medium">
+                    <h3 className="font-mono text-[0.68rem] tracking-[0.18em] uppercase text-gold font-medium">
                       CRÉDITOS DA GRAVAÇÃO
                     </h3>
                   </div>
@@ -777,7 +777,7 @@ export default function HarpaReadingPage() {
                     <button
                       type="button"
                       onClick={() => setCreditsModalOpen(true)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#382f23] bg-[#1e1a15] px-2.5 py-1 text-[0.65rem] font-mono text-[#8f8272] hover:border-[#e5b869]/50 hover:text-[#e5b869] transition-all"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-app-raised px-2.5 py-1 text-[0.65rem] font-mono text-app-text-muted hover:border-gold/50 hover:text-gold transition-all"
                       title="Editar créditos desta gravação"
                     >
                       <Pencil className="h-3 w-3" />
@@ -788,32 +788,32 @@ export default function HarpaReadingPage() {
 
                 {hasRealCredits && credits ? (
                   <>
-                    <p className="text-xs text-[#a89b8c] leading-relaxed">
+                    <p className="text-xs text-app-text-muted leading-relaxed">
                       Uma poderosa mensagem sonora da Harpa Cristã, interpretada com excelência para
                       edificar o seu coração.
                     </p>
 
-                    <div className="pt-2 space-y-1.5 text-xs text-[#8f8272] font-sans border-t border-[#382f23]/40">
+                    <div className="pt-2 space-y-1.5 text-xs text-app-text-muted font-sans border-t border-border/40">
                       {credits.voice && (
                         <p>
-                          <span className="text-[#a89b8c] font-medium">Intérprete:</span>{" "}
+                          <span className="text-app-text font-medium">Intérprete:</span>{" "}
                           {credits.voice}
                         </p>
                       )}
                       {credits.guitar && (
                         <p>
-                          <span className="text-[#a89b8c] font-medium">Violão:</span>{" "}
+                          <span className="text-app-text font-medium">Violão:</span>{" "}
                           {credits.guitar}
                         </p>
                       )}
                       {credits.source && (
                         <p>
-                          <span className="text-[#a89b8c] font-medium">Fonte:</span>{" "}
+                          <span className="text-app-text font-medium">Fonte:</span>{" "}
                           {credits.source}
                         </p>
                       )}
                       {credits.notes && (
-                        <p className="pt-1 text-[#7a6e63] italic leading-relaxed">
+                        <p className="pt-1 text-app-text-muted italic leading-relaxed">
                           {credits.notes}
                         </p>
                       )}
@@ -823,7 +823,7 @@ export default function HarpaReadingPage() {
                             href={credits.sourceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-[0.72rem] text-[#e5b869] hover:underline transition-colors"
+                            className="inline-flex items-center gap-1.5 text-[0.72rem] text-gold hover:underline transition-colors"
                           >
                             <span>Ouvir gravação original</span>
                             <ExternalLink className="h-3 w-3" />
@@ -834,7 +834,7 @@ export default function HarpaReadingPage() {
                   </>
                 ) : isAdmin ? (
                   // Placeholder para admin quando não há créditos
-                  <p className="text-[0.72rem] font-mono text-[#6e6355] italic">
+                  <p className="text-[0.72rem] font-mono text-app-text-muted italic">
                     Nenhum crédito registrado. Clique em "Editar" para adicionar.
                   </p>
                 ) : null}
@@ -842,15 +842,15 @@ export default function HarpaReadingPage() {
             )}
 
             {/* 3. CARD CITAÇÃO INSPIRADORA */}
-            <div className="rounded-2xl border border-[#382f23]/80 bg-[#161412] p-6 shadow-xl relative overflow-hidden flex items-start gap-4">
-              <span className="text-3xl font-serif text-[#e5b869] leading-none select-none opacity-80">
+            <div className="rounded-2xl border border-border/80 bg-app-surface p-6 shadow-xl relative overflow-hidden flex items-start gap-4">
+              <span className="text-3xl font-serif text-gold leading-none select-none opacity-80">
                 "
               </span>
               <div className="space-y-2">
-                <blockquote className="font-serif italic text-sm text-[#e8dfd5] leading-relaxed">
+                <blockquote className="font-serif italic text-sm text-app-text leading-relaxed">
                   "A Palavra de Deus não é apenas para ser lida, mas para ser vivida."
                 </blockquote>
-                <p className="text-[0.72rem] font-mono text-[#8f8272]">
+                <p className="text-[0.72rem] font-mono text-app-text-muted">
                   — Harpa Cristã
                 </p>
               </div>

@@ -78,7 +78,7 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
     <div className="relative w-full max-w-5xl mx-auto py-4">
       {/* Eixo Vertical Conector Contínuo */}
       <div
-        className="absolute left-[27px] sm:left-[31px] top-8 bottom-8 w-[2px] bg-gradient-to-b from-[#e5b869]/40 via-[#382f23] to-[#261f18]"
+        className="absolute left-[27px] sm:left-[31px] top-8 bottom-8 w-[2px] bg-gradient-to-b from-gold/40 via-border to-border/40"
         aria-hidden="true"
       />
 
@@ -105,19 +105,19 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
               <div
                 className={`relative flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 flex-col items-center justify-center rounded-full transition-all duration-300 z-10 select-none ${
                   isActive
-                    ? "border-2 border-[#e5b869] bg-[#1c1814] shadow-[0_0_18px_rgba(229,184,105,0.3)] ring-4 ring-[#e5b869]/10"
+                    ? "border-2 border-gold bg-app-surface shadow-[0_0_18px_rgba(229,184,105,0.3)] ring-4 ring-gold/10"
                     : isCompleted
-                      ? "border border-emerald-600/70 bg-[#131c15] text-emerald-400"
-                      : "border border-[#382f23]/80 bg-[#161412] text-[#6b6154]"
+                      ? "border border-emerald-600/70 bg-emerald-950/20 text-emerald-600 dark:text-emerald-400"
+                      : "border border-border/80 bg-app-surface text-app-text-muted"
                 }`}
               >
                 <span
                   className={`font-mono text-[0.62rem] sm:text-[0.68rem] uppercase tracking-widest leading-none ${
                     isActive
-                      ? "text-[#e5b869] font-semibold"
+                      ? "text-gold font-semibold"
                       : isCompleted
-                        ? "text-emerald-400 font-medium"
-                        : "text-[#6b6154]"
+                        ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                        : "text-app-text-muted"
                   }`}
                 >
                   DIA
@@ -125,10 +125,10 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                 <span
                   className={`font-serif text-base sm:text-lg font-bold leading-tight mt-0.5 ${
                     isActive
-                      ? "text-[#f4efea]"
+                      ? "text-app-text"
                       : isCompleted
-                        ? "text-emerald-300"
-                        : "text-[#8f8272]"
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-app-text-muted"
                   }`}
                 >
                   {dayItem.day}
@@ -139,10 +139,10 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
               <div
                 className={`flex-1 rounded-2xl border p-5 sm:p-7 transition-all duration-300 ${
                   isActive
-                    ? "border-[#e5b869]/40 bg-[#191613] shadow-2xl ring-1 ring-[#e5b869]/20"
+                    ? "border-gold/40 bg-app-surface shadow-xl ring-1 ring-gold/20"
                     : isCompleted
-                      ? "border-[#382f23]/60 bg-[#161412]/90 hover:border-[#382f23]"
-                      : "border-[#2b241d]/70 bg-[#151311]/80 opacity-75"
+                      ? "border-border/60 bg-app-surface/90 hover:border-border"
+                      : "border-border/60 bg-app-surface/60 opacity-75"
                 }`}
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
@@ -150,30 +150,30 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                   <div className="space-y-2 max-w-xl">
                     {/* Pílula de Categoria */}
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center rounded-full border border-[#3e3223] bg-[#241e18] px-2.5 py-0.5 font-mono text-[0.68rem] font-semibold uppercase tracking-wider text-[#e5b869]">
+                      <span className="inline-flex items-center rounded-full border border-border bg-app-raised px-2.5 py-0.5 font-mono text-[0.68rem] font-semibold uppercase tracking-wider text-gold">
                         {categoryTag}
                       </span>
                     </div>
 
                     {/* Título dos Capítulos */}
-                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#f4efea] tracking-tight">
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-app-text tracking-tight">
                       {chapterTitle}
                     </h3>
 
                     {/* Descrição / Tema Espiritual */}
-                    <p className="font-serif text-xs sm:text-sm text-[#8f8272] leading-relaxed">
+                    <p className="font-serif text-xs sm:text-sm text-app-text-muted leading-relaxed">
                       {subtitle}
                     </p>
 
                     {/* Metadados: Leituras e Tempo Estimado */}
-                    <div className="flex items-center gap-2 pt-1 font-mono text-xs text-[#8f8272]">
+                    <div className="flex items-center gap-2 pt-1 font-mono text-xs text-app-text-muted">
                       <span className="flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-[#e5b869]/70" />
+                        <BookOpen className="h-3.5 w-3.5 text-gold/70" />
                         {totalReadings} {totalReadings === 1 ? "leitura" : "leituras"}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-[#e5b869]/70" />
+                        <Clock className="h-3.5 w-3.5 text-gold/70" />
                         ~ {estimatedMin} min
                       </span>
                     </div>
@@ -185,9 +185,9 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                       <button
                         type="button"
                         onClick={() => onStartDayReading(dayItem.day, firstRef)}
-                        className="group/btn inline-flex items-center gap-2 rounded-full bg-[#e5b869] px-6 py-2.5 font-sans text-xs sm:text-sm font-bold text-[#161412] shadow-lg shadow-[#e5b869]/20 hover:bg-[#d8a855] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                        className="group/btn inline-flex items-center gap-2 rounded-full bg-gold px-6 py-2.5 font-sans text-xs sm:text-sm font-bold text-primary-foreground shadow-lg hover:bg-gold/90 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                       >
-                        <Play className="h-3.5 w-3.5 fill-current text-[#161412]" />
+                        <Play className="h-3.5 w-3.5 fill-current text-primary-foreground" />
                         <span>Ler hoje</span>
                         <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                       </button>
@@ -195,14 +195,14 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                       <button
                         type="button"
                         onClick={() => onStartDayReading(dayItem.day, firstRef)}
-                        className="group/btn inline-flex items-center gap-2 rounded-full border border-emerald-700/50 bg-emerald-950/20 px-5 py-2 font-mono text-xs font-medium text-emerald-400 hover:bg-emerald-950/40 hover:border-emerald-600 transition-all cursor-pointer"
+                        className="group/btn inline-flex items-center gap-2 rounded-full border border-emerald-600/50 bg-emerald-950/20 px-5 py-2 font-mono text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-950/40 hover:border-emerald-600 transition-all cursor-pointer"
                       >
-                        <Check className="h-3.5 w-3.5 text-emerald-400" />
+                        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                         <span>Concluído</span>
                       </button>
                     ) : (
-                      <div className="inline-flex items-center gap-2 rounded-full border border-[#2b241d] bg-[#1a1715] px-5 py-2 font-mono text-xs text-[#665d52] cursor-not-allowed select-none">
-                        <Lock className="h-3.5 w-3.5 text-[#665d52]" />
+                      <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-app-raised px-5 py-2 font-mono text-xs text-app-text-muted cursor-not-allowed select-none">
+                        <Lock className="h-3.5 w-3.5 text-app-text-muted" />
                         <span>Bloqueado</span>
                       </div>
                     )}

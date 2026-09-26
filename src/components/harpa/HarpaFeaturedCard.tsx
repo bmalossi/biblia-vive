@@ -62,13 +62,13 @@ export default function HarpaFeaturedCard({
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#382f23]/80 bg-[#161412] p-5 sm:p-6 md:p-7 shadow-2xl mb-10 transition-all duration-300 hover:border-[#c69a50]/60 min-h-[160px]">
+    <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/80 bg-app-surface p-5 sm:p-6 md:p-7 shadow-2xl mb-10 transition-all duration-300 hover:border-gold/60 min-h-[160px]">
       {/* Imagem de Fundo com Máscara e Degradês em Camadas para o Efeito Fumaça (Idêntico ao card de Jornada) */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-full sm:w-[55%] md:w-[48%] lg:w-[42%] overflow-hidden select-none">
         <img
           src="/images/jornadas-mountain-hero.jpg"
           alt="Montanhas ao amanhecer com raios de sol e névoa"
-          className="h-full w-full object-cover object-left"
+          className="h-full w-full object-cover object-left opacity-30 dark:opacity-50"
           style={{
             maskImage:
               "linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 30%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0.25) 78%, transparent 100%)",
@@ -78,17 +78,17 @@ export default function HarpaFeaturedCard({
         />
 
         {/* Camada 1 de Efeito Fumaça: Gradiente Linear Horizontal Suave */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#161412]/40 via-40% to-[#161412]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-app-surface/40 via-40% to-app-surface" />
 
         {/* Camada 2 de Efeito Fumaça: Névoa Radial Difusa / Densidade de Fumaça */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_90%_at_75%_50%,#161412_15%,rgba(22,20,18,0.75)_50%,transparent_90%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_90%_at_75%_50%,hsl(var(--bg-surface))_15%,hsl(var(--bg-surface)/0.75)_50%,transparent_90%)]" />
 
         {/* Camada 3: Blush/Brilho Dourado Confortável e Suave */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_45%,rgba(229,184,105,0.12)_0%,rgba(198,154,80,0.03)_50%,transparent_80%)] mix-blend-screen" />
 
         {/* Camada 4: Vinhetas Suaves de Borda (Top/Bottom/Left) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#161412]/50 via-transparent to-[#161412]/70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#161412]/30 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-app-surface/50 via-transparent to-app-surface/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-app-surface/30 via-transparent to-transparent" />
       </div>
 
       {/* Botões Superiores de Ação: Favorito e Marcador */}
@@ -99,8 +99,8 @@ export default function HarpaFeaturedCard({
           className={cn(
             "p-1.5 rounded-full transition-colors cursor-pointer",
             isFavorited
-              ? "text-[#e5b869] fill-[#e5b869]"
-              : "text-[#8f8272] hover:text-[#e5b869]"
+              ? "text-gold fill-gold"
+              : "text-app-text-muted hover:text-gold"
           )}
           aria-label={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
@@ -113,8 +113,8 @@ export default function HarpaFeaturedCard({
           className={cn(
             "p-1.5 rounded-full transition-colors cursor-pointer",
             isBookmarked
-              ? "text-[#e5b869] fill-[#e5b869]"
-              : "text-[#8f8272] hover:text-[#e5b869]"
+              ? "text-gold fill-gold"
+              : "text-app-text-muted hover:text-gold"
           )}
           aria-label={isBookmarked ? "Remover marcador" : "Salvar hino"}
         >
@@ -125,28 +125,28 @@ export default function HarpaFeaturedCard({
       <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         {/* Bloco Esquerda: Informações e Metadados do Hino */}
         <div className="space-y-1.5 min-w-0 max-w-xl pl-0 sm:pl-2 flex-1">
-          <p className="font-mono text-[0.62rem] sm:text-[0.65rem] uppercase tracking-[0.2em] text-[#e5b869] font-medium">
+          <p className="font-mono text-[0.62rem] sm:text-[0.65rem] uppercase tracking-[0.2em] text-gold font-medium">
             HINO EM DESTAQUE
           </p>
 
-          <p className="font-mono text-xs text-[#a09383] font-medium">
+          <p className="font-mono text-xs text-app-text-muted font-medium">
             Nº {formatHymnNumber(hymnNumber)}
           </p>
 
           <div className="flex items-baseline gap-2 flex-wrap">
             <Link
               to={`/harpa/${hymnNumber}`}
-              className="font-serif text-xl sm:text-2xl md:text-[1.7rem] text-[#f4efea] font-normal hover:text-[#e5b869] transition-colors leading-tight"
+              className="font-serif text-xl sm:text-2xl md:text-[1.7rem] text-app-text font-normal hover:text-gold transition-colors leading-tight"
             >
               {title}
             </Link>
 
             {hasValidRating(ratingInfo?.rating) && (
-              <div className="inline-flex items-center gap-1 text-xs text-[#e5b869] font-sans">
+              <div className="inline-flex items-center gap-1 text-xs text-gold font-sans">
                 <Star className="w-3 h-3 fill-current" />
                 <span className="font-medium">{ratingInfo.rating}</span>
                 {ratingInfo.reviewsCount && Number(ratingInfo.reviewsCount) > 0 && (
-                  <span className="text-[#8f8272] text-[0.7rem]">({ratingInfo.reviewsCount})</span>
+                  <span className="text-app-text-muted text-[0.7rem]">({ratingInfo.reviewsCount})</span>
                 )}
               </div>
             )}
@@ -158,7 +158,7 @@ export default function HarpaFeaturedCard({
               {ratingInfo.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-0.5 rounded-full bg-[#201b17]/90 border border-[#382f23] text-[0.65rem] text-[#9b8e7e] font-medium"
+                  className="px-2.5 py-0.5 rounded-full bg-app-raised/90 border border-border text-[0.65rem] text-app-text-muted font-medium"
                 >
                   {tag}
                 </span>
@@ -167,7 +167,7 @@ export default function HarpaFeaturedCard({
           )}
 
           {/* Descrição Sinopse */}
-          <p className="font-sans text-xs sm:text-[0.82rem] text-[#9b8e7e] leading-relaxed line-clamp-2 max-w-lg">
+          <p className="font-sans text-xs sm:text-[0.82rem] text-app-text-muted leading-relaxed line-clamp-2 max-w-lg">
             {ratingInfo.description}
           </p>
         </div>
@@ -178,7 +178,7 @@ export default function HarpaFeaturedCard({
           <button
             type="button"
             onClick={handlePlayPause}
-            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#e5b869] hover:bg-[#d8a855] text-[#161412] flex items-center justify-center shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gold hover:bg-gold/90 text-primary-foreground flex items-center justify-center shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
             aria-label={isPlaying ? "Pausar hino" : "Ouvir hino"}
           >
             {isPlaying ? (
@@ -208,7 +208,7 @@ export default function HarpaFeaturedCard({
                   className="w-1 sm:w-1.5 rounded-full transition-all duration-150"
                   style={{
                     height: `${isPlaying ? Math.max(15, (height * (0.6 + Math.random() * 0.4))) : height * 0.7}%`,
-                    backgroundColor: isPassed ? "#e5b869" : "#4a3e30",
+                    backgroundColor: isPassed ? "hsl(var(--gold))" : "hsl(var(--border))",
                   }}
                 />
               );
@@ -216,7 +216,7 @@ export default function HarpaFeaturedCard({
           </div>
 
           {/* Tempo decorrido / Duração */}
-          <div className="font-mono text-xs text-[#8f8272] shrink-0 min-w-[65px] text-right">
+          <div className="font-mono text-xs text-app-text-muted shrink-0 min-w-[65px] text-right">
             <span>
               {formatTime(currentSeconds)} / {formatTime(duration)}
             </span>

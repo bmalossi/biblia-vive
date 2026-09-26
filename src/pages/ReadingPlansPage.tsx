@@ -131,8 +131,8 @@ export default function ReadingPlansPage() {
         return (
             <Layout maxWidthClassName="max-w-7xl">
                 <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e5b869] border-t-transparent"></div>
-                    <p className="text-sm font-serif text-[#8f8272]">Carregando planos de leitura...</p>
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold border-t-transparent"></div>
+                    <p className="text-sm font-serif text-app-text-muted">Carregando planos de leitura...</p>
                 </div>
             </Layout>
         );
@@ -166,10 +166,10 @@ export default function ReadingPlansPage() {
                         {/* Coluna Esquerda: Grid de Planos de Leitura (8 colunas) */}
                         <main className="lg:col-span-8">
                             {filteredPlans.length === 0 ? (
-                                <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-[#382f23] bg-[#161412] max-w-xl mx-auto space-y-3">
-                                    <BookOpen className="h-10 w-10 text-[#8f8272]/40 mx-auto" />
-                                    <p className="text-base font-serif text-[#f4efea]">Nenhum plano encontrado</p>
-                                    <p className="text-xs text-[#8f8272] max-w-sm mx-auto leading-relaxed">
+                                <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-border bg-app-surface max-w-xl mx-auto space-y-3">
+                                    <BookOpen className="h-10 w-10 text-app-text-muted/40 mx-auto" />
+                                    <p className="text-base font-serif text-app-text">Nenhum plano encontrado</p>
+                                    <p className="text-xs text-app-text-muted max-w-sm mx-auto leading-relaxed">
                                         Não encontramos nenhum plano para o filtro selecionado. Tente buscar por outros termos ou redefinir a categoria.
                                     </p>
                                 </div>
@@ -239,7 +239,7 @@ export default function ReadingPlansPage() {
                 />
 
                 {/* Recomeçar Plano */}
-                <div className="mt-16 flex justify-center border-t border-[#382f23]/40 pt-8">
+                <div className="mt-16 flex justify-center border-t border-border/40 pt-8">
                     <Button
                         onClick={() => {
                             if (window.confirm("Tem certeza que deseja recomeçar este plano do zero? Todo o seu progresso neste plano será reiniciado.")) {

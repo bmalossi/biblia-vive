@@ -33,10 +33,10 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
     if (emptyState) return <>{emptyState}</>;
 
     return (
-      <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-[#382f23] space-y-3 bg-[#161412] max-w-xl mx-auto">
-        <Scroll className="h-10 w-10 text-[#8f8272]/40 mx-auto" />
-        <p className="text-[0.95rem] font-serif text-[#f4efea]">Nenhuma marca encontrada</p>
-        <p className="text-[0.8rem] text-[#9b8e7e] max-w-sm mx-auto">
+      <div className="text-center py-20 px-4 rounded-3xl border border-dashed border-border space-y-3 bg-app-surface max-w-xl mx-auto">
+        <Scroll className="h-10 w-10 text-app-text-muted/40 mx-auto" />
+        <p className="text-[0.95rem] font-serif text-app-text">Nenhuma marca encontrada</p>
+        <p className="text-[0.8rem] text-app-text-muted max-w-sm mx-auto">
           Grave suas orações, reflexões, testemunhos ou propósitos para erguer seu Altar de Memória diante do Senhor.
         </p>
       </div>
@@ -54,7 +54,7 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
       */}
       <div
         aria-hidden="true"
-        className="absolute top-0 bottom-0 left-5 md:left-1/2 w-0.5 -translate-x-1/2 bg-gradient-to-b from-[#e5b869]/40 via-[#e5b869]/20 to-[#e5b869]/40 pointer-events-none"
+        className="absolute top-0 bottom-0 left-5 md:left-1/2 w-0.5 -translate-x-1/2 bg-gradient-to-b from-gold/40 via-gold/20 to-gold/40 pointer-events-none"
       />
 
       <div className="space-y-10">
@@ -65,9 +65,9 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
               <div className="relative flex items-center justify-start md:justify-center pl-1 md:pl-0">
                 <div
                   data-testid="timeline-milestone"
-                  className="z-10 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#c69a50]/50 bg-[#161412] text-[#e5b869] text-[0.68rem] font-mono uppercase tracking-wider shadow-md backdrop-blur-xs"
+                  className="z-10 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-gold/50 bg-app-surface text-gold text-[0.68rem] font-mono uppercase tracking-wider shadow-md backdrop-blur-xs"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#e5b869] animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
                   <span>{group.label}</span>
                 </div>
               </div>
@@ -127,9 +127,9 @@ export const MemorialTimeline: React.FC<MemorialTimelineProps> = ({
                         )}
                       >
                         {renderCard ? renderCard(entry, globalIndex, entry.id === featuredEntryId) : (
-                          <div className="p-4 rounded-2xl border border-[#382f23] bg-[#161412] text-[#f4efea] text-sm">
+                          <div className="p-4 rounded-2xl border border-border bg-app-surface text-app-text text-sm">
                             <h4 className="font-serif font-semibold">{entry.title || (hasBibleReference(entry) ? entry.bookName : "")}</h4>
-                            <p className="text-xs text-[#9b8e7e] mt-1">{entry.content}</p>
+                            <p className="text-xs text-app-text-muted mt-1">{entry.content}</p>
                           </div>
                         )}
                       </div>

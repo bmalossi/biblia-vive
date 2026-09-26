@@ -793,10 +793,10 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
         {/* 1. CABEÇALHO CENTRAL                                              */}
         {/* ───────────────────────────────────────────────────────────────── */}
         <header className="mb-10 sm:mb-12 text-center">
-          <p className="font-mono text-[0.65rem] sm:text-xs uppercase tracking-[0.22em] text-[#e5b869] font-medium mb-3">
+          <p className="font-mono text-[0.65rem] sm:text-xs uppercase tracking-[0.22em] text-gold font-medium mb-3">
             CAPÍTULOS PARA A CAMINHADA
           </p>
-          <h1 className="font-serif text-2xl sm:text-3xl md:text-[2.35rem] font-normal tracking-tight text-[#f4efea] leading-[1.3] max-w-2xl mx-auto">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-[2.35rem] font-normal tracking-tight text-app-text leading-[1.3] max-w-2xl mx-auto">
             Pequenos encontros com a Palavra,
             <br className="hidden sm:inline" /> um capítulo de cada vez.
           </h1>
@@ -807,13 +807,13 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
         {/* Efeito de transição degradê "fumaça" impecável                    */}
         {/* ───────────────────────────────────────────────────────────────── */}
         <section aria-label="Capítulo de hoje" className="mb-10 sm:mb-12">
-          <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-[#382f23]/80 bg-[#161412] shadow-2xl transition-all duration-300 hover:border-[#c69a50]/60">
+          <div className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-border/80 bg-app-surface shadow-xl transition-all duration-300 hover:border-gold/60">
             {/* Imagem de Fundo com Máscara e Degradês em Camadas para o Efeito Fumaça */}
             <div className="pointer-events-none absolute inset-y-0 left-0 w-full sm:w-[58%] md:w-[48%] lg:w-[44%] overflow-hidden select-none">
               <img
                 src="/images/jornadas-mountain-hero.jpg"
                 alt="Montanhas ao amanhecer com raios de sol e névoa"
-                className="h-full w-full object-cover object-left"
+                className="h-full w-full object-cover object-left opacity-35 dark:opacity-50"
                 style={{
                   maskImage:
                     "linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 30%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0.25) 78%, transparent 100%)",
@@ -823,17 +823,17 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
               />
 
               {/* Camada 1 de Efeito Fumaça: Gradiente Linear Horizontal Suave */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#161412]/40 via-40% to-[#161412]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-app-surface/50 via-40% to-app-surface" />
 
               {/* Camada 2 de Efeito Fumaça: Névoa Radial Difusa / Densidade de Fumaça */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_90%_at_75%_50%,#161412_15%,rgba(22,20,18,0.75)_50%,transparent_90%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_90%_at_75%_50%,hsl(var(--bg-surface))_15%,transparent_90%)]" />
 
               {/* Camada 3: Blush/Brilho Dourado Confortável e Suave */}
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_45%,rgba(229,184,105,0.12)_0%,rgba(198,154,80,0.03)_50%,transparent_80%)] mix-blend-screen" />
 
               {/* Camada 4: Vinhetas Suaves de Borda (Top/Bottom/Left) */}
-              <div className="absolute inset-0 bg-gradient-to-b from-[#161412]/50 via-transparent to-[#161412]/70" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#161412]/30 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-app-surface/50 via-transparent to-app-surface/70" />
+              <div className="absolute inset-0 bg-gradient-to-r from-app-surface/40 via-transparent to-transparent" />
             </div>
 
             {/* Arcos Concêntricos Dourados Decorativos (Lado Direito) */}
@@ -844,10 +844,10 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle cx="340" cy="140" r="90" stroke="#e5b869" strokeWidth="1" strokeOpacity="0.3" />
-                <circle cx="340" cy="140" r="140" stroke="#e5b869" strokeWidth="1" strokeOpacity="0.25" />
-                <circle cx="340" cy="140" r="190" stroke="#e5b869" strokeWidth="1" strokeOpacity="0.18" />
-                <circle cx="340" cy="140" r="240" stroke="#e5b869" strokeWidth="1" strokeOpacity="0.1" />
+                <circle cx="340" cy="140" r="90" stroke="currentColor" className="text-gold" strokeWidth="1" strokeOpacity="0.3" />
+                <circle cx="340" cy="140" r="140" stroke="currentColor" className="text-gold" strokeWidth="1" strokeOpacity="0.25" />
+                <circle cx="340" cy="140" r="190" stroke="currentColor" className="text-gold" strokeWidth="1" strokeOpacity="0.18" />
+                <circle cx="340" cy="140" r="240" stroke="currentColor" className="text-gold" strokeWidth="1" strokeOpacity="0.1" />
               </svg>
             </div>
 
@@ -856,26 +856,26 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
               {/* Informações Centrais / Lado Esquerdo */}
               <div className="max-w-xl pl-0 sm:pl-2">
                 {/* Pílula de Categoria */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#c69a50]/50 bg-[#221c16]/80 text-[#e5b869] font-mono text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] uppercase mb-2.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/40 bg-gold/10 text-gold font-mono text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] uppercase mb-2.5">
                   <span>CAPÍTULO DE HOJE &bull; {heroSeriesName}</span>
                 </div>
 
                 {/* Título do Capítulo */}
                 <h2
                   onClick={() => setIsHeroModalOpen(true)}
-                  className="font-serif text-xl sm:text-2xl md:text-[1.7rem] text-[#f4efea] font-normal leading-tight tracking-normal mb-2 cursor-pointer hover:text-[#e5b869] transition-colors"
+                  className="font-serif text-xl sm:text-2xl md:text-[1.7rem] text-app-text font-normal leading-tight tracking-normal mb-2 cursor-pointer hover:text-gold transition-colors"
                 >
                   {heroTitle}
                 </h2>
 
                 {/* Referência Bíblica */}
-                <div className="flex items-center gap-2 text-xs text-[#d5c7b5] mb-2 font-medium">
-                  <BookOpen className="w-3.5 h-3.5 text-[#e5b869]" />
+                <div className="flex items-center gap-2 text-xs text-app-text-muted mb-2 font-medium">
+                  <BookOpen className="w-3.5 h-3.5 text-gold" />
                   <span>{heroReferenceText}</span>
                 </div>
 
                 {/* Texto Introdutório / Resumo delimitado a no máximo 2 linhas */}
-                <p className="font-sans text-xs sm:text-[0.82rem] text-[#9b8e7e] leading-relaxed max-w-lg line-clamp-2">
+                <p className="font-sans text-xs sm:text-[0.82rem] text-app-text-muted leading-relaxed max-w-lg line-clamp-2">
                   {heroExcerpt}
                 </p>
 
@@ -883,7 +883,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                 <button
                   type="button"
                   onClick={() => setIsHeroModalOpen(true)}
-                  className="mt-2 inline-flex items-center gap-1 text-[0.7rem] text-[#e5b869]/90 hover:text-[#e5b869] font-medium transition-colors cursor-pointer"
+                  className="mt-2 inline-flex items-center gap-1 text-[0.7rem] text-gold hover:underline font-medium transition-colors cursor-pointer"
                 >
                   Ler reflexão completa &rarr;
                 </button>
@@ -892,11 +892,11 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
               {/* Lado Direito: Linha Divisória e Botão de Ação */}
               <div className="flex items-center gap-6 sm:gap-8 shrink-0 self-start md:self-center pr-0 lg:pr-8">
                 {/* Hairline Divisória Vertical */}
-                <div className="hidden md:block h-20 w-[1px] bg-white/[0.08]" />
+                <div className="hidden md:block h-20 w-[1px] bg-border/60" />
 
                 <Link
                   to={heroTargetLink}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#e5b869] hover:bg-[#d8a855] text-[#161412] text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-gold hover:bg-gold/90 text-primary-foreground text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
                 >
                   <span>Ler capítulo</span>
                   <ArrowRight className="w-4 h-4" />
@@ -913,10 +913,10 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
         <section aria-label="Sua caminhada" className="w-full">
           {/* Cabeçalho da Seção */}
           <div className="mb-6">
-            <p className="font-mono text-[0.65rem] sm:text-xs uppercase tracking-[0.22em] text-[#e5b869] font-medium mb-1.5">
+            <p className="font-mono text-[0.65rem] sm:text-xs uppercase tracking-[0.22em] text-gold font-medium mb-1.5">
               SUA CAMINHADA
             </p>
-            <p className="text-xs sm:text-sm text-[#9b8e7e]">
+            <p className="text-xs sm:text-sm text-app-text-muted">
               Cada série é um passo na mesma direção: mais perto da Palavra.
             </p>
           </div>
@@ -938,15 +938,11 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                   }}
                   aria-label={`Ver capítulos da série ${series.name}`}
                   /* ATENÇÃO: NÃO ADICIONAR BARRAS LATERAIS ESQUERDAS (REQUISITO EXPLÍCITO DO USUÁRIO) */
-                  className="group relative overflow-hidden rounded-xl border border-[#382f23]/80 bg-[#161412] p-5 shadow-lg transition-all duration-300 hover:border-[#c69a50]/60 hover:shadow-xl hover:shadow-black/40 flex flex-col justify-between cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#e5b869]/50 select-none min-h-[160px]"
+                  className="group relative overflow-hidden rounded-xl border border-border/80 bg-app-surface p-5 shadow-md transition-all duration-300 hover:border-gold/60 hover:bg-app-raised/40 hover:shadow-lg flex flex-col justify-between cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold/50 select-none min-h-[160px]"
                 >
                   {/* Fundo Atmosférico com Névoa Sutil */}
                   <div
-                    className="pointer-events-none absolute inset-0 bg-[url('/images/jornadas-mountain-hero.jpg')] bg-cover bg-center opacity-[0.06] mix-blend-luminosity group-hover:opacity-[0.11] transition-opacity duration-500"
-                    aria-hidden="true"
-                  />
-                  <div
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1c1814]/80 via-[#161412] to-[#12100e]"
+                    className="pointer-events-none absolute inset-0 bg-[url('/images/jornadas-mountain-hero.jpg')] bg-cover bg-center opacity-[0.04] dark:opacity-[0.08] mix-blend-luminosity group-hover:opacity-[0.08] transition-opacity duration-500"
                     aria-hidden="true"
                   />
 
@@ -954,25 +950,25 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                   <div className="relative z-10">
                     {/* Linha Superior: Nome da Série */}
                     <div className="mb-3">
-                      <h2 className="font-serif text-base sm:text-lg text-[#f0e8de] font-normal tracking-wide group-hover:text-[#e5b869] transition-colors">
+                      <h2 className="font-serif text-base sm:text-lg text-app-text font-normal tracking-wide group-hover:text-gold transition-colors">
                         {series.name}
                       </h2>
                     </div>
 
                     {/* Resumo da Série */}
-                    <p className="font-sans text-xs text-[#8f8272] leading-relaxed line-clamp-2 min-h-[34px]">
+                    <p className="font-sans text-xs text-app-text-muted leading-relaxed line-clamp-2 min-h-[34px]">
                       {series.summary}
                     </p>
                   </div>
 
                   {/* Rodapé do Card: Contador de Capítulos + Seta Indicadora */}
-                  <div className="relative z-10 pt-4 border-t border-[#382f23]/50 flex items-center justify-between mt-3 text-xs text-[#c69a50]">
-                    <div className="flex items-center gap-1.5 font-mono text-[0.72rem] text-[#c69a50]">
+                  <div className="relative z-10 pt-4 border-t border-border/50 flex items-center justify-between mt-3 text-xs text-gold">
+                    <div className="flex items-center gap-1.5 font-mono text-[0.72rem] text-gold">
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>{series.chapters.length} capítulos</span>
                     </div>
 
-                    <ArrowRight className="w-4 h-4 text-[#c69a50] transition-transform duration-200 group-hover:translate-x-1" />
+                    <ArrowRight className="w-4 h-4 text-gold transition-transform duration-200 group-hover:translate-x-1" />
                   </div>
                 </div>
               );
@@ -984,13 +980,13 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
         {/* MODAL 1: LEITURA COMPLETA DA REFLEXÃO DO CAPÍTULO DE HOJE         */}
         {/* ───────────────────────────────────────────────────────────────── */}
         <Dialog open={isHeroModalOpen} onOpenChange={setIsHeroModalOpen}>
-          <DialogContent className="max-w-xl sm:max-w-2xl border-[#382f23] bg-[#161412] text-[#f5f5f0] p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
-            <DialogHeader className="space-y-2 text-left border-b border-[#382f23]/60 pb-4 shrink-0">
-              <span className="font-mono text-[0.62rem] sm:text-[0.68rem] font-semibold tracking-[0.2em] uppercase text-[#e5b869]">
+          <DialogContent className="max-w-xl sm:max-w-2xl border-border bg-app-surface text-app-text p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
+            <DialogHeader className="space-y-2 text-left border-b border-border/60 pb-4 shrink-0">
+              <span className="font-mono text-[0.62rem] sm:text-[0.68rem] font-semibold tracking-[0.2em] uppercase text-gold">
                 CAPÍTULO DE HOJE &bull; {heroSeriesName}
               </span>
 
-              <DialogTitle className="font-serif text-xl sm:text-2xl md:text-[1.65rem] font-normal text-[#f5f5f0] leading-snug">
+              <DialogTitle className="font-serif text-xl sm:text-2xl md:text-[1.65rem] font-normal text-app-text leading-snug">
                 {heroTitle}
               </DialogTitle>
 
@@ -998,14 +994,14 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                 Texto completo da reflexão do capítulo de hoje sobre {heroReferenceText}
               </DialogDescription>
 
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700/60 bg-neutral-900/60 px-3 py-1 text-[0.72rem] text-neutral-300 w-fit mt-1">
-                <BookOpen className="h-3.5 w-3.5 text-[#e5b869]" />
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-app-raised/60 px-3 py-1 text-[0.72rem] text-app-text-muted w-fit mt-1">
+                <BookOpen className="h-3.5 w-3.5 text-gold" />
                 <span className="font-sans font-medium tracking-wide">{heroReferenceText}</span>
               </div>
             </DialogHeader>
 
             {/* Conteúdo com os Parágrafos Completos da Reflexão */}
-            <div className="my-5 overflow-y-auto pr-2 space-y-4 font-serif text-sm sm:text-base text-neutral-200/90 leading-relaxed custom-scrollbar flex-1">
+            <div className="my-5 overflow-y-auto pr-2 space-y-4 font-serif text-sm sm:text-base text-app-text/90 leading-relaxed custom-scrollbar flex-1">
               {heroParagraphs.map((para, index) => (
                 <p key={index} className="text-balance font-light leading-relaxed">
                   {para}
@@ -1014,11 +1010,11 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
             </div>
 
             {/* Rodapé com CTA para Leitura Bíblica e Fechar */}
-            <div className="pt-4 border-t border-[#382f23]/60 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
+            <div className="pt-4 border-t border-border/60 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => setIsHeroModalOpen(false)}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-[#382f23] text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-border text-app-text-muted hover:text-app-text text-xs font-medium transition-colors cursor-pointer"
               >
                 Fechar
               </button>
@@ -1026,7 +1022,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
               <Link
                 to={heroTargetLink}
                 onClick={() => setIsHeroModalOpen(false)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#e5b869] px-6 py-2.5 text-xs font-semibold text-[#121110] shadow-md hover:bg-[#d8a855] transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-2.5 text-xs font-semibold text-primary-foreground shadow-md hover:bg-gold/90 transition-all cursor-pointer"
               >
                 <span>Ler capítulo na Bíblia ({heroReferenceText})</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -1039,22 +1035,22 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
         {/* MODAL 2: EXPLORAÇÃO DOS 6 CAPÍTULOS DE UMA SÉRIE                  */}
         {/* ───────────────────────────────────────────────────────────────── */}
         <Dialog open={!!selectedSeries} onOpenChange={(open) => !open && setSelectedSeries(null)}>
-          <DialogContent className="max-w-2xl sm:max-w-3xl border-[#382f23] bg-[#161412] text-[#f5f5f0] p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
+          <DialogContent className="max-w-2xl sm:max-w-3xl border-border bg-app-surface text-app-text p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
             {selectedSeries && (
               <>
-                <DialogHeader className="space-y-2 text-left border-b border-[#382f23]/60 pb-4 shrink-0">
-                  <div className="flex items-center gap-2 text-[#e5b869]">
+                <DialogHeader className="space-y-2 text-left border-b border-border/60 pb-4 shrink-0">
+                  <div className="flex items-center gap-2 text-gold">
                     <selectedSeries.icon className="w-4 h-4 stroke-[1.5]" />
                     <span className="font-mono text-xs uppercase tracking-[0.2em] font-medium">
                       Série {selectedSeries.order} · {selectedSeries.name}
                     </span>
                   </div>
 
-                  <DialogTitle className="font-serif text-xl sm:text-2xl font-normal text-[#f5f5f0]">
+                  <DialogTitle className="font-serif text-xl sm:text-2xl font-normal text-app-text">
                     {selectedSeries.name}
                   </DialogTitle>
 
-                  <DialogDescription className="text-xs sm:text-sm text-[#9b8e7e]">
+                  <DialogDescription className="text-xs sm:text-sm text-app-text-muted">
                     {selectedSeries.summary}
                   </DialogDescription>
                 </DialogHeader>
@@ -1072,25 +1068,25 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                     return (
                       <div
                         key={ch.chapter_number}
-                        className="rounded-xl border border-[#382f23]/70 bg-[#1c1814]/80 p-4 sm:p-5 transition-all hover:border-[#c69a50]/50 hover:bg-[#201b17] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        className="rounded-xl border border-border/70 bg-app-raised/50 p-4 sm:p-5 transition-all hover:border-gold/50 hover:bg-app-raised flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                       >
                         <div className="space-y-1 max-w-md">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[0.68rem] uppercase tracking-wider text-[#e5b869]">
+                            <span className="font-mono text-[0.68rem] uppercase tracking-wider text-gold">
                               Capítulo {ch.chapter_number}
                             </span>
-                            <span className="text-neutral-500 text-xs">&bull;</span>
-                            <span className="text-xs text-[#d5c7b5] flex items-center gap-1">
-                              <BookOpen className="w-3 h-3 text-[#e5b869]" />
+                            <span className="text-app-text-muted text-xs">&bull;</span>
+                            <span className="text-xs text-app-text-muted flex items-center gap-1">
+                              <BookOpen className="w-3 h-3 text-gold" />
                               {refText}
                             </span>
                           </div>
 
-                          <h4 className="font-serif text-base text-[#f5f5f0] font-normal">
+                          <h4 className="font-serif text-base text-app-text font-normal">
                             {ch.title}
                           </h4>
 
-                          <p className="text-xs text-[#8f8272] line-clamp-2 leading-relaxed font-sans">
+                          <p className="text-xs text-app-text-muted line-clamp-2 leading-relaxed font-sans">
                             {ch.intro_text}
                           </p>
                         </div>
@@ -1108,7 +1104,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                                 targetLink,
                               });
                             }}
-                            className="px-3.5 py-1.5 rounded-full border border-[#382f23] hover:border-[#e5b869]/50 text-[0.72rem] text-[#d5c7b5] hover:text-[#e5b869] transition-colors cursor-pointer"
+                            className="px-3.5 py-1.5 rounded-full border border-border hover:border-gold/50 text-[0.72rem] text-app-text-muted hover:text-gold transition-colors cursor-pointer"
                           >
                             Reflexão
                           </button>
@@ -1116,7 +1112,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                           <Link
                             to={targetLink}
                             onClick={() => setSelectedSeries(null)}
-                            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#e5b869] hover:bg-[#d8a855] text-[#161412] text-[0.72rem] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gold hover:bg-gold/90 text-primary-foreground text-[0.72rem] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
                           >
                             <span>Ler</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -1127,11 +1123,11 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                   })}
                 </div>
 
-                <div className="pt-3 border-t border-[#382f23]/60 flex justify-end shrink-0">
+                <div className="pt-3 border-t border-border/60 flex justify-end shrink-0">
                   <button
                     type="button"
                     onClick={() => setSelectedSeries(null)}
-                    className="px-5 py-2 rounded-full border border-[#382f23] text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-colors cursor-pointer"
+                    className="px-5 py-2 rounded-full border border-border text-app-text-muted hover:text-app-text text-xs font-medium transition-colors cursor-pointer"
                   >
                     Fechar
                   </button>
@@ -1148,15 +1144,15 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
           open={!!selectedChapterForReading}
           onOpenChange={(open) => !open && setSelectedChapterForReading(null)}
         >
-          <DialogContent className="max-w-xl sm:max-w-2xl border-[#382f23] bg-[#161412] text-[#f5f5f0] p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
+          <DialogContent className="max-w-xl sm:max-w-2xl border-border bg-app-surface text-app-text p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
             {selectedChapterForReading && (
               <>
-                <DialogHeader className="space-y-2 text-left border-b border-[#382f23]/60 pb-4 shrink-0">
-                  <span className="font-mono text-[0.62rem] sm:text-[0.68rem] font-semibold tracking-[0.2em] uppercase text-[#e5b869]">
+                <DialogHeader className="space-y-2 text-left border-b border-border/60 pb-4 shrink-0">
+                  <span className="font-mono text-[0.62rem] sm:text-[0.68rem] font-semibold tracking-[0.2em] uppercase text-gold">
                     {selectedChapterForReading.seriesName} &bull; Capítulo {selectedChapterForReading.chapterNumber}
                   </span>
 
-                  <DialogTitle className="font-serif text-xl sm:text-2xl font-normal text-[#f5f5f0] leading-snug">
+                  <DialogTitle className="font-serif text-xl sm:text-2xl font-normal text-app-text leading-snug">
                     {selectedChapterForReading.title}
                   </DialogTitle>
 
@@ -1164,15 +1160,15 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                     Reflexão sobre {selectedChapterForReading.referenceText}
                   </DialogDescription>
 
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700/60 bg-neutral-900/60 px-3 py-1 text-[0.72rem] text-neutral-300 w-fit mt-1">
-                    <BookOpen className="h-3.5 w-3.5 text-[#e5b869]" />
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-app-raised/60 px-3 py-1 text-[0.72rem] text-app-text-muted w-fit mt-1">
+                    <BookOpen className="h-3.5 w-3.5 text-gold" />
                     <span className="font-sans font-medium tracking-wide">
                       {selectedChapterForReading.referenceText}
                     </span>
                   </div>
                 </DialogHeader>
 
-                <div className="my-5 overflow-y-auto pr-2 space-y-4 font-serif text-sm sm:text-base text-neutral-200/90 leading-relaxed custom-scrollbar flex-1">
+                <div className="my-5 overflow-y-auto pr-2 space-y-4 font-serif text-sm sm:text-base text-app-text/90 leading-relaxed custom-scrollbar flex-1">
                   {selectedChapterForReading.introText.split("\n\n").filter(Boolean).map((p, idx) => (
                     <p key={idx} className="font-light leading-relaxed">
                       {p}
@@ -1180,11 +1176,11 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                   ))}
                 </div>
 
-                <div className="pt-4 border-t border-[#382f23]/60 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
+                <div className="pt-4 border-t border-border/60 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
                   <button
                     type="button"
                     onClick={() => setSelectedChapterForReading(null)}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-[#382f23] text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-colors cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-border text-app-text-muted hover:text-app-text text-xs font-medium transition-colors cursor-pointer"
                   >
                     Fechar
                   </button>
@@ -1195,7 +1191,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
                       setSelectedChapterForReading(null);
                       setSelectedSeries(null);
                     }}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#e5b869] px-6 py-2.5 text-xs font-semibold text-[#121110] shadow-md hover:bg-[#d8a855] transition-all cursor-pointer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-2.5 text-xs font-semibold text-primary-foreground shadow-md hover:bg-gold/90 transition-all cursor-pointer"
                   >
                     <span>Ler capítulo na Bíblia ({selectedChapterForReading.referenceText})</span>
                     <ArrowRight className="h-3.5 w-3.5" />

@@ -11,17 +11,17 @@ export default function HarpaHeroHeader({}: HarpaHeroHeaderProps = {}) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Coluna Esquerda: Textos de Apresentação */}
         <div className="lg:col-span-7 z-10 space-y-4">
-          <p className="font-mono text-[0.68rem] sm:text-xs uppercase tracking-[0.22em] text-[#e5b869] font-medium">
+          <p className="font-mono text-[0.68rem] sm:text-xs uppercase tracking-[0.22em] text-gold font-medium">
             HARPA CRISTÃ
           </p>
 
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-normal tracking-tight text-[#f4efea] leading-[1.12]">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-normal tracking-tight text-app-text leading-[1.12]">
             Hinos que acompanham
             <br />
             a caminhada.
           </h1>
 
-          <p className="font-sans text-xs sm:text-sm text-[#9b8e7e] leading-relaxed max-w-lg">
+          <p className="font-sans text-xs sm:text-sm text-app-text-muted leading-relaxed max-w-lg">
             Cante, ouça e guarde os hinos da Harpa Cristã. Uma coletânea de louvores que
             fortalecem a fé e renovam o coração todos os dias.
           </p>
@@ -30,7 +30,7 @@ export default function HarpaHeroHeader({}: HarpaHeroHeaderProps = {}) {
         {/* Coluna Direita: Arte Sacra Geométrica com Cruz Pura Luminosa e Arcos Celestiais */}
         <div className="lg:col-span-5 relative flex items-center justify-center min-h-[240px] select-none pointer-events-none">
           {/* Brilho Dourado Suave e Difuso de Fundo */}
-          <div className="absolute w-60 h-60 rounded-full bg-[radial-gradient(circle,rgba(229,184,105,0.12)_0%,rgba(180,130,40,0.04)_50%,transparent_70%)] blur-[35px] mix-blend-screen" />
+          <div className="absolute w-60 h-60 rounded-full bg-gold/10 blur-[35px]" />
 
           {/* SVG com Cruz Pura Slender e Arcos Concêntricos */}
           <svg
