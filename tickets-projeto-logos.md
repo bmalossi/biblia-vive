@@ -120,9 +120,9 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#29](https://github.com/bmalossi/biblia-vive/issues/29)
 
-- [ ] Serviço `jevHomileticService` construído com suporte às primitivas `Noul`, `Choice` e validação de payload estrito (sem as notas do Memorial).
-- [ ] Endpoint de borda ou Vercel function autenticada executando a chamada segura à API JEV com chave protegida.
-- [ ] Botão `[ 🏛️ Testar Ortodoxia ]` no Estúdio Homilético que recupera alinhamento histórico via RAG e avaliação JEV.
-- [ ] Checagem automática disparada ao clicar em `[ 📖 Pregar Agora ]`.
-- [ ] Card solene de Alerta de Fidelidade Doutrinária baseado em Gálatas 1:8 exibido quando confiança de desvio $\ge 0.85$, com opções pastorais reflexivas (sem bloqueio compulsório autoritário).
-- [ ] Testes de integração validando construção do payload, parsing das respostas JEV e renderização do alerta doutrinário.
+- [x] Serviço `jevHomileticService` construído com suporte às primitivas `Noul`, `Choice` e validação de payload estrito (sem as notas do Memorial).
+- [x] Endpoint de borda ou Vercel function autenticada executando a chamada segura à API JEV com chave protegida.
+- [x] Botão `[ 🏛️ Testar Ortodoxia ]` no Estúdio Homilético que recupera alinhamento histórico via RAG e avaliação JEV.
+- [x] Checagem automática disparada ao clicar em `[ 📖 Pregar Agora ]`.
+- [x] Card solene de Alerta de Fidelidade Doutrinária baseado em Gálatas 1:8 exibido quando confiança de desvio $\ge 0.85$, com opções pastorais reflexivas (sem bloqueio compulsório autoritário).
+- [x] Testes de integração validando construção do payload, parsing das respostas JEV e renderização do alerta doutrinário.

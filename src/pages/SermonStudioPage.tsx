@@ -28,6 +28,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import {
+  auditSermonOrthodoxy,
+  type HomileticAuditResult,
+} from "@/lib/jevHomileticService";
 
 const DESFECHO_CONFIG: Record<
   DesfechoTipo,
@@ -109,6 +113,10 @@ export default function SermonStudioPage() {
 
   // Histórico de Ministração (Prevenção de Repetição)
   const [preachingLogs, setPreachingLogs] = useState<PreachingLog[]>([]);
+
+  // Guardião do Evangelho / Gálatas 1:8
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditResult, setAuditResult] = useState<HomileticAuditResult | null>(null);
 
   const isBloco2Unlocked =
     isUnlocked &&
@@ -308,6 +316,64 @@ export default function SermonStudioPage() {
     }
   };
 
+  const handleTestOrthodoxy = async () => {
+    if (!sermon) return;
+    setIsAuditing(true);
+    try {
+      const result = await auditSermonOrthodoxy(sermon);
+      setAuditResult(result);
+      if (
+        result.theological_deviation !== "Fiel_Ao_Texto" &&
+        result.confidence >= 0.85
+      ) {
+        toast.warning("Alerta do Guardião do Evangelho: Possível desvio doutrinário detectado.");
+      } else {
+        toast.success("Esboço fiel ao texto bíblico e centrado na graça!");
+      }
+    } catch (err) {
+      console.error("[Estudio] Erro ao testar ortodoxia:", err);
+      toast.error("Erro ao avaliar ortodoxia do sermão.");
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const handlePreachNow = async () => {
+    if (!sermon) return;
+
+    // Se já foi realizada auditoria e há desvio com alta confiança
+    if (
+      auditResult &&
+      auditResult.theological_deviation !== "Fiel_Ao_Texto" &&
+      auditResult.confidence >= 0.85
+    ) {
+      toast.warning("Considere o Alerta de Gálatas 1:8 antes de subir ao altar.");
+      return;
+    }
+
+    // Se ainda não foi feita auditoria, realiza checagem automática
+    if (!auditResult) {
+      setIsAuditing(true);
+      try {
+        const result = await auditSermonOrthodoxy(sermon);
+        setAuditResult(result);
+        if (
+          result.theological_deviation !== "Fiel_Ao_Texto" &&
+          result.confidence >= 0.85
+        ) {
+          toast.warning("Alerta de Fidelidade Doutrinária (Gálatas 1:8) detectado.");
+          return;
+        }
+      } catch (err) {
+        console.warn("[Estudio] Checagem automática ignorada:", err);
+      } finally {
+        setIsAuditing(false);
+      }
+    }
+
+    navigate(`/pulpito/${sermon.id}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-app-bg flex items-center justify-center">
@@ -364,8 +430,20 @@ export default function SermonStudioPage() {
 
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => navigate(`/pulpito/${sermon.id}`)}
-              className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95"
+              type="button"
+              data-testid="test-orthodoxy-btn"
+              onClick={handleTestOrthodoxy}
+              disabled={isAuditing}
+              variant="outline"
+              className="border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700 text-gold text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <span>🏛️</span>
+              <span>{isAuditing ? "Avaliando..." : "Testar Ortodoxia"}</span>
+            </Button>
+
+            <Button
+              onClick={handlePreachNow}
+              className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Pregar Agora</span>
@@ -376,6 +454,98 @@ export default function SermonStudioPage() {
 
       {/* Main Studio Body */}
       <main className="max-w-4xl mx-auto w-full px-4 pt-6 space-y-6 flex-1">
+        {/* Confirmação de Ortodoxia Fiel */}
+        {auditResult && auditResult.theological_deviation === "Fiel_Ao_Texto" && (
+          <div
+            data-testid="orthodoxy-faithful-badge"
+            className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 flex items-start gap-3 shadow-xs animate-in fade-in duration-200"
+          >
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <span className="text-xs font-mono uppercase tracking-wide text-emerald-400 font-semibold block">
+                Fiel ao Texto & Centrado na Graça ({Math.round(auditResult.confidence * 100)}%)
+              </span>
+              <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                {auditResult.reasoning}
+              </p>
+              {auditResult.historical_alignment && (
+                <p className="text-[0.72rem] text-zinc-400 font-mono italic">
+                  🏛️ {auditResult.historical_alignment}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Card Solene de Alerta de Fidelidade Doutrinária (Gálatas 1:8) */}
+        {auditResult &&
+          auditResult.theological_deviation !== "Fiel_Ao_Texto" &&
+          auditResult.confidence >= 0.85 && (
+            <div
+              data-testid="galatas-alert-card"
+              className="rounded-2xl border-2 border-red-500/60 bg-red-950/40 p-5 space-y-4 shadow-xl animate-in fade-in duration-200"
+            >
+              <div className="flex items-center justify-between gap-3 border-b border-red-500/30 pb-3">
+                <div className="flex items-center gap-2 text-red-400 font-bold text-sm font-serif">
+                  <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
+                  <span>Guardião do Evangelho — Gálatas 1:8</span>
+                </div>
+                <span className="text-[0.7rem] font-mono text-red-400 bg-red-500/20 border border-red-500/40 px-2.5 py-0.5 rounded-full uppercase font-semibold">
+                  Alerta Doutrinário Pastoral
+                </span>
+              </div>
+
+              <blockquote className="border-l-2 border-red-500/60 pl-3 italic text-xs text-red-200/90 font-serif">
+                "Mas, ainda que nós mesmos ou um anjo do céu vos anuncie outro evangelho além do que já vos tenho anunciado, seja anátema."
+                <span className="block not-italic font-mono text-[0.68rem] text-red-400 mt-1">— Gálatas 1:8</span>
+              </blockquote>
+
+              <div className="space-y-2 text-xs text-zinc-200 font-sans">
+                <div className="inline-flex items-center gap-2 font-mono font-semibold text-red-300 bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-800">
+                  <span>Desvio Detectado:</span>
+                  <span className="text-red-400">
+                    {auditResult.theological_deviation === "Teologia_Prosperidade" && "Teologia da Prosperidade"}
+                    {auditResult.theological_deviation === "Humanismo_SelfHelp" && "Humanismo / Autoajuda"}
+                    {auditResult.theological_deviation === "Moralismo_Sem_Graca" && "Moralismo sem Graça"}
+                  </span>
+                  <span className="text-zinc-400 text-[0.7rem]">
+                    (Confiança: {Math.round(auditResult.confidence * 100)}%)
+                  </span>
+                </div>
+
+                <p className="leading-relaxed text-zinc-300">
+                  {auditResult.reasoning}
+                </p>
+
+                {auditResult.historical_alignment && (
+                  <p className="text-[0.72rem] text-zinc-400 font-mono italic">
+                    🏛️ {auditResult.historical_alignment}
+                  </p>
+                )}
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center justify-end gap-3 border-t border-red-500/30">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAuditResult(null)}
+                  className="text-xs border-red-500/40 text-red-200 hover:bg-red-950/50"
+                >
+                  ✍️ Ajustar Mensagem no Gabinete
+                </Button>
+                <Button
+                  type="button"
+                  data-testid="proceed-to-pulpit-anyway"
+                  onClick={() => navigate(`/pulpito/${sermon.id}`)}
+                  className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold px-4 py-1.5 rounded-xl border border-zinc-600 cursor-pointer"
+                >
+                  🕊️ Prosseguir Consciente ao Púlpito
+                </Button>
+              </div>
+            </div>
+          )}
+
         {/* Alerta Preventivo de Ministração Anterior / Prevenção de Repetição */}
         {preachingLogs.length > 0 && (
           <div
