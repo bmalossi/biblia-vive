@@ -43,25 +43,25 @@ const DESFECHO_CONFIG: Record<
     label: "Consolação",
     desc: "Bálsamo, cura e paz pela certeza da Graça",
     icon: "🕊️",
-    classes: "border-blue-500/40 text-blue-400 bg-blue-500/10",
+    classes: "border-sky-500/40 text-sky-600 dark:text-sky-400 bg-sky-500/10",
   },
   confronto: {
     label: "Confronto",
     desc: "Arrependimento, renúncia e santidade de vida",
     icon: "⚡",
-    classes: "border-amber-500/40 text-amber-400 bg-amber-500/10",
+    classes: "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10",
   },
   conversao: {
     label: "Conversão",
     desc: "Entrega total a Cristo e salvação",
     icon: "✝️",
-    classes: "border-emerald-500/40 text-emerald-400 bg-emerald-500/10",
+    classes: "border-gold/40 text-gold bg-gold/10",
   },
   oracao: {
     label: "Oração",
     desc: "Clamor, consagração e busca da presença",
     icon: "🙏",
-    classes: "border-purple-500/40 text-purple-400 bg-purple-500/10",
+    classes: "border-purple-500/40 text-purple-600 dark:text-purple-400 bg-purple-500/10",
   },
 };
 
@@ -79,7 +79,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
       return (
         <span
           key={index}
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
         >
           💡 Ilustração
         </span>
@@ -89,7 +89,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
       return (
         <span
           key={index}
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-sky-500/15 text-sky-600 dark:text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
         >
           🤫 Pausa
         </span>
@@ -99,7 +99,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
       return (
         <span
           key={index}
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
         >
           ⚡ Tom
         </span>
@@ -113,11 +113,11 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
 function VoiceTonePills({ onInsert }: { onInsert: (marker: string) => void }) {
   return (
     <div className="flex items-center gap-1.5 pt-1 text-[0.68rem] font-mono select-none">
-      <span className="text-app-text-muted/60 text-[0.65rem]">Tom de voz:</span>
+      <span className="text-app-text-muted text-[0.65rem]">Tom de voz:</span>
       <button
         type="button"
         onClick={() => onInsert("[Ilustração]")}
-        className="px-2 py-0.5 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition-colors cursor-pointer"
+        className="px-2 py-0.5 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-amber-300 border border-amber-500/30 transition-colors cursor-pointer"
         title="Inserir marcador de Ilustração"
       >
         💡 Ilustração
@@ -125,7 +125,7 @@ function VoiceTonePills({ onInsert }: { onInsert: (marker: string) => void }) {
       <button
         type="button"
         onClick={() => onInsert("[Pausa]")}
-        className="px-2 py-0.5 rounded-md bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 transition-colors cursor-pointer"
+        className="px-2 py-0.5 rounded-md bg-sky-500/15 hover:bg-sky-500/25 text-sky-600 dark:text-sky-300 border border-sky-500/30 transition-colors cursor-pointer"
         title="Inserir pausa silenciosa"
       >
         🤫 Pausa
@@ -133,7 +133,7 @@ function VoiceTonePills({ onInsert }: { onInsert: (marker: string) => void }) {
       <button
         type="button"
         onClick={() => onInsert("[Tom/Apelo]")}
-        className="px-2 py-0.5 rounded-md bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 transition-colors cursor-pointer"
+        className="px-2 py-0.5 rounded-md bg-purple-500/15 hover:bg-purple-500/25 text-purple-600 dark:text-purple-300 border border-purple-500/30 transition-colors cursor-pointer"
         title="Inserir inflexão de tom ou apelo"
       >
         ⚡ Tom
@@ -648,9 +648,9 @@ export default function SermonStudioPage() {
           {/* Lado Esquerdo: Voltar, Título & Passagem Bíblica Base */}
           <div className="flex items-center gap-3 min-w-0">
             <Link
-              to="/memorial"
-              className="p-2 rounded-xl hover:bg-app-raised text-app-text-muted hover:text-app-text transition-colors shrink-0"
-              title="Voltar ao Memorial"
+              to="/estudio"
+              className="p-2 rounded-xl hover:bg-app-raised text-app-text-muted hover:text-gold transition-colors shrink-0"
+              title="Voltar ao Estúdio"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
@@ -663,21 +663,21 @@ export default function SermonStudioPage() {
                 {/* Indicador de Auto-save no Cabeçalho */}
                 <div
                   data-testid="autosave-indicator"
-                  className="inline-flex items-center gap-1 text-[0.68rem] font-mono text-app-text-muted px-2 py-0.5 rounded-md bg-app-raised/80 border border-border/60 select-none"
+                  className="inline-flex items-center gap-1.5 text-[0.68rem] font-mono text-app-text-muted px-2.5 py-0.5 rounded-full bg-app-raised border border-border select-none"
                 >
                   {saveStatus === "saving" ? (
-                    <span className="flex items-center gap-1 text-amber-400 animate-pulse">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span className="flex items-center gap-1 text-amber-500 animate-pulse">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                       Salvando...
                     </span>
                   ) : saveStatus === "error" ? (
-                    <span className="flex items-center gap-1 text-red-400">
-                      <ShieldAlert className="w-3 h-3 text-red-400" />
+                    <span className="flex items-center gap-1 text-red-500">
+                      <ShieldAlert className="w-3 h-3 text-red-500" />
                       Erro ao salvar
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-emerald-400/90 font-medium">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <span className="flex items-center gap-1 text-gold font-medium">
+                      <CheckCircle2 className="w-3 h-3 text-gold" />
                       Salvo
                     </span>
                   )}
@@ -692,7 +692,7 @@ export default function SermonStudioPage() {
                 {/* 📖 Campo Dedicado: Passagem Bíblica Base */}
                 <div
                   data-testid="base-scripture-field"
-                  className="inline-flex items-center gap-1.5 text-xs bg-zinc-900/90 border border-gold/30 hover:border-gold/60 px-2.5 py-0.5 rounded-full transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs bg-app-raised border border-gold/30 hover:border-gold/60 px-3 py-1 rounded-full transition-colors shadow-xs"
                 >
                   <BookOpen className="w-3 h-3 text-gold shrink-0" />
                   {isEditingPassage ? (
@@ -702,27 +702,27 @@ export default function SermonStudioPage() {
                         value={passageBookInput}
                         onChange={(e) => setPassageBookInput(e.target.value)}
                         placeholder="Livro"
-                        className="w-20 bg-zinc-800 text-[0.72rem] text-zinc-100 px-1.5 py-0.5 rounded border border-zinc-700 focus:outline-none focus:border-gold"
+                        className="w-20 bg-app-surface text-[0.72rem] text-app-text px-1.5 py-0.5 rounded border border-border focus:outline-none focus:border-gold"
                       />
                       <input
                         type="number"
                         value={passageChapterInput}
                         onChange={(e) => setPassageChapterInput(e.target.value)}
                         placeholder="Cap"
-                        className="w-10 bg-zinc-800 text-[0.72rem] text-zinc-100 px-1 py-0.5 rounded border border-zinc-700 focus:outline-none focus:border-gold"
+                        className="w-10 bg-app-surface text-[0.72rem] text-app-text px-1 py-0.5 rounded border border-border focus:outline-none focus:border-gold"
                       />
-                      <span className="text-zinc-500">:</span>
+                      <span className="text-app-text-muted">:</span>
                       <input
                         type="number"
                         value={passageVerseInput}
                         onChange={(e) => setPassageVerseInput(e.target.value)}
                         placeholder="Ver"
-                        className="w-10 bg-zinc-800 text-[0.72rem] text-zinc-100 px-1 py-0.5 rounded border border-zinc-700 focus:outline-none focus:border-gold"
+                        className="w-10 bg-app-surface text-[0.72rem] text-app-text px-1 py-0.5 rounded border border-border focus:outline-none focus:border-gold"
                       />
                       <button
                         type="button"
                         onClick={handleSavePassage}
-                        className="p-1 rounded bg-gold text-primary-foreground hover:bg-gold/90"
+                        className="p-1 rounded bg-gold text-primary-foreground hover:bg-gold/90 cursor-pointer"
                         title="Salvar Passagem"
                       >
                         <Check className="w-3 h-3" />
@@ -732,11 +732,11 @@ export default function SermonStudioPage() {
                     <button
                       type="button"
                       onClick={() => setIsEditingPassage(true)}
-                      className="font-mono text-[0.72rem] text-gold hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                      className="font-mono text-[0.72rem] text-gold hover:underline flex items-center gap-1.5 cursor-pointer font-medium"
                       title="Editar passagem bíblica base"
                     >
                       <span>{currentPassageDisplay}</span>
-                      <Edit2 className="w-2.5 h-2.5 text-zinc-400 opacity-60 hover:opacity-100" />
+                      <Edit2 className="w-2.5 h-2.5 text-app-text-muted opacity-70 hover:opacity-100" />
                     </button>
                   )}
                 </div>
@@ -750,37 +750,37 @@ export default function SermonStudioPage() {
             {isAuditing ? (
               <span
                 data-testid="jev-status-badge"
-                className="inline-flex items-center gap-1 text-[0.68rem] font-mono px-2 py-1 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-300 animate-pulse select-none"
+                className="inline-flex items-center gap-1.5 text-[0.68rem] font-mono px-2.5 py-1 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-300 animate-pulse select-none font-semibold"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                 JEV: Auditando...
               </span>
             ) : auditResult ? (
               auditResult.theological_deviation === "Fiel_Ao_Texto" ? (
                 <span
                   data-testid="jev-status-badge"
-                  className="inline-flex items-center gap-1 text-[0.68rem] font-mono px-2 py-1 rounded-lg border border-emerald-500/40 bg-emerald-500/15 text-emerald-400 font-semibold select-none shadow-xs"
+                  className="inline-flex items-center gap-1.5 text-[0.68rem] font-mono px-2.5 py-1 rounded-lg border border-gold/40 bg-gold/10 text-gold font-semibold select-none shadow-xs"
                   title={auditResult.reasoning}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-gold" />
                   JEV: Fiel ({Math.round(auditResult.confidence * 100)}%)
                 </span>
               ) : (
                 <span
                   data-testid="jev-status-badge"
-                  className="inline-flex items-center gap-1 text-[0.68rem] font-mono px-2 py-1 rounded-lg border border-red-500/50 bg-red-950/60 text-red-300 font-semibold select-none shadow-xs"
+                  className="inline-flex items-center gap-1.5 text-[0.68rem] font-mono px-2.5 py-1 rounded-lg border border-red-500/40 bg-red-500/10 text-red-500 font-semibold select-none shadow-xs"
                   title={auditResult.reasoning}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                   JEV: Alerta ⚠️
                 </span>
               )
             ) : (
               <span
                 data-testid="jev-status-badge"
-                className="hidden md:inline-flex items-center gap-1 text-[0.68rem] font-mono px-2 py-1 rounded-lg border border-border bg-app-raised/60 text-app-text-muted select-none"
+                className="hidden md:inline-flex items-center gap-1.5 text-[0.68rem] font-mono px-2.5 py-1 rounded-lg border border-border bg-app-raised text-app-text-muted select-none"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-app-text-muted/60" />
                 JEV: Pendente
               </span>
             )}
@@ -791,7 +791,7 @@ export default function SermonStudioPage() {
               onClick={handleTestOrthodoxy}
               disabled={isAuditing}
               variant="outline"
-              className="border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700 text-gold text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+              className="border-border bg-app-raised hover:bg-app-surface text-gold hover:text-gold text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
             >
               <span>🏛️</span>
               <span>{isAuditing ? "Avaliando..." : "Testar Ortodoxia"}</span>
@@ -799,7 +799,7 @@ export default function SermonStudioPage() {
 
             <Button
               onClick={handlePreachNow}
-              className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+              className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Pregar Agora</span>
@@ -814,18 +814,18 @@ export default function SermonStudioPage() {
         {auditResult && auditResult.theological_deviation === "Fiel_Ao_Texto" && (
           <div
             data-testid="orthodoxy-faithful-badge"
-            className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 flex items-start gap-3 shadow-xs animate-in fade-in duration-200"
+            className="rounded-2xl border border-gold/40 bg-gold/5 p-4 flex items-start gap-3 shadow-xs animate-in fade-in duration-200"
           >
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <span className="text-xs font-mono uppercase tracking-wide text-emerald-400 font-semibold block">
+              <span className="text-xs font-mono uppercase tracking-wide text-gold font-semibold block">
                 Fiel ao Texto & Centrado na Graça ({Math.round(auditResult.confidence * 100)}%)
               </span>
-              <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+              <p className="text-xs text-app-text font-sans leading-relaxed">
                 {auditResult.reasoning}
               </p>
               {auditResult.historical_alignment && (
-                <p className="text-[0.72rem] text-zinc-400 font-mono italic">
+                <p className="text-[0.72rem] text-app-text-muted font-mono italic">
                   🏛️ {auditResult.historical_alignment}
                 </p>
               )}
@@ -839,54 +839,54 @@ export default function SermonStudioPage() {
           auditResult.confidence >= 0.85 && (
             <div
               data-testid="galatas-alert-card"
-              className="rounded-2xl border-2 border-red-500/60 bg-red-950/40 p-5 space-y-4 shadow-xl animate-in fade-in duration-200"
+              className="rounded-2xl border-2 border-red-500/40 bg-red-500/5 p-5 space-y-4 shadow-sm animate-in fade-in duration-200"
             >
-              <div className="flex items-center justify-between gap-3 border-b border-red-500/30 pb-3">
-                <div className="flex items-center gap-2 text-red-400 font-bold text-sm font-serif">
+              <div className="flex items-center justify-between gap-3 border-b border-red-500/20 pb-3">
+                <div className="flex items-center gap-2 text-red-500 font-bold text-sm font-serif">
                   <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
                   <span>Guardião do Evangelho — Gálatas 1:8</span>
                 </div>
-                <span className="text-[0.7rem] font-mono text-red-400 bg-red-500/20 border border-red-500/40 px-2.5 py-0.5 rounded-full uppercase font-semibold">
+                <span className="text-[0.7rem] font-mono text-red-500 bg-red-500/10 border border-red-500/30 px-2.5 py-0.5 rounded-full uppercase font-semibold">
                   Alerta Doutrinário Pastoral
                 </span>
               </div>
 
-              <blockquote className="border-l-2 border-red-500/60 pl-3 italic text-xs text-red-200/90 font-serif">
+              <blockquote className="border-l-2 border-red-500/50 pl-3 italic text-xs text-red-600 dark:text-red-300 font-serif">
                 "Mas, ainda que nós mesmos ou um anjo do céu vos anuncie outro evangelho além do que já vos tenho anunciado, seja anátema."
-                <span className="block not-italic font-mono text-[0.68rem] text-red-400 mt-1">— Gálatas 1:8</span>
+                <span className="block not-italic font-mono text-[0.68rem] text-red-500 mt-1">— Gálatas 1:8</span>
               </blockquote>
 
-              <div className="space-y-2 text-xs text-zinc-200 font-sans">
-                <div className="inline-flex items-center gap-2 font-mono font-semibold text-red-300 bg-red-950/60 px-2.5 py-1 rounded-lg border border-red-800">
+              <div className="space-y-2 text-xs text-app-text font-sans">
+                <div className="inline-flex items-center gap-2 font-mono font-semibold text-red-600 dark:text-red-300 bg-red-500/10 px-2.5 py-1 rounded-lg border border-red-500/30">
                   <span>Desvio Detectado:</span>
-                  <span className="text-red-400">
+                  <span className="text-red-600 dark:text-red-400 font-bold">
                     {auditResult.theological_deviation === "Teologia_Prosperidade" && "Teologia da Prosperidade"}
                     {auditResult.theological_deviation === "Humanismo_SelfHelp" && "Humanismo / Autoajuda"}
                     {auditResult.theological_deviation === "Moralismo_Sem_Graca" && "Moralismo sem Graça"}
                   </span>
-                  <span className="text-zinc-400 text-[0.7rem]">
+                  <span className="text-app-text-muted text-[0.7rem]">
                     (Confiança: {Math.round(auditResult.confidence * 100)}%)
                   </span>
                 </div>
 
-                <p className="leading-relaxed text-zinc-300">
+                <p className="leading-relaxed text-app-text">
                   {auditResult.reasoning}
                 </p>
 
                 {auditResult.historical_alignment && (
-                  <p className="text-[0.72rem] text-zinc-400 font-mono italic">
+                  <p className="text-[0.72rem] text-app-text-muted font-mono italic">
                     🏛️ {auditResult.historical_alignment}
                   </p>
                 )}
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center justify-end gap-3 border-t border-red-500/30">
+              <div className="pt-2 flex flex-wrap items-center justify-end gap-3 border-t border-red-500/20">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setAuditResult(null)}
-                  className="text-xs border-red-500/40 text-red-200 hover:bg-red-950/50"
+                  className="text-xs border-red-500/30 text-red-600 dark:text-red-300 hover:bg-red-500/10"
                 >
                   ✍️ Ajustar Mensagem no Gabinete
                 </Button>
@@ -894,7 +894,7 @@ export default function SermonStudioPage() {
                   type="button"
                   data-testid="proceed-to-pulpit-anyway"
                   onClick={() => navigate(`/pulpito/${sermon.id}`)}
-                  className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold px-4 py-1.5 rounded-xl border border-zinc-600 cursor-pointer"
+                  className="bg-app-raised hover:bg-app-surface text-app-text text-xs font-semibold px-4 py-1.5 rounded-xl border border-border cursor-pointer shadow-xs"
                 >
                   🕊️ Prosseguir Consciente ao Púlpito
                 </Button>
@@ -906,24 +906,24 @@ export default function SermonStudioPage() {
         {preachingLogs.length > 0 && (
           <div
             data-testid="preaching-repetition-alert"
-            className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 space-y-2 shadow-xs animate-in fade-in duration-200"
+            className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2 shadow-xs animate-in fade-in duration-200"
           >
-            <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs font-mono uppercase tracking-wide">
-              <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-xs font-mono uppercase tracking-wide">
+              <ShieldAlert className="w-4 h-4 text-amber-500 shrink-0" />
               <span>Atenção Pastoral — Mensagem Já Ministrada Nesta Comunidade</span>
             </div>
-            <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+            <p className="text-xs text-app-text leading-relaxed font-sans">
               Este sermão já possui histórico de pregação registrado. Verifique as comunidades para prevenir repetição involuntária da mesma mensagem:
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
               {preachingLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="inline-flex items-center gap-1.5 text-xs bg-zinc-900/80 border border-amber-500/30 text-zinc-200 px-3 py-1 rounded-lg font-mono"
+                  className="inline-flex items-center gap-1.5 text-xs bg-app-surface border border-amber-500/30 text-app-text px-3 py-1 rounded-lg font-mono shadow-xs"
                 >
-                  <span className="text-amber-400 font-semibold">{log.churchName}</span>
-                  <span className="text-zinc-400">({log.city})</span>
-                  <span className="text-zinc-500 text-[0.7rem]">· {log.preachedAt}</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-semibold">{log.churchName}</span>
+                  <span className="text-app-text-muted">({log.city})</span>
+                  <span className="text-app-text-muted/70 text-[0.7rem]">· {log.preachedAt}</span>
                 </div>
               ))}
             </div>
@@ -931,8 +931,8 @@ export default function SermonStudioPage() {
         )}
 
         {/* ── SELECTOR DE MODO DE VISUALIZAÇÃO (Construção vs Visão Consolidada) ── */}
-        <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-3 flex-wrap">
-          <div className="flex items-center p-1 bg-zinc-900/80 border border-zinc-800 rounded-xl">
+        <div className="flex items-center justify-between gap-3 border-b border-border pb-3 flex-wrap">
+          <div className="flex items-center p-1 bg-app-raised border border-border rounded-xl">
             <button
               type="button"
               data-testid="view-mode-construcao"
@@ -940,8 +940,8 @@ export default function SermonStudioPage() {
               className={cn(
                 "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer",
                 studioViewMode === "construcao"
-                  ? "bg-zinc-800 text-gold shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-app-surface text-gold shadow-xs font-bold border border-gold/20"
+                  : "text-app-text-muted hover:text-app-text"
               )}
             >
               <span>🛠️</span>
@@ -954,8 +954,8 @@ export default function SermonStudioPage() {
               className={cn(
                 "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer",
                 studioViewMode === "consolidada"
-                  ? "bg-zinc-800 text-gold shadow-sm font-bold"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-app-surface text-gold shadow-xs font-bold border border-gold/20"
+                  : "text-app-text-muted hover:text-app-text"
               )}
             >
               <span>📜</span>
@@ -974,11 +974,11 @@ export default function SermonStudioPage() {
         {studioViewMode === "consolidada" && (
           <div
             data-testid="consolidated-sermon-view"
-            className="space-y-6 bg-app-surface/60 rounded-2xl border border-border p-6 shadow-sm animate-in fade-in duration-200"
+            className="space-y-6 bg-app-surface rounded-2xl border border-border p-6 shadow-sm animate-in fade-in duration-200"
           >
             {/* 0. Passagem Bíblica & Chama Inicial */}
-            <div className="border-l-2 border-amber-500/60 pl-4 py-1 space-y-1.5">
-              <span className="text-[0.68rem] font-mono uppercase tracking-wider text-amber-400 font-semibold block">
+            <div className="border-l-2 border-gold pl-4 py-1 space-y-1.5">
+              <span className="text-[0.68rem] font-mono uppercase tracking-wider text-gold font-semibold block">
                 Passagem Bíblica & Chama Inicial
               </span>
               <h3 className="text-base font-serif font-bold text-app-text">
@@ -990,12 +990,12 @@ export default function SermonStudioPage() {
             </div>
 
             {/* 1. Introdução Reordenada para o Topo */}
-            <div className="border-l-2 border-gold/60 pl-4 py-2 space-y-2 bg-gold/5 rounded-r-xl p-3">
+            <div className="border-l-2 border-gold pl-4 py-2 space-y-2 bg-gold/5 rounded-r-xl p-3 border-y border-r border-gold/20">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-gold font-bold flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" /> 1. Introdução (Gancho de Entrada)
                 </span>
-                <span className="text-[0.68rem] font-mono text-zinc-500">Início da Ministração</span>
+                <span className="text-[0.68rem] font-mono text-app-text-muted">Início da Ministração</span>
               </div>
               <div className="text-xs sm:text-sm font-sans text-app-text leading-relaxed whitespace-pre-line">
                 {introducao ? (
@@ -1009,14 +1009,14 @@ export default function SermonStudioPage() {
             </div>
 
             {/* 2. Bloco 1: Explicar o Texto */}
-            <div className="border-l-2 border-zinc-700 pl-4 py-1 space-y-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold block">
+            <div className="border-l-2 border-border pl-4 py-1 space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-app-text-muted font-bold block">
                 2. Explicar o Texto (Exegese & Contexto)
               </span>
 
               {bloco1IntencaoOriginal && (
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs sm:text-sm text-zinc-200 italic font-serif leading-relaxed">
-                  <span className="font-mono text-[0.68rem] text-amber-400 font-bold block mb-1 not-italic uppercase tracking-wide">
+                <div className="bg-gold/5 border border-gold/25 rounded-xl p-3 text-xs sm:text-sm text-app-text italic font-serif leading-relaxed">
+                  <span className="font-mono text-[0.68rem] text-gold font-bold block mb-1 not-italic uppercase tracking-wide">
                     ⚓ Ancoradouro Histórico:
                   </span>
                   "{bloco1IntencaoOriginal}"
@@ -1033,41 +1033,41 @@ export default function SermonStudioPage() {
             </div>
 
             {/* 3. Bloco 2: Tópicos e Degraus */}
-            <div className="border-l-2 border-zinc-700 pl-4 py-1 space-y-4">
-              <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold block">
+            <div className="border-l-2 border-border pl-4 py-1 space-y-4">
+              <span className="text-xs font-mono uppercase tracking-wider text-app-text-muted font-bold block">
                 3. Pregar a Inspiração (Tópicos da Mensagem)
               </span>
 
               {topicos.map((top, idx) => (
-                <div key={top.id || idx} className="bg-app-raised/40 p-4 rounded-xl border border-border/60 space-y-3">
+                <div key={top.id || idx} className="bg-app-raised p-4 rounded-xl border border-border space-y-3 shadow-xs">
                   <h4 className="font-serif font-bold text-sm text-gold flex items-center gap-2">
                     <span className="font-mono text-xs px-2 py-0.5 rounded bg-gold/15 border border-gold/30">
                       Tópico {idx + 1}
                     </span>
-                    <span>{top.title}</span>
+                    <span className="text-app-text">{top.title}</span>
                   </h4>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-zinc-300">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-app-text">
                     {top.steps.stepA_fato && (
-                      <div className="p-2.5 rounded-lg bg-app-surface/60 border border-border/40">
+                      <div className="p-2.5 rounded-lg bg-app-surface border border-border">
                         <strong className="text-gold font-mono block text-[0.7rem] mb-0.5">A. Fato:</strong>
                         <span>{renderWithDynamicMarkers(top.steps.stepA_fato)}</span>
                       </div>
                     )}
                     {top.steps.stepB_porque && (
-                      <div className="p-2.5 rounded-lg bg-app-surface/60 border border-border/40">
+                      <div className="p-2.5 rounded-lg bg-app-surface border border-border">
                         <strong className="text-gold font-mono block text-[0.7rem] mb-0.5">B. Porquê:</strong>
                         <span>{renderWithDynamicMarkers(top.steps.stepB_porque)}</span>
                       </div>
                     )}
                     {top.steps.stepC_contraste && (
-                      <div className="p-2.5 rounded-lg bg-app-surface/60 border border-border/40">
+                      <div className="p-2.5 rounded-lg bg-app-surface border border-border">
                         <strong className="text-gold font-mono block text-[0.7rem] mb-0.5">C. Contraste:</strong>
                         <span>{renderWithDynamicMarkers(top.steps.stepC_contraste)}</span>
                       </div>
                     )}
                     {top.steps.stepD_tensao && (
-                      <div className="p-2.5 rounded-lg bg-app-surface/60 border border-border/40">
+                      <div className="p-2.5 rounded-lg bg-app-surface border border-border">
                         <strong className="text-gold font-mono block text-[0.7rem] mb-0.5">D. Tensão:</strong>
                         <span>{renderWithDynamicMarkers(top.steps.stepD_tensao)}</span>
                       </div>
@@ -1078,8 +1078,8 @@ export default function SermonStudioPage() {
             </div>
 
             {/* 4. Bloco 3: Aplicar à Vida Real */}
-            <div className="border-l-2 border-zinc-700 pl-4 py-1 space-y-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold block">
+            <div className="border-l-2 border-border pl-4 py-1 space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-app-text-muted font-bold block">
                 4. Aplicar à Vida Real (Conexão Prática)
               </span>
               <div className="text-xs sm:text-sm font-sans text-app-text leading-relaxed whitespace-pre-line">
@@ -1092,11 +1092,11 @@ export default function SermonStudioPage() {
             </div>
 
             {/* 5. Desfecho Homilético */}
-            <div className="border-l-2 border-emerald-500/60 pl-4 py-2 space-y-2 bg-emerald-500/5 rounded-r-xl p-3">
-              <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold block">
+            <div className="border-l-2 border-gold pl-4 py-2 space-y-2 bg-gold/5 rounded-r-xl p-3 border-y border-r border-gold/20">
+              <span className="text-xs font-mono uppercase tracking-wider text-gold font-bold block">
                 5. Desfecho Homilético ({desfechoTipo ? DESFECHO_CONFIG[desfechoTipo]?.label : "Ponto de Chegada"})
               </span>
-              <p className="text-xs sm:text-sm font-sans text-zinc-100 leading-relaxed font-medium whitespace-pre-line">
+              <p className="text-xs sm:text-sm font-sans text-app-text leading-relaxed font-medium whitespace-pre-line">
                 {desfechoTexto ? (
                   renderWithDynamicMarkers(desfechoTexto)
                 ) : (
@@ -1112,19 +1112,19 @@ export default function SermonStudioPage() {
           {/* Bloco 0: A Chama Inicial ("Eu e Deus") */}
           <section
             data-testid="eu-e-deus-section"
-            className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-3 shadow-xs"
+            className="rounded-2xl border border-gold/30 bg-gold/5 p-5 space-y-3 shadow-xs"
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-amber-500 font-semibold text-xs font-mono uppercase tracking-wide">
-                <Flame className="w-4 h-4 fill-amber-500/20" />
+              <div className="flex items-center gap-2 text-gold font-semibold text-xs font-mono uppercase tracking-wide">
+                <Flame className="w-4 h-4 fill-gold/20 text-gold" />
                 <span>Eu e Deus — A Chama Inicial</span>
               </div>
-              <span className="text-[0.72rem] font-mono text-gold bg-app-raised px-2.5 py-0.5 rounded-full border border-gold/30">
+              <span className="text-[0.72rem] font-mono text-gold bg-app-surface px-2.5 py-0.5 rounded-full border border-gold/30 shadow-xs">
                 {currentPassageDisplay}
               </span>
             </div>
 
-            <div className="bg-app-surface/60 rounded-xl p-3.5 border border-border/60">
+            <div className="bg-app-surface rounded-xl p-3.5 border border-border shadow-xs">
               <p className="text-xs sm:text-sm font-sans text-app-text leading-relaxed whitespace-pre-line italic">
                 "{sermon.sparkText || "Inspiração espiritual capturada no momento da oração."}"
               </p>
@@ -1139,10 +1139,10 @@ export default function SermonStudioPage() {
           <section
             data-testid="desfecho-section"
             className={cn(
-              "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all shadow-sm",
+              "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all shadow-xs",
               isUnlocked
-                ? "border-gold/40 bg-app-surface/90"
-                : "border-gold/60 bg-gold/5 ring-1 ring-gold/20"
+                ? "border-gold/30 bg-app-surface"
+                : "border-gold/50 bg-gold/5 ring-1 ring-gold/20"
             )}
           >
             <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -1154,7 +1154,7 @@ export default function SermonStudioPage() {
                   <h2 className="text-sm sm:text-base font-serif font-bold text-app-text flex items-center gap-2">
                     Método da Marcha-Ré: Ponto de Chegada
                     {isUnlocked && (
-                      <span className="inline-flex items-center gap-1 text-[0.68rem] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="inline-flex items-center gap-1 text-[0.68rem] font-mono text-gold bg-gold/10 px-2.5 py-0.5 rounded-full border border-gold/30 font-semibold">
                         <Unlock className="w-3 h-3" /> Desbloqueado
                       </span>
                     )}
@@ -1169,7 +1169,7 @@ export default function SermonStudioPage() {
                 type="button"
                 onClick={handleSaveDesfecho}
                 disabled={isSavingDesfecho || !desfechoTipo || !desfechoTexto.trim()}
-                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs cursor-pointer"
               >
                 <Save className="w-3.5 h-3.5 mr-1" />
                 <span>{isSavingDesfecho ? "Salvando..." : "Fixar Desfecho"}</span>
@@ -1189,8 +1189,8 @@ export default function SermonStudioPage() {
                     className={cn(
                       "flex flex-col items-start p-3 rounded-xl border text-left transition-all relative overflow-hidden cursor-pointer",
                       isSelected
-                        ? "border-gold bg-gold/10 ring-1 ring-gold shadow-sm"
-                        : "border-border/80 bg-app-surface hover:border-border hover:bg-app-raised/50"
+                        ? "border-gold bg-gold/10 ring-1 ring-gold shadow-xs"
+                        : "border-border bg-app-surface hover:border-gold/40 hover:bg-app-raised/60"
                     )}
                   >
                     <div className="flex items-center gap-1.5 mb-1">
@@ -1220,7 +1220,7 @@ export default function SermonStudioPage() {
                 onChange={(e) => setDesfechoTexto(e.target.value)}
                 placeholder="Onde a mensagem vai terminar? Qual é o apelo e impacto espiritual pretendido?"
                 rows={3}
-                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
               />
             </div>
           </section>
@@ -1233,11 +1233,11 @@ export default function SermonStudioPage() {
               "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
               !isUnlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
-                : "border-border/80 bg-app-surface shadow-xs"
+                : "border-border bg-app-surface shadow-xs"
             )}
           >
             {!isUnlocked && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <Lock className="w-6 h-6 text-gold mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Bloqueado pelo Método da Marcha-Ré
@@ -1248,7 +1248,7 @@ export default function SermonStudioPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
                 <span className="text-[0.68rem] font-mono text-gold font-semibold uppercase tracking-wider">
                   Bloco 1
@@ -1272,7 +1272,7 @@ export default function SermonStudioPage() {
                 onChange={(e) => setBloco1Exegese(e.target.value)}
                 placeholder="Pano de fundo histórico, intenção do autor sagrado e significado das palavras no original..."
                 rows={4}
-                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
               />
             </div>
 
@@ -1282,20 +1282,20 @@ export default function SermonStudioPage() {
               className={cn(
                 "rounded-xl border p-4 space-y-3 transition-all",
                 isBloco2Unlocked
-                  ? "bg-amber-500/10 border-amber-500/40"
-                  : "bg-app-raised/60 border-amber-500/30"
+                  ? "bg-gold/5 border-gold/30 shadow-xs"
+                  : "bg-app-raised border-border"
               )}
             >
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-500 shrink-0">
+                  <div className="p-1.5 rounded-lg bg-gold/15 text-gold shrink-0">
                     <ScrollText className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-serif font-bold text-app-text flex items-center gap-1.5">
                       <span>Ancoradouro Histórico (Trava Anti-Esegese)</span>
                       {isBloco2Unlocked && (
-                        <span className="text-[0.68rem] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-semibold">
+                        <span className="text-[0.68rem] font-mono text-gold bg-gold/10 px-2.5 py-0.5 rounded-full border border-gold/30 font-semibold">
                           ⚓ Ancorado · Bloco 2 Liberado
                         </span>
                       )}
@@ -1310,7 +1310,7 @@ export default function SermonStudioPage() {
                   type="button"
                   onClick={handleSaveBloco1}
                   disabled={isSavingBloco1 || !bloco1IntencaoOriginal.trim()}
-                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5 mr-1" />
                   <span>{isSavingBloco1 ? "Salvando..." : "Fixar Ancoradouro"}</span>
@@ -1329,7 +1329,7 @@ export default function SermonStudioPage() {
                   onChange={(e) => setBloco1IntencaoOriginal(e.target.value)}
                   placeholder="O que o autor bíblico pretendia comunicar aos seus ouvintes originais? Qual era o problema pastoral ou teológico endereçado?"
                   rows={3}
-                  className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                  className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
                 />
               </div>
 
@@ -1337,9 +1337,9 @@ export default function SermonStudioPage() {
               {(sermon?.bloco1IntencaoOriginal || isBloco2Unlocked) && (
                 <div
                   data-testid="ancoradouro-historico-header"
-                  className="pt-2 border-t border-amber-500/20 flex items-start gap-2 text-xs font-serif italic text-amber-300"
+                  className="pt-2 border-t border-gold/20 flex items-start gap-2 text-xs font-serif italic text-gold"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-gold shrink-0 mt-0.5" />
                   <span>"{sermon?.bloco1IntencaoOriginal || bloco1IntencaoOriginal}"</span>
                 </div>
               )}
@@ -1354,11 +1354,11 @@ export default function SermonStudioPage() {
               "rounded-2xl border p-5 sm:p-6 space-y-5 transition-all relative",
               !isBloco2Unlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
-                : "border-border/80 bg-app-surface shadow-xs"
+                : "border-border bg-app-surface shadow-xs"
             )}
           >
             {!isUnlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <Lock className="w-6 h-6 text-gold mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Bloqueado pelo Método da Marcha-Ré
@@ -1368,7 +1368,7 @@ export default function SermonStudioPage() {
                 </p>
               </div>
             ) : !isBloco2Unlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <ShieldAlert className="w-6 h-6 text-amber-500 mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Trava Anti-Esegese Ativa
@@ -1380,7 +1380,7 @@ export default function SermonStudioPage() {
             ) : null}
 
             {/* Cabeçalho do Bloco 2 */}
-            <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-2">
+            <div className="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
               <div>
                 <span className="text-[0.68rem] font-mono text-gold font-semibold uppercase tracking-wider">
                   Bloco 2
@@ -1403,7 +1403,7 @@ export default function SermonStudioPage() {
                   size="sm"
                   onClick={handleAddTopic}
                   disabled={topicos.length >= 4}
-                  className="text-xs flex items-center gap-1 rounded-xl"
+                  className="text-xs flex items-center gap-1 rounded-xl border-border bg-app-raised hover:bg-app-surface text-app-text cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+ Adicionar Tópico</span>
@@ -1413,7 +1413,7 @@ export default function SermonStudioPage() {
                   size="sm"
                   onClick={handleSaveTopicos}
                   disabled={isSavingTopicos || topicos.length === 0}
-                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1"
+                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>{isSavingTopicos ? "Salvando..." : "Salvar Tópicos"}</span>
@@ -1430,7 +1430,7 @@ export default function SermonStudioPage() {
                   <div
                     key={topic.id || `topic-${index}`}
                     data-testid={`topic-card-${index}`}
-                    className="p-4 sm:p-5 rounded-xl border border-border/80 bg-app-surface/60 space-y-3.5 shadow-xs"
+                    className="p-4 sm:p-5 rounded-xl border border-border bg-app-surface space-y-3.5 shadow-xs"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 flex-1">
@@ -1442,7 +1442,7 @@ export default function SermonStudioPage() {
                           value={topic.title}
                           onChange={(e) => handleUpdateTopicTitle(index, e.target.value)}
                           placeholder={`Título do Tópico ${index + 1}`}
-                          className="w-full font-serif font-bold text-sm bg-transparent border-b border-border/60 pb-1 text-app-text focus:outline-none focus:border-gold"
+                          className="w-full font-serif font-bold text-sm bg-transparent border-b border-border pb-1 text-app-text focus:outline-none focus:border-gold"
                         />
                       </div>
 
@@ -1453,7 +1453,7 @@ export default function SermonStudioPage() {
                         aria-label="Remover Tópico"
                         disabled={topicos.length <= 1}
                         onClick={() => handleRemoveTopic(index)}
-                        className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg p-1.5 h-auto flex items-center gap-1 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                        className="text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg p-1.5 h-auto flex items-center gap-1 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                         title={topicos.length <= 1 ? "Mínimo de 1 tópico" : "Remover Tópico"}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1462,7 +1462,7 @@ export default function SermonStudioPage() {
                     </div>
 
                     {/* Abas Mobile para os 4 Degraus (md:hidden) */}
-                    <div className="md:hidden flex items-center gap-1 border-b border-border/60 pb-2 overflow-x-auto no-scrollbar">
+                    <div className="md:hidden flex items-center gap-1 border-b border-border pb-2 overflow-x-auto no-scrollbar">
                       {(["A", "B", "C", "D"] as const).map((stepLetter) => {
                         const active = currentMobileTab === stepLetter;
                         const labels = {
@@ -1485,7 +1485,7 @@ export default function SermonStudioPage() {
                               "px-2.5 py-1 text-xs font-mono rounded-lg transition-colors whitespace-nowrap cursor-pointer",
                               active
                                 ? "bg-gold text-primary-foreground font-semibold shadow-xs"
-                                : "bg-app-raised/80 text-app-text-muted hover:text-app-text"
+                                : "bg-app-raised text-app-text-muted hover:text-app-text"
                             )}
                           >
                             {labels[stepLetter]}
@@ -1499,7 +1499,7 @@ export default function SermonStudioPage() {
                       {/* Degrau A: Fato */}
                       <div
                         className={cn(
-                          "space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40",
+                          "space-y-1 bg-app-raised/60 p-3.5 rounded-xl border border-border/70",
                           currentMobileTab !== "A" ? "hidden md:block" : "block"
                         )}
                       >
@@ -1516,14 +1516,14 @@ export default function SermonStudioPage() {
                           onChange={(e) => handleUpdateStep(index, "stepA_fato", e.target.value)}
                           placeholder="O que o texto afirma expressamente..."
                           rows={2}
-                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold"
                         />
                       </div>
 
                       {/* Degrau B: Porquê */}
                       <div
                         className={cn(
-                          "space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40",
+                          "space-y-1 bg-app-raised/60 p-3.5 rounded-xl border border-border/70",
                           currentMobileTab !== "B" ? "hidden md:block" : "block"
                         )}
                       >
@@ -1540,14 +1540,14 @@ export default function SermonStudioPage() {
                           onChange={(e) => handleUpdateStep(index, "stepB_porque", e.target.value)}
                           placeholder="A razão teológica ou a causa espiritual..."
                           rows={2}
-                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold"
                         />
                       </div>
 
                       {/* Degrau C: Contraste */}
                       <div
                         className={cn(
-                          "space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40",
+                          "space-y-1 bg-app-raised/60 p-3.5 rounded-xl border border-border/70",
                           currentMobileTab !== "C" ? "hidden md:block" : "block"
                         )}
                       >
@@ -1564,14 +1564,14 @@ export default function SermonStudioPage() {
                           onChange={(e) => handleUpdateStep(index, "stepC_contraste", e.target.value)}
                           placeholder="O que acontece sem essa verdade? O engano humano ou o contraste..."
                           rows={2}
-                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold"
                         />
                       </div>
 
                       {/* Degrau D: Tensão / Gancho */}
                       <div
                         className={cn(
-                          "space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40",
+                          "space-y-1 bg-app-raised/60 p-3.5 rounded-xl border border-border/70",
                           currentMobileTab !== "D" ? "hidden md:block" : "block"
                         )}
                       >
@@ -1588,7 +1588,7 @@ export default function SermonStudioPage() {
                           onChange={(e) => handleUpdateStep(index, "stepD_tensao", e.target.value)}
                           placeholder="A pergunta provocativa ou gancho para a consciência dos ouvintes..."
                           rows={2}
-                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                          className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold"
                         />
                       </div>
                     </div>
@@ -1606,25 +1606,25 @@ export default function SermonStudioPage() {
               "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
               !isBloco3Unlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
-                : "border-border/80 bg-app-surface shadow-xs"
+                : "border-border bg-app-surface shadow-xs"
             )}
           >
             {!isUnlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <Lock className="w-6 h-6 text-gold mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Bloqueado pelo Método da Marcha-Ré
                 </p>
               </div>
             ) : !isBloco2Unlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <ShieldAlert className="w-6 h-6 text-amber-500 mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Aguardando Conclusão do Bloco 1
                 </p>
               </div>
             ) : !isBloco3Unlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <Lock className="w-6 h-6 text-gold mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Aguardando Conclusão do Bloco 2
@@ -1635,7 +1635,7 @@ export default function SermonStudioPage() {
               </div>
             ) : null}
 
-            <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-2">
+            <div className="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
               <div>
                 <span className="text-[0.68rem] font-mono text-gold font-semibold uppercase tracking-wider">
                   Bloco 3
@@ -1648,7 +1648,7 @@ export default function SermonStudioPage() {
                 type="button"
                 onClick={handleSaveBloco3}
                 disabled={isSavingBloco3}
-                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs cursor-pointer"
               >
                 <Save className="w-3.5 h-3.5 mr-1" />
                 <span>{isSavingBloco3 ? "Salvando..." : "Salvar Aplicação"}</span>
@@ -1664,7 +1664,7 @@ export default function SermonStudioPage() {
                 onChange={(e) => setBloco3Aplicacao(e.target.value)}
                 placeholder="Transposição prática para os desafios da igreja na segunda-feira de manhã..."
                 rows={3}
-                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
               />
             </div>
           </section>
@@ -1677,25 +1677,25 @@ export default function SermonStudioPage() {
               "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
               !isBloco3Unlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
-                : "border-border/80 bg-app-surface shadow-xs"
+                : "border-border bg-app-surface shadow-xs"
             )}
           >
             {!isUnlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <Lock className="w-6 h-6 text-gold mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Bloqueado pelo Método da Marcha-Ré
                 </p>
               </div>
             ) : !isBloco2Unlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <ShieldAlert className="w-6 h-6 text-amber-500 mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Aguardando Conclusão do Bloco 1
                 </p>
               </div>
             ) : !isBloco3Unlocked ? (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[2px] rounded-2xl p-4 text-center">
                 <Lock className="w-6 h-6 text-gold mb-2" />
                 <p className="text-xs font-semibold text-app-text">
                   Aguardando Conclusão do Bloco 2
@@ -1706,7 +1706,7 @@ export default function SermonStudioPage() {
               </div>
             ) : null}
 
-            <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-2">
+            <div className="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
               <div>
                 <span className="text-[0.68rem] font-mono text-gold font-semibold uppercase tracking-wider">
                   Passo Final da Marcha-Ré
@@ -1719,7 +1719,7 @@ export default function SermonStudioPage() {
                 type="button"
                 onClick={handleSaveIntroducao}
                 disabled={isSavingIntroducao}
-                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs cursor-pointer"
               >
                 <Save className="w-3.5 h-3.5 mr-1" />
                 <span>{isSavingIntroducao ? "Salvando..." : "Salvar Introdução"}</span>
@@ -1735,7 +1735,7 @@ export default function SermonStudioPage() {
                 onChange={(e) => setIntroducao(e.target.value)}
                 placeholder="Gancho inicial para capturar a atenção da igreja sabendo exatamente onde você vai chegar..."
                 rows={3}
-                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.85rem] text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
               />
             </div>
           </section>

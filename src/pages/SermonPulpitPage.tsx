@@ -38,7 +38,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
         <span
           key={index}
           data-testid="dynamic-chip-ilustracao"
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
         >
           💡 Ilustração
         </span>
@@ -49,7 +49,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
         <span
           key={index}
           data-testid="dynamic-chip-pausa"
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-sky-500/15 text-sky-600 dark:text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
         >
           🤫 Pausa Silenciosa
         </span>
@@ -60,7 +60,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
         <span
           key={index}
           data-testid="dynamic-chip-apelo"
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
         >
           ⚡ Tom de Voz / Apelo
         </span>
@@ -77,9 +77,79 @@ export default function SermonPulpitPage() {
   const [sermon, setSermon] = useState<Sermon | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Tamanho de Fonte para leitura a um braço de distância
-  const [fontSizeIndex, setFontSizeIndex] = useState(1); // 0: normal, 1: grande, 2: extragrande
-  const fontSizes = ["text-base sm:text-lg", "text-lg sm:text-xl", "text-xl sm:text-2xl"];
+  // Tipografia para leitura a 60cm de distância (18px-20px padrão no altar)
+  const [fontSizeIndex, setFontSizeIndex] = useState(1); // 0: 18px, 1: 20px (padrão altar), 2: 22px, 3: 24px
+  const fontSizes = [
+    "text-[18px] leading-[1.8]",
+    "text-[20px] leading-[1.85]",
+    "text-[22px] leading-[1.9]",
+    "text-[24px] leading-[2.0]",
+  ];
+
+  // Modo Altar / Pregar Agora (oculta menus e evita toques acidentais no púlpito)
+  const [isAltarMode, setIsAltarMode] = useState(false);
+
+  // Trava de Tela (Screen Wake Lock API)
+  const [isWakeLockActive, setIsWakeLockActive] = useState(false);
+  const wakeLockSentinelRef = useRef<any>(null);
+
+  const requestWakeLock = async () => {
+    if ("wakeLock" in navigator && (navigator as any).wakeLock) {
+      try {
+        const lock = await (navigator as any).wakeLock.request("screen");
+        wakeLockSentinelRef.current = lock;
+        setIsWakeLockActive(true);
+        if (lock && typeof lock.addEventListener === "function") {
+          lock.addEventListener("release", () => {
+            setIsWakeLockActive(false);
+          });
+        }
+      } catch (err) {
+        console.warn("[ModoPulpito] Screen Wake Lock falhou:", err);
+        setIsWakeLockActive(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    requestWakeLock();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      if (wakeLockSentinelRef.current && typeof wakeLockSentinelRef.current.release === "function") {
+        try {
+          const res = wakeLockSentinelRef.current.release();
+          if (res && typeof res.catch === "function") {
+            res.catch(() => {});
+          }
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, []);
+
+  const handleEnterAltarMode = () => {
+    setIsAltarMode(true);
+    if (typeof document !== "undefined" && document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+    toast.success("Modo Altar Ativo: Menus ocultos contra toques acidentais.");
+  };
+
+  const handleExitAltarMode = () => {
+    setIsAltarMode(false);
+    if (typeof document !== "undefined" && document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
   // Cronômetro de Púlpito
   const [seconds, setSeconds] = useState(0);
@@ -147,36 +217,7 @@ export default function SermonPulpitPage() {
     }
   };
 
-  // 1. Screen Wake Lock API
-  useEffect(() => {
-    let sentinel: any = null;
-
-    if ("wakeLock" in navigator && (navigator as any).wakeLock) {
-      (navigator as any).wakeLock
-        .request("screen")
-        .then((lock: any) => {
-          sentinel = lock;
-        })
-        .catch((err: any) => {
-          console.warn("[ModoPulpito] Screen Wake Lock falhou ou não permitido:", err);
-        });
-    }
-
-    return () => {
-      if (sentinel && typeof sentinel.release === "function") {
-        try {
-          const res = sentinel.release();
-          if (res && typeof res.catch === "function") {
-            res.catch(() => {});
-          }
-        } catch {
-          // ignore
-        }
-      }
-    };
-  }, []);
-
-  // 2. Cronômetro contínuo
+  // Cronômetro contínuo
   useEffect(() => {
     if (!isTimerRunning) return;
     const interval = setInterval(() => {
@@ -243,7 +284,7 @@ export default function SermonPulpitPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center">
+      <div className="min-h-screen bg-app-bg text-app-text flex items-center justify-center">
         <Flame className="w-8 h-8 text-gold animate-pulse" />
       </div>
     );
@@ -251,11 +292,11 @@ export default function SermonPulpitPage() {
 
   if (!sermon) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center p-4">
-        <div className="max-w-md text-center space-y-4">
-          <p className="text-sm text-zinc-400">Sermão não encontrado.</p>
-          <Button onClick={() => navigate("/memorial")} variant="outline">
-            Voltar ao Memorial
+      <div className="min-h-screen bg-app-bg text-app-text flex items-center justify-center p-4">
+        <div className="max-w-md text-center space-y-4 bg-app-surface p-6 rounded-2xl border border-border shadow-sm">
+          <p className="text-sm text-app-text-muted">Sermão não encontrado.</p>
+          <Button onClick={() => navigate("/estudio")} variant="outline" className="border-border">
+            Voltar ao Estúdio
           </Button>
         </div>
       </div>
@@ -265,16 +306,19 @@ export default function SermonPulpitPage() {
   const hasPassage = Boolean(sermon.bookName && sermon.chapter);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-serif selection:bg-gold/30 selection:text-gold-light antialiased">
-      {/* ── HEADER DO PÚLPITO (Zero distrações de site) ────────────────────────── */}
+    <div className="min-h-screen bg-app-bg text-app-text flex flex-col font-serif selection:bg-gold/30 selection:text-gold antialiased">
+      {/* ── BARRA FIXA SUPERIOR DO ALTAR (Tema + Versículo Flutuante + Cronômetro + Trava de Tela) ── */}
       <header
         data-testid="pulpit-header"
-        className="sticky top-0 z-40 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800 px-4 py-2.5 transition-all shadow-md"
+        className="sticky top-0 z-40 bg-app-surface/95 backdrop-blur-md border-b border-border px-4 py-2.5 transition-all shadow-xs"
       >
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
-          {/* Lado Esquerdo: Título & Pílula da Escritura */}
+          {/* Lado Esquerdo: Tema / Título & Versículo Flutuante */}
           <div className="flex items-center gap-2.5 min-w-0">
-            <h1 className="text-sm sm:text-base font-bold text-zinc-100 truncate max-w-[160px] sm:max-w-xs md:max-w-sm">
+            <h1
+              title={sermon.title}
+              className="text-sm sm:text-base font-bold text-app-text truncate max-w-[140px] sm:max-w-xs md:max-w-sm"
+            >
               {sermon.title}
             </h1>
 
@@ -283,10 +327,10 @@ export default function SermonPulpitPage() {
                 type="button"
                 data-testid="scripture-pill-main"
                 onClick={handleOpenScripture}
-                className="inline-flex items-center gap-1 text-[0.72rem] font-mono text-gold bg-gold/15 border border-gold/30 hover:bg-gold/25 px-2.5 py-0.5 rounded-full transition-colors shrink-0 shadow-xs"
-                title="Abrir passagem bíblica no card flutuante"
+                className="inline-flex items-center gap-1.5 text-[0.72rem] font-mono text-gold bg-gold/10 border border-gold/30 hover:bg-gold/20 px-2.5 py-1 rounded-full transition-colors shrink-0 shadow-xs cursor-pointer font-medium"
+                title="Abrir versículo bíblico no card flutuante"
               >
-                <BookOpen className="w-3 h-3" />
+                <BookOpen className="w-3.5 h-3.5" />
                 <span>
                   {sermon.bookName} {sermon.chapter}
                   {sermon.verse ? `:${sermon.verse}` : ""}
@@ -295,190 +339,322 @@ export default function SermonPulpitPage() {
             )}
           </div>
 
-          {/* Lado Direito: Cronômetro, Controles de Leitura e Encerramento */}
+          {/* Lado Direito: Cronômetro + Trava de Tela + Botão Pregar Agora / Modo Altar + Controles */}
           <div className="flex items-center gap-2 shrink-0">
             {/* Cronômetro */}
             <div
               data-testid="pulpit-stopwatch"
-              className="flex items-center gap-1.5 font-mono text-xs sm:text-sm text-gold bg-zinc-800/80 border border-zinc-700/60 px-2.5 py-1 rounded-lg"
+              className="flex items-center gap-1.5 font-mono text-xs sm:text-sm text-gold bg-app-raised border border-border px-2.5 py-1 rounded-xl shadow-xs"
             >
               <Clock className="w-3.5 h-3.5 text-gold/80" />
               <span>{formattedTimer}</span>
             </div>
 
-            {/* Ajuste de Fonte */}
-            <div className="flex items-center bg-zinc-800/80 border border-zinc-700/60 rounded-lg p-0.5">
-              <button
-                type="button"
-                onClick={() => setFontSizeIndex((prev) => Math.max(0, prev - 1))}
-                disabled={fontSizeIndex === 0}
-                className="px-2 py-0.5 text-xs text-zinc-300 hover:text-white disabled:opacity-30"
-                title="Diminuir texto"
-              >
-                A-
-              </button>
-              <button
-                type="button"
-                onClick={() => setFontSizeIndex((prev) => Math.min(fontSizes.length - 1, prev + 1))}
-                disabled={fontSizeIndex === fontSizes.length - 1}
-                className="px-2 py-0.5 text-xs text-zinc-300 hover:text-white disabled:opacity-30"
-                title="Aumentar texto"
-              >
-                A+
-              </button>
-            </div>
+            {/* Trava de Tela (Screen Wake Lock) */}
+            <button
+              type="button"
+              data-testid="wake-lock-status-indicator"
+              onClick={requestWakeLock}
+              title={
+                isWakeLockActive
+                  ? "Trava de Tela ativa: o display não apagará durante a pregação"
+                  : "Clique para ativar a Trava de Tela"
+              }
+              className={cn(
+                "flex items-center gap-1.5 font-mono text-xs px-2.5 py-1 rounded-xl border transition-all cursor-pointer select-none shadow-xs",
+                isWakeLockActive
+                  ? "bg-gold/15 text-gold border-gold/40 font-semibold"
+                  : "bg-app-raised text-app-text-muted border-border hover:text-app-text"
+              )}
+            >
+              <span
+                className={cn(
+                  "w-2 h-2 rounded-full",
+                  isWakeLockActive
+                    ? "bg-gold animate-pulse shadow-xs shadow-gold/50"
+                    : "bg-app-text-muted/60"
+                )}
+              />
+              <span className="hidden md:inline font-semibold">
+                {isWakeLockActive ? "Tela Ativa" : "Travar Tela"}
+              </span>
+              <span className="md:hidden">🔒</span>
+            </button>
 
-            {/* Botão Sair / Encerrar Pregação */}
+            {/* Botão [ 📖 Pregar Agora ] / Sair do Modo Altar */}
+            {!isAltarMode ? (
+              <Button
+                type="button"
+                data-testid="enter-altar-mode-btn"
+                onClick={handleEnterAltarMode}
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+                title="Ocultar menus e evitar toques acidentais no púlpito"
+              >
+                <span>📖</span>
+                <span>Pregar Agora</span>
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                data-testid="exit-altar-mode-btn"
+                onClick={handleExitAltarMode}
+                variant="outline"
+                size="sm"
+                className="text-xs border-border bg-app-raised text-app-text hover:bg-app-surface rounded-xl px-2.5 h-8 flex items-center gap-1.5 cursor-pointer"
+                title="Sair do modo foco e reexibir menus"
+              >
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Desbloquear Menus</span>
+              </Button>
+            )}
+
+            {/* Ajuste de Fonte (Oculto no modo altar para evitar toques acidentais) */}
+            {!isAltarMode && (
+              <div className="hidden sm:flex items-center bg-app-raised border border-border rounded-xl p-0.5 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setFontSizeIndex((prev) => Math.max(0, prev - 1))}
+                  disabled={fontSizeIndex === 0}
+                  className="px-2 py-0.5 text-xs text-app-text-muted hover:text-app-text disabled:opacity-30 cursor-pointer"
+                  title="Diminuir texto"
+                >
+                  A-
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFontSizeIndex((prev) => Math.min(fontSizes.length - 1, prev + 1))
+                  }
+                  disabled={fontSizeIndex === fontSizes.length - 1}
+                  className="px-2 py-0.5 text-xs text-app-text-muted hover:text-app-text disabled:opacity-30 cursor-pointer"
+                  title="Aumentar texto"
+                >
+                  A+
+                </button>
+              </div>
+            )}
+
+            {/* Botão Encerrar Pregação */}
             <Button
               data-testid="finish-preaching-btn"
               onClick={() => setIsPreachingModalOpen(true)}
               variant="outline"
               size="sm"
-              className="text-xs border-amber-500/40 bg-zinc-800/80 hover:bg-zinc-700 text-amber-300 rounded-lg px-2.5 h-8 flex items-center gap-1.5"
+              className="text-xs border-amber-500/30 bg-app-raised hover:bg-app-surface text-amber-600 dark:text-amber-400 rounded-xl px-2.5 h-8 flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
-              <span>Encerrar Pregação</span>
+              <span className="hidden sm:inline">Encerrar</span>
             </Button>
           </div>
         </div>
 
-        {/* ── MAPA DO SERMÃO (Pílulas de Smooth Scroll) ─────────────────────────── */}
-        <div className="max-w-5xl mx-auto flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 text-[0.68rem] font-mono no-scrollbar">
-          <button
-            type="button"
-            onClick={() => scrollToSection("sec-spark")}
-            className="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-amber-400 whitespace-nowrap transition-colors"
-          >
-            0. Eu e Deus
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToSection("sec-intro")}
-            className="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 whitespace-nowrap transition-colors"
-          >
-            Introd.
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToSection("sec-bloco-1")}
-            className="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 whitespace-nowrap transition-colors"
-          >
-            1. Exegese
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToSection("sec-bloco-2")}
-            className="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 whitespace-nowrap transition-colors"
-          >
-            2. Tópicos
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToSection("sec-bloco-3")}
-            className="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 whitespace-nowrap transition-colors"
-          >
-            3. Aplicação
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToSection("sec-desfecho")}
-            className="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-gold whitespace-nowrap transition-colors"
-          >
-            4. Desfecho
-          </button>
-        </div>
+        {/* ── MAPA DO SERMÃO (Pílulas de Navegação - Ocultas quando isAltarMode para evitar toques acidentais) ── */}
+        {!isAltarMode && (
+          <div className="max-w-5xl mx-auto flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 text-[0.68rem] font-mono no-scrollbar">
+            <button
+              type="button"
+              onClick={() => scrollToSection("sec-spark")}
+              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-gold whitespace-nowrap transition-colors cursor-pointer font-medium"
+            >
+              0. Eu e Deus
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToSection("sec-intro")}
+              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-gold whitespace-nowrap transition-colors cursor-pointer font-bold"
+            >
+              Introd.
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToSection("sec-bloco-1")}
+              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
+            >
+              1. Exegese
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToSection("sec-bloco-2")}
+              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
+            >
+              2. Tópicos
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToSection("sec-bloco-3")}
+              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
+            >
+              3. Aplicação
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToSection("sec-desfecho")}
+              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-gold whitespace-nowrap transition-colors cursor-pointer font-semibold"
+            >
+              4. Desfecho
+            </button>
+          </div>
+        )}
       </header>
 
-      {/* ── CORPO DO SERMÃO NO PÚLPITO ────────────────────────────────────────── */}
+      {/* ── CORPO DO SERMÃO NO PÚLPITO (Ordem Cronológica da Pregação: Introdução no topo, Desfecho na conclusão) ── */}
       <main
+        data-testid="pulpit-main-content"
         className={cn(
-          "max-w-3xl mx-auto w-full px-5 sm:px-8 py-8 space-y-12 flex-1 leading-relaxed",
+          "max-w-3xl mx-auto w-full px-5 sm:px-8 py-8 space-y-12 flex-1 antialiased",
           fontSizes[fontSizeIndex]
         )}
       >
-        {/* Seção 0: Eu e Deus */}
-        <section id="sec-spark" className="space-y-3 border-l-2 border-amber-500/50 pl-4 py-1">
-          <span className="text-xs font-mono uppercase tracking-widest text-amber-400 font-semibold block">
-            0. Eu e Deus — Chama Inicial
-          </span>
-          <p className="italic text-zinc-300 leading-relaxed">
-            "{sermon.sparkText || "Inspiração capturada em oração."}"
-          </p>
-        </section>
-
-        {/* Seção: Introdução */}
-        {sermon.introducao && (
-          <section id="sec-intro" className="space-y-3 border-l-2 border-zinc-700 pl-4 py-1">
-            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-semibold block">
-              Introdução (Gancho de Entrada)
-            </span>
-            <div className="text-zinc-200 leading-relaxed whitespace-pre-line">
-              {renderWithDynamicMarkers(sermon.introducao)}
+        {/* Banner Indicador do Modo Altar Ativo */}
+        {isAltarMode && (
+          <div
+            data-testid="altar-mode-banner"
+            className="flex items-center justify-between bg-zinc-900/90 border border-gold/40 px-4 py-2 rounded-xl text-xs font-mono text-gold select-none animate-in fade-in duration-200"
+          >
+            <div className="flex items-center gap-2">
+              <span className="animate-pulse">🛡️</span>
+              <span className="font-semibold">Modo Altar Ativo: Menus ocultos contra toques acidentais</span>
             </div>
+            <button
+              type="button"
+              onClick={handleExitAltarMode}
+              className="text-[0.7rem] text-zinc-400 hover:text-white underline cursor-pointer"
+            >
+              Desbloquear Menus
+            </button>
+          </div>
+        )}
+
+        {/* 0. Eu e Deus — Chama Inicial (Referência Devocional) */}
+        {sermon.sparkText && (
+          <section
+            id="sec-spark"
+            className="space-y-2 border-l-2 border-amber-500/50 pl-5 py-2 bg-amber-500/5 rounded-r-xl"
+          >
+            <span className="text-[0.7rem] font-mono uppercase tracking-widest text-amber-400 font-bold block">
+              0. Eu e Deus — Chama Inicial
+            </span>
+            <p className="italic text-zinc-300 font-serif text-sm sm:text-base leading-relaxed">
+              "{sermon.sparkText}"
+            </p>
           </section>
         )}
 
-        {/* Seção 1: Explicar o Texto */}
-        <section id="sec-bloco-1" className="space-y-4 border-l-2 border-zinc-700 pl-4 py-1">
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-semibold block">
-            1. Explicar o Texto (Exegese & Contexto)
+        {/* 1. Introdução (Gancho de Entrada no Topo da Pregação) */}
+        <section id="sec-intro" className="space-y-4 border-l-2 border-gold/70 pl-5 py-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> 1. Introdução (Gancho de Entrada)
+            </span>
+            <span className="text-[0.68rem] font-mono text-zinc-500">Início da Ministração</span>
+          </div>
+          <div className="text-zinc-100 font-serif whitespace-pre-line leading-relaxed">
+            {sermon.introducao ? (
+              renderWithDynamicMarkers(sermon.introducao)
+            ) : (
+              <p className="italic text-zinc-400">Nenhuma introdução redigida ainda.</p>
+            )}
+          </div>
+        </section>
+
+        {/* 2. Explicar o Texto (Exegese & Contexto Histórico) */}
+        <section id="sec-bloco-1" className="space-y-5 border-l-2 border-zinc-700 pl-5 py-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold block">
+            2. Explicar o Texto (Exegese & Contexto)
           </span>
 
           {sermon.bloco1IntencaoOriginal && (
-            <div className="bg-zinc-900 border border-amber-500/30 rounded-xl p-3.5 text-sm sm:text-base text-zinc-300 leading-relaxed italic">
-              <span className="font-mono text-xs text-amber-400 font-bold block mb-1 not-italic">
-                📜 Intenção Original do Autor:
+            <div className="bg-zinc-900/90 border border-amber-500/30 rounded-2xl p-4 text-[1rem] sm:text-[1.125rem] text-zinc-200 leading-relaxed italic font-serif shadow-xs">
+              <span className="font-mono text-xs text-amber-400 font-bold block mb-1 not-italic uppercase tracking-wide">
+                ⚓ Ancoradouro Histórico (Intenção Original do Autor):
               </span>
               "{sermon.bloco1IntencaoOriginal}"
             </div>
           )}
 
           {sermon.bloco1Exegese && (
-            <div className="text-zinc-200 leading-relaxed whitespace-pre-line">
+            <div className="text-zinc-100 font-serif whitespace-pre-line leading-relaxed">
               {renderWithDynamicMarkers(sermon.bloco1Exegese)}
             </div>
           )}
         </section>
 
-        {/* Seção 2: Tópicos e Degraus */}
-        <section id="sec-bloco-2" className="space-y-8 border-l-2 border-zinc-700 pl-4 py-1">
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-semibold block">
-            2. Pregar a Inspiração (Tópicos em Degraus)
+        {/* 3. Pregar a Inspiração (Tópicos da Mensagem em Degraus Contínuos) */}
+        <section id="sec-bloco-2" className="space-y-8 border-l-2 border-zinc-700 pl-5 py-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold block">
+            3. Pregar a Inspiração (Tópicos em Degraus)
           </span>
 
           {sermon.bloco2Topicos && sermon.bloco2Topicos.length > 0 ? (
             sermon.bloco2Topicos.map((top, idx) => (
-              <div key={top.id || idx} className="space-y-3 bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl">
-                <h2 className="font-bold text-lg sm:text-xl text-gold">
-                  {idx + 1}. {top.title}
-                </h2>
+              <div
+                key={top.id || idx}
+                className="space-y-5 pt-3 pb-4 border-b border-zinc-800/80 last:border-b-0"
+              >
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-xs uppercase tracking-wider px-2.5 py-0.5 rounded bg-gold/15 text-gold border border-gold/30 shrink-0 font-bold">
+                    Tópico {idx + 1}
+                  </span>
+                  <h2 className="font-serif font-bold text-xl sm:text-2xl text-gold-light leading-snug">
+                    {top.title}
+                  </h2>
+                </div>
 
-                <div className="space-y-3 pt-2 text-zinc-200">
+                {/* Parágrafos contínuos dos 4 Degraus com badges sutis na margem */}
+                <div className="space-y-4 text-zinc-100 font-serif">
                   {top.steps?.stepA_fato && (
-                    <div>
-                      <span className="text-xs font-mono text-zinc-400 block">A. O Fato:</span>
-                      <p className="leading-relaxed">{renderWithDynamicMarkers(top.steps.stepA_fato)}</p>
+                    <div className="flex items-start gap-3">
+                      <span
+                        data-testid={`badge-degrau-a-${idx}`}
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                      >
+                        A · Fato
+                      </span>
+                      <div className="flex-1 whitespace-pre-line leading-relaxed">
+                        {renderWithDynamicMarkers(top.steps.stepA_fato)}
+                      </div>
                     </div>
                   )}
 
                   {top.steps?.stepB_porque && (
-                    <div>
-                      <span className="text-xs font-mono text-zinc-400 block">B. O Porquê:</span>
-                      <p className="leading-relaxed">{renderWithDynamicMarkers(top.steps.stepB_porque)}</p>
+                    <div className="flex items-start gap-3">
+                      <span
+                        data-testid={`badge-degrau-b-${idx}`}
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                      >
+                        B · Porquê
+                      </span>
+                      <div className="flex-1 whitespace-pre-line leading-relaxed">
+                        {renderWithDynamicMarkers(top.steps.stepB_porque)}
+                      </div>
                     </div>
                   )}
 
                   {top.steps?.stepC_contraste && (
-                    <div>
-                      <span className="text-xs font-mono text-zinc-400 block">C. O Contraste:</span>
-                      <p className="leading-relaxed">{renderWithDynamicMarkers(top.steps.stepC_contraste)}</p>
+                    <div className="flex items-start gap-3">
+                      <span
+                        data-testid={`badge-degrau-c-${idx}`}
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                      >
+                        C · Contraste
+                      </span>
+                      <div className="flex-1 whitespace-pre-line leading-relaxed">
+                        {renderWithDynamicMarkers(top.steps.stepC_contraste)}
+                      </div>
                     </div>
                   )}
 
                   {top.steps?.stepD_tensao && (
-                    <div>
-                      <span className="text-xs font-mono text-zinc-400 block">D. Tensão / Gancho:</span>
-                      <p className="leading-relaxed">{renderWithDynamicMarkers(top.steps.stepD_tensao)}</p>
+                    <div className="flex items-start gap-3">
+                      <span
+                        data-testid={`badge-degrau-d-${idx}`}
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                      >
+                        D · Tensão
+                      </span>
+                      <div className="flex-1 whitespace-pre-line leading-relaxed">
+                        {renderWithDynamicMarkers(top.steps.stepD_tensao)}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -489,24 +665,32 @@ export default function SermonPulpitPage() {
           )}
         </section>
 
-        {/* Seção 3: Aplicar à Vida Real */}
-        {sermon.bloco3Aplicacao && (
-          <section id="sec-bloco-3" className="space-y-3 border-l-2 border-zinc-700 pl-4 py-1">
-            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-semibold block">
-              3. Aplicar à Vida Real (Conexão Prática)
-            </span>
-            <div className="text-zinc-200 leading-relaxed whitespace-pre-line">
-              {renderWithDynamicMarkers(sermon.bloco3Aplicacao)}
-            </div>
-          </section>
-        )}
-
-        {/* Seção 4: Desfecho Homilético */}
-        <section id="sec-desfecho" className="space-y-3 border-l-2 border-gold pl-4 py-1 bg-gold/5 p-4 rounded-xl border">
-          <span className="text-xs font-mono uppercase tracking-widest text-gold font-semibold block">
-            4. Desfecho Homilético & Apelo Final ({sermon.desfechoTipo || "Conclusão"})
+        {/* 4. Aplicar à Vida Real (Conexão Prática) */}
+        <section id="sec-bloco-3" className="space-y-4 border-l-2 border-zinc-700 pl-5 py-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold block">
+            4. Aplicar à Vida Real (Conexão Prática)
           </span>
-          <p className="text-zinc-100 font-bold leading-relaxed whitespace-pre-line">
+          <div className="text-zinc-100 font-serif whitespace-pre-line leading-relaxed">
+            {sermon.bloco3Aplicacao ? (
+              renderWithDynamicMarkers(sermon.bloco3Aplicacao)
+            ) : (
+              <p className="italic text-zinc-400">Nenhuma aplicação redigida ainda.</p>
+            )}
+          </div>
+        </section>
+
+        {/* 5. Desfecho Homilético & Apelo Final (Conclusão na Ordem Cronológica) */}
+        <section
+          id="sec-desfecho"
+          className="space-y-4 border-l-2 border-gold pl-5 py-4 bg-gold/5 p-5 rounded-2xl border border-gold/20"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold block">
+              5. Desfecho Homilético & Apelo Final ({sermon.desfechoTipo || "Conclusão"})
+            </span>
+            <span className="text-[0.68rem] font-mono text-gold/80">Conclusão da Mensagem</span>
+          </div>
+          <p className="text-zinc-100 font-serif font-bold whitespace-pre-line leading-relaxed">
             {renderWithDynamicMarkers(sermon.desfechoTexto || "Conclusão da mensagem.")}
           </p>
         </section>

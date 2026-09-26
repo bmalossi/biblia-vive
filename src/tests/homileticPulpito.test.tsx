@@ -186,4 +186,128 @@ describe("Ticket 6: Modo Púlpito Solene com Screen Wake Lock e Versículos Inte
       expect(screen.queryByTestId("biblical-text-floating-card")).not.toBeInTheDocument();
     });
   });
+
+  describe("Ajustes Ergonômicos do Altar no Modo Púlpito (5 Itens)", () => {
+    it("1. Reordena blocos na ordem cronológica: Introdução no topo e Desfecho na conclusão", async () => {
+      render(
+        <MemoryRouter initialEntries={["/pulpito/sermon-pulpito-1"]}>
+          <Routes>
+            <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("pulpit-main-content")).toBeInTheDocument();
+      });
+
+      const introSec = document.getElementById("sec-intro");
+      const exegesisSec = document.getElementById("sec-bloco-1");
+      const topicsSec = document.getElementById("sec-bloco-2");
+      const appSec = document.getElementById("sec-bloco-3");
+      const desfechoSec = document.getElementById("sec-desfecho");
+
+      expect(introSec).toBeInTheDocument();
+      expect(exegesisSec).toBeInTheDocument();
+      expect(topicsSec).toBeInTheDocument();
+      expect(appSec).toBeInTheDocument();
+      expect(desfechoSec).toBeInTheDocument();
+
+      // Verifica ordem cronológica no DOM: Intro vem antes de Exegese, e Desfecho por último
+      expect(introSec!.compareDocumentPosition(exegesisSec!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(exegesisSec!.compareDocumentPosition(topicsSec!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(topicsSec!.compareDocumentPosition(appSec!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(appSec!.compareDocumentPosition(desfechoSec!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it("2. Tipografia padrão para leitura ergonômica a 60cm de distância (18px-20px)", async () => {
+      render(
+        <MemoryRouter initialEntries={["/pulpito/sermon-pulpito-1"]}>
+          <Routes>
+            <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        const main = screen.getByTestId("pulpit-main-content");
+        // Índice 1 é o padrão altar: text-[20px] leading-[1.85]
+        expect(main.className).toContain("text-[20px]");
+      });
+    });
+
+    it("3. Renderiza os 4 Degraus em parágrafos contínuos com badges sutis na margem", async () => {
+      render(
+        <MemoryRouter initialEntries={["/pulpito/sermon-pulpito-1"]}>
+          <Routes>
+            <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("badge-degrau-a-0")).toHaveTextContent(/A · Fato/i);
+        expect(screen.getByTestId("badge-degrau-b-0")).toHaveTextContent(/B · Porquê/i);
+        expect(screen.getByTestId("badge-degrau-c-0")).toHaveTextContent(/C · Contraste/i);
+        expect(screen.getByTestId("badge-degrau-d-0")).toHaveTextContent(/D · Tensão/i);
+      });
+    });
+
+    it("4. Barra Fixa Superior contém Tema, Versículo Flutuante, Cronômetro e Trava de Tela", async () => {
+      render(
+        <MemoryRouter initialEntries={["/pulpito/sermon-pulpito-1"]}>
+          <Routes>
+            <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("pulpit-header")).toBeInTheDocument();
+        // Tema
+        expect(screen.getByText("O Alicerce Inabalável da Graça")).toBeInTheDocument();
+        // Versículo Flutuante
+        expect(screen.getByTestId("scripture-pill-main")).toBeInTheDocument();
+        // Cronômetro
+        expect(screen.getByTestId("pulpit-stopwatch")).toBeInTheDocument();
+        // Trava de Tela (Screen Wake Lock)
+        expect(screen.getByTestId("wake-lock-status-indicator")).toBeInTheDocument();
+      });
+    });
+
+    it("5. Botão [ 📖 Pregar Agora ] oculta menus secundários e ativa o Modo Altar contra toques acidentais", async () => {
+      render(
+        <MemoryRouter initialEntries={["/pulpito/sermon-pulpito-1"]}>
+          <Routes>
+            <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("enter-altar-mode-btn")).toBeInTheDocument();
+      });
+
+      // Antes de clicar: menus e pílulas do mapa do sermão estão visíveis
+      expect(screen.getByRole("button", { name: /1\. Exegese/i })).toBeInTheDocument();
+
+      // Clica em [ 📖 Pregar Agora ]
+      fireEvent.click(screen.getByTestId("enter-altar-mode-btn"));
+
+      // Menus secundários e pílulas de navegação são ocultos para evitar toques acidentais
+      await waitFor(() => {
+        expect(screen.getByTestId("altar-mode-banner")).toBeInTheDocument();
+        expect(screen.getByTestId("exit-altar-mode-btn")).toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: /1\. Exegese/i })).not.toBeInTheDocument();
+      });
+
+      // Ao clicar em Desbloquear / Sair do modo altar, restaura os menus
+      fireEvent.click(screen.getByTestId("exit-altar-mode-btn"));
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("altar-mode-banner")).not.toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /1\. Exegese/i })).toBeInTheDocument();
+      });
+    });
+  });
 });
