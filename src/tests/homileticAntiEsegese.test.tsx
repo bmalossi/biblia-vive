@@ -79,10 +79,9 @@ describe("Ticket 3: Trava Anti-Esegese e Bloco 1 (Explicar o Texto)", () => {
       expect(screen.getByTestId("bloco-1-container")).toHaveAttribute("data-locked", "false");
     });
 
-    // Bloco 2 deve estar bloqueado pela Trava Anti-Esegese
     const bloco2 = screen.getByTestId("bloco-2-container");
     expect(bloco2).toHaveAttribute("data-locked", "true");
-    expect(screen.getByText(/Trava Anti-Esegese Ativa/i)).toBeInTheDocument();
+    expect(within(bloco2).getByText(/Trava Anti-Esegese Ativa/i)).toBeInTheDocument();
   });
 
   it("desbloqueia o Bloco 2 e persiste no D1 quando o pregador responde à pergunta reflexiva e salva o Bloco 1", async () => {

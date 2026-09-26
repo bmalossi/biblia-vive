@@ -12,12 +12,16 @@ import {
   Save,
   ShieldAlert,
   ScrollText,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import {
   getSermon,
   saveSermon,
   type Sermon,
   type DesfechoTipo,
+  type HomileticTopic,
+  type HomileticTopicStep,
 } from "@/lib/homileticClient";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -53,6 +57,27 @@ const DESFECHO_CONFIG: Record<
   },
 };
 
+function createDefaultTopic(index: number): HomileticTopic {
+  return {
+    id: `topic-${Date.now()}-${index}`,
+    title: `Tópico ${index}`,
+    steps: {
+      stepA_fato: "",
+      stepB_porque: "",
+      stepC_contraste: "",
+      stepD_tensao: "",
+    },
+  };
+}
+
+function getDefaultTopics(): HomileticTopic[] {
+  return [
+    createDefaultTopic(1),
+    createDefaultTopic(2),
+    createDefaultTopic(3),
+  ];
+}
+
 export default function SermonStudioPage() {
   const { sermonId } = useParams<{ sermonId: string }>();
   const navigate = useNavigate();
@@ -69,8 +94,16 @@ export default function SermonStudioPage() {
   const [bloco1Exegese, setBloco1Exegese] = useState("");
   const [bloco1IntencaoOriginal, setBloco1IntencaoOriginal] = useState("");
   const [isSavingBloco1, setIsSavingBloco1] = useState(false);
+
+  // Bloco 2: Tópicos e Degraus
+  const [topicos, setTopicos] = useState<HomileticTopic[]>(getDefaultTopics());
+  const [isSavingTopicos, setIsSavingTopicos] = useState(false);
+
+  // Bloco 3 e Introdução
   const [bloco3Aplicacao, setBloco3Aplicacao] = useState("");
+  const [isSavingBloco3, setIsSavingBloco3] = useState(false);
   const [introducao, setIntroducao] = useState("");
+  const [isSavingIntroducao, setIsSavingIntroducao] = useState(false);
 
   const isBloco2Unlocked =
     isUnlocked &&
@@ -78,6 +111,10 @@ export default function SermonStudioPage() {
       sermon?.bloco1IntencaoOriginal &&
         sermon.bloco1IntencaoOriginal.trim().length >= 5
     );
+
+  const isBloco3Unlocked =
+    isBloco2Unlocked &&
+    Boolean(sermon?.bloco2Topicos && sermon.bloco2Topicos.length >= 1);
 
   useEffect(() => {
     if (!sermonId) return;
@@ -91,6 +128,11 @@ export default function SermonStudioPage() {
           setDesfechoTexto(data.desfechoTexto || "");
           setBloco1Exegese(data.bloco1Exegese || "");
           setBloco1IntencaoOriginal(data.bloco1IntencaoOriginal || "");
+          if (data.bloco2Topicos && data.bloco2Topicos.length > 0) {
+            setTopicos(data.bloco2Topicos);
+          } else {
+            setTopicos(getDefaultTopics());
+          }
           setBloco3Aplicacao(data.bloco3Aplicacao || "");
           setIntroducao(data.introducao || "");
           const unlocked = Boolean(data.desfechoTipo && data.desfechoTexto?.trim());
@@ -152,6 +194,102 @@ export default function SermonStudioPage() {
       toast.error("Erro ao salvar Bloco 1.");
     } finally {
       setIsSavingBloco1(false);
+    }
+  };
+
+  const handleAddTopic = () => {
+    if (topicos.length >= 4) {
+      toast.error("O limite máximo inegociável é de 4 tópicos para evitar dispersão.");
+      return;
+    }
+    const nextIndex = topicos.length + 1;
+    setTopicos((prev) => [...prev, createDefaultTopic(nextIndex)]);
+  };
+
+  const handleRemoveTopic = (indexToRemove: number) => {
+    if (topicos.length <= 1) {
+      toast.error("O sermão deve possuir no mínimo 1 tópico ativo.");
+      return;
+    }
+    setTopicos((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleUpdateTopicTitle = (index: number, newTitle: string) => {
+    setTopicos((prev) =>
+      prev.map((t, idx) => (idx === index ? { ...t, title: newTitle } : t))
+    );
+  };
+
+  const handleUpdateStep = (
+    topicIndex: number,
+    stepKey: keyof HomileticTopicStep,
+    value: string
+  ) => {
+    setTopicos((prev) =>
+      prev.map((t, idx) =>
+        idx === topicIndex
+          ? { ...t, steps: { ...t.steps, [stepKey]: value } }
+          : t
+      )
+    );
+  };
+
+  const handleSaveTopicos = async () => {
+    if (!sermon) return;
+    if (topicos.length === 0) {
+      toast.error("Adicione pelo menos 1 tópico ao sermão.");
+      return;
+    }
+
+    setIsSavingTopicos(true);
+    try {
+      const updated = await saveSermon({
+        id: sermon.id,
+        bloco2Topicos: topicos,
+      });
+      setSermon(updated);
+      toast.success("Tópicos e Degraus salvos com sucesso! Bloco 3 e Introdução liberados.");
+    } catch (err) {
+      console.error("Erro ao salvar tópicos:", err);
+      toast.error("Erro ao salvar tópicos.");
+    } finally {
+      setIsSavingTopicos(false);
+    }
+  };
+
+  const handleSaveBloco3 = async () => {
+    if (!sermon) return;
+    setIsSavingBloco3(true);
+    try {
+      const updated = await saveSermon({
+        id: sermon.id,
+        bloco3Aplicacao: bloco3Aplicacao.trim(),
+      });
+      setSermon(updated);
+      toast.success("Aplicação prática salva com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar Bloco 3:", err);
+      toast.error("Erro ao salvar Bloco 3.");
+    } finally {
+      setIsSavingBloco3(false);
+    }
+  };
+
+  const handleSaveIntroducao = async () => {
+    if (!sermon) return;
+    setIsSavingIntroducao(true);
+    try {
+      const updated = await saveSermon({
+        id: sermon.id,
+        introducao: introducao.trim(),
+      });
+      setSermon(updated);
+      toast.success("Introdução e Gancho de Entrada salvos com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar Introdução:", err);
+      toast.error("Erro ao salvar Introdução.");
+    } finally {
+      setIsSavingIntroducao(false);
     }
   };
 
@@ -446,7 +584,7 @@ export default function SermonStudioPage() {
           data-testid="bloco-2-container"
           data-locked={!isBloco2Unlocked ? "true" : "false"}
           className={cn(
-            "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
+            "rounded-2xl border p-5 sm:p-6 space-y-5 transition-all relative",
             !isBloco2Unlocked
               ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
               : "border-border/80 bg-app-surface shadow-xs"
@@ -474,7 +612,8 @@ export default function SermonStudioPage() {
             </div>
           ) : null}
 
-          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          {/* Cabeçalho do Bloco 2 */}
+          <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-2">
             <div>
               <span className="text-[0.68rem] font-mono text-gold font-semibold uppercase tracking-wider">
                 Bloco 2
@@ -482,33 +621,175 @@ export default function SermonStudioPage() {
               <h3 className="text-sm sm:text-base font-serif font-bold text-app-text">
                 Pregar a Inspiração (Exposição 3x4)
               </h3>
+              <p className="text-[0.72rem] text-app-text-muted">
+                Desenvolva de 1 a 4 tópicos com os 4 Degraus (A, B, C, D) para avançar a mensagem sem divagar.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[0.68rem] font-mono text-app-text-muted bg-app-raised px-2.5 py-1 rounded-lg border border-border">
+                {topicos.length} de 4 Tópicos
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddTopic}
+                disabled={topicos.length >= 4}
+                className="text-xs flex items-center gap-1 rounded-xl"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Adicionar Tópico</span>
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSaveTopicos}
+                disabled={isSavingTopicos || topicos.length === 0}
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{isSavingTopicos ? "Salvando..." : "Salvar Tópicos"}</span>
+              </Button>
             </div>
           </div>
 
-          <p className="text-xs text-app-text-muted">
-            Desenvolvimento dos tópicos homiléticos com os 4 Degraus (A, B, C, D).
-          </p>
+          {/* Lista de Tópicos Ativos */}
+          <div className="space-y-4">
+            {topicos.map((topic, index) => (
+              <div
+                key={topic.id || `topic-${index}`}
+                data-testid={`topic-card-${index}`}
+                className="p-4 sm:p-5 rounded-xl border border-border/80 bg-app-surface/60 space-y-3.5 shadow-xs"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-xs font-mono font-bold text-gold px-2 py-0.5 rounded-md bg-gold/10 border border-gold/30">
+                      #{index + 1}
+                    </span>
+                    <input
+                      type="text"
+                      value={topic.title}
+                      onChange={(e) => handleUpdateTopicTitle(index, e.target.value)}
+                      placeholder={`Título do Tópico ${index + 1}`}
+                      className="w-full font-serif font-bold text-sm bg-transparent border-b border-border/60 pb-1 text-app-text focus:outline-none focus:border-gold"
+                    />
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Remover Tópico"
+                    disabled={topicos.length <= 1}
+                    onClick={() => handleRemoveTopic(index)}
+                    className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg p-1.5 h-auto flex items-center gap-1 disabled:opacity-30 disabled:pointer-events-none"
+                    title={topicos.length <= 1 ? "Mínimo de 1 tópico" : "Remover Tópico"}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="text-[0.68rem]">Remover Tópico</span>
+                  </Button>
+                </div>
+
+                {/* Os 4 Degraus (A, B, C, D) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                  {/* Degrau A: Fato */}
+                  <div className="space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40">
+                    <label className="text-[0.72rem] font-semibold text-app-text flex items-center gap-1">
+                      <span className="text-gold font-mono">A.</span> Degrau A: Fato (A Afirmação Central)
+                    </label>
+                    <textarea
+                      value={topic.steps.stepA_fato}
+                      onChange={(e) => handleUpdateStep(index, "stepA_fato", e.target.value)}
+                      placeholder="O que o texto afirma expressamente..."
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                    />
+                  </div>
+
+                  {/* Degrau B: Porquê */}
+                  <div className="space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40">
+                    <label className="text-[0.72rem] font-semibold text-app-text flex items-center gap-1">
+                      <span className="text-gold font-mono">B.</span> Degrau B: Porquê (A Razão Teológica)
+                    </label>
+                    <textarea
+                      value={topic.steps.stepB_porque}
+                      onChange={(e) => handleUpdateStep(index, "stepB_porque", e.target.value)}
+                      placeholder="A razão teológica ou a causa espiritual..."
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                    />
+                  </div>
+
+                  {/* Degrau C: Contraste */}
+                  <div className="space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40">
+                    <label className="text-[0.72rem] font-semibold text-app-text flex items-center gap-1">
+                      <span className="text-gold font-mono">C.</span> Degrau C: Contraste (O Erro ou Consequência)
+                    </label>
+                    <textarea
+                      value={topic.steps.stepC_contraste}
+                      onChange={(e) => handleUpdateStep(index, "stepC_contraste", e.target.value)}
+                      placeholder="O que acontece sem essa verdade? O engano humano ou o contraste..."
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                    />
+                  </div>
+
+                  {/* Degrau D: Tensão / Gancho */}
+                  <div className="space-y-1 bg-app-raised/40 p-3 rounded-lg border border-border/40">
+                    <label className="text-[0.72rem] font-semibold text-app-text flex items-center gap-1">
+                      <span className="text-gold font-mono">D.</span> Degrau D: Tensão / Gancho (Pergunta Provocativa)
+                    </label>
+                    <textarea
+                      value={topic.steps.stepD_tensao}
+                      onChange={(e) => handleUpdateStep(index, "stepD_tensao", e.target.value)}
+                      placeholder="A pergunta provocativa ou gancho para a consciência dos ouvintes..."
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-border bg-app-surface px-2.5 py-1.5 text-xs text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Bloco 3: Aplicar à Vida Real */}
         <section
           data-testid="bloco-3-container"
-          data-locked={!isUnlocked ? "true" : "false"}
+          data-locked={!isBloco3Unlocked ? "true" : "false"}
           className={cn(
             "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
-            !isUnlocked
+            !isBloco3Unlocked
               ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
               : "border-border/80 bg-app-surface shadow-xs"
           )}
         >
-          {!isUnlocked && (
+          {!isUnlocked ? (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
               <Lock className="w-6 h-6 text-gold mb-2" />
               <p className="text-xs font-semibold text-app-text">
                 Bloqueado pelo Método da Marcha-Ré
               </p>
             </div>
-          )}
+          ) : !isBloco2Unlocked ? (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <ShieldAlert className="w-6 h-6 text-amber-500 mb-2" />
+              <p className="text-xs font-semibold text-app-text">
+                Aguardando Conclusão do Bloco 1
+              </p>
+            </div>
+          ) : !isBloco3Unlocked ? (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <Lock className="w-6 h-6 text-gold mb-2" />
+              <p className="text-xs font-semibold text-app-text">
+                Aguardando Conclusão do Bloco 2
+              </p>
+              <p className="text-[0.72rem] text-app-text-muted max-w-xs mt-1">
+                Salve os tópicos e degraus no Bloco 2 acima para liberar a Aplicação Prática.
+              </p>
+            </div>
+          ) : null}
 
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div>
@@ -519,6 +800,15 @@ export default function SermonStudioPage() {
                 Aplicar à Vida Real (Conexão Prática)
               </h3>
             </div>
+            <Button
+              type="button"
+              onClick={handleSaveBloco3}
+              disabled={isSavingBloco3}
+              className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+            >
+              <Save className="w-3.5 h-3.5 mr-1" />
+              <span>{isSavingBloco3 ? "Salvando..." : "Salvar Aplicação"}</span>
+            </Button>
           </div>
 
           <textarea
@@ -533,22 +823,39 @@ export default function SermonStudioPage() {
         {/* Introdução: Gancho de Entrada (Último passo da Marcha-Ré) */}
         <section
           data-testid="introducao-container"
-          data-locked={!isUnlocked ? "true" : "false"}
+          data-locked={!isBloco3Unlocked ? "true" : "false"}
           className={cn(
             "rounded-2xl border p-5 sm:p-6 space-y-4 transition-all relative",
-            !isUnlocked
+            !isBloco3Unlocked
               ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
               : "border-border/80 bg-app-surface shadow-xs"
           )}
         >
-          {!isUnlocked && (
+          {!isUnlocked ? (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
               <Lock className="w-6 h-6 text-gold mb-2" />
               <p className="text-xs font-semibold text-app-text">
                 Bloqueado pelo Método da Marcha-Ré
               </p>
             </div>
-          )}
+          ) : !isBloco2Unlocked ? (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <ShieldAlert className="w-6 h-6 text-amber-500 mb-2" />
+              <p className="text-xs font-semibold text-app-text">
+                Aguardando Conclusão do Bloco 1
+              </p>
+            </div>
+          ) : !isBloco3Unlocked ? (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-2xl p-4 text-center">
+              <Lock className="w-6 h-6 text-gold mb-2" />
+              <p className="text-xs font-semibold text-app-text">
+                Aguardando Conclusão do Bloco 2
+              </p>
+              <p className="text-[0.72rem] text-app-text-muted max-w-xs mt-1">
+                A Introdução é o último passo da Marcha-Ré. Conclua os tópicos do Bloco 2 para destravá-la.
+              </p>
+            </div>
+          ) : null}
 
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div>
@@ -559,6 +866,15 @@ export default function SermonStudioPage() {
                 Introdução (Gancho de Entrada)
               </h3>
             </div>
+            <Button
+              type="button"
+              onClick={handleSaveIntroducao}
+              disabled={isSavingIntroducao}
+              className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-xs"
+            >
+              <Save className="w-3.5 h-3.5 mr-1" />
+              <span>{isSavingIntroducao ? "Salvando..." : "Salvar Introdução"}</span>
+            </Button>
           </div>
 
           <textarea

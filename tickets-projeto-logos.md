@@ -57,13 +57,13 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#28](https://github.com/bmalossi/biblia-vive/issues/28)
 
-- [ ] Bloco 2 inicializa com 3 Tópicos Homiléticos por padrão.
-- [ ] Ações de remoção respeitam o limite mínimo de 1 tópico ativo.
-- [ ] Ação de adicionar tópico (`[ + Adicionar Tópico ]`) respeita o teto máximo inegociável de 4 tópicos ativos.
-- [ ] Cada tópico ativo renderiza obrigatoriamente os 4 campos de Degraus (A: Fato, B: Porquê, C: Contraste, D: Tensão/Gancho).
-- [ ] Conclusão do Bloco 2 desbloqueia o Bloco 3 (Aplicação Prática) e a Introdução (Gancho de Entrada).
-- [ ] Todos os tópicos, degraus, aplicação e introdução persistem no Cloudflare D1.
-- [ ] Testes de integração validando os limites de tópicos (1 a 4), campos obrigatórios dos degraus e persistência.
+- [x] Bloco 2 inicializa com 3 Tópicos Homiléticos por padrão.
+- [x] Ações de remoção respeitam o limite mínimo de 1 tópico ativo.
+- [x] Ação de adicionar tópico (`[ + Adicionar Tópico ]`) respeita o teto máximo inegociável de 4 tópicos ativos.
+- [x] Cada tópico ativo renderiza obrigatoriamente os 4 campos de Degraus (A: Fato, B: Porquê, C: Contraste, D: Tensão/Gancho).
+- [x] Conclusão do Bloco 2 desbloqueia o Bloco 3 (Aplicação Prática) e a Introdução (Gancho de Entrada).
+- [x] Todos os tópicos, degraus, aplicação e introdução persistem no Cloudflare D1.
+- [x] Testes de integração validando os limites de tópicos (1 a 4), campos obrigatórios dos degraus e persistência.
 
 ---
 
