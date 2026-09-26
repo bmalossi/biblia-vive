@@ -15,6 +15,10 @@ import {
   Maximize2,
   Minimize2,
   ExternalLink,
+  Layers,
+  Compass,
+  Target,
+  ScrollText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSermon, savePreachingLog, type Sermon } from "@/lib/homileticClient";
@@ -38,7 +42,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
         <span
           key={index}
           data-testid="dynamic-chip-ilustracao"
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-amber-500/15 text-amber-500 dark:text-amber-300 border border-amber-500/35 px-2.5 py-0.5 rounded-lg mx-1 font-semibold select-none shadow-xs"
         >
           💡 Ilustração
         </span>
@@ -49,7 +53,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
         <span
           key={index}
           data-testid="dynamic-chip-pausa"
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-sky-500/15 text-sky-600 dark:text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-sky-500/15 text-sky-500 dark:text-sky-300 border border-sky-500/35 px-2.5 py-0.5 rounded-lg mx-1 font-semibold select-none shadow-xs"
         >
           🤫 Pausa Silenciosa
         </span>
@@ -60,7 +64,7 @@ function renderWithDynamicMarkers(text: string | undefined): React.ReactNode {
         <span
           key={index}
           data-testid="dynamic-chip-apelo"
-          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-md mx-1 font-semibold select-none shadow-xs"
+          className="inline-flex items-center gap-1 font-mono text-[0.72rem] bg-purple-500/15 text-purple-500 dark:text-purple-300 border border-purple-500/35 px-2.5 py-0.5 rounded-lg mx-1 font-semibold select-none shadow-xs"
         >
           ⚡ Tom de Voz / Apelo
         </span>
@@ -306,13 +310,19 @@ export default function SermonPulpitPage() {
   const hasPassage = Boolean(sermon.bookName && sermon.chapter);
 
   return (
-    <div className="min-h-screen bg-app-bg text-app-text flex flex-col font-serif selection:bg-gold/30 selection:text-gold antialiased">
+    <div className="min-h-screen bg-app-bg text-app-text flex flex-col font-serif selection:bg-gold/30 selection:text-gold antialiased relative">
+      {/* Luz ambiente sagrada e suave ao fundo */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden select-none z-0">
+        <div className="absolute -top-32 -right-32 w-[620px] h-[620px] bg-[radial-gradient(circle,rgba(229,184,105,0.06)_0%,transparent_70%)] blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 -left-32 w-[520px] h-[520px] bg-[radial-gradient(circle,rgba(229,184,105,0.03)_0%,transparent_70%)] blur-3xl pointer-events-none" />
+      </div>
+
       {/* ── BARRA FIXA SUPERIOR DO ALTAR (Tema + Versículo Flutuante + Cronômetro + Trava de Tela) ── */}
       <header
         data-testid="pulpit-header"
-        className="sticky top-0 z-40 bg-app-surface/95 backdrop-blur-md border-b border-border px-4 py-2.5 transition-all shadow-xs"
+        className="sticky top-0 z-40 bg-app-surface/90 dark:bg-[#14110c]/90 backdrop-blur-md border-b border-border/80 dark:border-amber-900/30 px-4 py-3 transition-all shadow-xs"
       >
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3 flex-wrap">
           {/* Lado Esquerdo: Tema / Título & Versículo Flutuante */}
           <div className="flex items-center gap-2.5 min-w-0">
             <h1
@@ -327,7 +337,7 @@ export default function SermonPulpitPage() {
                 type="button"
                 data-testid="scripture-pill-main"
                 onClick={handleOpenScripture}
-                className="inline-flex items-center gap-1.5 text-[0.72rem] font-mono text-gold bg-gold/10 border border-gold/30 hover:bg-gold/20 px-2.5 py-1 rounded-full transition-colors shrink-0 shadow-xs cursor-pointer font-medium"
+                className="inline-flex items-center gap-1.5 text-xs font-mono text-gold bg-gold/10 border border-gold/30 hover:bg-gold/20 px-3 py-1.5 rounded-full transition-all shrink-0 shadow-xs cursor-pointer font-medium"
                 title="Abrir versículo bíblico no card flutuante"
               >
                 <BookOpen className="w-3.5 h-3.5" />
@@ -344,7 +354,7 @@ export default function SermonPulpitPage() {
             {/* Cronômetro */}
             <div
               data-testid="pulpit-stopwatch"
-              className="flex items-center gap-1.5 font-mono text-xs sm:text-sm text-gold bg-app-raised border border-border px-2.5 py-1 rounded-xl shadow-xs"
+              className="flex items-center gap-1.5 font-mono text-xs sm:text-sm text-gold bg-black/25 dark:bg-[#120f0b] border border-border/80 dark:border-amber-900/40 px-3 py-1.5 rounded-xl shadow-xs font-bold"
             >
               <Clock className="w-3.5 h-3.5 text-gold/80" />
               <span>{formattedTimer}</span>
@@ -361,10 +371,10 @@ export default function SermonPulpitPage() {
                   : "Clique para ativar a Trava de Tela"
               }
               className={cn(
-                "flex items-center gap-1.5 font-mono text-xs px-2.5 py-1 rounded-xl border transition-all cursor-pointer select-none shadow-xs",
+                "flex items-center gap-1.5 font-mono text-xs px-3 py-1.5 rounded-xl border transition-all cursor-pointer select-none shadow-xs",
                 isWakeLockActive
                   ? "bg-gold/15 text-gold border-gold/40 font-semibold"
-                  : "bg-app-raised text-app-text-muted border-border hover:text-app-text"
+                  : "bg-black/25 dark:bg-[#120f0b] text-app-text-muted border-border/80 dark:border-amber-900/40 hover:text-app-text"
               )}
             >
               <span
@@ -387,7 +397,7 @@ export default function SermonPulpitPage() {
                 type="button"
                 data-testid="enter-altar-mode-btn"
                 onClick={handleEnterAltarMode}
-                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+                className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs sm:text-sm font-bold px-4 py-1.5 rounded-xl flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
                 title="Ocultar menus e evitar toques acidentais no púlpito"
               >
                 <span>📖</span>
@@ -400,7 +410,7 @@ export default function SermonPulpitPage() {
                 onClick={handleExitAltarMode}
                 variant="outline"
                 size="sm"
-                className="text-xs border-border bg-app-raised text-app-text hover:bg-app-surface rounded-xl px-2.5 h-8 flex items-center gap-1.5 cursor-pointer"
+                className="text-xs border-border/80 dark:border-amber-900/40 bg-app-surface dark:bg-[#1a150e] text-app-text hover:bg-app-raised rounded-xl px-3 h-8 flex items-center gap-1.5 cursor-pointer"
                 title="Sair do modo foco e reexibir menus"
               >
                 <Minimize2 className="w-3.5 h-3.5" />
@@ -410,12 +420,12 @@ export default function SermonPulpitPage() {
 
             {/* Ajuste de Fonte (Oculto no modo altar para evitar toques acidentais) */}
             {!isAltarMode && (
-              <div className="hidden sm:flex items-center bg-app-raised border border-border rounded-xl p-0.5 shadow-xs">
+              <div className="hidden sm:flex items-center bg-black/25 dark:bg-[#120f0b] border border-border/80 dark:border-amber-900/40 rounded-xl p-0.5 shadow-xs">
                 <button
                   type="button"
                   onClick={() => setFontSizeIndex((prev) => Math.max(0, prev - 1))}
                   disabled={fontSizeIndex === 0}
-                  className="px-2 py-0.5 text-xs text-app-text-muted hover:text-app-text disabled:opacity-30 cursor-pointer"
+                  className="px-2.5 py-1 text-xs text-app-text-muted hover:text-app-text disabled:opacity-30 cursor-pointer font-bold"
                   title="Diminuir texto"
                 >
                   A-
@@ -426,7 +436,7 @@ export default function SermonPulpitPage() {
                     setFontSizeIndex((prev) => Math.min(fontSizes.length - 1, prev + 1))
                   }
                   disabled={fontSizeIndex === fontSizes.length - 1}
-                  className="px-2 py-0.5 text-xs text-app-text-muted hover:text-app-text disabled:opacity-30 cursor-pointer"
+                  className="px-2.5 py-1 text-xs text-app-text-muted hover:text-app-text disabled:opacity-30 cursor-pointer font-bold"
                   title="Aumentar texto"
                 >
                   A+
@@ -440,7 +450,7 @@ export default function SermonPulpitPage() {
               onClick={() => setIsPreachingModalOpen(true)}
               variant="outline"
               size="sm"
-              className="text-xs border-amber-500/30 bg-app-raised hover:bg-app-surface text-amber-600 dark:text-amber-400 rounded-xl px-2.5 h-8 flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="text-xs border-amber-500/35 bg-app-surface dark:bg-[#1a150e] hover:bg-app-raised text-amber-500 dark:text-amber-400 rounded-xl px-3 h-8 flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Encerrar</span>
@@ -450,46 +460,46 @@ export default function SermonPulpitPage() {
 
         {/* ── MAPA DO SERMÃO (Pílulas de Navegação - Ocultas quando isAltarMode para evitar toques acidentais) ── */}
         {!isAltarMode && (
-          <div className="max-w-5xl mx-auto flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 text-[0.68rem] font-mono no-scrollbar">
+          <div className="max-w-5xl mx-auto flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-0.5 text-[0.68rem] font-mono no-scrollbar">
             <button
               type="button"
               onClick={() => scrollToSection("sec-spark")}
-              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-gold whitespace-nowrap transition-colors cursor-pointer font-medium"
+              className="px-3 py-1 rounded-xl bg-app-surface dark:bg-[#1a150e] hover:border-gold/40 border border-border/80 dark:border-amber-900/40 text-gold whitespace-nowrap transition-colors cursor-pointer font-medium"
             >
               0. Eu e Deus
             </button>
             <button
               type="button"
               onClick={() => scrollToSection("sec-intro")}
-              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-gold whitespace-nowrap transition-colors cursor-pointer font-bold"
+              className="px-3 py-1 rounded-xl bg-app-surface dark:bg-[#1a150e] hover:border-gold/40 border border-border/80 dark:border-amber-900/40 text-gold whitespace-nowrap transition-colors cursor-pointer font-bold"
             >
               Introd.
             </button>
             <button
               type="button"
               onClick={() => scrollToSection("sec-bloco-1")}
-              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
+              className="px-3 py-1 rounded-xl bg-app-surface dark:bg-[#1a150e] hover:border-gold/40 border border-border/80 dark:border-amber-900/40 text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
             >
               1. Exegese
             </button>
             <button
               type="button"
               onClick={() => scrollToSection("sec-bloco-2")}
-              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
+              className="px-3 py-1 rounded-xl bg-app-surface dark:bg-[#1a150e] hover:border-gold/40 border border-border/80 dark:border-amber-900/40 text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
             >
               2. Tópicos
             </button>
             <button
               type="button"
               onClick={() => scrollToSection("sec-bloco-3")}
-              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
+              className="px-3 py-1 rounded-xl bg-app-surface dark:bg-[#1a150e] hover:border-gold/40 border border-border/80 dark:border-amber-900/40 text-app-text-muted hover:text-app-text whitespace-nowrap transition-colors cursor-pointer"
             >
               3. Aplicação
             </button>
             <button
               type="button"
               onClick={() => scrollToSection("sec-desfecho")}
-              className="px-2.5 py-1 rounded-lg bg-app-raised hover:bg-app-surface border border-border text-gold whitespace-nowrap transition-colors cursor-pointer font-semibold"
+              className="px-3 py-1 rounded-xl bg-app-surface dark:bg-[#1a150e] hover:border-gold/40 border border-border/80 dark:border-amber-900/40 text-gold whitespace-nowrap transition-colors cursor-pointer font-semibold"
             >
               4. Desfecho
             </button>
@@ -501,7 +511,7 @@ export default function SermonPulpitPage() {
       <main
         data-testid="pulpit-main-content"
         className={cn(
-          "max-w-3xl mx-auto w-full px-5 sm:px-8 py-8 space-y-12 flex-1 antialiased",
+          "max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 space-y-8 flex-1 antialiased relative z-10",
           fontSizes[fontSizeIndex]
         )}
       >
@@ -509,16 +519,16 @@ export default function SermonPulpitPage() {
         {isAltarMode && (
           <div
             data-testid="altar-mode-banner"
-            className="flex items-center justify-between bg-app-surface border border-gold/40 px-4 py-2.5 rounded-xl text-xs font-mono text-gold select-none shadow-xs animate-in fade-in duration-200"
+            className="flex items-center justify-between bg-gold/10 dark:bg-[#20180f] border border-gold/40 px-5 py-3 rounded-2xl text-xs font-mono text-gold select-none shadow-md animate-in fade-in duration-200"
           >
-            <div className="flex items-center gap-2">
-              <span className="animate-pulse">🛡️</span>
-              <span className="font-semibold">Modo Altar Ativo: Menus ocultos contra toques acidentais</span>
+            <div className="flex items-center gap-2.5">
+              <span className="animate-pulse text-base">🛡️</span>
+              <span className="font-semibold text-sm">Modo Altar Ativo: Menus ocultos contra toques acidentais</span>
             </div>
             <button
               type="button"
               onClick={handleExitAltarMode}
-              className="text-[0.7rem] text-app-text-muted hover:text-gold underline cursor-pointer"
+              className="text-xs text-app-text-muted hover:text-gold underline cursor-pointer font-medium"
             >
               Desbloquear Menus
             </button>
@@ -529,22 +539,28 @@ export default function SermonPulpitPage() {
         {sermon.sparkText && (
           <section
             id="sec-spark"
-            className="space-y-2 border-l-2 border-gold/50 pl-5 py-2 bg-gold/5 rounded-r-xl border-y border-r border-gold/20"
+            className="rounded-2xl border border-gold/25 dark:border-amber-900/40 bg-app-surface/95 dark:bg-[#16130e]/95 p-6 sm:p-7 space-y-3 shadow-lg"
           >
-            <span className="text-[0.7rem] font-mono uppercase tracking-widest text-gold font-bold block">
-              0. Eu e Deus — Chama Inicial
-            </span>
-            <p className="italic text-app-text font-serif text-sm sm:text-base leading-relaxed">
-              "{sermon.sparkText}"
-            </p>
+            <div className="flex items-center gap-2 text-gold font-sans font-bold text-xs tracking-wider uppercase">
+              <Flame className="w-4 h-4 fill-gold/20 text-gold" />
+              <span>0. Eu e Deus — Chama Inicial</span>
+            </div>
+            <div className="bg-black/25 dark:bg-[#0c0a08]/85 border border-border/60 dark:border-[#2a2217] rounded-xl p-4 sm:p-5 shadow-inner">
+              <p className="italic text-app-text font-serif text-sm sm:text-base leading-relaxed">
+                "{sermon.sparkText}"
+              </p>
+            </div>
           </section>
         )}
 
         {/* 1. Introdução (Gancho de Entrada no Topo da Pregação) */}
-        <section id="sec-intro" className="space-y-4 border-l-2 border-gold/70 pl-5 py-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> 1. Introdução (Gancho de Entrada)
+        <section
+          id="sec-intro"
+          className="rounded-2xl border border-gold/25 dark:border-amber-900/40 bg-app-surface/95 dark:bg-[#16130e]/95 p-6 sm:p-8 space-y-4 shadow-lg"
+        >
+          <div className="flex items-center justify-between border-b border-border/80 dark:border-amber-900/30 pb-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+              <Sparkles className="w-4 h-4" /> 1. Introdução (Gancho de Entrada)
             </span>
             <span className="text-[0.68rem] font-mono text-app-text-muted">Início da Ministração</span>
           </div>
@@ -552,20 +568,26 @@ export default function SermonPulpitPage() {
             {sermon.introducao ? (
               renderWithDynamicMarkers(sermon.introducao)
             ) : (
-              <p className="italic text-app-text-muted">Nenhuma introdução redigida ainda.</p>
+              <p className="italic text-app-text-muted text-sm">Nenhuma introdução redigida ainda.</p>
             )}
           </div>
         </section>
 
         {/* 2. Explicar o Texto (Exegese & Contexto Histórico) */}
-        <section id="sec-bloco-1" className="space-y-5 border-l-2 border-border pl-5 py-2">
-          <span className="text-xs font-mono uppercase tracking-widest text-app-text-muted font-bold block">
-            2. Explicar o Texto (Exegese & Contexto)
-          </span>
+        <section
+          id="sec-bloco-1"
+          className="rounded-2xl border border-gold/25 dark:border-amber-900/40 bg-app-surface/95 dark:bg-[#16130e]/95 p-6 sm:p-8 space-y-5 shadow-lg"
+        >
+          <div className="flex items-center gap-2.5 border-b border-border/80 dark:border-amber-900/30 pb-3">
+            <BookOpen className="w-4 h-4 text-gold" />
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold">
+              2. Explicar o Texto (Exegese & Contexto)
+            </span>
+          </div>
 
           {sermon.bloco1IntencaoOriginal && (
-            <div className="bg-app-surface border border-gold/30 rounded-2xl p-4 text-[1rem] sm:text-[1.125rem] text-app-text leading-relaxed italic font-serif shadow-xs">
-              <span className="font-mono text-xs text-gold font-bold block mb-1 not-italic uppercase tracking-wide">
+            <div className="bg-gold/5 dark:bg-[#120f0c] border border-gold/30 rounded-2xl p-5 text-[1rem] sm:text-[1.125rem] text-app-text leading-relaxed italic font-serif shadow-xs">
+              <span className="font-mono text-xs text-gold font-bold block mb-1.5 not-italic uppercase tracking-wide">
                 ⚓ Ancoradouro Histórico (Intenção Original do Autor):
               </span>
               "{sermon.bloco1IntencaoOriginal}"
@@ -580,19 +602,25 @@ export default function SermonPulpitPage() {
         </section>
 
         {/* 3. Pregar a Inspiração (Tópicos da Mensagem em Degraus Contínuos) */}
-        <section id="sec-bloco-2" className="space-y-8 border-l-2 border-border pl-5 py-2">
-          <span className="text-xs font-mono uppercase tracking-widest text-app-text-muted font-bold block">
-            3. Pregar a Inspiração (Tópicos em Degraus)
-          </span>
+        <section
+          id="sec-bloco-2"
+          className="rounded-2xl border border-gold/25 dark:border-amber-900/40 bg-app-surface/95 dark:bg-[#16130e]/95 p-6 sm:p-8 space-y-8 shadow-lg"
+        >
+          <div className="flex items-center gap-2.5 border-b border-border/80 dark:border-amber-900/30 pb-3">
+            <Layers className="w-4 h-4 text-gold" />
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold">
+              3. Pregar a Inspiração (Tópicos em Degraus)
+            </span>
+          </div>
 
           {sermon.bloco2Topicos && sermon.bloco2Topicos.length > 0 ? (
             sermon.bloco2Topicos.map((top, idx) => (
               <div
                 key={top.id || idx}
-                className="space-y-5 pt-3 pb-4 border-b border-border/80 last:border-b-0"
+                className="space-y-5 pt-3 pb-6 border-b border-border/80 dark:border-amber-900/30 last:border-b-0"
               >
                 <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-xs uppercase tracking-wider px-2.5 py-0.5 rounded bg-gold/15 text-gold border border-gold/30 shrink-0 font-bold">
+                  <span className="font-mono text-xs uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-gold/15 text-gold border border-gold/30 shrink-0 font-bold">
                     Tópico {idx + 1}
                   </span>
                   <h2 className="font-serif font-bold text-xl sm:text-2xl text-app-text leading-snug">
@@ -606,7 +634,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-a-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-amber-500 dark:text-amber-300 bg-amber-500/15 border border-amber-500/35 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
                       >
                         A · Fato
                       </span>
@@ -620,7 +648,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-b-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-sky-600 dark:text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-sky-500 dark:text-sky-300 bg-sky-500/15 border border-sky-500/35 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
                       >
                         B · Porquê
                       </span>
@@ -634,7 +662,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-c-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-rose-500 dark:text-rose-300 bg-rose-500/15 border border-rose-500/35 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
                       >
                         C · Contraste
                       </span>
@@ -648,7 +676,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-d-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-purple-500 dark:text-purple-300 bg-purple-500/15 border border-purple-500/35 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
                       >
                         D · Tensão
                       </span>
@@ -666,15 +694,21 @@ export default function SermonPulpitPage() {
         </section>
 
         {/* 4. Aplicar à Vida Real (Conexão Prática) */}
-        <section id="sec-bloco-3" className="space-y-4 border-l-2 border-border pl-5 py-2">
-          <span className="text-xs font-mono uppercase tracking-widest text-app-text-muted font-bold block">
-            4. Aplicar à Vida Real (Conexão Prática)
-          </span>
+        <section
+          id="sec-bloco-3"
+          className="rounded-2xl border border-gold/25 dark:border-amber-900/40 bg-app-surface/95 dark:bg-[#16130e]/95 p-6 sm:p-8 space-y-4 shadow-lg"
+        >
+          <div className="flex items-center gap-2.5 border-b border-border/80 dark:border-amber-900/30 pb-3">
+            <Compass className="w-4 h-4 text-gold" />
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold">
+              4. Aplicar à Vida Real (Conexão Prática)
+            </span>
+          </div>
           <div className="text-app-text font-serif whitespace-pre-line leading-relaxed">
             {sermon.bloco3Aplicacao ? (
               renderWithDynamicMarkers(sermon.bloco3Aplicacao)
             ) : (
-              <p className="italic text-app-text-muted">Nenhuma aplicação redigida ainda.</p>
+              <p className="italic text-app-text-muted text-sm">Nenhuma aplicação redigida ainda.</p>
             )}
           </div>
         </section>
@@ -682,15 +716,15 @@ export default function SermonPulpitPage() {
         {/* 5. Desfecho Homilético & Apelo Final (Conclusão na Ordem Cronológica) */}
         <section
           id="sec-desfecho"
-          className="space-y-4 border-l-2 border-gold pl-5 py-4 bg-gold/5 p-5 rounded-2xl border border-gold/30 shadow-xs"
+          className="rounded-2xl border-2 border-gold ring-1 ring-gold/40 bg-gold/10 dark:bg-[#20180f] p-6 sm:p-8 space-y-4 shadow-xl"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold block">
-              5. Desfecho Homilético & Apelo Final ({sermon.desfechoTipo || "Conclusão"})
+          <div className="flex items-center justify-between border-b border-gold/30 pb-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold flex items-center gap-2">
+              <Target className="w-4 h-4" /> 5. Desfecho Homilético & Apelo Final ({sermon.desfechoTipo || "Conclusão"})
             </span>
-            <span className="text-[0.68rem] font-mono text-gold/80">Conclusão da Mensagem</span>
+            <span className="text-[0.68rem] font-mono text-gold font-semibold">Conclusão da Mensagem</span>
           </div>
-          <p className="text-app-text font-serif font-bold whitespace-pre-line leading-relaxed">
+          <p className="text-app-text font-serif font-bold whitespace-pre-line leading-relaxed text-lg sm:text-xl">
             {renderWithDynamicMarkers(sermon.desfechoTexto || "Conclusão da mensagem.")}
           </p>
         </section>
@@ -700,7 +734,7 @@ export default function SermonPulpitPage() {
           <Button
             type="button"
             onClick={() => setIsPreachingModalOpen(true)}
-            className="bg-gold text-primary-foreground hover:bg-gold/90 text-sm font-semibold px-6 py-2.5 rounded-xl flex items-center gap-2 shadow-md active:scale-95 cursor-pointer"
+            className="bg-gold text-primary-foreground hover:bg-gold/90 text-sm font-bold px-7 py-3 rounded-2xl flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer"
           >
             <span>⏹️</span>
             <span>Encerrar Pregação & Registrar</span>
@@ -712,10 +746,10 @@ export default function SermonPulpitPage() {
       {isScriptureOpen && (
         <div
           data-testid="biblical-text-floating-card"
-          className="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-[480px] max-h-[70vh] z-50 bg-app-surface border border-gold/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-[480px] max-h-[70vh] z-50 bg-app-surface/95 dark:bg-[#16130e]/95 backdrop-blur-md border border-gold/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header do Card */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-app-raised/80">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border/80 dark:border-amber-900/30 bg-app-raised/80 dark:bg-[#120f0c]">
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-gold" />
               <span className="font-mono text-xs font-bold text-app-text">
@@ -753,11 +787,11 @@ export default function SermonPulpitPage() {
                   <p
                     key={v.number}
                     className={cn(
-                      "py-0.5",
-                      isSelectedVerse && "bg-gold/15 text-gold rounded px-1.5 font-semibold"
+                      "py-1 px-2 rounded-lg transition-colors",
+                      isSelectedVerse && "bg-gold/15 text-gold font-semibold border border-gold/30"
                     )}
                   >
-                    <sup className="text-gold text-[0.68rem] font-mono mr-1.5">{v.number}</sup>
+                    <sup className="text-gold text-[0.68rem] font-mono mr-1.5 font-bold">{v.number}</sup>
                     {v.text}
                   </p>
                 );
@@ -773,10 +807,10 @@ export default function SermonPulpitPage() {
       {isPreachingModalOpen && (
         <div
           data-testid="preaching-log-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
         >
-          <div className="bg-app-surface border border-border w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-5 text-app-text font-sans">
-            <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="bg-app-surface/95 dark:bg-[#16130e]/95 backdrop-blur-md border border-gold/30 w-full max-w-lg rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 text-app-text font-sans">
+            <div className="flex items-center justify-between border-b border-border/80 dark:border-amber-900/30 pb-3">
               <div className="flex items-center gap-2.5">
                 <span className="text-xl">🏛️</span>
                 <div>
@@ -800,7 +834,7 @@ export default function SermonPulpitPage() {
 
             <form onSubmit={handleSavePreaching} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
+                <label className="block text-xs font-mono uppercase text-app-text-muted mb-1 font-semibold">
                   Nome da Igreja / Comunidade *
                 </label>
                 <input
@@ -810,13 +844,13 @@ export default function SermonPulpitPage() {
                   value={churchName}
                   onChange={(e) => setChurchName(e.target.value)}
                   placeholder="Ex: Igreja Batista Esperança, Comunidade da Graça..."
-                  className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
+                  className="w-full bg-black/25 dark:bg-[#0c0a08]/85 border border-border/80 dark:border-[#2a2217] rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/60 focus:border-gold transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
+                  <label className="block text-xs font-mono uppercase text-app-text-muted mb-1 font-semibold">
                     Cidade *
                   </label>
                   <input
@@ -826,11 +860,11 @@ export default function SermonPulpitPage() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Ex: Curitiba, PR"
-                    className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
+                    className="w-full bg-black/25 dark:bg-[#0c0a08]/85 border border-border/80 dark:border-[#2a2217] rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/60 focus:border-gold transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
+                  <label className="block text-xs font-mono uppercase text-app-text-muted mb-1 font-semibold">
                     Data da Ministração *
                   </label>
                   <input
@@ -839,13 +873,13 @@ export default function SermonPulpitPage() {
                     required
                     value={preachedAt}
                     onChange={(e) => setPreachedAt(e.target.value)}
-                    className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
+                    className="w-full bg-black/25 dark:bg-[#0c0a08]/85 border border-border/80 dark:border-[#2a2217] rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/60 focus:border-gold transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
+                <label className="block text-xs font-mono uppercase text-app-text-muted mb-1 font-semibold">
                   Resumo do Impacto Espiritual & Notas
                 </label>
                 <textarea
@@ -854,11 +888,11 @@ export default function SermonPulpitPage() {
                   value={preachingNotes}
                   onChange={(e) => setPreachingNotes(e.target.value)}
                   placeholder="Como o Espírito Santo se moveu? Reconciliações, consolações, arrependimento ou impressões marcantes..."
-                  className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold resize-none transition-colors"
+                  className="w-full bg-black/25 dark:bg-[#0c0a08]/85 border border-border/80 dark:border-[#2a2217] rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/60 focus:border-gold resize-none transition-colors"
                 />
               </div>
 
-              <div className="flex items-center gap-2 bg-app-raised/60 p-3 rounded-xl border border-border">
+              <div className="flex items-center gap-2 bg-black/25 dark:bg-[#120f0b] p-3.5 rounded-xl border border-border/80 dark:border-amber-900/30">
                 <input
                   id="mirror-checkbox"
                   data-testid="preaching-mirror-memorial-checkbox"
@@ -878,7 +912,7 @@ export default function SermonPulpitPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => navigate(`/estudio/${sermon.id}`)}
-                  className="text-xs border-border bg-app-raised hover:bg-app-surface text-app-text-muted hover:text-app-text rounded-xl cursor-pointer"
+                  className="text-xs border-border/80 dark:border-amber-900/40 bg-app-surface dark:bg-[#1a150e] hover:bg-app-raised text-app-text-muted hover:text-app-text rounded-xl px-4 py-2 cursor-pointer"
                 >
                   Sair sem salvar
                 </Button>
@@ -886,7 +920,7 @@ export default function SermonPulpitPage() {
                   type="submit"
                   data-testid="save-preaching-log-btn"
                   disabled={isSavingLog || !churchName.trim() || !city.trim()}
-                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer shadow-xs"
+                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-bold px-4 py-2 rounded-xl cursor-pointer shadow-md"
                 >
                   {isSavingLog ? "Salvando..." : "Salvar Registro & Concluir"}
                 </Button>

@@ -260,6 +260,12 @@ export default {
             await env.DB.prepare(
               `UPDATE sermons SET
                 title = COALESCE(?, title),
+                book_id = COALESCE(?, book_id),
+                book_name = COALESCE(?, book_name),
+                chapter = COALESCE(?, chapter),
+                verse = COALESCE(?, verse),
+                version = COALESCE(?, version),
+                spark_text = COALESCE(?, spark_text),
                 desfecho_tipo = COALESCE(?, desfecho_tipo),
                 desfecho_texto = COALESCE(?, desfecho_texto),
                 bloco_1_exegese = COALESCE(?, bloco_1_exegese),
@@ -273,6 +279,12 @@ export default {
             )
               .bind(
                 body.title ?? null,
+                body.bookId ?? null,
+                body.bookName ?? null,
+                body.chapter ?? null,
+                body.verse ?? null,
+                body.version ?? null,
+                body.sparkText ?? null,
                 body.desfechoTipo ?? null,
                 body.desfechoTexto ?? null,
                 body.bloco1Exegese ?? null,

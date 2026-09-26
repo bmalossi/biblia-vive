@@ -177,7 +177,10 @@ export async function saveSermon(sermon: Partial<Sermon> & { id: string }): Prom
       });
       if (res.ok) {
         const data = await res.json();
-        return data.sermon;
+        if (data.sermon) {
+          localStorage.setItem(`bv_sermon_${sermon.id}`, JSON.stringify(data.sermon));
+          return data.sermon;
+        }
       }
     } catch (err) {
       markWorkerOffline();
@@ -194,9 +197,17 @@ export async function saveSermon(sermon: Partial<Sermon> & { id: string }): Prom
     } catch {}
   }
 
+  // Não sobrescrever campos existentes com undefined
+  const cleanedPayload: any = {};
+  for (const [k, v] of Object.entries(updatedPayload)) {
+    if (v !== undefined) {
+      cleanedPayload[k] = v;
+    }
+  }
+
   const merged: Sermon = {
     ...(existing || ({} as Sermon)),
-    ...updatedPayload,
+    ...cleanedPayload,
     updatedAt: updatedPayload.updatedAt,
   } as Sermon;
 

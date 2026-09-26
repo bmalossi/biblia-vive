@@ -35,6 +35,10 @@ export default function SermonDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "completed">("all");
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newPassage, setNewPassage] = useState("");
+  const [newSpark, setNewSpark] = useState("");
 
   useEffect(() => {
     if (!isTemplo) {
@@ -60,16 +64,38 @@ export default function SermonDashboardPage() {
     };
   }, [isTemplo]);
 
-  const handleCreateNewSermon = async () => {
+  const handleCreateNewSermon = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsCreating(true);
     try {
+      const finalTitle = newTitle.trim() || "Novo Estudo Homilético";
+
+      let bookName: string | undefined = undefined;
+      let chapter: number | undefined = undefined;
+      let verse: number | undefined = undefined;
+
+      if (newPassage.trim()) {
+        const match = newPassage.trim().match(/^([\d\s\p{L}]+?)\s+(\d+)(?::(\d+))?$/u);
+        if (match) {
+          bookName = match[1].trim();
+          chapter = parseInt(match[2], 10);
+          verse = match[3] ? parseInt(match[3], 10) : undefined;
+        } else {
+          bookName = newPassage.trim();
+        }
+      }
+
       const newSermon = await saveSermon({
         id: `sermon_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-        title: "Novo Estudo Homilético",
+        title: finalTitle,
+        bookName,
+        chapter,
+        verse,
         status: "draft",
-        sparkText: "Inspiração capturada para ministração da Palavra.",
+        sparkText: newSpark.trim() || "Inspiração capturada para ministração da Palavra.",
       });
       toast.success("Novo sermão criado no Estúdio!");
+      setIsCreateModalOpen(false);
       navigate(`/estudio/${newSermon.id}`);
     } catch (err) {
       console.error("Erro ao criar novo sermão:", err);
@@ -315,7 +341,13 @@ export default function SermonDashboardPage() {
 
             <div className="flex items-center gap-3 shrink-0">
               <Button
-                onClick={handleCreateNewSermon}
+                data-testid="create-sermon-btn"
+                onClick={() => {
+                  setNewTitle("");
+                  setNewPassage("");
+                  setNewSpark("");
+                  setIsCreateModalOpen(true);
+                }}
                 disabled={isCreating}
                 className="w-full sm:w-auto bg-gold text-primary-foreground hover:bg-gold/90 text-xs sm:text-sm font-semibold px-6 py-2.5 rounded-full flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer"
               >
@@ -435,7 +467,13 @@ export default function SermonDashboardPage() {
             </div>
             {!searchQuery && (
               <Button
-                onClick={handleCreateNewSermon}
+                data-testid="btn-novo-estudo-top"
+                onClick={() => {
+                  setNewTitle("");
+                  setNewPassage("");
+                  setNewSpark("");
+                  setIsCreateModalOpen(true);
+                }}
                 className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full shadow-md cursor-pointer transition-all active:scale-95"
               >
                 <Plus className="w-4 h-4 mr-1.5" /> Criar Primeiro Estudo
@@ -522,6 +560,106 @@ export default function SermonDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Modal de Criação de Novo Estudo Homilético com Título & Passagem */}
+      {isCreateModalOpen && (
+        <div
+          data-testid="create-sermon-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+          <div className="bg-app-surface border border-border w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-5 text-app-text font-sans">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">🏛️</span>
+                <div>
+                  <h3 className="font-serif font-bold text-base text-app-text">
+                    Novo Estudo Homilético
+                  </h3>
+                  <p className="text-xs text-app-text-muted">
+                    Defina o título e a passagem bíblica base da mensagem
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="text-app-text-muted hover:text-app-text p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNewSermon} className="space-y-4">
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-gold font-semibold mb-1">
+                  Título da Pregação *
+                </label>
+                <input
+                  data-testid="new-sermon-title-input"
+                  type="text"
+                  required
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="Ex: O Filho Pródigo, Graça Inabalável, Lucas 15..."
+                  className="w-full bg-app-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-app-text-muted mb-1">
+                  Passagem Bíblica Base (Opcional)
+                </label>
+                <input
+                  data-testid="new-sermon-passage-input"
+                  type="text"
+                  value={newPassage}
+                  onChange={(e) => setNewPassage(e.target.value)}
+                  placeholder="Ex: Lucas 15:11-32, Romanos 8:28, João 3:16..."
+                  className="w-full bg-app-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold"
+                />
+                <span className="text-[0.68rem] text-app-text-muted/70 mt-1 block">
+                  Identifica automaticamente o livro, capítulo e versículo da passagem.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-app-text-muted mb-1">
+                  A Chama Inicial — Eu e Deus (Opcional)
+                </label>
+                <textarea
+                  data-testid="new-sermon-spark-input"
+                  rows={2}
+                  value={newSpark}
+                  onChange={(e) => setNewSpark(e.target.value)}
+                  placeholder="O que o Espírito Santo ministrou ao seu coração durante a oração?"
+                  className="w-full bg-app-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="text-xs border-border text-app-text-muted hover:text-app-text cursor-pointer"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  data-testid="confirm-create-sermon-btn"
+                  disabled={isCreating}
+                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer"
+                >
+                  {isCreating ? "Criando..." : "Criar e Abrir no Estúdio"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
