@@ -89,13 +89,13 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#29](https://github.com/bmalossi/biblia-vive/issues/29)
 
-- [ ] Rota `/pulpito/[sermonId]` criada com interface imersiva e zero distrações.
-- [ ] Screen Wake Lock API acionada na montagem do componente com liberação graciosa no unmount ou saída.
-- [ ] Cronômetro discreto no topo superior exibindo tempo decorrido de pregação.
-- [ ] Mapa do sermão em pílulas no cabeçalho com salto suave por scroll para cada seção.
-- [ ] Estilização visual para marcadores de dinâmica (`[Ilustração]`, `[Pausa Silenciosa]`, `[Tom de Voz / Apelo]`).
-- [ ] Pílulas de referências bíblicas que expandem o texto canônico completo em card flutuante mantendo o scroll do sermão.
-- [ ] Testes de integração validando ativação da Wake Lock API, interação com pílulas e navegação.
+- [x] Rota `/pulpito/[sermonId]` criada com interface imersiva e zero distrações.
+- [x] Screen Wake Lock API acionada na montagem do componente com liberação graciosa no unmount ou saída.
+- [x] Cronômetro discreto no topo superior exibindo tempo decorrido de pregação.
+- [x] Mapa do sermão em pílulas no cabeçalho com salto suave por scroll para cada seção.
+- [x] Estilização visual para marcadores de dinâmica (`[Ilustração]`, `[Pausa Silenciosa]`, `[Tom de Voz / Apelo]`).
+- [x] Pílulas de referências bíblicas que expandem o texto canônico completo em card flutuante mantendo o scroll do sermão.
+- [x] Testes de integração validando ativação da Wake Lock API, interação com pílulas e navegação.
 
 ---
 

@@ -23,6 +23,7 @@ const MemorialPage = lazy(() => import("./pages/MemorialPage"));
 const MemorialEntryPage = lazy(() => import("./pages/MemorialEntryPage"));
 const SermonStudioPage = lazy(() => import("./pages/SermonStudioPage"));
 const SermonDashboardPage = lazy(() => import("./pages/SermonDashboardPage"));
+const SermonPulpitPage = lazy(() => import("./pages/SermonPulpitPage"));
 const MyNotesPage = lazy(() => import("./pages/MyNotesPage"));
 const ReadingPlansPage = lazy(() => import("./pages/ReadingPlansPage"));
 const SharePage = lazy(() => import("./pages/SharePage"));
@@ -96,6 +97,7 @@ const App = () => (
                   <Route path="/memorial/:id" element={<MemorialEntryPage />} />
                   <Route path="/estudio" element={<SermonDashboardPage />} />
                   <Route path="/estudio/:sermonId" element={<SermonStudioPage />} />
+                  <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
                   <Route path="/minhas-notas" element={<Navigate to="/memorial" replace />} />
                   <Route path="/planos" element={<ReadingPlansPage />} />
                   <Route path="/jornadas" element={<JornadasPage />} />
