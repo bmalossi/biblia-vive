@@ -50,6 +50,17 @@ const DEFAULT_WORKER_URL =
   import.meta.env.VITE_HOMILETIC_WORKER_URL ||
   (import.meta.env.DEV ? "http://localhost:8788" : "https://estudio.bibliavive.com.br");
 
+// Circuit breaker simples para não spammar erros de rede quando o Worker local não estiver rodando
+let workerOfflineUntil = 0;
+
+function markWorkerOffline() {
+  workerOfflineUntil = Date.now() + 45000; // pausa tentativas de rede por 45s se offline
+}
+
+function isWorkerCircuitOpen(): boolean {
+  return Date.now() < workerOfflineUntil;
+}
+
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
@@ -77,19 +88,22 @@ export async function createSermonFromInspiration(
     sparkText: inspirationEntry.content,
   };
 
-  try {
-    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
+  if (!isWorkerCircuitOpen()) {
+    try {
+      const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
 
-    if (res.ok) {
-      const data = await res.json();
-      return data.sermon;
+      if (res.ok) {
+        const data = await res.json();
+        return data.sermon;
+      }
+    } catch (err) {
+      markWorkerOffline();
+      console.info("[homileticClient] Worker D1 local offline (localhost:8788). Operando em modo cache local resiliente.");
     }
-  } catch (err) {
-    console.warn("[homileticClient] Falha ao contatar Worker D1, gerando local:", err);
   }
 
   // Fallback local se worker ainda não estiver conectado em desenvolvimento
@@ -117,18 +131,20 @@ export async function createSermonFromInspiration(
  * Recupera um Sermão por ID.
  */
 export async function getSermon(sermonId: string): Promise<Sermon | null> {
-  const headers = await getAuthHeaders();
-
-  try {
-    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${sermonId}`, {
-      headers,
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data.sermon;
+  if (!isWorkerCircuitOpen()) {
+    const headers = await getAuthHeaders();
+    try {
+      const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${sermonId}`, {
+        headers,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.sermon;
+      }
+    } catch (err) {
+      markWorkerOffline();
+      console.info("[homileticClient] Worker D1 local offline, lendo cache local.");
     }
-  } catch (err) {
-    console.warn("[homileticClient] Falha ao buscar no Worker D1, lendo cache local:", err);
   }
 
   const cached = localStorage.getItem(`bv_sermon_${sermonId}`);
@@ -146,27 +162,38 @@ export async function getSermon(sermonId: string): Promise<Sermon | null> {
  * Atualiza os blocos e campos de um Sermão no D1.
  */
 export async function saveSermon(sermon: Partial<Sermon> & { id: string }): Promise<Sermon> {
-  const headers = await getAuthHeaders();
   const updatedPayload = {
     ...sermon,
     updatedAt: new Date().toISOString(),
   };
 
-  try {
-    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${sermon.id}`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify(updatedPayload),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data.sermon;
+  if (!isWorkerCircuitOpen()) {
+    const headers = await getAuthHeaders();
+    try {
+      const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${sermon.id}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(updatedPayload),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.sermon;
+      }
+    } catch (err) {
+      markWorkerOffline();
+      console.info("[homileticClient] Worker D1 local offline, persistindo no cache local.");
     }
-  } catch (err) {
-    console.warn("[homileticClient] Falha ao salvar no Worker D1, salvando local:", err);
   }
 
-  const existing = await getSermon(sermon.id);
+  // Leitura direta do localStorage no fallback sem nova tentativa de rede redundante
+  let existing: Sermon | null = null;
+  const cached = localStorage.getItem(`bv_sermon_${sermon.id}`);
+  if (cached) {
+    try {
+      existing = JSON.parse(cached) as Sermon;
+    } catch {}
+  }
+
   const merged: Sermon = {
     ...(existing || ({} as Sermon)),
     ...updatedPayload,
@@ -181,17 +208,20 @@ export async function saveSermon(sermon: Partial<Sermon> & { id: string }): Prom
  * Lista todos os sermões do usuário autenticado no D1.
  */
 export async function listSermons(): Promise<Sermon[]> {
-  const headers = await getAuthHeaders();
-  try {
-    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons`, {
-      headers,
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data.sermons || [];
+  if (!isWorkerCircuitOpen()) {
+    const headers = await getAuthHeaders();
+    try {
+      const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons`, {
+        headers,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.sermons || [];
+      }
+    } catch (err) {
+      markWorkerOffline();
+      console.info("[homileticClient] Worker D1 local offline, listando do cache local.");
     }
-  } catch (err) {
-    console.warn("[homileticClient] Falha ao listar sermões do Worker D1, lendo cache local:", err);
   }
 
   // Fallback local: recuperar todas as chaves bv_sermon_* do localStorage
@@ -241,18 +271,21 @@ export async function savePreachingLog(log: {
     createdAt: new Date().toISOString(),
   };
 
-  try {
-    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${log.sermonId}/preaching-logs`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data.preachingLog;
+  if (!isWorkerCircuitOpen()) {
+    try {
+      const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${log.sermonId}/preaching-logs`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.preachingLog;
+      }
+    } catch (err) {
+      markWorkerOffline();
+      console.info("[homileticClient] Worker D1 local offline, registrando pregação no cache local.");
     }
-  } catch (err) {
-    console.warn("[homileticClient] Falha ao salvar log de pregação no Worker D1, salvando local:", err);
   }
 
   // Fallback local
@@ -283,17 +316,20 @@ export async function savePreachingLog(log: {
  */
 export async function listPreachingLogs(sermonId?: string): Promise<PreachingLog[]> {
   const headers = await getAuthHeaders();
-  try {
-    const url = sermonId
-      ? `${DEFAULT_WORKER_URL}/api/sermons/${sermonId}/preaching-logs`
-      : `${DEFAULT_WORKER_URL}/api/preaching-logs`;
-    const res = await fetch(url, { headers });
-    if (res.ok) {
-      const data = await res.json();
-      return data.preachingLogs || [];
+  if (!isWorkerCircuitOpen()) {
+    try {
+      const url = sermonId
+        ? `${DEFAULT_WORKER_URL}/api/sermons/${sermonId}/preaching-logs`
+        : `${DEFAULT_WORKER_URL}/api/preaching-logs`;
+      const res = await fetch(url, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        return data.preachingLogs || [];
+      }
+    } catch (err) {
+      markWorkerOffline();
+      console.info("[homileticClient] Worker D1 local offline, listando pregações do cache local.");
     }
-  } catch (err) {
-    console.warn("[homileticClient] Falha ao listar logs no Worker D1, lendo cache local:", err);
   }
 
   if (sermonId) {
