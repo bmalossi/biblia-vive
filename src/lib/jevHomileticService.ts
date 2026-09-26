@@ -8,7 +8,7 @@
 
 import { supabase } from "@/lib/supabase";
 import type { Sermon } from "@/lib/homileticClient";
-import { fetchManualCommentaries } from "@/lib/studyPanel";
+import { getManualCommentaries } from "@/lib/studyPanel";
 
 export type TheologicalDeviation =
   | "Fiel_Ao_Texto"
@@ -90,7 +90,7 @@ export async function auditSermonOrthodoxy(
   let historicalCommentary = "";
   if (sermon.bookId && sermon.chapter) {
     try {
-      const commentaries = await fetchManualCommentaries(sermon.bookId, sermon.chapter, sermon.verse || undefined);
+      const commentaries = await getManualCommentaries(sermon.bookId, sermon.chapter, sermon.verse || undefined);
       if (commentaries && commentaries.length > 0) {
         historicalCommentary = commentaries
           .slice(0, 3)

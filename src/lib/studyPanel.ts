@@ -187,11 +187,11 @@ export async function getChapterCachedVerseNumbers(
  * Busca comentários inseridos manualmente pelo admin na tabela `manual_commentaries`.
  * Retorna array vazio se não houver nenhum (nunca lança erro).
  */
-async function getManualCommentaries(
+export async function getManualCommentaries(
   bookId: string,
   chapter: number,
   verse: number | null | undefined,
-  language: string
+  language: string = 'pt'
 ): Promise<Commentary[]> {
   try {
     const isChapterLevel = verse === null || verse === undefined || verse === 0;
