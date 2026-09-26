@@ -28,11 +28,11 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#26](https://github.com/bmalossi/biblia-vive/issues/26)
 
-- [ ] Seletor das 4 categorias de Desfecho Homilético (Consolação, Confronto, Conversão, Oração) com campo de texto da chegada pretendida.
-- [ ] Estado inicial do Estúdio mantém Bloco 1, Bloco 2, Bloco 3 e Introdução bloqueados até o Desfecho ser preenchido.
-- [ ] Salvamento do Desfecho desbloqueia os blocos e persiste os dados na tabela `sermons` do Cloudflare D1 via Worker.
-- [ ] Após o desbloqueio inicial, o pregador pode editar livremente qualquer bloco ou alterar o Desfecho sem perder conteúdo digitado.
-- [ ] Testes de integração validando o comportamento de bloqueio/desbloqueio progressivo e persistência no D1.
+- [x] Seletor das 4 categorias de Desfecho Homilético (Consolação, Confronto, Conversão, Oração) com campo de texto da chegada pretendida.
+- [x] Estado inicial do Estúdio mantém Bloco 1, Bloco 2, Bloco 3 e Introdução bloqueados até o Desfecho ser preenchido.
+- [x] Salvamento do Desfecho desbloqueia os blocos e persiste os dados na tabela `sermons` do Cloudflare D1 via Worker.
+- [x] Após o desbloqueio inicial, o pregador pode editar livremente qualquer bloco ou alterar o Desfecho sem perder conteúdo digitado.
+- [x] Testes de integração validando o comportamento de bloqueio/desbloqueio progressivo e persistência no D1.
 
 ---
 
