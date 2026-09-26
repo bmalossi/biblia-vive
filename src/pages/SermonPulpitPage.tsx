@@ -509,7 +509,7 @@ export default function SermonPulpitPage() {
         {isAltarMode && (
           <div
             data-testid="altar-mode-banner"
-            className="flex items-center justify-between bg-zinc-900/90 border border-gold/40 px-4 py-2 rounded-xl text-xs font-mono text-gold select-none animate-in fade-in duration-200"
+            className="flex items-center justify-between bg-app-surface border border-gold/40 px-4 py-2.5 rounded-xl text-xs font-mono text-gold select-none shadow-xs animate-in fade-in duration-200"
           >
             <div className="flex items-center gap-2">
               <span className="animate-pulse">🛡️</span>
@@ -518,7 +518,7 @@ export default function SermonPulpitPage() {
             <button
               type="button"
               onClick={handleExitAltarMode}
-              className="text-[0.7rem] text-zinc-400 hover:text-white underline cursor-pointer"
+              className="text-[0.7rem] text-app-text-muted hover:text-gold underline cursor-pointer"
             >
               Desbloquear Menus
             </button>
@@ -529,12 +529,12 @@ export default function SermonPulpitPage() {
         {sermon.sparkText && (
           <section
             id="sec-spark"
-            className="space-y-2 border-l-2 border-amber-500/50 pl-5 py-2 bg-amber-500/5 rounded-r-xl"
+            className="space-y-2 border-l-2 border-gold/50 pl-5 py-2 bg-gold/5 rounded-r-xl border-y border-r border-gold/20"
           >
-            <span className="text-[0.7rem] font-mono uppercase tracking-widest text-amber-400 font-bold block">
+            <span className="text-[0.7rem] font-mono uppercase tracking-widest text-gold font-bold block">
               0. Eu e Deus — Chama Inicial
             </span>
-            <p className="italic text-zinc-300 font-serif text-sm sm:text-base leading-relaxed">
+            <p className="italic text-app-text font-serif text-sm sm:text-base leading-relaxed">
               "{sermon.sparkText}"
             </p>
           </section>
@@ -546,26 +546,26 @@ export default function SermonPulpitPage() {
             <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> 1. Introdução (Gancho de Entrada)
             </span>
-            <span className="text-[0.68rem] font-mono text-zinc-500">Início da Ministração</span>
+            <span className="text-[0.68rem] font-mono text-app-text-muted">Início da Ministração</span>
           </div>
-          <div className="text-zinc-100 font-serif whitespace-pre-line leading-relaxed">
+          <div className="text-app-text font-serif whitespace-pre-line leading-relaxed">
             {sermon.introducao ? (
               renderWithDynamicMarkers(sermon.introducao)
             ) : (
-              <p className="italic text-zinc-400">Nenhuma introdução redigida ainda.</p>
+              <p className="italic text-app-text-muted">Nenhuma introdução redigida ainda.</p>
             )}
           </div>
         </section>
 
         {/* 2. Explicar o Texto (Exegese & Contexto Histórico) */}
-        <section id="sec-bloco-1" className="space-y-5 border-l-2 border-zinc-700 pl-5 py-2">
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold block">
+        <section id="sec-bloco-1" className="space-y-5 border-l-2 border-border pl-5 py-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-app-text-muted font-bold block">
             2. Explicar o Texto (Exegese & Contexto)
           </span>
 
           {sermon.bloco1IntencaoOriginal && (
-            <div className="bg-zinc-900/90 border border-amber-500/30 rounded-2xl p-4 text-[1rem] sm:text-[1.125rem] text-zinc-200 leading-relaxed italic font-serif shadow-xs">
-              <span className="font-mono text-xs text-amber-400 font-bold block mb-1 not-italic uppercase tracking-wide">
+            <div className="bg-app-surface border border-gold/30 rounded-2xl p-4 text-[1rem] sm:text-[1.125rem] text-app-text leading-relaxed italic font-serif shadow-xs">
+              <span className="font-mono text-xs text-gold font-bold block mb-1 not-italic uppercase tracking-wide">
                 ⚓ Ancoradouro Histórico (Intenção Original do Autor):
               </span>
               "{sermon.bloco1IntencaoOriginal}"
@@ -573,15 +573,15 @@ export default function SermonPulpitPage() {
           )}
 
           {sermon.bloco1Exegese && (
-            <div className="text-zinc-100 font-serif whitespace-pre-line leading-relaxed">
+            <div className="text-app-text font-serif whitespace-pre-line leading-relaxed">
               {renderWithDynamicMarkers(sermon.bloco1Exegese)}
             </div>
           )}
         </section>
 
         {/* 3. Pregar a Inspiração (Tópicos da Mensagem em Degraus Contínuos) */}
-        <section id="sec-bloco-2" className="space-y-8 border-l-2 border-zinc-700 pl-5 py-2">
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold block">
+        <section id="sec-bloco-2" className="space-y-8 border-l-2 border-border pl-5 py-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-app-text-muted font-bold block">
             3. Pregar a Inspiração (Tópicos em Degraus)
           </span>
 
@@ -589,24 +589,24 @@ export default function SermonPulpitPage() {
             sermon.bloco2Topicos.map((top, idx) => (
               <div
                 key={top.id || idx}
-                className="space-y-5 pt-3 pb-4 border-b border-zinc-800/80 last:border-b-0"
+                className="space-y-5 pt-3 pb-4 border-b border-border/80 last:border-b-0"
               >
                 <div className="flex items-baseline gap-3">
                   <span className="font-mono text-xs uppercase tracking-wider px-2.5 py-0.5 rounded bg-gold/15 text-gold border border-gold/30 shrink-0 font-bold">
                     Tópico {idx + 1}
                   </span>
-                  <h2 className="font-serif font-bold text-xl sm:text-2xl text-gold-light leading-snug">
+                  <h2 className="font-serif font-bold text-xl sm:text-2xl text-app-text leading-snug">
                     {top.title}
                   </h2>
                 </div>
 
                 {/* Parágrafos contínuos dos 4 Degraus com badges sutis na margem */}
-                <div className="space-y-4 text-zinc-100 font-serif">
+                <div className="space-y-4 text-app-text font-serif">
                   {top.steps?.stepA_fato && (
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-a-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded select-none shadow-xs"
                       >
                         A · Fato
                       </span>
@@ -620,7 +620,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-b-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-sky-600 dark:text-sky-300 bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 rounded select-none shadow-xs"
                       >
                         B · Porquê
                       </span>
@@ -634,7 +634,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-c-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-300 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded select-none shadow-xs"
                       >
                         C · Contraste
                       </span>
@@ -648,7 +648,7 @@ export default function SermonPulpitPage() {
                     <div className="flex items-start gap-3">
                       <span
                         data-testid={`badge-degrau-d-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded select-none shadow-xs"
+                        className="shrink-0 mt-1 inline-flex items-center text-[0.68rem] font-mono font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300 bg-purple-500/15 border border-purple-500/30 px-2 py-0.5 rounded select-none shadow-xs"
                       >
                         D · Tensão
                       </span>
@@ -661,20 +661,20 @@ export default function SermonPulpitPage() {
               </div>
             ))
           ) : (
-            <p className="text-sm text-zinc-400 italic">Sem tópicos definidos no esboço.</p>
+            <p className="text-sm text-app-text-muted italic">Sem tópicos definidos no esboço.</p>
           )}
         </section>
 
         {/* 4. Aplicar à Vida Real (Conexão Prática) */}
-        <section id="sec-bloco-3" className="space-y-4 border-l-2 border-zinc-700 pl-5 py-2">
-          <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold block">
+        <section id="sec-bloco-3" className="space-y-4 border-l-2 border-border pl-5 py-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-app-text-muted font-bold block">
             4. Aplicar à Vida Real (Conexão Prática)
           </span>
-          <div className="text-zinc-100 font-serif whitespace-pre-line leading-relaxed">
+          <div className="text-app-text font-serif whitespace-pre-line leading-relaxed">
             {sermon.bloco3Aplicacao ? (
               renderWithDynamicMarkers(sermon.bloco3Aplicacao)
             ) : (
-              <p className="italic text-zinc-400">Nenhuma aplicação redigida ainda.</p>
+              <p className="italic text-app-text-muted">Nenhuma aplicação redigida ainda.</p>
             )}
           </div>
         </section>
@@ -682,7 +682,7 @@ export default function SermonPulpitPage() {
         {/* 5. Desfecho Homilético & Apelo Final (Conclusão na Ordem Cronológica) */}
         <section
           id="sec-desfecho"
-          className="space-y-4 border-l-2 border-gold pl-5 py-4 bg-gold/5 p-5 rounded-2xl border border-gold/20"
+          className="space-y-4 border-l-2 border-gold pl-5 py-4 bg-gold/5 p-5 rounded-2xl border border-gold/30 shadow-xs"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono uppercase tracking-widest text-gold font-bold block">
@@ -690,7 +690,7 @@ export default function SermonPulpitPage() {
             </span>
             <span className="text-[0.68rem] font-mono text-gold/80">Conclusão da Mensagem</span>
           </div>
-          <p className="text-zinc-100 font-serif font-bold whitespace-pre-line leading-relaxed">
+          <p className="text-app-text font-serif font-bold whitespace-pre-line leading-relaxed">
             {renderWithDynamicMarkers(sermon.desfechoTexto || "Conclusão da mensagem.")}
           </p>
         </section>
@@ -712,17 +712,17 @@ export default function SermonPulpitPage() {
       {isScriptureOpen && (
         <div
           data-testid="biblical-text-floating-card"
-          className="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-[480px] max-h-[70vh] z-50 bg-zinc-900 border border-gold/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-[480px] max-h-[70vh] z-50 bg-app-surface border border-gold/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header do Card */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950/60">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-app-raised/80">
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-gold" />
-              <span className="font-mono text-xs font-bold text-zinc-100">
+              <span className="font-mono text-xs font-bold text-app-text">
                 {sermon.bookName} {sermon.chapter}
                 {sermon.verse ? `:${sermon.verse}` : ""}
               </span>
-              <span className="text-[0.65rem] font-mono text-zinc-400 uppercase">
+              <span className="text-[0.65rem] font-mono text-app-text-muted uppercase">
                 ({sermon.version || "acf"})
               </span>
             </div>
@@ -733,16 +733,16 @@ export default function SermonPulpitPage() {
               size="sm"
               onClick={() => setIsScriptureOpen(false)}
               aria-label="Fechar Passagem"
-              className="text-zinc-400 hover:text-white p-1 h-auto"
+              className="text-app-text-muted hover:text-app-text p-1 h-auto cursor-pointer"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
 
           {/* Versículos */}
-          <div className="p-4 overflow-y-auto space-y-2 text-sm leading-relaxed text-zinc-200 font-serif">
+          <div className="p-4 overflow-y-auto space-y-2 text-sm leading-relaxed text-app-text font-serif">
             {loadingScripture ? (
-              <div className="py-6 text-center text-xs text-zinc-400 flex items-center justify-center gap-2">
+              <div className="py-6 text-center text-xs text-app-text-muted flex items-center justify-center gap-2">
                 <Flame className="w-4 h-4 text-gold animate-spin" />
                 <span>Carregando texto sagrado...</span>
               </div>
@@ -754,7 +754,7 @@ export default function SermonPulpitPage() {
                     key={v.number}
                     className={cn(
                       "py-0.5",
-                      isSelectedVerse && "bg-gold/15 text-gold-light rounded px-1 font-semibold"
+                      isSelectedVerse && "bg-gold/15 text-gold rounded px-1.5 font-semibold"
                     )}
                   >
                     <sup className="text-gold text-[0.68rem] font-mono mr-1.5">{v.number}</sup>
@@ -763,7 +763,7 @@ export default function SermonPulpitPage() {
                 );
               })
             ) : (
-              <p className="text-xs text-zinc-400">Passagem bíblica não carregada.</p>
+              <p className="text-xs text-app-text-muted">Passagem bíblica não carregada.</p>
             )}
           </div>
         </div>
@@ -773,17 +773,17 @@ export default function SermonPulpitPage() {
       {isPreachingModalOpen && (
         <div
           data-testid="preaching-log-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
         >
-          <div className="bg-zinc-900 border border-zinc-700 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-5 text-zinc-100 font-sans">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div className="bg-app-surface border border-border w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-5 text-app-text font-sans">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="flex items-center gap-2.5">
                 <span className="text-xl">🏛️</span>
                 <div>
-                  <h3 className="font-serif font-bold text-base text-zinc-100">
+                  <h3 className="font-serif font-bold text-base text-app-text">
                     Registro Pós-Pregação
                   </h3>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-app-text-muted">
                     Guarde o testemunho da ministração no Cloudflare D1
                   </p>
                 </div>
@@ -792,7 +792,7 @@ export default function SermonPulpitPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsPreachingModalOpen(false)}
-                className="text-zinc-400 hover:text-white p-1 h-auto"
+                className="text-app-text-muted hover:text-app-text p-1 h-auto cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -800,7 +800,7 @@ export default function SermonPulpitPage() {
 
             <form onSubmit={handleSavePreaching} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
                   Nome da Igreja / Comunidade *
                 </label>
                 <input
@@ -810,13 +810,13 @@ export default function SermonPulpitPage() {
                   value={churchName}
                   onChange={(e) => setChurchName(e.target.value)}
                   placeholder="Ex: Igreja Batista Esperança, Comunidade da Graça..."
-                  className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold"
+                  className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                  <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
                     Cidade *
                   </label>
                   <input
@@ -826,11 +826,11 @@ export default function SermonPulpitPage() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Ex: Curitiba, PR"
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold"
+                    className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                  <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
                     Data da Ministração *
                   </label>
                   <input
@@ -839,13 +839,13 @@ export default function SermonPulpitPage() {
                     required
                     value={preachedAt}
                     onChange={(e) => setPreachedAt(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold"
+                    className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                <label className="block text-xs font-mono uppercase text-app-text-muted mb-1">
                   Resumo do Impacto Espiritual & Notas
                 </label>
                 <textarea
@@ -854,20 +854,20 @@ export default function SermonPulpitPage() {
                   value={preachingNotes}
                   onChange={(e) => setPreachingNotes(e.target.value)}
                   placeholder="Como o Espírito Santo se moveu? Reconciliações, consolações, arrependimento ou impressões marcantes..."
-                  className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold resize-none"
+                  className="w-full bg-app-raised border border-border rounded-xl px-3 py-2 text-sm text-app-text placeholder:text-app-text-muted/50 focus:outline-none focus:ring-1 focus:ring-gold/50 focus:border-gold resize-none transition-colors"
                 />
               </div>
 
-              <div className="flex items-center gap-2 bg-zinc-950/60 p-3 rounded-xl border border-zinc-800">
+              <div className="flex items-center gap-2 bg-app-raised/60 p-3 rounded-xl border border-border">
                 <input
                   id="mirror-checkbox"
                   data-testid="preaching-mirror-memorial-checkbox"
                   type="checkbox"
                   checked={mirrorToMemorial}
                   onChange={(e) => setMirrorToMemorial(e.target.checked)}
-                  className="w-4 h-4 rounded text-gold focus:ring-gold bg-zinc-900 border-zinc-700 cursor-pointer"
+                  className="w-4 h-4 rounded text-gold focus:ring-gold bg-app-surface border-border cursor-pointer accent-gold"
                 />
-                <label htmlFor="mirror-checkbox" className="text-xs text-zinc-300 cursor-pointer select-none">
+                <label htmlFor="mirror-checkbox" className="text-xs text-app-text cursor-pointer select-none">
                   Espelhar resumo no Meu Memorial como Testemunho
                 </label>
               </div>
@@ -878,7 +878,7 @@ export default function SermonPulpitPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => navigate(`/estudio/${sermon.id}`)}
-                  className="text-xs border-zinc-700 text-zinc-400 hover:text-white"
+                  className="text-xs border-border bg-app-raised hover:bg-app-surface text-app-text-muted hover:text-app-text rounded-xl cursor-pointer"
                 >
                   Sair sem salvar
                 </Button>
@@ -886,7 +886,7 @@ export default function SermonPulpitPage() {
                   type="submit"
                   data-testid="save-preaching-log-btn"
                   disabled={isSavingLog || !churchName.trim() || !city.trim()}
-                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer"
+                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer shadow-xs"
                 >
                   {isSavingLog ? "Salvando..." : "Salvar Registro & Concluir"}
                 </Button>
