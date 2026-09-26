@@ -62,6 +62,70 @@ Categoria de Registro do Memorial para registro de fatos marcantes e como Deus s
 **Jejum / Propósito**:
 Categoria de Registro do Memorial para acompanhamento de períodos dedicados de busca espiritual com data inicial, data prevista e status. Cor institucional: Cinza ardósia.
 
+**Inspiração Homilética**:
+5ª categoria de Registro do Memorial (tipo canônico: `inspiration`), exclusiva de Pregadores (Leitores Templo). Captura a faísca espiritual inicial de um sermão no cotidiano — exige mínimo de 3 a 5 linhas descrevendo o raciocínio espiritual, o sentimento e as percepções no momento em que a ideia nasceu. É a semente que pode gerar um Sermão no Estúdio Homilético. Cor institucional: a definir.
+_Evitar_: rascunho de sermão, ideia de mensagem, nota de pregação
+
+**Sermão**:
+Esboço homilético estruturado criado no Estúdio Homilético por um Pregador, sempre originado a partir de uma Inspiração Homilética do Memorial (campo `inspiration_note_id`). Segue a estrutura 3x4 (Explicar, Pregar, Aplicar) com os 4 Degraus (A, B, C, D) por tópico. Persiste na infraestrutura de borda (Cloudflare D1) com autenticação validada via JWT do Supabase. Entidade independente do Registro do Memorial.
+_Evitar_: nota de estudo, reflexão pastoral, esboço de mensagem
+
+**Repositório Homilético D1**:
+Instância de banco de dados SQLite serverless na Edge da Cloudflare (D1) responsável por armazenar os Sermões, seus tópicos e o histórico de pregações, aliviando a cota do Supabase e garantindo persistência multiplataforma com latência ultra-baixa.
+_Evitar_: banco de sermões, supabase de pregações
+
+**Método da Marcha-Ré**:
+Metodologia homilética de construção inversa onde a definição do Desfecho Homilético é obrigatória antes da redação dos blocos temáticos e da Introdução. Na interface, opera via **Desbloqueio Progressivo com Edição Livre**: os blocos subsequentes iniciam bloqueados até a definição do Desfecho, mas permanecem editáveis e reajustáveis livremente a qualquer momento após o desbloqueio.
+_Evitar_: wizard rígido, formulário sequencial travado
+
+**Desfecho Homilético**:
+Ponto de chegada intencional do Sermão definido na Marcha-Ré. Classificado compulsoriamente em uma de 4 categorias de apelo espiritual: Consolação, Confronto, Conversão ou Oração.
+_Evitar_: conclusão solta, fim da mensagem, fechamento
+
+**Blocos do Sermão**:
+As três macroetapas sequenciais da exposição homilética no Estúdio: Bloco 1 (Explicar o Texto — Exegese & Contexto), Bloco 2 (Pregar a Inspiração — Exposição & Tema Central) e Bloco 3 (Aplicar à Vida Real — Conexão Prática).
+_Evitar_: seções do sermão, partes do esboço
+
+**Tópico Homilético**:
+Unidade expositiva de desenvolvimento dentro do Bloco 2. Nasce por padrão com 3 Tópicos na tela, possui guardrail com limite mínimo de 1 e máximo de 4 tópicos (prevenindo dispersão prolixa), e cada tópico herda compulsoriamente a estrutura dos 4 Degraus de Desenvolvimento.
+_Evitar_: ponto solto, subtítulo livre
+
+**Degraus de Desenvolvimento**:
+Estrutura quádrupla e obrigatória de progressão para cada Tópico Homilético: Degrau A (O Fato — Afirmação Central), Degrau B (O Porquê — Fundamentação Teológica), Degrau C (O Contraste — Objeção do Ouvinte) e Degrau D (A Tensão/Gancho — Elevação da expectativa espiritual para o ponto seguinte).
+_Evitar_: tópicos a, b, c; sub-itens genéricos
+
+**Painel do Estúdio**:
+Página do Pregador acessível via rota `/estudio` (exclusiva para plano Templo), responsável pela gestão do acervo homilético: listagem de Sermões (rascunhos e finalizados), busca por passagem bíblica, estatísticas de ministração e inicialização de novo estudo via gabinete (`/estudio/[sermonId]`). Leitores Gratuitos e Pro visualizam chamada institucional ao plano Templo.
+_Evitar_: dashboard de sermões, lista de pregações
+
+**Modo Púlpito**:
+Ambiente de imersão de alta visibilidade e zero distração voltado à fase de altar (`/pulpito/[sermonId]`). Aciona a `Screen Wake Lock API` para impedir repouso de tela, exibe cronômetro discreto, mapa do sermão por pílulas com smooth scroll e versículos expansíveis em cards flutuantes.
+_Evitar_: tela de leitura cheia, modo apresentação de sermão
+
+**Registro Pós-Pregação**:
+Registro de histórico de ministração (`preaching_logs`) salvo no Cloudflare D1 ao encerrar o Modo Púlpito. Armazena `sermon_id`, nome da comunidade/igreja, cidade, data e notas de impacto espiritual. Alimenta o mecanismo de prevenção de repetição acidental de mensagens na mesma congregação, com opção voluntária de espelhar o resumo no Memorial como Testemunho.
+_Evitar_: anotação de culto, diário de púlpito
+
+**Guardião do Evangelho**:
+Mecanismo de proteção teológica baseado no modelo JEV (TypeSafe AI) que audita o Sermão avaliando centralidade na Graça (`is_grace_centered`) e detecção de desvios doutrinários (`theological_deviation`: prosperidade, humanismo/autoajuda, moralismo sem graça ou fiel ao texto). Opera sob demanda ou em marcos (ao clicar em Testar Ortodoxia ou Pregar Agora), sem censura robótica contínua durante a digitação.
+_Evitar_: corretor de sermão, sensor teológico, validador de texto
+
+**Alerta de Fidelidade Doutrinária**:
+Notificação solene de consciência pastoral exibida na UI caso a auditoria do Guardião do Evangelho aponte desvio com confiança $\ge 0.85$. Fundamentada em Gálatas 1:8, convoca o Pregador a refletir na suficiência de Cristo e ajustar a mensagem, sem bloquear compulsória ou autoritariamente o acesso ao altar.
+_Evitar_: erro de compilação homilética, bloqueio de sermão
+
+**Trava Anti-Esegese**:
+Mecanismo hermenêutico de proteção no Estúdio Homilético (Ancoradouro de Intenção Original) posicionado ao final do Bloco 1. Exige o preenchimento de um campo reflexivo obrigatório (*"Qual era a intenção do autor sagrado para os primeiros ouvintes deste texto?"*) antes de liberar o Bloco 2. O conteúdo respondido é incorporado automaticamente como o cabeçalho exegético do esboço e compõe o payload auditado pelo Guardião do Evangelho.
+_Evitar_: questionário teológico, bloqueio por nota de IA
+
+**Teste de Ortodoxia**:
+Ação sob demanda acionada pelo Pregador no Estúdio (`[ 🏛️ Testar Ortodoxia ]`) que cruza os argumentos do Sermão com o acervo teológico histórico e a autoridade do autor bíblico, apresentando confirmações de alinhamento exegético e citações históricas.
+_Evitar_: consulta de IA, busca de referências
+
+**Payload Homilético JEV**:
+Estrutura tipada de dados enviada ao modelo JEV no Estúdio Homilético, rigorosamente autocontida e livre de notas históricas pessoais. Composta por: texto bíblico base, faísca inicial ("Eu e Deus"), Desfecho Homilético, exegese do Bloco 1, tópicos com 4 degraus do Bloco 2 e aplicação do Bloco 3.
+_Evitar_: contexto completo do leitor, pool de notas do sermão
+
 **Gravação por Voz (Speech-to-Text)**:
 Recurso de captura e transcrição imediata de fala posicionado na página inicial (`HomePage`) e no Caderno de Estudos que permite a Visitantes e Leitores registrar uma Reflexão, Oração ou Testemunho por voz com zero fricção (ex.: enquanto dirigem ou em movimento). Opera em arquitetura híbrida de alta fidelidade: captura áudio em alta definição com cancelamento de ruído/eco, envia diretamente para o Cloudflare R2 (com zero tráfego pesado na Vercel) e transcreve via AssemblyAI (modelo Universal-2 em pt-BR com pontuação correta), mantendo a Web Speech API determinística (sem duplicação de palavras) como preview visual em tempo real e fallback automático em caso de instabilidade de rede ou timeout. Salva automaticamente no Memorial, com mapeamento semântico imediato para o campo correto da categoria (Reflexão → Observação, Oração → Motivo, Testemunho → O que Deus fez, Propósito → Objetivo).
 _Evitar_: comando de voz, assistente de voz, gravação de áudio simples
@@ -123,6 +187,10 @@ _Evitar_: premium, subscriber, assinante
 **Templo**:
 Plano de assinatura B2B para igrejas. Inclui todas as funcionalidades Pro e acesso exclusivo ao Modo Igreja. Não é destinado a pessoas físicas.
 _Evitar_: plano institucional, plano grupo
+
+**Pregador**:
+Leitor com plano Templo ativo que utiliza o Estúdio Homilético e o Modo Púlpito. Não é uma identidade separada de Leitor — é um Leitor Templo no contexto das funcionalidades homiléticas.
+_Evitar_: pastor (papel eclesiástico, não de domínio), usuário homilético, líder
 
 **Modo Igreja**:
 Funcionalidade exclusiva do plano Templo. Permite ao responsável pela igreja selecionar versículos na plataforma e projetá-los em tempo real em uma segunda tela (projetor). Opera via uma aba separada (`/church-display`) sincronizada por mensagens.

@@ -153,6 +153,12 @@ export default function MemorialEntryModal({
             badgeClasses: "bg-app-raised text-app-text border-border font-medium",
             labelColor: "text-app-text",
         },
+        inspiration: {
+            label: "Inspiração",
+            colorClasses: "border-amber-500/40 text-amber-500",
+            badgeClasses: "bg-amber-950/20 text-amber-500 border-amber-500/40 font-semibold",
+            labelColor: "text-amber-500",
+        },
     };
 
     const currentConfig = categoryConfigs[selectedCategory];
@@ -201,6 +207,16 @@ export default function MemorialEntryModal({
                 metadataPayload.dataInicio = dataInicio;
                 metadataPayload.dataPrevista = dataPrevista;
                 compiledContent = objetivo || compiledContent;
+            } else if (selectedCategory === 'inspiration') {
+                const lines = content.split("\n").map(l => l.trim()).filter(Boolean);
+                if (lines.length < 3) {
+                    toast.error("A captura de inspiração homilética exige ao menos 3 linhas detalhando o raciocínio espiritual.");
+                    return false;
+                }
+                metadataPayload.inspiration = {
+                    spark: content.trim(),
+                };
+                compiledContent = content.trim();
             }
 
             const parsedTags = tags
@@ -264,7 +280,7 @@ export default function MemorialEntryModal({
                 <form onSubmit={(e) => { e.preventDefault(); handleSaveAction(); }} className="p-5 space-y-4 overflow-y-auto flex-1">
                     {/* Seletor de Categoria */}
                     <div className="flex rounded-xl bg-app-raised p-1 gap-1 border border-border/50">
-                        {(['reflection', 'prayer', 'testimony', 'fasting'] as MemorialCategory[]).map(cat => {
+                        {(['reflection', 'prayer', 'testimony', 'fasting', 'inspiration'] as MemorialCategory[]).map(cat => {
                             const conf = categoryConfigs[cat];
                             const isActive = selectedCategory === cat;
                             return (
@@ -563,6 +579,46 @@ export default function MemorialEntryModal({
                                         onChange={e => setDataPrevista(e.target.value)}
                                         className="w-full rounded-xl border border-border bg-app-surface px-3 py-1.5 text-[0.82rem] text-app-text focus:outline-none focus:ring-1 focus:ring-gold/40"
                                     />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedCategory === 'inspiration' && (
+                        <div className="space-y-3">
+                            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-600 dark:text-amber-400 space-y-1">
+                                <p className="font-semibold">🏛️ Captura do Fluxo Espiritual ("Eu e Deus")</p>
+                                <p className="text-[0.75rem] opacity-90 leading-relaxed">
+                                    Descreva o raciocínio espiritual, sentimento e percepções deste momento. Exige no mínimo 3 a 5 linhas para preservar a faísca homilética intacta.
+                                </p>
+                            </div>
+                            <div>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="text-[0.72rem] font-sans text-gold font-medium">
+                                        Raciocínio Espiritual e Iluminação (mínimo 3 linhas)
+                                    </label>
+                                    <VoiceRecordButton
+                                        currentValue={content}
+                                        onTranscript={setContent}
+                                        size="icon"
+                                    />
+                                </div>
+                                <textarea
+                                    value={content}
+                                    onChange={e => setContent(e.target.value)}
+                                    placeholder={"Linha 1: Percepção espiritual sobre o texto...\nLinha 2: O que Deus colocou no coração...\nLinha 3: O sentimento e direção homilética..."}
+                                    rows={5}
+                                    className="w-full resize-none rounded-xl border border-border bg-app-surface px-3.5 py-2.5 text-[0.82rem] text-app-text placeholder:text-app-text-muted/40 focus:outline-none focus:ring-1 focus:ring-gold/40"
+                                />
+                                <div className="flex justify-end pt-1">
+                                    <span className={cn(
+                                        "text-[0.7rem] font-mono",
+                                        content.split("\n").map(l => l.trim()).filter(Boolean).length >= 3
+                                            ? "text-emerald-500 font-medium"
+                                            : "text-amber-500"
+                                    )}>
+                                        {content.split("\n").map(l => l.trim()).filter(Boolean).length} / 3 linhas mínimas
+                                    </span>
                                 </div>
                             </div>
                         </div>

@@ -10,6 +10,7 @@ import {
   Tag as TagIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createSermonFromInspiration } from "@/lib/homileticClient";
 import type { MemorialCategory, MemorialEntry } from "@/lib/noteStore";
 import { MEMORIAL_CATEGORY_CONFIG, getBibleLink, hasBibleReference, formatBibleReference } from "@/lib/memorialUtils";
 import SpotlightCard from "@/components/memorial/SpotlightCard";
@@ -52,6 +53,20 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeveloping, setIsDeveloping] = useState(false);
+
+  const handleDevelopInStudio = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeveloping(true);
+    try {
+      const sermon = await createSermonFromInspiration(entry);
+      navigate(`/estudio/${sermon.id}`);
+    } catch (err) {
+      console.error("Erro ao iniciar Estúdio:", err);
+    } finally {
+      setIsDeveloping(false);
+    }
+  };
 
   const category = (entry.type as MemorialCategory) || "reflection";
   const catInfo = MEMORIAL_CATEGORY_CONFIG[category] || MEMORIAL_CATEGORY_CONFIG.reflection;
@@ -104,6 +119,8 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                   ? "bg-emerald-950/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                   : category === "fasting"
                   ? "bg-amber-950/20 border-amber-500/30 text-amber-600 dark:text-amber-400"
+                  : category === "inspiration"
+                  ? "bg-amber-950/20 border-amber-500/50 text-amber-500 font-semibold"
                   : "bg-app-raised border-border text-app-text-muted"
               )}
             >
@@ -277,6 +294,25 @@ export const MemorialCard: React.FC<MemorialCardProps> = ({
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Área de Inspiração Homilética: Botão de Desenvolver no Estúdio 3x4 */}
+        {category === "inspiration" && (
+          <div className="pt-2 border-t border-border/50">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <span className="text-[0.72rem] text-gold/80 italic">
+                Semente Homilética (Eu e Deus)
+              </span>
+              <button
+                type="button"
+                disabled={isDeveloping}
+                onClick={handleDevelopInStudio}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gold/40 bg-gold/10 text-gold hover:bg-gold hover:text-primary-foreground transition-all text-xs font-semibold cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+              >
+                <span>{isDeveloping ? "Iniciando..." : "🏛️ Desenvolver no Estúdio 3x4"}</span>
+              </button>
+            </div>
           </div>
         )}
       </SpotlightCard>

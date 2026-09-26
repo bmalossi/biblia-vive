@@ -9,7 +9,7 @@
 import { supabase } from "./supabase";
 import { bumpNotesVersion } from "./scriptureThread";
 
-export type MemorialCategory = 'reflection' | 'prayer' | 'testimony' | 'fasting';
+export type MemorialCategory = 'reflection' | 'prayer' | 'testimony' | 'fasting' | 'inspiration';
 
 export interface MemorialMetadata {
     // Reflexão (SOAP)
@@ -32,6 +32,13 @@ export interface MemorialMetadata {
     dataInicio?: string;
     dataPrevista?: string;
     acompanhamentos?: string[];
+    // Inspiração Homilética ("Eu e Deus")
+    inspiration?: {
+        spark?: string;
+        feeling?: string;
+        spiritualReasoning?: string;
+        sermonId?: string;
+    };
     // Extensível para anexos futuros (fotos, áudios, etc)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;

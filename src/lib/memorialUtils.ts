@@ -26,6 +26,10 @@ export const MEMORIAL_CATEGORY_CONFIG: Record<
         label: "Propósito",
         classes: "bg-app-raised text-app-text-muted border-border font-medium",
     },
+    inspiration: {
+        label: "Inspiração",
+        classes: "bg-amber-500/10 text-amber-500 border-amber-500/30 font-medium",
+    },
 };
 
 /**
