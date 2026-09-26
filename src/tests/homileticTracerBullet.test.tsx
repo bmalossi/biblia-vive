@@ -12,6 +12,7 @@ import homileticWorker from "../../cloudflare/homiletic-worker/src/index";
 vi.mock("@/lib/homileticClient", () => ({
   createSermonFromInspiration: vi.fn(),
   getSermon: vi.fn(),
+  listPreachingLogs: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock("@/hooks/useAuth", () => ({

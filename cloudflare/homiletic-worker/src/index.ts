@@ -183,6 +183,74 @@ export default {
         }
       }
 
+      // Match /api/sermons/:id/preaching-logs
+      const sermonLogsMatch = path.match(/^\/api\/sermons\/([^/]+)\/preaching-logs$/);
+      if (sermonLogsMatch) {
+        const sermonId = sermonLogsMatch[1];
+
+        // POST /api/sermons/:id/preaching-logs
+        if (request.method === "POST") {
+          const body = (await request.json()) as any;
+          const logId = body.id || `log_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+          const now = new Date().toISOString();
+
+          await env.DB.prepare(
+            `INSERT INTO preaching_logs (
+              id, sermon_id, user_id, church_name, city, preached_at, notes, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+          )
+            .bind(
+              logId,
+              sermonId,
+              userId,
+              body.churchName || "",
+              body.city || "",
+              body.preachedAt || now.split("T")[0],
+              body.notes || null,
+              now
+            )
+            .run();
+
+          const created = await env.DB.prepare(
+            "SELECT * FROM preaching_logs WHERE id = ?"
+          )
+            .bind(logId)
+            .first();
+
+          return jsonResponse({ preachingLog: formatPreachingLogRow(created) }, 201);
+        }
+
+        // GET /api/sermons/:id/preaching-logs
+        if (request.method === "GET") {
+          const rows = await env.DB.prepare(
+            "SELECT * FROM preaching_logs WHERE sermon_id = ? AND user_id = ? ORDER BY preached_at DESC"
+          )
+            .bind(sermonId, userId)
+            .all();
+
+          return jsonResponse({
+            preachingLogs: (rows.results || []).map(formatPreachingLogRow),
+          });
+        }
+      }
+
+      // GET /api/preaching-logs — Lista todos os registros de pregação do usuário
+      if (request.method === "GET" && path === "/api/preaching-logs") {
+        const rows = await env.DB.prepare(
+          `SELECT p.*, s.title as sermon_title 
+           FROM preaching_logs p 
+           LEFT JOIN sermons s ON p.sermon_id = s.id 
+           WHERE p.user_id = ? 
+           ORDER BY p.preached_at DESC`
+        )
+          .bind(userId)
+          .all();
+
+        return jsonResponse({
+          preachingLogs: (rows.results || []).map(formatPreachingLogRow),
+        });
+      }
+
       return jsonResponse({ error: "Not Found" }, 404);
     } catch (err: any) {
       console.error("[HomileticWorker] Erro:", err);
@@ -214,5 +282,20 @@ function formatSermonRow(row: any): any {
     introducao: row.introducao,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function formatPreachingLogRow(row: any): any {
+  if (!row) return null;
+  return {
+    id: row.id,
+    sermonId: row.sermon_id,
+    userId: row.user_id,
+    churchName: row.church_name,
+    city: row.city,
+    preachedAt: row.preached_at,
+    notes: row.notes,
+    createdAt: row.created_at,
+    sermonTitle: row.sermon_title,
   };
 }

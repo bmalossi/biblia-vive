@@ -17,8 +17,11 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getSermon, type Sermon } from "@/lib/homileticClient";
+import { getSermon, savePreachingLog, type Sermon } from "@/lib/homileticClient";
 import { fetchChapter, type Chapter } from "@/lib/bibleApi";
+import { createNoteStore } from "@/lib/noteStore";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 // Renderizador com realce de marcadores de dinâmica vocal e retórica
@@ -86,6 +89,63 @@ export default function SermonPulpitPage() {
   const [isScriptureOpen, setIsScriptureOpen] = useState(false);
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loadingScripture, setLoadingScripture] = useState(false);
+
+  // Registro Pós-Pregação
+  const [isPreachingModalOpen, setIsPreachingModalOpen] = useState(false);
+  const [churchName, setChurchName] = useState("");
+  const [city, setCity] = useState("");
+  const [preachedAt, setPreachedAt] = useState(() => new Date().toISOString().split("T")[0]);
+  const [preachingNotes, setPreachingNotes] = useState("");
+  const [mirrorToMemorial, setMirrorToMemorial] = useState(false);
+  const [isSavingLog, setIsSavingLog] = useState(false);
+
+  const handleSavePreaching = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sermon || !churchName.trim() || !city.trim()) return;
+
+    setIsSavingLog(true);
+    try {
+      await savePreachingLog({
+        sermonId: sermon.id,
+        churchName: churchName.trim(),
+        city: city.trim(),
+        preachedAt: preachedAt || new Date().toISOString().split("T")[0],
+        notes: preachingNotes.trim() || undefined,
+      });
+
+      if (mirrorToMemorial) {
+        const { data } = await supabase.auth.getSession();
+        const userId = data.session?.user.id || null;
+        const noteStore = createNoteStore(userId);
+        await noteStore.save({
+          type: "testimony",
+          title: `Testemunho de Ministração: ${sermon.title}`,
+          content: `${churchName} (${city}) - ${preachingNotes || "Ministração no Modo Púlpito."}`,
+          bookId: sermon.bookId || "sl",
+          bookName: sermon.bookName || "Salmos",
+          chapter: sermon.chapter || 1,
+          verse: sermon.verse || null,
+          version: sermon.version || "acf",
+          metadata: {
+            testimony: {
+              churchName: churchName.trim(),
+              city: city.trim(),
+              preachedAt,
+              sermonId: sermon.id,
+            },
+          },
+        });
+      }
+
+      toast.success("Ministração registrada com sucesso!");
+      navigate(`/estudio/${sermon.id}`);
+    } catch (err) {
+      console.error("[ModoPulpito] Erro ao salvar registro de pregação:", err);
+      toast.error("Erro ao registrar ministração.");
+    } finally {
+      setIsSavingLog(false);
+    }
+  };
 
   // 1. Screen Wake Lock API
   useEffect(() => {
@@ -268,15 +328,16 @@ export default function SermonPulpitPage() {
               </button>
             </div>
 
-            {/* Botão Sair / Encerrar */}
+            {/* Botão Sair / Encerrar Pregação */}
             <Button
-              onClick={() => navigate(`/estudio/${sermon.id}`)}
+              data-testid="finish-preaching-btn"
+              onClick={() => setIsPreachingModalOpen(true)}
               variant="outline"
               size="sm"
-              className="text-xs border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 rounded-lg px-2.5 h-8 flex items-center gap-1"
+              className="text-xs border-amber-500/40 bg-zinc-800/80 hover:bg-zinc-700 text-amber-300 rounded-lg px-2.5 h-8 flex items-center gap-1.5"
             >
               <X className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Encerrar</span>
+              <span>Encerrar Pregação</span>
             </Button>
           </div>
         </div>
@@ -449,6 +510,18 @@ export default function SermonPulpitPage() {
             {renderWithDynamicMarkers(sermon.desfechoTexto || "Conclusão da mensagem.")}
           </p>
         </section>
+
+        {/* Encerramento da Pregação */}
+        <div className="pt-8 pb-12 flex justify-center">
+          <Button
+            type="button"
+            onClick={() => setIsPreachingModalOpen(true)}
+            className="bg-gold text-primary-foreground hover:bg-gold/90 text-sm font-semibold px-6 py-2.5 rounded-xl flex items-center gap-2 shadow-md active:scale-95 cursor-pointer"
+          >
+            <span>⏹️</span>
+            <span>Encerrar Pregação & Registrar</span>
+          </Button>
+        </div>
       </main>
 
       {/* ── CARD FLUTUANTE DE TEXTO BÍBLICO ───────────────────────────────────── */}
@@ -508,6 +581,133 @@ export default function SermonPulpitPage() {
             ) : (
               <p className="text-xs text-zinc-400">Passagem bíblica não carregada.</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL SOLENE DE REGISTRO PÓS-PREGAÇÃO ──────────────────────────── */}
+      {isPreachingModalOpen && (
+        <div
+          data-testid="preaching-log-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+          <div className="bg-zinc-900 border border-zinc-700 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-5 text-zinc-100 font-sans">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">🏛️</span>
+                <div>
+                  <h3 className="font-serif font-bold text-base text-zinc-100">
+                    Registro Pós-Pregação
+                  </h3>
+                  <p className="text-xs text-zinc-400">
+                    Guarde o testemunho da ministração no Cloudflare D1
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsPreachingModalOpen(false)}
+                className="text-zinc-400 hover:text-white p-1 h-auto"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleSavePreaching} className="space-y-4">
+              <div>
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                  Nome da Igreja / Comunidade *
+                </label>
+                <input
+                  data-testid="preaching-church-input"
+                  type="text"
+                  required
+                  value={churchName}
+                  onChange={(e) => setChurchName(e.target.value)}
+                  placeholder="Ex: Igreja Batista Esperança, Comunidade da Graça..."
+                  className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                    Cidade *
+                  </label>
+                  <input
+                    data-testid="preaching-city-input"
+                    type="text"
+                    required
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Ex: Curitiba, PR"
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                    Data da Ministração *
+                  </label>
+                  <input
+                    data-testid="preaching-date-input"
+                    type="date"
+                    required
+                    value={preachedAt}
+                    onChange={(e) => setPreachedAt(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase text-zinc-400 mb-1">
+                  Resumo do Impacto Espiritual & Notas
+                </label>
+                <textarea
+                  data-testid="preaching-notes-input"
+                  rows={3}
+                  value={preachingNotes}
+                  onChange={(e) => setPreachingNotes(e.target.value)}
+                  placeholder="Como o Espírito Santo se moveu? Reconciliações, consolações, arrependimento ou impressões marcantes..."
+                  className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-gold resize-none"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 bg-zinc-950/60 p-3 rounded-xl border border-zinc-800">
+                <input
+                  id="mirror-checkbox"
+                  data-testid="preaching-mirror-memorial-checkbox"
+                  type="checkbox"
+                  checked={mirrorToMemorial}
+                  onChange={(e) => setMirrorToMemorial(e.target.checked)}
+                  className="w-4 h-4 rounded text-gold focus:ring-gold bg-zinc-900 border-zinc-700 cursor-pointer"
+                />
+                <label htmlFor="mirror-checkbox" className="text-xs text-zinc-300 cursor-pointer select-none">
+                  Espelhar resumo no Meu Memorial como Testemunho
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/estudio/${sermon.id}`)}
+                  className="text-xs border-zinc-700 text-zinc-400 hover:text-white"
+                >
+                  Sair sem salvar
+                </Button>
+                <Button
+                  type="submit"
+                  data-testid="save-preaching-log-btn"
+                  disabled={isSavingLog || !churchName.trim() || !city.trim()}
+                  className="bg-gold text-primary-foreground hover:bg-gold/90 text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer"
+                >
+                  {isSavingLog ? "Salvando..." : "Salvar Registro & Concluir"}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

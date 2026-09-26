@@ -105,12 +105,12 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#31](https://github.com/bmalossi/biblia-vive/issues/31)
 
-- [ ] Tabela `preaching_logs` criada no Cloudflare D1 vinculada a `sermon_id` e `user_id`.
-- [ ] Modal de encerramento de pregação solicitando comunidade, cidade, data e notas espirituais.
-- [ ] Checkbox opcional para criar automaticamente um Registro do Memorial (categoria Testemunho) no Supabase.
-- [ ] Endpoint do Worker para salvar e listar históricos de pregação de um sermão no D1.
-- [ ] Indicador preventivo no Estúdio Homilético alertando caso a mensagem já tenha sido pregada na mesma comunidade.
-- [ ] Testes cobrindo persistência em `preaching_logs`, alerta de duplicidade e fluxo de encerramento.
+- [x] Tabela `preaching_logs` criada no Cloudflare D1 vinculada a `sermon_id` e `user_id`.
+- [x] Modal de encerramento de pregação solicitando comunidade, cidade, data e notas espirituais.
+- [x] Checkbox opcional para criar automaticamente um Registro do Memorial (categoria Testemunho) no Supabase.
+- [x] Endpoint do Worker para salvar e listar históricos de pregação de um sermão no D1.
+- [x] Indicador preventivo no Estúdio Homilético alertando caso a mensagem já tenha sido pregada na mesma comunidade.
+- [x] Testes cobrindo persistência em `preaching_logs`, alerta de duplicidade e fluxo de encerramento.
 
 ---
 

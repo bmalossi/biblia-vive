@@ -18,10 +18,12 @@ import {
 import {
   getSermon,
   saveSermon,
+  listPreachingLogs,
   type Sermon,
   type DesfechoTipo,
   type HomileticTopic,
   type HomileticTopicStep,
+  type PreachingLog,
 } from "@/lib/homileticClient";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -105,6 +107,9 @@ export default function SermonStudioPage() {
   const [introducao, setIntroducao] = useState("");
   const [isSavingIntroducao, setIsSavingIntroducao] = useState(false);
 
+  // Histórico de Ministração (Prevenção de Repetição)
+  const [preachingLogs, setPreachingLogs] = useState<PreachingLog[]>([]);
+
   const isBloco2Unlocked =
     isUnlocked &&
     Boolean(
@@ -141,6 +146,16 @@ export default function SermonStudioPage() {
         setLoading(false);
       }
     });
+
+    if (typeof listPreachingLogs === "function") {
+      listPreachingLogs(sermonId)
+        .then((logs) => {
+          if (isMounted && Array.isArray(logs)) {
+            setPreachingLogs(logs);
+          }
+        })
+        .catch(() => {});
+    }
 
     return () => {
       isMounted = false;
@@ -361,6 +376,34 @@ export default function SermonStudioPage() {
 
       {/* Main Studio Body */}
       <main className="max-w-4xl mx-auto w-full px-4 pt-6 space-y-6 flex-1">
+        {/* Alerta Preventivo de Ministração Anterior / Prevenção de Repetição */}
+        {preachingLogs.length > 0 && (
+          <div
+            data-testid="preaching-repetition-alert"
+            className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 space-y-2 shadow-xs animate-in fade-in duration-200"
+          >
+            <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs font-mono uppercase tracking-wide">
+              <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Atenção Pastoral — Mensagem Já Ministrada Nesta Comunidade</span>
+            </div>
+            <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+              Este sermão já possui histórico de pregação registrado. Verifique as comunidades para prevenir repetição involuntária da mesma mensagem:
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {preachingLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className="inline-flex items-center gap-1.5 text-xs bg-zinc-900/80 border border-amber-500/30 text-zinc-200 px-3 py-1 rounded-lg font-mono"
+                >
+                  <span className="text-amber-400 font-semibold">{log.churchName}</span>
+                  <span className="text-zinc-400">({log.city})</span>
+                  <span className="text-zinc-500 text-[0.7rem]">· {log.preachedAt}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Bloco 0: A Chama Inicial ("Eu e Deus") */}
         <section
           data-testid="eu-e-deus-section"

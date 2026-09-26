@@ -211,3 +211,116 @@ export async function listSermons(): Promise<Sermon[]> {
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
 }
+
+export interface PreachingLog {
+  id: string;
+  sermonId: string;
+  userId: string;
+  churchName: string;
+  city: string;
+  preachedAt: string;
+  notes?: string;
+  createdAt: string;
+  sermonTitle?: string;
+}
+
+/**
+ * Salva um registro pós-pregação na tabela preaching_logs do Cloudflare D1.
+ */
+export async function savePreachingLog(log: {
+  sermonId: string;
+  churchName: string;
+  city: string;
+  preachedAt: string;
+  notes?: string;
+}): Promise<PreachingLog> {
+  const headers = await getAuthHeaders();
+  const payload = {
+    ...log,
+    id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons/${log.sermonId}/preaching-logs`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.preachingLog;
+    }
+  } catch (err) {
+    console.warn("[homileticClient] Falha ao salvar log de pregação no Worker D1, salvando local:", err);
+  }
+
+  // Fallback local
+  const session = (await supabase.auth.getSession()).data.session;
+  const localLog: PreachingLog = {
+    id: payload.id,
+    sermonId: log.sermonId,
+    userId: session?.user.id || "guest",
+    churchName: log.churchName,
+    city: log.city,
+    preachedAt: log.preachedAt,
+    notes: log.notes,
+    createdAt: payload.createdAt,
+  };
+
+  const key = `bv_preaching_logs_${log.sermonId}`;
+  try {
+    const existing: PreachingLog[] = JSON.parse(localStorage.getItem(key) || "[]");
+    existing.unshift(localLog);
+    localStorage.setItem(key, JSON.stringify(existing));
+  } catch {}
+
+  return localLog;
+}
+
+/**
+ * Lista o histórico de pregação de um sermão específico ou de todos do usuário.
+ */
+export async function listPreachingLogs(sermonId?: string): Promise<PreachingLog[]> {
+  const headers = await getAuthHeaders();
+  try {
+    const url = sermonId
+      ? `${DEFAULT_WORKER_URL}/api/sermons/${sermonId}/preaching-logs`
+      : `${DEFAULT_WORKER_URL}/api/preaching-logs`;
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      return data.preachingLogs || [];
+    }
+  } catch (err) {
+    console.warn("[homileticClient] Falha ao listar logs no Worker D1, lendo cache local:", err);
+  }
+
+  if (sermonId) {
+    const key = `bv_preaching_logs_${sermonId}`;
+    try {
+      return JSON.parse(localStorage.getItem(key) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  // Se sem sermonId, agrega todos os bv_preaching_logs_*
+  const allLogs: PreachingLog[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith("bv_preaching_logs_")) {
+        try {
+          const items = JSON.parse(localStorage.getItem(key) || "[]");
+          if (Array.isArray(items)) allLogs.push(...items);
+        } catch {}
+      }
+    }
+  } catch {}
+
+  return allLogs.sort(
+    (a, b) => new Date(b.preachedAt).getTime() - new Date(a.preachedAt).getTime()
+  );
+}
+
