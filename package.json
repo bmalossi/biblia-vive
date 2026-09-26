@@ -21,7 +21,9 @@
     "indexnow:core": "tsx scripts/indexnow-notify.ts config/indexnow-core-urls.json",
     "indexnow:sitemap": "tsx scripts/indexnow-sitemap.ts",
     "backfill:articles": "tsx scripts/backfill-articles-r2.ts",
-    "sync:harpa": "node scripts/sync-harpa-r2.mjs"
+    "sync:harpa": "node scripts/sync-harpa-r2.mjs",
+    "dev:worker": "wrangler dev cloudflare/homiletic-worker/src/index.ts --config cloudflare/homiletic-worker/wrangler.toml --port 8788",
+    "db:migrate:local": "wrangler d1 execute biblia-vive-homiletic --local --file=cloudflare/homiletic-worker/src/schema.sql --config cloudflare/homiletic-worker/wrangler.toml"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1044.0",

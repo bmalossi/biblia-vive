@@ -60,3 +60,7 @@ docs/plan-*.md
 
 # HAR network dump files
 *.har
+
+# Cloudflare Wrangler dev state
+.wrangler/
+**/.wrangler/

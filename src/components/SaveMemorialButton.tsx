@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Save, Check } from "lucide-react";
 
 // ─── ⚙️  TIMING — ajuste aqui os tempos do efeito de salvamento ───────────────
@@ -43,6 +43,16 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
   variant = "gold",
 }) => {
   const [state, setState] = useState<SaveState>("idle");
+  const isMountedRef = useRef(true);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      timeoutsRef.current.forEach(clearTimeout);
+    };
+  }, []);
 
   const triggerHaptic = () => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator && typeof navigator.vibrate === "function") {
@@ -73,18 +83,25 @@ export const SaveMemorialButton: React.FC<SaveMemorialButtonProps> = ({
     const elapsed = Date.now() - start;
     const remaining = Math.max(TIMING.MIN_SAVE_MS - elapsed, 0);
 
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
+      if (!isMountedRef.current) return;
       if (success) {
         setState("success");
         triggerHaptic();
 
         if (onSuccessComplete) {
-          setTimeout(onSuccessComplete, TIMING.SUCCESS_HOLD_MS);
+          const t2 = setTimeout(() => {
+            if (isMountedRef.current) {
+              onSuccessComplete();
+            }
+          }, TIMING.SUCCESS_HOLD_MS);
+          timeoutsRef.current.push(t2);
         }
       } else {
         setState("idle");
       }
     }, remaining);
+    timeoutsRef.current.push(t1);
   };
 
   const isGoldVariant = variant === "gold";
