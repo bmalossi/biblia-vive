@@ -176,3 +176,38 @@ export async function saveSermon(sermon: Partial<Sermon> & { id: string }): Prom
   localStorage.setItem(`bv_sermon_${sermon.id}`, JSON.stringify(merged));
   return merged;
 }
+
+/**
+ * Lista todos os sermões do usuário autenticado no D1.
+ */
+export async function listSermons(): Promise<Sermon[]> {
+  const headers = await getAuthHeaders();
+  try {
+    const res = await fetch(`${DEFAULT_WORKER_URL}/api/sermons`, {
+      headers,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.sermons || [];
+    }
+  } catch (err) {
+    console.warn("[homileticClient] Falha ao listar sermões do Worker D1, lendo cache local:", err);
+  }
+
+  // Fallback local: recuperar todas as chaves bv_sermon_* do localStorage
+  const localSermons: Sermon[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key?.startsWith("bv_sermon_")) {
+      try {
+        const item = JSON.parse(localStorage.getItem(key) || "");
+        if (item && item.id) localSermons.push(item);
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return localSermons.sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  );
+}

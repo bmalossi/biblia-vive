@@ -99,7 +99,7 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut, isPending } = useAuth();
-  const { isPro, loading: proLoading } = useSubscription();
+  const { isPro, isTemplo, loading: proLoading } = useSubscription();
   const userRole = (user?.app_metadata as any)?.role;
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -469,6 +469,19 @@ export default function Header() {
                 {item.label}
               </NavLink>
             ))}
+            {isTemplo && (
+              <NavLink
+                className={({ isActive }) =>
+                  `flex h-full items-center text-sm font-medium transition-colors hover:text-app-text whitespace-nowrap ${isActive
+                    ? "text-app-text border-b-2 border-gold"
+                    : "text-app-text-muted"
+                  }`
+                }
+                to="/estudio"
+              >
+                Estúdio
+              </NavLink>
+            )}
             {userRole === "admin" && (
               <NavLink
                 className={({ isActive }) =>
@@ -757,6 +770,21 @@ export default function Header() {
                   <HelpCircle className="h-4 w-4 flex-shrink-0" />
                   Como usar
                 </NavLink>
+                {isTemplo && (
+                  <NavLink
+                    to="/estudio"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive
+                        ? "bg-app-raised text-app-text"
+                        : "text-app-text-muted hover:bg-app-raised hover:text-app-text"
+                      }`
+                    }
+                  >
+                    <BookOpen className="h-4 w-4 flex-shrink-0 text-gold" />
+                    Estúdio Homilético
+                  </NavLink>
+                )}
                 {userRole === "admin" && (
                   <NavLink
                     to="/admin"

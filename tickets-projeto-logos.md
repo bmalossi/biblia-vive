@@ -73,13 +73,13 @@ Work the **frontier**: any ticket whose blockers are all done. For a purely line
 
 **Blocked by:** [#26](https://github.com/bmalossi/biblia-vive/issues/26)
 
-- [ ] Rota `/estudio` criada e protegida por verificação de permissão do plano Templo.
-- [ ] Endpoint do Cloudflare Worker para listagem paginada de sermões do usuário autenticado no D1.
-- [ ] Interface do Painel listando sermões com título, passagem bíblica, status (rascunho/pronto), data de criação e histórico de ministração.
-- [ ] Filtro de busca na listagem por termo do título ou referência bíblica.
-- [ ] Gate institucional exibido para usuários sem plano Templo (Gratuito/Pro/Visitante) explicando os recursos do Estúdio e convidando ao upgrade.
-- [ ] Item 'Estúdio Homilético' visível no menu de navegação da aplicação para usuários Templo.
-- [ ] Testes de rotas, controle de acesso e renderização de listagem.
+- [x] Rota `/estudio` criada e protegida por verificação de permissão do plano Templo.
+- [x] Endpoint do Cloudflare Worker para listagem paginada de sermões do usuário autenticado no D1.
+- [x] Interface do Painel listando sermões com título, passagem bíblica, status (rascunho/pronto), data de criação e histórico de ministração.
+- [x] Filtro de busca na listagem por termo do título ou referência bíblica.
+- [x] Gate institucional exibido para usuários sem plano Templo (Gratuito/Pro/Visitante) explicando os recursos do Estúdio e convidando ao upgrade.
+- [x] Item 'Estúdio Homilético' visível no menu de navegação da aplicação para usuários Templo.
+- [x] Testes de rotas, controle de acesso e renderização de listagem.
 
 ---
 
