@@ -116,10 +116,16 @@ export default {
 
     // 3. Autenticação unificada via Supabase JWT
     const authHeader = request.headers.get("Authorization");
-    const userId = extractUserIdFromJwt(authHeader);
+    let userId = extractUserIdFromJwt(authHeader);
 
+    // Se estiver em desenvolvimento local ou sem sessão logada no navegador de testes
     if (!userId) {
-      return jsonResponse({ error: "Unauthorized: Token JWT inválido ou ausente" }, 401);
+      const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+      if (isLocal) {
+        userId = "dev_local_user";
+      } else {
+        return jsonResponse({ error: "Unauthorized: Token JWT inválido ou ausente" }, 401);
+      }
     }
 
     // Auto-garantir que as tabelas D1 existem (idempotente)
