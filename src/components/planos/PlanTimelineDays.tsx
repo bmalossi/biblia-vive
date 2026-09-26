@@ -107,16 +107,21 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                   isActive
                     ? "border-2 border-gold bg-app-surface shadow-[0_0_18px_rgba(229,184,105,0.3)] ring-4 ring-gold/10"
                     : isCompleted
-                      ? "border border-emerald-600/70 bg-emerald-950/20 text-emerald-600 dark:text-emerald-400"
+                      ? "border border-gold/50 bg-gold/5 text-gold shadow-sm shadow-gold/5"
                       : "border border-border/80 bg-app-surface text-app-text-muted"
                 }`}
               >
+                {isCompleted && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-primary-foreground shadow-xs">
+                    <Check className="h-2.5 w-2.5 stroke-[3]" />
+                  </span>
+                )}
                 <span
                   className={`font-mono text-[0.62rem] sm:text-[0.68rem] uppercase tracking-widest leading-none ${
                     isActive
                       ? "text-gold font-semibold"
                       : isCompleted
-                        ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                        ? "text-gold/80 font-medium"
                         : "text-app-text-muted"
                   }`}
                 >
@@ -127,7 +132,7 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                     isActive
                       ? "text-app-text"
                       : isCompleted
-                        ? "text-emerald-600 dark:text-emerald-400"
+                        ? "text-gold"
                         : "text-app-text-muted"
                   }`}
                 >
@@ -195,9 +200,9 @@ export const PlanTimelineDays: React.FC<PlanTimelineDaysProps> = ({
                       <button
                         type="button"
                         onClick={() => onStartDayReading(dayItem.day, firstRef)}
-                        className="group/btn inline-flex items-center gap-2 rounded-full border border-emerald-600/50 bg-emerald-950/20 px-5 py-2 font-mono text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-950/40 hover:border-emerald-600 transition-all cursor-pointer"
+                        className="group/btn inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 font-mono text-xs font-medium text-gold hover:bg-gold/20 hover:border-gold transition-all cursor-pointer"
                       >
-                        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <Check className="h-3.5 w-3.5 text-gold" />
                         <span>Concluído</span>
                       </button>
                     ) : (

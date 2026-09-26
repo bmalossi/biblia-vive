@@ -104,17 +104,17 @@ export default function PlanCard({
             <span>{plan.totalDays} dias</span>
           </div>
 
-          {/* Símbolo de confirmação em verde quando 100% concluído */}
+          {/* Símbolo de confirmação quando 100% concluído */}
           {progressPct === 100 ? (
             <span
-              className="inline-flex items-center justify-center p-0.5 rounded-full bg-emerald-950/20 border border-emerald-700/40 text-emerald-600 dark:text-emerald-400"
+              className="inline-flex items-center justify-center p-0.5 rounded-full bg-gold/10 border border-gold/40 text-gold"
               title="100% concluído"
               aria-label="Plano concluído"
             >
               <Check className="w-3.5 h-3.5 stroke-[2.5]" />
             </span>
           ) : progressPct > 0 ? (
-            <span className="px-1.5 py-0.5 rounded-full bg-emerald-950/20 border border-emerald-700/40 text-emerald-600 dark:text-emerald-400 text-[0.62rem] font-medium font-mono">
+            <span className="px-1.5 py-0.5 rounded-full bg-gold/10 border border-gold/40 text-gold text-[0.62rem] font-medium font-mono">
               {progressPct}% lido
             </span>
           ) : null}
