@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
-import { listSermons, saveSermon, type Sermon } from "@/lib/homileticClient";
+import { listSermons, saveSermon, isCloudTablePending, type Sermon } from "@/lib/homileticClient";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -39,6 +39,7 @@ export default function SermonDashboardPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newPassage, setNewPassage] = useState("");
   const [newSpark, setNewSpark] = useState("");
+  const [cloudPending, setCloudPending] = useState(false);
 
   useEffect(() => {
     if (!isTemplo) {
@@ -51,6 +52,7 @@ export default function SermonDashboardPage() {
       .then((data) => {
         if (isMounted) {
           setSermons(data);
+          setCloudPending(isCloudTablePending());
           setLoading(false);
         }
       })
@@ -389,13 +391,30 @@ export default function SermonDashboardPage() {
 
           <div className="bg-app-surface border border-border/80 rounded-2xl p-4 sm:p-5 space-y-1 shadow-xs hover:border-border transition-all">
             <span className="text-[0.68rem] font-mono uppercase tracking-wider text-app-text-muted">
-              Banco de Dados
+              Armazenamento
             </span>
-            <p className="text-xs sm:text-sm font-mono text-gold/80 pt-1">
-              Cloudflare D1 (Edge)
+            <p className="text-xs sm:text-sm font-mono text-gold/90 pt-1 flex items-center gap-1.5">
+              {cloudPending ? (
+                <span className="text-amber-400">⚠️ Local (Requer SQL)</span>
+              ) : (
+                <span className="text-emerald-400">☁️ Nuvem da Conta</span>
+              )}
             </p>
           </div>
         </div>
+
+        {/* Banner Informativo se as tabelas da nuvem ainda não foram criadas no Supabase */}
+        {cloudPending && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 sm:p-5 text-amber-200 text-xs sm:text-sm space-y-2">
+            <div className="flex items-center gap-2 font-semibold text-amber-300">
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span>Sincronização com Celular e Outros Dispositivos</span>
+            </div>
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              Seus sermões estão salvos com segurança neste navegador. Para que eles fiquem sincronizados na sua conta e apareçam automaticamente no seu celular ou no aplicativo, execute o script SQL <strong>supabase/sprint32-homiletic-studio-schema.sql</strong> no SQL Editor do seu Supabase Dashboard.
+            </p>
+          </div>
+        )}
 
         {/* Barra de Filtro e Busca */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-app-surface p-2 sm:p-2.5 rounded-2xl border border-border/80 shadow-xs">
