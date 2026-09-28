@@ -16,6 +16,7 @@ import {
   Layers,
   ChevronRight,
   ExternalLink,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -341,7 +342,16 @@ export default function SermonDashboardPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <Link
+                to="/estudio/aprenda-a-usar"
+                data-testid="dashboard-aprenda-a-usar"
+                className="w-full sm:w-auto border border-gold/40 hover:border-gold/70 bg-gold/10 hover:bg-gold/15 text-gold text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-full flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <GraduationCap className="w-4 h-4 text-gold" />
+                <span>Aprenda a Usar</span>
+              </Link>
+
               <Button
                 data-testid="create-sermon-btn"
                 onClick={() => {

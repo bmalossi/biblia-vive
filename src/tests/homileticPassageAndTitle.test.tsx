@@ -199,4 +199,49 @@ describe("Persistência de Passagem Bíblica Base e Título da Pregação", () =
       );
     });
   });
+
+  it("permite salvar passagem com intervalo de versículos (ex: Lucas 10:15-18) e abrir o popup de inspiração completa", async () => {
+    const rangeSermon: Sermon = {
+      ...baseSermon,
+      id: "sermon-lucas-range",
+      bookName: "Lucas",
+      chapter: 10,
+      verse: "15-18",
+    };
+
+    vi.mocked(homileticClient.getSermon).mockResolvedValue(rangeSermon);
+
+    render(
+      <MemoryRouter initialEntries={["/estudio/sermon-lucas-range"]}>
+        <Routes>
+          <Route path="/estudio/:sermonId" element={<SermonStudioPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    // Aguarda carregar Card 1 EU E DEUS
+    await waitFor(() => {
+      expect(screen.getByTestId("eu-e-deus-section")).toBeInTheDocument();
+    });
+
+    // Botão de Inspiração Completa deve estar presente
+    const fullInspirationBtn = screen.getByTestId("open-full-inspiration-btn");
+    expect(fullInspirationBtn).toBeInTheDocument();
+
+    // Clica para abrir o popup de Inspiração Completa
+    fireEvent.click(fullInspirationBtn);
+
+    // O modal deve estar aberto
+    await waitFor(() => {
+      expect(screen.getByTestId("full-passage-modal")).toBeInTheDocument();
+    });
+
+    // Fecha o modal
+    const closeBtn = screen.getByTestId("close-full-passage-modal-btn");
+    fireEvent.click(closeBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("full-passage-modal")).not.toBeInTheDocument();
+    });
+  });
 });

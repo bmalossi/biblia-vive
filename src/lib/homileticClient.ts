@@ -32,7 +32,7 @@ export interface Sermon {
   bookId?: string;
   bookName?: string;
   chapter?: number;
-  verse?: number | null;
+  verse?: number | string | null;
   version?: string;
   sparkText?: string;
   status: "draft" | "completed";
@@ -111,7 +111,7 @@ function mapSermonRow(row: any): Sermon {
     bookId: row.book_id || undefined,
     bookName: row.book_name || undefined,
     chapter: row.chapter !== null && row.chapter !== undefined ? Number(row.chapter) : undefined,
-    verse: row.verse !== null && row.verse !== undefined ? Number(row.verse) : undefined,
+    verse: row.verse !== null && row.verse !== undefined ? (typeof row.verse === "number" || !Number.isNaN(Number(row.verse)) ? Number(row.verse) : String(row.verse)) : undefined,
     version: row.version || "acf",
     sparkText: row.spark_text || undefined,
     status: (row.status as "draft" | "completed") || "draft",
@@ -139,7 +139,9 @@ function mapSermonToRow(sermon: Partial<Sermon> & { id: string }, userId: string
   if (sermon.bookId !== undefined) row.book_id = sermon.bookId;
   if (sermon.bookName !== undefined) row.book_name = sermon.bookName;
   if (sermon.chapter !== undefined) row.chapter = sermon.chapter;
-  if (sermon.verse !== undefined) row.verse = sermon.verse;
+  if (sermon.verse !== undefined) {
+    row.verse = typeof sermon.verse === "number" ? sermon.verse : (parseInt(String(sermon.verse), 10) || null);
+  }
   if (sermon.version !== undefined) row.version = sermon.version;
   if (sermon.sparkText !== undefined) row.spark_text = sermon.sparkText;
   if (sermon.status !== undefined) row.status = sermon.status;

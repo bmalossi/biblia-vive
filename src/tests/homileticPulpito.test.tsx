@@ -309,5 +309,40 @@ describe("Ticket 6: Modo Púlpito Solene com Screen Wake Lock e Versículos Inte
         expect(screen.getByRole("button", { name: /1\. Exegese/i })).toBeInTheDocument();
       });
     });
+
+    it("6. Permite alternar entre os modos White, Sépia e Dark na página de pregação", async () => {
+      render(
+        <MemoryRouter initialEntries={["/pulpito/sermon-pulpito-1"]}>
+          <Routes>
+            <Route path="/pulpito/:sermonId" element={<SermonPulpitPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("theme-selector-group")).toBeInTheDocument();
+      });
+
+      // Botões White, Sépia, Dark
+      const whiteBtn = screen.getByTitle(/Modo White/i);
+      const sepiaBtn = screen.getByTitle(/Modo Sépia/i);
+      const darkBtn = screen.getByTitle(/Modo Dark/i);
+
+      expect(whiteBtn).toBeInTheDocument();
+      expect(sepiaBtn).toBeInTheDocument();
+      expect(darkBtn).toBeInTheDocument();
+
+      // Clica em White
+      fireEvent.click(whiteBtn);
+      expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+
+      // Clica em Sépia
+      fireEvent.click(sepiaBtn);
+      expect(document.documentElement.getAttribute("data-theme")).toBe("sepia");
+
+      // Clica em Dark
+      fireEvent.click(darkBtn);
+      expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    });
   });
 });
