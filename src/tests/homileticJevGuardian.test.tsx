@@ -173,6 +173,43 @@ describe("Ticket 8: Guardião do Evangelho (Gálatas 1:8) e Teste de Ortodoxia v
         expect(galatasAlert).toHaveTextContent(/Teologia da Prosperidade/i);
       });
     });
+
+    it("ao clicar em Testar Ortodoxia com rascunho/gibberish, exibe badge JEV: Rascunho (0%) e banner de conteúdo insuficiente", async () => {
+      const draftResult: HomileticAuditResult = {
+        is_grace_centered: false,
+        theological_deviation: "Inconclusivo_Rascunho",
+        confidence: 0,
+        reasoning: "Conteúdo Insuficiente para Auditoria: O esboço ainda está em fase inicial ou não possui texto suficiente.",
+        evaluatedAt: new Date().toISOString(),
+      };
+
+      vi.mocked(jevHomileticService.auditSermonOrthodoxy).mockResolvedValue(draftResult);
+
+      render(
+        <MemoryRouter initialEntries={["/estudio/sermon-jev-1"]}>
+          <Routes>
+            <Route path="/estudio/:sermonId" element={<SermonStudioPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("O Custo do Discipulado")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("test-orthodoxy-btn"));
+
+      await waitFor(() => {
+        expect(jevHomileticService.auditSermonOrthodoxy).toHaveBeenCalled();
+        const badge = screen.getByTestId("jev-status-badge");
+        expect(badge).toHaveTextContent(/JEV: Rascunho \(0%\)/i);
+        const banner = screen.getByTestId("orthodoxy-inconclusive-badge");
+        expect(banner).toBeInTheDocument();
+        expect(banner).toHaveTextContent(/Conteúdo Insuficiente para Auditoria Doutrinária \(0%\)/i);
+        // Não deve renderizar o alerta solene de Gálatas 1:8
+        expect(screen.queryByTestId("galatas-alert-card")).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe("Checagem Automática ao Clicar em [ 📖 Pregar Agora ]", () => {
@@ -252,10 +289,57 @@ describe("Ticket 8: Guardião do Evangelho (Gálatas 1:8) e Teste de Ortodoxia v
       const result = evaluateLocalHomileticHeuristic(payload);
 
       expect(result.is_grace_centered).toBe(false);
-      expect(result.theological_deviation).toBe("Humanismo_SelfHelp");
-      expect(result.confidence).toBeGreaterThanOrEqual(0.9);
-      expect(result.reasoning).toContain("Alerta de Inconsistência Homilética");
+      expect(result.theological_deviation).toBe("Inconclusivo_Rascunho");
+      expect(result.confidence).toBe(0);
+      expect(result.reasoning).toContain("Alerta de Conteúdo Ininteligível");
       expect(result.reasoning).toContain("Tópico 2");
+    });
+
+    it("detecta digitação aleatória / gibberish no Desfecho Homilético e retorna Inconclusivo_Rascunho com 0%", async () => {
+      const { evaluateLocalHomileticHeuristic } = await vi.importActual<
+        typeof import("@/lib/jevHomileticService")
+      >("@/lib/jevHomileticService");
+
+      const payload = {
+        sermonId: "sermon-gibberish-desfecho",
+        biblical_passage_text: "Lucas 10:16-19",
+        sermon_initial_spark: "Faísca inicial",
+        sermon_intended_outcome: "testeteeas dsadsad asdoasdksa odakspokasdop OOdasdsadosakdposakdposakdpokasodpksaopdksaopdkaopdkasopdkaspokdosapkdopsakd",
+        sermon_block_1_exegesis: "dasdsadsaddasdasdsad",
+        sermon_block_2_topics: [],
+        sermon_block_3_application: "",
+      };
+
+      const result = evaluateLocalHomileticHeuristic(payload);
+
+      expect(result.is_grace_centered).toBe(false);
+      expect(result.theological_deviation).toBe("Inconclusivo_Rascunho");
+      expect(result.confidence).toBe(0);
+      expect(result.reasoning).toContain("Alerta de Conteúdo Ininteligível");
+      expect(result.reasoning).toContain("Desfecho Homilético");
+    });
+
+    it("retorna Inconclusivo_Rascunho e 0% se o esboço estiver vazio ou com volume insuficiente de palavras", async () => {
+      const { evaluateLocalHomileticHeuristic } = await vi.importActual<
+        typeof import("@/lib/jevHomileticService")
+      >("@/lib/jevHomileticService");
+
+      const payload = {
+        sermonId: "sermon-empty-test",
+        biblical_passage_text: "Lucas 10:16-19",
+        sermon_initial_spark: "",
+        sermon_intended_outcome: "",
+        sermon_block_1_exegesis: "",
+        sermon_block_2_topics: [],
+        sermon_block_3_application: "",
+      };
+
+      const result = evaluateLocalHomileticHeuristic(payload);
+
+      expect(result.is_grace_centered).toBe(false);
+      expect(result.theological_deviation).toBe("Inconclusivo_Rascunho");
+      expect(result.confidence).toBe(0);
+      expect(result.reasoning).toContain("Conteúdo Insuficiente para Auditoria");
     });
 
     it("aprova sermão bíblico com tópicos coerentes e centralizados em Cristo", async () => {

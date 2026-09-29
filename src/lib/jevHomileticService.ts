@@ -14,7 +14,8 @@ export type TheologicalDeviation =
   | "Fiel_Ao_Texto"
   | "Teologia_Prosperidade"
   | "Humanismo_SelfHelp"
-  | "Moralismo_Sem_Graca";
+  | "Moralismo_Sem_Graca"
+  | "Inconclusivo_Rascunho";
 
 export interface HomileticAuditPayload {
   sermonId: string;
@@ -43,6 +44,97 @@ export interface HomileticAuditResult {
   reasoning: string;
   historical_alignment?: string;
   evaluatedAt: string;
+}
+
+/**
+ * Vocabulário padrão de palavras funcionais e bíblicas comuns para validação de coerência textual.
+ */
+const COMMON_VOCABULARY = new Set([
+  // Português (funcionais, conectivos e termos básicos)
+  "o", "a", "os", "as", "um", "uma", "uns", "umas",
+  "de", "do", "da", "dos", "das", "em", "no", "na", "nos", "nas",
+  "por", "pelo", "pela", "pelos", "pelas", "para", "pra", "com", "sem", "sob", "sobre",
+  "e", "ou", "mas", "porem", "porém", "contudo", "todavia", "pois", "porque", "porquê",
+  "que", "se", "como", "quando", "onde", "quem", "qual", "quanto",
+  "nao", "não", "sim", "já", "ja", "ainda", "sempre", "nunca",
+  "eu", "tu", "ele", "ela", "nos", "nós", "eles", "elas", "você", "voce", "voces", "vocês",
+  "meu", "minha", "seu", "sua", "nosso", "nossa",
+  "este", "esta", "esse", "essa", "aquele", "aquela", "isto", "isso", "aquilo",
+  "deus", "jesus", "cristo", "senhor", "espirito", "espírito", "graça", "graca", "fe", "fé",
+  "amor", "vida", "morte", "cruz", "palavra", "texto", "biblia", "bíblia", "evangelho",
+  "igreja", "irmaos", "irmãos", "pecado", "salvacao", "salvação", "perdao", "perdão",
+  "pregador", "sermao", "sermão", "pregacao", "pregação", "ouvinte", "ouvintes",
+  "homem", "mulher", "filho", "pai", "mae", "mãe", "povo", "mundo", "reino",
+  "ser", "estar", "ter", "haver", "fazer", "dizer", "ir", "ver", "dar", "saber",
+  "é", "sao", "são", "foi", "era", "tem", "ha", "há", "vai", "vem",
+  // Espanhol e Inglês (suporte a leituras multilíngues)
+  "the", "of", "and", "to", "in", "is", "that", "for", "with", "god", "lord",
+  "el", "la", "y", "en", "dios", "cristo"
+]);
+
+/**
+ * Conta palavras com significado no texto (mínimo 2 letras alfabéticas).
+ */
+export function countMeaningfulWords(text: string): number {
+  if (!text) return 0;
+  return text
+    .split(/\s+/)
+    .map((w) => w.replace(/[^\p{L}]/gu, ""))
+    .filter((w) => w.length >= 2).length;
+}
+
+/**
+ * Detecta conteúdo sem sentido, repetição de teclas, aglomerados de consoantes ou digitação aleatória.
+ */
+export function detectGibberishOrKeyboardMash(text: string): { isGibberish: boolean; sample?: string } {
+  if (!text || !text.trim()) return { isGibberish: false };
+
+  // 1. Palavras contínuas anômalas (> 30 caracteres sem espaço)
+  const giantWords = text.match(/[^\s]{30,}/g);
+  if (giantWords && giantWords.length > 0) {
+    return { isGibberish: true, sample: giantWords[0].slice(0, 25) + "..." };
+  }
+
+  // 2. Repetição contínua do mesmo caractere (ex: "aaaaaa", ".....")
+  const repeatedChar = text.match(/(.)\1{4,}/);
+  if (repeatedChar) {
+    return { isGibberish: true, sample: repeatedChar[0] };
+  }
+
+  // 3. Aglomerados de 5 ou mais consoantes consecutivas sem vogais (ex: "bcdfgh", "pksaop", "sdks")
+  const consonantCluster = text.match(/[bcdfghjklmnpqrstvwxyz]{5,}/i);
+  if (consonantCluster) {
+    return { isGibberish: true, sample: consonantCluster[0] };
+  }
+
+  // 4. Palavras longas com baixíssima variedade de letras (ex: "dasdsadsaddasdasdsad" -> apenas 'a','d','s')
+  const rawWords = text
+    .split(/\s+/)
+    .map((w) => w.replace(/[^\p{L}]/gu, "").toLowerCase())
+    .filter(Boolean);
+
+  for (const w of rawWords) {
+    if (w.length >= 10) {
+      const uniqueChars = new Set(w.split("")).size;
+      if (uniqueChars <= 3) {
+        return { isGibberish: true, sample: w };
+      }
+    }
+    // Palavras médias (>= 5 letras) sem nenhuma vogal
+    if (w.length >= 5 && !/[aeiouyáéíóúâêîôûãõàèìòùäëïöü]/i.test(w)) {
+      return { isGibberish: true, sample: w };
+    }
+  }
+
+  // 5. Se o texto tem pelo menos 4 palavras e mais de 25 caracteres, mas nenhuma palavra reconhecida no vocabulário
+  if (rawWords.length >= 4 && text.trim().length >= 25) {
+    const hasRecognizedWord = rawWords.some((w) => COMMON_VOCABULARY.has(w));
+    if (!hasRecognizedWord) {
+      return { isGibberish: true, sample: rawWords.slice(0, 3).join(" ") + "..." };
+    }
+  }
+
+  return { isGibberish: false };
 }
 
 /**
@@ -87,46 +179,58 @@ export function evaluateLocalHomileticHeuristic(
   payload: HomileticAuditPayload,
   historicalCommentary?: string
 ): HomileticAuditResult {
-  const allText = [
-    payload.sermon_intended_outcome,
-    payload.sermon_block_1_exegesis,
-    ...(payload.sermon_block_2_topics || []).flatMap((t) => [
-      t.title,
-      t.steps.stepA_fato,
-      t.steps.stepB_porque,
-      t.steps.stepC_contraste,
-      t.steps.stepD_tensao,
-    ]),
-    payload.sermon_block_3_application,
-  ]
+  // 1. Mapeamento de todas as seções redigidas para auditoria integral
+  const sectionsToCheck: Array<{ name: string; text: string }> = [
+    { name: "Desfecho Homilético", text: payload.sermon_intended_outcome || "" },
+    { name: "Bloco 1 (Exegese)", text: payload.sermon_block_1_exegesis || "" },
+    { name: "Aplicação (Bloco 3)", text: payload.sermon_block_3_application || "" },
+    { name: "Faísca Inicial", text: payload.sermon_initial_spark || "" },
+  ];
+
+  (payload.sermon_block_2_topics || []).forEach((t, i) => {
+    sectionsToCheck.push({
+      name: `Tópico ${i + 1} (${t.title || "Sem título"})`,
+      text: `${t.title || ""} ${t.steps.stepA_fato || ""} ${t.steps.stepB_porque || ""} ${t.steps.stepC_contraste || ""} ${t.steps.stepD_tensao || ""}`,
+    });
+  });
+
+  // 2. Checagem de Conteúdo Incoerente / Spam / Gibberish em QUALQUER seção
+  for (const sec of sectionsToCheck) {
+    const gibberish = detectGibberishOrKeyboardMash(sec.text);
+    if (gibberish.isGibberish) {
+      return {
+        is_grace_centered: false,
+        theological_deviation: "Inconclusivo_Rascunho",
+        confidence: 0,
+        reasoning: `Alerta de Conteúdo Ininteligível: Detectamos digitação aleatória ou repetição de caracteres em "${sec.name}" (${gibberish.sample ? `'${gibberish.sample}'` : "caracteres desconexos"}). Para manter a fidelidade e edificação da igreja, desenvolva o raciocínio bíblico com clareza antes de pregar.`,
+        historical_alignment: "Não avaliado: o conteúdo atual não possui base textual para comparação histórica.",
+        evaluatedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  // 3. Validação de Conteúdo Mínimo / Rascunho Inicial
+  const allText = sectionsToCheck
+    .map((s) => s.text)
     .join(" ")
     .toLowerCase();
 
-  // 1. Checagem de Conteúdo Incoerente / Spam / Gibberish nos tópicos
-  // Detecta repetições de teclas sem sentido como "dasdsadsad", "asdsad", "sadsad"
-  const gibberishRegex = /\b[bcdfghjklmnpqrstvwxyz]{6,}\b|\b[asdfjkl]{5,}\b/i;
-  const topics = payload.sermon_block_2_topics || [];
-  const invalidTopics: string[] = [];
+  const totalWords = countMeaningfulWords(allText);
+  const desfechoWords = countMeaningfulWords(payload.sermon_intended_outcome || "");
+  const exegeseWords = countMeaningfulWords(payload.sermon_block_1_exegesis || "");
 
-  topics.forEach((t, i) => {
-    const topicText = `${t.title} ${t.steps.stepA_fato} ${t.steps.stepB_porque} ${t.steps.stepC_contraste} ${t.steps.stepD_tensao}`;
-    if (gibberishRegex.test(topicText) || /^(.)\1{4,}$/.test(topicText.trim())) {
-      invalidTopics.push(t.title || `Tópico ${i + 1}`);
-    }
-  });
-
-  if (invalidTopics.length > 0) {
+  if (totalWords < 15 || (desfechoWords < 3 && exegeseWords < 3)) {
     return {
       is_grace_centered: false,
-      theological_deviation: "Humanismo_SelfHelp",
-      confidence: 0.91,
-      reasoning: `Alerta de Inconsistência Homilética: O(s) tópico(s) [${invalidTopics.join(", ")}] contém conteúdo aleatório ou não redigido ('dasdsadsad...'). Para manter a fidelidade e edificação da igreja, desenvolva os degraus bíblicos com clareza antes de pregar.`,
-      historical_alignment: "Não alinhado: conteúdo desprovido de base exegética compromete a seriedade do púlpito.",
+      theological_deviation: "Inconclusivo_Rascunho",
+      confidence: 0,
+      reasoning: "Conteúdo Insuficiente para Auditoria: O esboço ainda está em fase inicial ou não possui texto suficiente. Redija ao menos o Desfecho da Marcha-Ré e a Exegese do Bloco 1 com suas próprias palavras para avaliar a conformidade doutrinária.",
+      historical_alignment: "Pendente: aguardando redação do esboço para análise com os comentários bíblicos históricos.",
       evaluatedAt: new Date().toISOString(),
     };
   }
 
-  // 2. Teologia da Prosperidade
+  // 4. Teologia da Prosperidade
   const prosperityPatterns = [
     /barganh/i,
     /pacto de prosperidade/i,
@@ -149,7 +253,7 @@ export function evaluateLocalHomileticHeuristic(
     };
   }
 
-  // 3. Humanismo / Self-Help
+  // 5. Humanismo / Self-Help
   const humanismPatterns = [
     /você é o centro/i,
     /o herói é você/i,
@@ -170,7 +274,7 @@ export function evaluateLocalHomileticHeuristic(
     };
   }
 
-  // 4. Moralismo Sem Graça
+  // 6. Moralismo Sem Graça
   const moralismPatterns = [
     /faça por merecer/i,
     /salvação pelas obras/i,
@@ -188,7 +292,7 @@ export function evaluateLocalHomileticHeuristic(
     };
   }
 
-  // 5. Sermão Fiel ao Texto e Centrado em Cristo
+  // 7. Sermão Fiel ao Texto e Centrado em Cristo
   return {
     is_grace_centered: true,
     theological_deviation: "Fiel_Ao_Texto",
@@ -208,7 +312,16 @@ export async function auditSermonOrthodoxy(
   sermon: Sermon,
   biblicalPassageText?: string
 ): Promise<HomileticAuditResult> {
-  // 1. RAG de Comentários Históricos (Barnes, Henry, Gill) se disponível
+  // 1. Constrói payload preliminar para validação de entrada (Gatekeeper)
+  const initialPayload = buildHomileticPayload(sermon, biblicalPassageText);
+
+  // 2. Validação prévia imediata (zero custo de IA, zero latência de rede para rascunho/gibberish)
+  const preCheck = evaluateLocalHomileticHeuristic(initialPayload);
+  if (preCheck.theological_deviation === "Inconclusivo_Rascunho") {
+    return preCheck;
+  }
+
+  // 3. RAG de Comentários Históricos (Barnes, Henry, Gill) se disponível
   let historicalCommentary = "";
   if (sermon.bookId && sermon.chapter) {
     try {
@@ -224,10 +337,10 @@ export async function auditSermonOrthodoxy(
     }
   }
 
-  // 2. Constrói payload estrito
+  // 4. Constrói payload estrito completo com contexto histórico
   const payload = buildHomileticPayload(sermon, biblicalPassageText, historicalCommentary);
 
-  // 3. Obtém token JWT
+  // 5. Obtém token JWT
   let token: string | undefined;
   try {
     const { data } = await supabase.auth.getSession();

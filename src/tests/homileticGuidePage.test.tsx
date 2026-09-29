@@ -160,7 +160,7 @@ describe("Guia Prático de Construção: Passo a Passo no Estúdio (SermonStudio
     const rawBtn = screen.getByRole("button", { name: /Visão em Texto \(ASCII\)/i });
     fireEvent.click(rawBtn);
 
-    expect(screen.getByText(/🏁 DESFECHO & APELO FINAL/i)).toBeInTheDocument();
+    expect(screen.getByText(/DESFECHO & APELO FINAL/i)).toBeInTheDocument();
   });
 
   it("renderiza as 4 dicas de ouro para memorização e fluidez", () => {

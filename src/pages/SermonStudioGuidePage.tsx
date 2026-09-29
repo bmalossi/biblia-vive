@@ -36,48 +36,48 @@ import { cn } from "@/lib/utils";
 
 // Exemplo completo para cópia rápida
 const FULL_PULPIT_TEXT = `====================================================================
-📖 LUCAS 24:13-35  |  ⏱️ 00:00  |  💡 TELA ATIVA  |  [ 🏛️ VER PARÂMETROS ]
+LUCAS 24:13-35  |  00:00  |  TELA ATIVA  |  [ VER PARÂMETROS ]
 ====================================================================
 
 TEMA: Quando a Frustração Cega os Olhos, mas a Palavra Aquece
 DESFECHO: Dobrar joelhos -> Oração de renúncia de expectativas.
 
 --------------------------------------------------------------------
-🔥 INTRODUÇÃO (GANCHO DE ENTRADA)
+INTRODUÇÃO (GANCHO DE ENTRADA)
 "Você já esteve em um lugar onde fez tudo certo, mas deu errado?..."
 --------------------------------------------------------------------
 
-🏛️ BLOCO 1: EXEGESE & CONTEXTO HISTÓRICO
+BLOCO 1: EXEGESE & CONTEXTO HISTÓRICO
 • Ancoradouro: Mostrar a Teófilo e crentes que Cristo é o cumprimento profético.
 • Contexto: Emaús (11 km) = Fuga e desistência. Olhos impedidos pela dor.
 
 --------------------------------------------------------------------
-📖 BLOCO 2: PREGAR A INSPIRAÇÃO
+BLOCO 2: PREGAR A INSPIRAÇÃO
 
 TÓPICO 1: A FRUSTRAÇÃO CEGA A VISÃO DO SAGRADO
 • [A: Fato] Caminhavam com Cristo sem O reconhecer (v.15-16).
 • [B: Porquê] Presos à expectativa de um Messias político (v.21).
-• [C: Contraste] [ 🤫 PAUSA 3S ] A dor não afasta Deus, afasta sua visão.
+• [C: Contraste] [ PAUSA 3S ] A dor não afasta Deus, afasta sua visão.
 • [D: Tensão] -> O que Jesus faz quando nos vê cegos?
 
 TÓPICO 2: A PALAVRA EXPOSTA É O REMÉDIO QUE QUEIMA
 • [A: Fato] Jesus abre as Escrituras de Moisés aos Profetas (v.27).
 • [B: Porquê] Fé madura não vem de show, vem da Palavra explicada.
-• [C: Contraste] [ 💡 ILUSTRAÇÃO: Fogo de palha x Fogo do fogão a lenha ].
+• [C: Contraste] [ ILUSTRAÇÃO: Fogo de palha x Fogo do fogão a lenha ].
 • [D: Tensão] -> Qual o resultado da Palavra no partir do pão?
 
 TÓPICO 3: A REVELAÇÃO TRANSFORMA A FUGA EM MISSÃO
 • [A: Fato] Olhos se abrem no partir do pão e voltam a Jerusalém (v.31-33).
 • [B: Porquê] Encontro com Cristo elimina a passividade.
-• [C: Contraste] [ ⚡ ELEVAR TOM ] Correram 11km de noite cheios de força!
+• [C: Contraste] [ ELEVAR TOM ] Correram 11km de noite cheios de força!
 • [D: Tensão] -> Vai continuar fugindo para Emaús ou volta para Jerusalém?
 
 --------------------------------------------------------------------
-🎯 BLOCO 3: APLICAÇÃO PRÁTICA
+BLOCO 3: APLICAÇÃO PRÁTICA
 • Segunda-feira, 7h da manhã: Antes das redes sociais, abra a Bíblia na mesa.
 
 --------------------------------------------------------------------
-🏁 DESFECHO & APELO FINAL
+DESFECHO & APELO FINAL
 • Chamada à oração de joelhos: "Abre os meus olhos e queima o coração!"
 ====================================================================`;
 
@@ -962,7 +962,7 @@ export default function SermonStudioGuidePage() {
                 <div className="space-y-2 border-t border-border/80 dark:border-[#221c16] pt-5">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-gold uppercase tracking-wider">
                     <Flame className="w-3.5 h-3.5" />
-                    <span>🔥 INTRODUÇÃO (GANCHO DE ENTRADA)</span>
+                    <span>INTRODUÇÃO (GANCHO DE ENTRADA)</span>
                   </div>
                   <p className="text-base sm:text-lg font-serif italic text-app-text leading-relaxed pl-3 border-l-2 border-gold/40">
                     &ldquo;Você já esteve em um lugar onde fez tudo certo, mas deu errado? Você já sentiu a sensação amarga de ver um projeto morrer e perguntar: &lsquo;Deus, onde o Senhor estava?&rsquo;...&rdquo;
@@ -973,7 +973,7 @@ export default function SermonStudioGuidePage() {
                 <div className="space-y-3 border-t border-border/80 dark:border-[#221c16] pt-5">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-gold uppercase tracking-wider">
                     <Compass className="w-3.5 h-3.5" />
-                    <span>🏛️ BLOCO 1: EXEGESE & CONTEXTO HISTÓRICO</span>
+                    <span>BLOCO 1: EXEGESE & CONTEXTO HISTÓRICO</span>
                   </div>
                   <ul className="space-y-2 text-sm text-app-text pl-3">
                     <li className="flex items-start gap-2">
@@ -991,7 +991,7 @@ export default function SermonStudioGuidePage() {
                 <div className="space-y-6 border-t border-border/80 dark:border-[#221c16] pt-5">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-gold uppercase tracking-wider">
                     <BookOpen className="w-3.5 h-3.5" />
-                    <span>📖 BLOCO 2: PREGAR A INSPIRAÇÃO</span>
+                    <span>BLOCO 2: PREGAR A INSPIRAÇÃO</span>
                   </div>
 
                   {/* Tópico 1 */}
@@ -1006,7 +1006,7 @@ export default function SermonStudioGuidePage() {
                         <span className="font-mono text-xs font-bold text-gold">[C: Contraste]</span>
                         <span className="inline-flex items-center gap-1 font-mono text-[0.7rem] bg-gold/10 text-gold border border-gold/30 px-2 py-0.5 rounded font-semibold">
                           <Pause className="w-3 h-3 text-gold/80" />
-                          [ 🤫 PAUSA 3S ]
+                          [ PAUSA 3S ]
                         </span>
                         <span>A dor não afasta Deus, afasta sua visão.</span>
                       </p>
@@ -1026,7 +1026,7 @@ export default function SermonStudioGuidePage() {
                         <span className="font-mono text-xs font-bold text-gold">[C: Contraste]</span>
                         <span className="inline-flex items-center gap-1 font-mono text-[0.7rem] bg-gold/10 text-gold border border-gold/30 px-2 py-0.5 rounded font-semibold ml-1.5">
                           <Sparkles className="w-3 h-3 text-gold/80" />
-                          [ 💡 ILUSTRAÇÃO: Fogo de palha x Fogo do fogão a lenha ]
+                          [ ILUSTRAÇÃO: Fogo de palha x Fogo do fogão a lenha ]
                         </span>
                       </div>
                       <p className="text-gold italic font-serif"><span className="font-mono text-xs font-bold text-gold font-sans not-italic">[D: Tensão]</span> &rarr; Qual o resultado da Palavra no partir do pão?</p>
@@ -1045,7 +1045,7 @@ export default function SermonStudioGuidePage() {
                         <span className="font-mono text-xs font-bold text-gold">[C: Contraste]</span>
                         <span className="inline-flex items-center gap-1 font-mono text-[0.7rem] bg-gold/10 text-gold border border-gold/30 px-2 py-0.5 rounded font-semibold">
                           <Zap className="w-3 h-3 text-gold/80" />
-                          [ ⚡ ELEVAR TOM ]
+                          [ ELEVAR TOM ]
                         </span>
                         <span>Correram 11km de noite cheios de força!</span>
                       </p>
@@ -1058,7 +1058,7 @@ export default function SermonStudioGuidePage() {
                 <div className="space-y-2 border-t border-border/80 dark:border-[#221c16] pt-5">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-gold uppercase tracking-wider">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>🎯 BLOCO 3: APLICAÇÃO PRÁTICA</span>
+                    <span>BLOCO 3: APLICAÇÃO PRÁTICA</span>
                   </div>
                   <p className="text-sm sm:text-base text-app-text pl-3">
                     • <strong>Segunda-feira, 7h da manhã:</strong> Antes das redes sociais, abra a Bíblia na mesa.
@@ -1069,7 +1069,7 @@ export default function SermonStudioGuidePage() {
                 <div className="space-y-2 border-t border-border/80 dark:border-[#221c16] pt-5">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-gold uppercase tracking-wider">
                     <Flame className="w-3.5 h-3.5" />
-                    <span>🏁 DESFECHO & APELO FINAL</span>
+                    <span>DESFECHO & APELO FINAL</span>
                   </div>
                   <p className="text-sm sm:text-base font-semibold text-app-text pl-3">
                     • Chamada à oração de joelhos: <em>&ldquo;Abre os meus olhos e queima o coração!&rdquo;</em>

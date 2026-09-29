@@ -34,6 +34,12 @@ import {
   Sun,
   Moon,
   GraduationCap,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  CheckCheck,
+  Bookmark,
 } from "lucide-react";
 import { getTheme, setTheme as setGlobalTheme, type Theme, THEME_KEY } from "@/lib/themes";
 import {
@@ -47,6 +53,7 @@ import {
   type PreachingLog,
 } from "@/lib/homileticClient";
 import { fetchChapter, type Chapter } from "@/lib/bibleApi";
+import { ALL_BOOKS, OLD_TESTAMENT, NEW_TESTAMENT, findBookGlobally } from "@/lib/books";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -309,10 +316,14 @@ export default function SermonStudioPage() {
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditResult, setAuditResult] = useState<HomileticAuditResult | null>(null);
 
-  // Card Flutuante de Texto Bíblico
+  // Drawer Canônico de Leitura e Consulta das Escrituras (66 Livros)
   const [isScriptureOpen, setIsScriptureOpen] = useState(false);
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loadingScripture, setLoadingScripture] = useState(false);
+  const [canonicalBook, setCanonicalBook] = useState<string>("Lucas");
+  const [canonicalChapter, setCanonicalChapter] = useState<number>(1);
+  const [canonicalVersion, setCanonicalVersion] = useState<string>("acf");
+  const [canonicalError, setCanonicalError] = useState<string | null>(null);
 
   const isBloco2Unlocked =
     isUnlocked &&
@@ -358,24 +369,135 @@ export default function SermonStudioPage() {
     );
   };
 
-  // Carregar texto bíblico canônico no drawer
-  const handleOpenScripture = async () => {
-    setIsScriptureOpen(true);
-    if (chapterData || !sermon?.bookName || !sermon?.chapter) return;
-
+  // Carregar capítulo canônico sob demanda com resolução de slug
+  const loadCanonicalChapter = async (
+    bookNameOrSlug: string,
+    chapterNum: number,
+    version: string = "acf"
+  ) => {
     setLoadingScripture(true);
+    setCanonicalError(null);
     try {
-      const data = await fetchChapter(
-        sermon.version || "acf",
-        sermon.bookId || "rom",
-        String(sermon.chapter)
+      const bookObj = findBookGlobally(bookNameOrSlug);
+      const targetSlug = bookObj?.slug || bookNameOrSlug || "lc";
+      const targetBookName = bookObj?.name || bookNameOrSlug || "Lucas";
+      const maxCh = bookObj?.chapters || 150;
+      const validChapter = Math.max(1, Math.min(Number(chapterNum) || 1, maxCh));
+
+      setCanonicalBook(targetBookName);
+      setCanonicalChapter(validChapter);
+      setCanonicalVersion(version);
+
+      const promise = fetchChapter(version, targetSlug, String(validChapter));
+      const data = promise && typeof promise.then === "function" ? await promise : null;
+      setChapterData(data || null);
+    } catch (err: any) {
+      console.error("[Estudio] Erro ao buscar texto canônico:", err);
+      setCanonicalError(
+        err?.message || "Não foi possível carregar este capítulo da Bíblia."
       );
-      setChapterData(data);
-    } catch (err) {
-      console.error("[Estudio] Erro ao buscar passagem bíblica:", err);
+      setChapterData(null);
     } finally {
       setLoadingScripture(false);
     }
+  };
+
+  // Abrir o Drawer Canônico sincronizando com a passagem base ou o último texto
+  const handleOpenScripture = async () => {
+    setIsScriptureOpen(true);
+
+    const baseBook = sermon?.bookName || sermon?.bookId;
+    const baseChapter = sermon?.chapter ? Number(sermon.chapter) : undefined;
+    const baseVersion = sermon?.version || "acf";
+
+    const targetBook = baseBook || canonicalBook || "Lucas";
+    const targetChapter =
+      baseChapter && !isNaN(baseChapter) ? baseChapter : canonicalChapter || 1;
+    const targetVersion = baseVersion || canonicalVersion || "acf";
+
+    await loadCanonicalChapter(targetBook, targetChapter, targetVersion);
+  };
+
+  // Navegação no Drawer Canônico
+  const handleCanonicalBookChange = async (newBookSlugOrName: string) => {
+    const bookObj = findBookGlobally(newBookSlugOrName);
+    const targetBookName = bookObj?.name || newBookSlugOrName;
+    const maxCh = bookObj?.chapters || 1;
+    const nextChapter = Math.min(canonicalChapter, maxCh);
+    await loadCanonicalChapter(targetBookName, nextChapter, canonicalVersion);
+  };
+
+  const handleCanonicalChapterChange = async (newChapter: number) => {
+    await loadCanonicalChapter(canonicalBook, newChapter, canonicalVersion);
+  };
+
+  const handleCanonicalVersionChange = async (newVersion: string) => {
+    await loadCanonicalChapter(canonicalBook, canonicalChapter, newVersion);
+  };
+
+  const handleSetAsBasePassage = async () => {
+    if (!sermon) return;
+    const bookObj = findBookGlobally(canonicalBook);
+    const resolvedName = bookObj?.name || canonicalBook;
+    const resolvedSlug = bookObj?.slug || canonicalBook;
+
+    try {
+      const updated = await saveSermon({
+        id: sermon.id,
+        bookName: resolvedName,
+        bookId: resolvedSlug,
+        chapter: canonicalChapter,
+        version: canonicalVersion,
+      });
+      setSermon(updated);
+      setPassageBookInput(resolvedName);
+      setPassageChapterInput(String(canonicalChapter));
+      toast.success(`Passagem base definida: ${resolvedName} ${canonicalChapter} (${canonicalVersion.toUpperCase()})`);
+    } catch (e) {
+      console.error("Erro ao salvar passagem base:", e);
+      toast.error("Erro ao salvar passagem base do sermão");
+    }
+  };
+
+  const handleSetVerseAsBase = async (verseNumber: number) => {
+    if (!sermon) return;
+    const bookObj = findBookGlobally(canonicalBook);
+    const resolvedName = bookObj?.name || canonicalBook;
+    const resolvedSlug = bookObj?.slug || canonicalBook;
+
+    try {
+      const updated = await saveSermon({
+        id: sermon.id,
+        bookName: resolvedName,
+        bookId: resolvedSlug,
+        chapter: canonicalChapter,
+        verse: verseNumber,
+        version: canonicalVersion,
+      });
+      setSermon(updated);
+      setPassageBookInput(resolvedName);
+      setPassageChapterInput(String(canonicalChapter));
+      setPassageVerseInput(String(verseNumber));
+      toast.success(`Passagem base definida: ${resolvedName} ${canonicalChapter}:${verseNumber}`);
+    } catch (e) {
+      console.error("Erro ao salvar:", e);
+    }
+  };
+
+  const handleCopyCanonicalChapter = () => {
+    if (!chapterData?.verses || chapterData.verses.length === 0) return;
+    const header = `${canonicalBook} ${canonicalChapter} (${canonicalVersion.toUpperCase()})`;
+    const versesText = chapterData.verses
+      .map((v) => `${v.number}. ${v.text || v.content}`)
+      .join("\n");
+    navigator.clipboard.writeText(`${header}\n\n${versesText}`);
+    toast.success("Capítulo copiado para a área de transferência!");
+  };
+
+  const handleCopyVerse = (verseNumber: number, text: string) => {
+    const fullRef = `${canonicalBook} ${canonicalChapter}:${verseNumber} (${canonicalVersion.toUpperCase()})`;
+    navigator.clipboard.writeText(`${fullRef}\n"${text}"`);
+    toast.success(`Versículo ${verseNumber} copiado!`);
   };
 
   // Notas Rápidas e Navegação da Barra Lateral
@@ -526,27 +648,32 @@ export default function SermonStudioPage() {
     let isMounted = true;
     setIsLoadingPassageVerses(true);
 
-    fetchChapter(sermon.version || "acf", book, String(chapter))
-      .then((data) => {
-        if (!isMounted) return;
-        if (data?.verses && Array.isArray(data.verses)) {
-          const range = parseVerseRange(sermon.verse);
-          if (range) {
-            const filtered = data.verses.filter(
-              (v) => v.number >= range.start && v.number <= range.end
-            );
-            setPassageVerses(filtered.length > 0 ? filtered : data.verses);
-          } else {
-            setPassageVerses(data.verses);
+    const promise = fetchChapter(sermon.version || "acf", book, String(chapter));
+    if (promise && typeof (promise as any).then === "function") {
+      promise
+        .then((data) => {
+          if (!isMounted) return;
+          if (data?.verses && Array.isArray(data.verses)) {
+            const range = parseVerseRange(sermon.verse);
+            if (range) {
+              const filtered = data.verses.filter(
+                (v) => v.number >= range.start && v.number <= range.end
+              );
+              setPassageVerses(filtered.length > 0 ? filtered : data.verses);
+            } else {
+              setPassageVerses(data.verses);
+            }
           }
-        }
-      })
-      .catch((err) => {
-        console.warn("[Estudio] Erro ao carregar versículos da passagem base:", err);
-      })
-      .finally(() => {
-        if (isMounted) setIsLoadingPassageVerses(false);
-      });
+        })
+        .catch((err) => {
+          console.warn("[Estudio] Erro ao carregar versículos da passagem base:", err);
+        })
+        .finally(() => {
+          if (isMounted) setIsLoadingPassageVerses(false);
+        });
+    } else {
+      setIsLoadingPassageVerses(false);
+    }
 
     return () => {
       isMounted = false;
@@ -831,6 +958,8 @@ export default function SermonStudioPage() {
       setAuditResult(result);
       if (result.theological_deviation === "Fiel_Ao_Texto") {
         toast.success("Auditoria JEV: Mensagem fiel e centrada na Graça!");
+      } else if (result.theological_deviation === "Inconclusivo_Rascunho") {
+        toast.info("Auditoria JEV: Conteúdo insuficiente ou em rascunho para avaliar ortodoxia.");
       } else {
         toast.warning(
           `Alerta Doutrinário: Possível desvio detectado (${result.theological_deviation.replace(/_/g, " ")})`
@@ -936,6 +1065,18 @@ export default function SermonStudioPage() {
           verseDisplay ? `:${verseDisplay}` : ""
         }`
       : "Definir Passagem Base";
+
+  const resolvedBookObj = findBookGlobally(canonicalBook);
+  const totalChapters = resolvedBookObj?.chapters || 50;
+  const currentSermonBook = sermon.bookName || passageBookInput;
+  const currentSermonBookObj = currentSermonBook ? findBookGlobally(currentSermonBook) : undefined;
+  const isCurrentSermonBase = Boolean(
+    currentSermonBookObj &&
+    resolvedBookObj &&
+    currentSermonBookObj.slug === resolvedBookObj.slug &&
+    Number(sermon.chapter || passageChapterInput || 1) === canonicalChapter
+  );
+  const sermonVerseRange = parseVerseRange(sermon.verse !== undefined && sermon.verse !== null ? sermon.verse : passageVerseInput);
 
   return (
     <div className="min-h-screen bg-app-bg text-app-text flex relative selection:bg-gold/30 selection:text-gold antialiased">
@@ -1299,7 +1440,16 @@ export default function SermonStudioPage() {
                 JEV: Auditando...
               </span>
             ) : auditResult ? (
-              auditResult.theological_deviation === "Fiel_Ao_Texto" ? (
+              auditResult.theological_deviation === "Inconclusivo_Rascunho" ? (
+                <span
+                  data-testid="jev-status-badge"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-2 rounded-xl border border-zinc-500/40 bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 font-semibold select-none shadow-xs"
+                  title={auditResult.reasoning}
+                >
+                  <HelpCircle className="w-3.5 h-3.5 text-zinc-500" />
+                  JEV: Rascunho (0%)
+                </span>
+              ) : auditResult.theological_deviation === "Fiel_Ao_Texto" ? (
                 <span
                   data-testid="jev-status-badge"
                   className="inline-flex items-center gap-1.5 text-xs font-mono px-3.5 py-2 rounded-xl border border-gold/40 bg-gold/10 text-gold font-semibold select-none shadow-xs"
@@ -1354,6 +1504,30 @@ export default function SermonStudioPage() {
 
       {/* ── MAIN STUDIO BODY ──────────────────────────────────────────────────── */}
       <main className="max-w-5xl 2xl:max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 space-y-6 sm:space-y-7 relative z-10 flex-1">
+        {/* Aviso de Conteúdo Insuficiente / Rascunho */}
+        {auditResult && auditResult.theological_deviation === "Inconclusivo_Rascunho" && (
+          <div
+            data-testid="orthodoxy-inconclusive-badge"
+            className="rounded-2xl border border-zinc-500/30 bg-zinc-500/5 p-4 flex items-start gap-3 shadow-xs animate-in fade-in duration-200"
+          >
+            <HelpCircle className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <span className="text-xs font-mono uppercase tracking-wide text-zinc-600 dark:text-zinc-400 font-semibold block">
+                Conteúdo Insuficiente para Auditoria Doutrinária (0%)
+              </span>
+              <p className="text-xs text-app-text font-sans leading-relaxed">
+                {auditResult.reasoning}
+              </p>
+              {auditResult.historical_alignment && (
+                <p className="text-[0.72rem] text-app-text-muted font-mono italic flex items-center gap-1.5">
+                  <Landmark className="w-3.5 h-3.5 text-zinc-500/70 shrink-0" />
+                  <span>{auditResult.historical_alignment}</span>
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Confirmação de Ortodoxia Fiel */}
         {auditResult && auditResult.theological_deviation === "Fiel_Ao_Texto" && (
           <div
@@ -1381,6 +1555,7 @@ export default function SermonStudioPage() {
         {/* Card Solene de Alerta de Fidelidade Doutrinária (Gálatas 1:8) */}
         {auditResult &&
           auditResult.theological_deviation !== "Fiel_Ao_Texto" &&
+          auditResult.theological_deviation !== "Inconclusivo_Rascunho" &&
           auditResult.confidence >= 0.85 && (
             <div
               data-testid="galatas-alert-card"
@@ -2542,6 +2717,7 @@ export default function SermonStudioPage() {
           {/* Bíblia Canônica */}
           <button
             type="button"
+            data-testid="tools-canonical-bible-btn"
             onClick={handleOpenScripture}
             className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-border/80 dark:border-[#221c15] bg-app-surface dark:bg-[#120f0c] hover:border-gold/40 text-xs text-app-text hover:text-gold transition-all text-left group cursor-pointer shadow-xs"
           >
@@ -2678,82 +2854,270 @@ export default function SermonStudioPage() {
       {/* ── BOTÃO FLUTUANTE DE LEITURA BÍBLICA ─────────────────────────────────── */}
       <button
         type="button"
+        data-testid="floating-canonical-bible-btn"
         onClick={handleOpenScripture}
-        aria-label="Consultar Texto Bíblico no Estúdio"
+        aria-label="Consultar Bíblia Canônica no Estúdio"
         className="fixed bottom-6 right-6 z-30 flex items-center justify-center w-12 h-12 rounded-2xl bg-app-surface dark:bg-[#16120d] border border-gold/40 text-gold hover:text-gold shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
-        title="Consultar Texto Bíblico no Estúdio"
+        title="Consultar Bíblia Canônica no Estúdio"
       >
-        <BookMarked className="w-5 h-5 text-gold" />
+        <BookOpen className="w-5 h-5 text-gold" />
       </button>
 
       {/* ── DRAWER FLUTUANTE DE TEXTO BÍBLICO CANÔNICO ─────────────────────────── */}
       {isScriptureOpen && (
         <div
           data-testid="biblical-text-floating-card"
-          className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-app-surface/95 dark:bg-[#14110d]/95 backdrop-blur-md border-l border-gold/30 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300"
+          className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-app-surface/95 dark:bg-[#14110d]/95 backdrop-blur-md border-l border-gold/30 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300"
         >
-          <div className="flex items-center justify-between border-b border-border/80 dark:border-[#221c15] p-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-gold" />
-              <h3 className="font-serif font-bold text-sm text-app-text">
-                {currentPassageDisplay}
-              </h3>
+          {/* Header do Drawer */}
+          <div className="flex items-center justify-between border-b border-border/80 dark:border-[#221c15] px-4 py-3.5 bg-app-raised/80 dark:bg-[#120f0c]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-serif font-bold text-sm text-app-text">Bíblia Canônica</h3>
+                  <span className="text-[0.65rem] font-mono uppercase px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 font-semibold">
+                    {resolvedBookObj?.name || canonicalBook} {canonicalChapter} ({canonicalVersion.toUpperCase()})
+                  </span>
+                </div>
+                <p className="text-[0.68rem] text-app-text-muted font-sans">
+                  Navegação pelos 66 livros das Sagradas Escrituras
+                </p>
+              </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsScriptureOpen(false)}
-              className="text-app-text-muted hover:text-app-text p-1 h-auto cursor-pointer"
+              aria-label="Fechar Bíblia Canônica"
+              className="text-app-text-muted hover:text-app-text p-1.5 h-auto rounded-lg cursor-pointer"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 font-serif text-sm leading-relaxed text-app-text">
+          {/* Barra de Navegação Canônica (Livro + Versão + Capítulo + Ações) */}
+          <div className="p-3 border-b border-border/80 dark:border-[#221c15] bg-app-surface/90 dark:bg-[#16120e] space-y-2.5">
+            {/* Linha 1: Seletor de Livro + Versão */}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <label className="text-[0.65rem] font-mono uppercase tracking-wider text-app-text-muted block mb-1 font-semibold">
+                  Livro
+                </label>
+                <select
+                  data-testid="canonical-book-select"
+                  aria-label="Selecionar Livro Canônico"
+                  value={resolvedBookObj?.slug || canonicalBook}
+                  onChange={(e) => handleCanonicalBookChange(e.target.value)}
+                  className="w-full text-xs rounded-lg border border-border/80 dark:border-[#2c2317] bg-app-surface dark:bg-[#1a1510] text-app-text py-1.5 px-2 focus:ring-1 focus:ring-gold/50 focus:border-gold outline-none cursor-pointer"
+                >
+                  <optgroup label="Antigo Testamento">
+                    {OLD_TESTAMENT.map((b) => (
+                      <option key={b.slug} value={b.slug}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Novo Testamento">
+                    {NEW_TESTAMENT.map((b) => (
+                      <option key={b.slug} value={b.slug}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+
+              <div className="w-24 shrink-0">
+                <label className="text-[0.65rem] font-mono uppercase tracking-wider text-app-text-muted block mb-1 font-semibold">
+                  Versão
+                </label>
+                <select
+                  data-testid="canonical-version-select"
+                  aria-label="Selecionar Versão Bíblica"
+                  value={canonicalVersion}
+                  onChange={(e) => handleCanonicalVersionChange(e.target.value)}
+                  className="w-full text-xs font-mono uppercase rounded-lg border border-border/80 dark:border-[#2c2317] bg-app-surface dark:bg-[#1a1510] text-gold font-bold py-1.5 px-2 focus:ring-1 focus:ring-gold/50 focus:border-gold outline-none cursor-pointer"
+                >
+                  <option value="acf">ACF</option>
+                  <option value="nvi">NVI</option>
+                  <option value="arc">ARC</option>
+                  <option value="kja">KJA</option>
+                  <option value="aa">AA</option>
+                  <option value="kjv">KJV</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Linha 2: Navegação de Capítulo + Ações Rápidas */}
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/50 dark:border-[#221c15]">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  data-testid="canonical-prev-chapter-btn"
+                  disabled={canonicalChapter <= 1 || loadingScripture}
+                  onClick={() => handleCanonicalChapterChange(canonicalChapter - 1)}
+                  aria-label="Capítulo anterior"
+                  title="Capítulo anterior"
+                  className="w-7 h-7 rounded-md border border-border/80 dark:border-[#2c2317] text-app-text hover:text-gold hover:border-gold/40 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-[0.7rem] font-mono text-app-text-muted font-semibold">Cap.</span>
+                  <select
+                    data-testid="canonical-chapter-select"
+                    aria-label="Selecionar Capítulo"
+                    value={canonicalChapter}
+                    onChange={(e) => handleCanonicalChapterChange(Number(e.target.value))}
+                    className="text-xs font-mono font-bold rounded-md border border-border/80 dark:border-[#2c2317] bg-app-surface dark:bg-[#1a1510] text-app-text py-1 px-2 focus:ring-1 focus:ring-gold/50 focus:border-gold outline-none cursor-pointer"
+                  >
+                    {Array.from({ length: totalChapters }, (_, i) => i + 1).map((ch) => (
+                      <option key={ch} value={ch}>
+                        {ch}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-[0.7rem] font-mono text-app-text-muted">/ {totalChapters}</span>
+                </div>
+
+                <button
+                  type="button"
+                  data-testid="canonical-next-chapter-btn"
+                  disabled={canonicalChapter >= totalChapters || loadingScripture}
+                  onClick={() => handleCanonicalChapterChange(canonicalChapter + 1)}
+                  aria-label="Próximo capítulo"
+                  title="Próximo capítulo"
+                  className="w-7 h-7 rounded-md border border-border/80 dark:border-[#2c2317] text-app-text hover:text-gold hover:border-gold/40 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Ações Rápidas */}
+              <div className="flex items-center gap-1.5">
+                {isCurrentSermonBase ? (
+                  <span className="text-[0.68rem] font-mono text-gold flex items-center gap-1 bg-gold/10 px-2 py-1 rounded-md border border-gold/30 font-medium">
+                    <CheckCheck className="w-3 h-3 text-gold" />
+                    <span>Passagem Base</span>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    data-testid="set-as-sermon-base-btn"
+                    onClick={handleSetAsBasePassage}
+                    title="Definir este capítulo como a passagem base deste sermão"
+                    className="text-[0.68rem] px-2 py-1 rounded-md border border-gold/40 bg-gold/10 hover:bg-gold/20 text-gold font-medium flex items-center gap-1 transition-all cursor-pointer"
+                  >
+                    <Bookmark className="w-3 h-3 text-gold" />
+                    <span>Usar no Sermão</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  data-testid="copy-canonical-chapter-btn"
+                  onClick={handleCopyCanonicalChapter}
+                  title="Copiar texto de todo o capítulo"
+                  className="w-7 h-7 rounded-md border border-border/80 dark:border-[#2c2317] text-app-text-muted hover:text-gold hover:border-gold/40 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Lista de Versículos com Scroll Confortável */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 font-serif text-sm sm:text-base leading-relaxed text-app-text">
             {loadingScripture ? (
-              <div className="flex flex-col items-center justify-center h-48 gap-2 text-app-text-muted">
-                <Flame className="w-6 h-6 text-gold animate-pulse" />
+              <div className="flex flex-col items-center justify-center h-48 gap-2.5 text-app-text-muted">
+                <Flame className="w-6 h-6 text-gold animate-spin" />
                 <span className="text-xs font-sans">Buscando Escrituras no Cânon...</span>
               </div>
-            ) : chapterData ? (
-              <div className="space-y-3">
-                <p className="text-xs font-mono uppercase tracking-wider text-gold font-semibold pb-1 border-b border-border/50">
-                  {chapterData.book.name} · Capítulo {chapterData.chapter.number} ({sermon.version?.toUpperCase() || "ACF"})
-                </p>
+            ) : canonicalError ? (
+              <div className="text-center py-10 text-app-text-muted text-xs space-y-3 font-sans">
+                <p className="text-red-400">{canonicalError}</p>
+                <Button
+                  onClick={() => loadCanonicalChapter(canonicalBook, canonicalChapter, "acf")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs border-gold/40 text-gold"
+                >
+                  Tentar versão ACF (Rocha)
+                </Button>
+              </div>
+            ) : chapterData?.verses && chapterData.verses.length > 0 ? (
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between pb-1.5 border-b border-border/60 dark:border-[#231b12]">
+                  <p className="text-[0.72rem] font-mono uppercase tracking-wider text-gold font-bold">
+                    {resolvedBookObj?.name || canonicalBook} · Capítulo {canonicalChapter} ({canonicalVersion.toUpperCase()})
+                  </p>
+                  <span className="text-[0.68rem] font-mono text-app-text-muted">
+                    {chapterData.verses.length} versículos
+                  </span>
+                </div>
+
                 {chapterData.verses.map((v) => {
-                  const range = parseVerseRange(sermon.verse);
-                  const isHighlighted = range
-                    ? v.number >= range.start && v.number <= range.end
-                    : sermon.verse === v.number;
+                  const isHighlighted =
+                    isCurrentSermonBase && sermonVerseRange
+                      ? v.number !== undefined &&
+                        v.number >= sermonVerseRange.start &&
+                        v.number <= sermonVerseRange.end
+                      : isCurrentSermonBase && sermon.verse === v.number;
+
+                  const verseText = v.text || v.content || "";
 
                   return (
-                    <p
-                      key={v.number}
+                    <div
+                      key={v.number ?? v.id}
                       className={cn(
-                        "transition-colors",
+                        "group p-2 rounded-xl transition-all relative",
                         isHighlighted
-                          ? "bg-gold/10 text-gold font-semibold p-2 rounded-lg border border-gold/30"
-                          : "text-app-text"
+                          ? "bg-gold/15 text-gold font-semibold border border-gold/40 shadow-xs"
+                          : "hover:bg-app-raised/50 dark:hover:bg-[#1a1510] text-app-text"
                       )}
                     >
-                      <sup className="text-[0.65rem] font-mono text-gold font-bold mr-1.5 select-none">
-                        {v.number}
-                      </sup>
-                      {v.text}
-                    </p>
+                      <div className="flex items-start gap-2">
+                        <sup className="text-[0.68rem] font-mono text-gold font-bold mr-0.5 select-none pt-0.5 shrink-0">
+                          {v.number}
+                        </sup>
+                        <p className="flex-1 leading-relaxed">{verseText}</p>
+                        <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 shrink-0 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyVerse(v.number ?? 0, verseText)}
+                            title="Copiar este versículo"
+                            className="p-1 rounded text-app-text-muted hover:text-gold cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSetVerseAsBase(v.number ?? 1)}
+                            title="Definir como versículo base do sermão"
+                            className="p-1 rounded text-app-text-muted hover:text-gold cursor-pointer"
+                          >
+                            <Bookmark className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             ) : (
               <div className="text-center py-10 text-app-text-muted text-xs space-y-2 font-sans">
-                <p>Nenhuma passagem bíblica base carregada.</p>
+                <p>Nenhum versículo encontrado neste capítulo.</p>
                 <Button
-                  onClick={() => setIsEditingPassage(true)}
+                  onClick={() => loadCanonicalChapter("Lucas", 1, "acf")}
                   variant="outline"
                   size="sm"
                   className="text-xs border-gold/40 text-gold"
                 >
-                  Definir Passagem Base
+                  Carregar Lucas 1 (ACF)
                 </Button>
               </div>
             )}

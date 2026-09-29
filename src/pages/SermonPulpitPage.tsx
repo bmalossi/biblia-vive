@@ -414,11 +414,13 @@ export default function SermonPulpitPage() {
     if (chapterData || !sermon?.bookName || !sermon?.chapter) return;
 
     setLoadingScripture(true);
+    const book = sermon?.bookName || sermon?.bookId || "Lucas";
+    const chapter = sermon?.chapter || 1;
     try {
       const data = await fetchChapter(
-        sermon.version || "acf",
-        sermon.bookId || sermon.bookName || "rom",
-        String(sermon.chapter)
+        sermon?.version || "acf",
+        book,
+        String(chapter)
       );
       setChapterData(data);
     } catch (err) {
@@ -827,7 +829,7 @@ export default function SermonPulpitPage() {
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 font-mono text-xs uppercase font-bold tracking-wider">
               <Flame className="w-3.5 h-3.5" />
-              <span>🔥 INTRODUÇÃO</span>
+              <span>INTRODUÇÃO</span>
             </span>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Início da Ministração</span>
           </div>
@@ -844,7 +846,7 @@ export default function SermonPulpitPage() {
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-gold/10 text-gold border border-gold/30 font-mono text-xs uppercase font-bold tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
-              <span>🏛️ EXEGESE & CONTEXTO HISTÓRICO</span>
+              <span>EXEGESE & CONTEXTO HISTÓRICO</span>
             </span>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Fundamento Bíblico</span>
           </div>
@@ -873,7 +875,7 @@ export default function SermonPulpitPage() {
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-gold/15 text-gold border border-gold/30 font-mono text-xs uppercase font-bold tracking-wider">
               <Zap className="w-3.5 h-3.5" />
-              <span>⚡ TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS)</span>
+              <span>TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS)</span>
             </span>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Corpo do Sermão</span>
           </div>
@@ -961,7 +963,7 @@ export default function SermonPulpitPage() {
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono text-xs uppercase font-bold tracking-wider">
               <Target className="w-3.5 h-3.5" />
-              <span>🎯 APLICAÇÃO PRÁTICA (CONEXÃO COM A VIDA)</span>
+              <span>APLICAÇÃO PRÁTICA (CONEXÃO COM A VIDA)</span>
             </span>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Segunda-feira</span>
           </div>
@@ -978,7 +980,7 @@ export default function SermonPulpitPage() {
           <div className="flex items-center justify-between pb-3 border-b border-gold/30">
             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl bg-gold/20 text-gold border border-gold/50 font-mono text-xs uppercase font-bold tracking-wider shadow-xs">
               <Flame className="w-3.5 h-3.5" />
-              <span>🏁 DESFECHO & APELO ({sermon.desfechoTipo || "Conclusão"})</span>
+              <span>DESFECHO & APELO ({sermon.desfechoTipo || "Conclusão"})</span>
             </span>
             <span className="text-[0.68rem] font-mono text-gold font-bold uppercase tracking-wider">
               MOMENTO FINAL

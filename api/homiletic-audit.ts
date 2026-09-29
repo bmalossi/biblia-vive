@@ -67,52 +67,117 @@ ${sermon_block_3_application || "Não especificado"}
 
 ${historical_commentary ? `[COMENTÁRIOS HISTÓRICOS DE REFERÊNCIA (RAG - BARNES / HENRY / GILL)]\n${historical_commentary}` : ""}`;
 
-    const typesafeApiKey = process.env.TYPESAFE_API_KEY;
-    if (!typesafeApiKey) {
-      // Heurística de auditoria homilética inteligente para ambiente sem chave externa configurada (ADR-0016)
-      const allText = [
-        sermon_intended_outcome,
-        sermon_block_1_exegesis,
-        ...(Array.isArray(sermon_block_2_topics) ? sermon_block_2_topics : []).flatMap((t: any) => [
-          t.title,
-          t.steps?.stepA_fato,
-          t.steps?.stepB_porque,
-          t.steps?.stepC_contraste,
-          t.steps?.stepD_tensao,
-        ]),
-        sermon_block_3_application,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+    const sectionsToCheck: Array<{ name: string; text: string }> = [
+      { name: "Desfecho Homilético", text: sermon_intended_outcome || "" },
+      { name: "Bloco 1 (Exegese)", text: sermon_block_1_exegesis || "" },
+      { name: "Aplicação (Bloco 3)", text: sermon_block_3_application || "" },
+      { name: "Faísca Inicial", text: sermon_initial_spark || "" },
+    ];
 
-      // 1. Checagem de Conteúdo Incoerente / Spam / Gibberish nos tópicos
-      const gibberishRegex = /\b[bcdfghjklmnpqrstvwxyz]{6,}\b|\b[asdfjkl]{5,}\b/i;
-      const topics = Array.isArray(sermon_block_2_topics) ? sermon_block_2_topics : [];
-      const invalidTopics: string[] = [];
-
-      topics.forEach((t: any, i: number) => {
-        const topicText = `${t.title || ""} ${t.steps?.stepA_fato || ""} ${t.steps?.stepB_porque || ""} ${t.steps?.stepC_contraste || ""} ${t.steps?.stepD_tensao || ""}`;
-        if (gibberishRegex.test(topicText) || /^(.)\1{4,}$/.test(topicText.trim())) {
-          invalidTopics.push(t.title || `Tópico ${i + 1}`);
-        }
+    if (Array.isArray(sermon_block_2_topics)) {
+      sermon_block_2_topics.forEach((t: any, i: number) => {
+        const steps = t.steps || {};
+        sectionsToCheck.push({
+          name: `Tópico ${i + 1} (${t.title || "Sem título"})`,
+          text: `${t.title || ""} ${steps.stepA_fato || ""} ${steps.stepB_porque || ""} ${steps.stepC_contraste || ""} ${steps.stepD_tensao || ""}`,
+        });
       });
+    }
 
-      if (invalidTopics.length > 0) {
+    // Vocabulário de apoio para validação textual em português
+    const COMMON_VOCABULARY = new Set([
+      "o", "a", "os", "as", "um", "uma", "uns", "umas",
+      "de", "do", "da", "dos", "das", "em", "no", "na", "nos", "nas",
+      "por", "pelo", "pela", "pelos", "pelas", "para", "pra", "com", "sem", "sob", "sobre",
+      "e", "ou", "mas", "porem", "porém", "contudo", "todavia", "pois", "porque", "porquê",
+      "que", "se", "como", "quando", "onde", "quem", "qual", "quanto",
+      "nao", "não", "sim", "já", "ja", "ainda", "sempre", "nunca",
+      "eu", "tu", "ele", "ela", "nos", "nós", "eles", "elas", "você", "voce", "voces", "vocês",
+      "meu", "minha", "seu", "sua", "nosso", "nossa",
+      "este", "esta", "esse", "essa", "aquele", "aquela", "isto", "isso", "aquilo",
+      "deus", "jesus", "cristo", "senhor", "espirito", "espírito", "graça", "graca", "fe", "fé",
+      "amor", "vida", "morte", "cruz", "palavra", "texto", "biblia", "bíblia", "evangelho",
+      "igreja", "irmaos", "irmãos", "pecado", "salvacao", "salvação", "perdao", "perdão",
+      "pregador", "sermao", "sermão", "pregacao", "pregação", "ouvinte", "ouvintes",
+      "homem", "mulher", "filho", "pai", "mae", "mãe", "povo", "mundo", "reino",
+      "ser", "estar", "ter", "haver", "fazer", "dizer", "ir", "ver", "dar", "saber",
+      "é", "sao", "são", "foi", "era", "tem", "ha", "há", "vai", "vem",
+      "the", "of", "and", "to", "in", "is", "that", "for", "with", "god", "lord",
+      "el", "la", "y", "en", "dios", "cristo"
+    ]);
+
+    function checkGibberish(text: string): { isGibberish: boolean; sample?: string } {
+      if (!text || !text.trim()) return { isGibberish: false };
+      const giantWords = text.match(/[^\s]{30,}/g);
+      if (giantWords && giantWords.length > 0) return { isGibberish: true, sample: giantWords[0].slice(0, 25) + "..." };
+      const repeatedChar = text.match(/(.)\1{4,}/);
+      if (repeatedChar) return { isGibberish: true, sample: repeatedChar[0] };
+      const cluster = text.match(/[bcdfghjklmnpqrstvwxyz]{5,}/i);
+      if (cluster) return { isGibberish: true, sample: cluster[0] };
+
+      const rawWords = text.split(/\s+/).map((w) => w.replace(/[^\p{L}]/gu, "").toLowerCase()).filter(Boolean);
+      for (const w of rawWords) {
+        if (w.length >= 10 && new Set(w.split("")).size <= 3) return { isGibberish: true, sample: w };
+        if (w.length >= 5 && !/[aeiouyáéíóúâêîôûãõàèìòùäëïöü]/i.test(w)) return { isGibberish: true, sample: w };
+      }
+      if (rawWords.length >= 4 && text.trim().length >= 25) {
+        const hasRecognized = rawWords.some((w) => COMMON_VOCABULARY.has(w));
+        if (!hasRecognized) return { isGibberish: true, sample: rawWords.slice(0, 3).join(" ") + "..." };
+      }
+      return { isGibberish: false };
+    }
+
+    // 1. Checagem de Conteúdo Ininteligível / Spam / Gibberish em QUALQUER bloco
+    for (const sec of sectionsToCheck) {
+      const gibberish = checkGibberish(sec.text);
+      if (gibberish.isGibberish) {
         return new Response(
           JSON.stringify({
             audit: {
               is_grace_centered: false,
-              theological_deviation: "Humanismo_SelfHelp",
-              confidence: 0.91,
-              reasoning: `Alerta de Inconsistência Homilética: O(s) tópico(s) [${invalidTopics.join(", ")}] contém conteúdo aleatório ou não redigido. Para manter a fidelidade e edificação da igreja, desenvolva os degraus bíblicos com clareza antes de pregar.`,
-              historical_alignment: "Não alinhado: conteúdo desprovido de base exegética compromete a seriedade do púlpito.",
+              theological_deviation: "Inconclusivo_Rascunho",
+              confidence: 0,
+              reasoning: `Alerta de Conteúdo Ininteligível: Detectamos digitação aleatória ou repetição de caracteres em "${sec.name}" (${gibberish.sample ? `'${gibberish.sample}'` : "caracteres desconexos"}). Para manter a fidelidade e edificação da igreja, desenvolva o raciocínio bíblico com clareza antes de pregar.`,
+              historical_alignment: "Não avaliado: o conteúdo atual não possui base textual para comparação histórica.",
               evaluatedAt: new Date().toISOString(),
             },
           }),
           { status: 200, headers: jsonHeaders }
         );
       }
+    }
+
+    // 2. Checagem de Volume de Conteúdo Mínimo para Auditoria
+    function countWords(t: string): number {
+      if (!t) return 0;
+      return t.split(/\s+/).map((w) => w.replace(/[^\p{L}]/gu, "")).filter((w) => w.length >= 2).length;
+    }
+
+    const allJoinedText = sectionsToCheck.map((s) => s.text).join(" ").toLowerCase();
+    const totalWords = countWords(allJoinedText);
+    const desfechoWords = countWords(sermon_intended_outcome || "");
+    const exegeseWords = countWords(sermon_block_1_exegesis || "");
+
+    if (totalWords < 15 || (desfechoWords < 3 && exegeseWords < 3)) {
+      return new Response(
+        JSON.stringify({
+          audit: {
+            is_grace_centered: false,
+            theological_deviation: "Inconclusivo_Rascunho",
+            confidence: 0,
+            reasoning: "Conteúdo Insuficiente para Auditoria: O esboço ainda está em fase inicial ou não possui texto suficiente. Redija ao menos o Desfecho da Marcha-Ré e a Exegese do Bloco 1 com suas próprias palavras para avaliar a conformidade doutrinária.",
+            historical_alignment: "Pendente: aguardando redação do esboço para análise com os comentários bíblicos históricos.",
+            evaluatedAt: new Date().toISOString(),
+          },
+        }),
+        { status: 200, headers: jsonHeaders }
+      );
+    }
+
+    const typesafeApiKey = process.env.TYPESAFE_API_KEY;
+    if (!typesafeApiKey) {
+      // Heurística de auditoria homilética inteligente para ambiente sem chave externa configurada (ADR-0016)
+      const allText = allJoinedText;
 
       // 2. Teologia da Prosperidade
       const prosperityPatterns = [
@@ -232,6 +297,8 @@ ${historical_commentary ? `[COMENTÁRIOS HISTÓRICOS DE REFERÊNCIA (RAG - BARNE
               "Antropocentrismo, coaching motivacional e fé focada no potencial humano desvinculado da cruz e dependência do Espírito Santo.",
             Moralismo_Sem_Graca:
               "Exigência de conduta e mandamentos desprovidos da capacitação da graça, justificação pela fé e reconciliação em Cristo.",
+            Inconclusivo_Rascunho:
+              "O texto não contém raciocínio homilético inteligível, é composto por caracteres aleatórios, spam, rascunhos desconexos ou possui volume textual insuficiente para validação teológica.",
           },
         },
       },
@@ -261,10 +328,10 @@ ${historical_commentary ? `[COMENTÁRIOS HISTÓRICOS DE REFERÊNCIA (RAG - BARNE
     const noulAnswer = jevData?.answers?.is_grace_centered;
     const choiceAnswer = jevData?.answers?.theological_deviation;
 
-    const isGraceCentered = typeof noulAnswer?.value === "boolean" ? noulAnswer.value : true;
     const chosenDeviation = choiceAnswer?.choice || "Fiel_Ao_Texto";
-    const confidence = typeof choiceAnswer?.confidence === "number" ? choiceAnswer.confidence : 0.9;
-    const reasoning = choiceAnswer?.reasoning || "Avaliação de conformidade doutrinária concluída.";
+    const isGraceCentered = chosenDeviation === "Inconclusivo_Rascunho" ? false : typeof noulAnswer?.value === "boolean" ? noulAnswer.value : true;
+    const confidence = chosenDeviation === "Inconclusivo_Rascunho" ? 0 : typeof choiceAnswer?.confidence === "number" ? choiceAnswer.confidence : 0.9;
+    const reasoning = choiceAnswer?.reasoning || (chosenDeviation === "Inconclusivo_Rascunho" ? "Conteúdo insuficiente ou em rascunho para auditoria." : "Avaliação de conformidade doutrinária concluída.");
 
     return new Response(
       JSON.stringify({
