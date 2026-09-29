@@ -1262,20 +1262,20 @@ export default function SermonStudioPage() {
         </div>
 
         {/* ── TOP HEADER (Título do Sermão, Passagem e Ações do Gabinete) ───────── */}
-        <header className="sticky top-0 z-20 bg-app-bg/95 dark:bg-[#0d0b09]/95 backdrop-blur-md border-b border-border/80 dark:border-[#221c15] px-4 sm:px-6 lg:px-8 py-4 transition-all">
-          <div className="max-w-5xl 2xl:max-w-6xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+        <header className="sticky top-0 z-20 bg-app-bg/95 dark:bg-[#0d0b09]/95 backdrop-blur-md border-b border-border/80 dark:border-[#221c15] px-3.5 sm:px-6 lg:px-8 py-3 sm:py-4 transition-all">
+          <div className="max-w-5xl 2xl:max-w-6xl mx-auto flex items-start sm:items-center justify-between gap-3 sm:gap-4 flex-wrap">
           {/* Lado Esquerdo: Back button + Title Stack */}
-          <div className="flex items-center gap-3.5 min-w-0">
+          <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
             <Link
               to="/estudio"
-              className="w-9 h-9 rounded-full bg-app-surface dark:bg-[#16120d] border border-border/80 dark:border-[#2a2217] hover:border-gold/50 flex items-center justify-center text-app-text-muted hover:text-gold transition-all shrink-0 cursor-pointer shadow-xs"
+              className="mt-0.5 sm:mt-0 w-9 h-9 rounded-full bg-app-surface dark:bg-[#16120d] border border-border/80 dark:border-[#2a2217] hover:border-gold/50 flex items-center justify-center text-app-text-muted hover:text-gold transition-all shrink-0 cursor-pointer shadow-xs"
               title="Voltar ao Estúdio"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
 
             <div className="min-w-0 space-y-1">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[0.65rem] font-mono uppercase tracking-[0.2em] text-gold/90 font-semibold flex items-center gap-1">
                   ESTÚDIO HOMILÉTICO 3X4
                 </span>
@@ -1322,7 +1322,7 @@ export default function SermonStudioPage() {
                       }}
                       placeholder="Nome da pregação..."
                       autoFocus
-                      className="bg-app-surface dark:bg-[#16120d] text-xl sm:text-2xl font-serif font-medium text-app-text px-3 py-1 rounded-xl border border-gold focus:outline-none focus:ring-1 focus:ring-gold min-w-[240px] sm:min-w-[360px]"
+                      className="bg-app-surface dark:bg-[#16120d] text-xl sm:text-2xl font-serif font-medium text-app-text px-3 py-1 rounded-xl border border-gold focus:outline-none focus:ring-1 focus:ring-gold min-w-[200px] sm:min-w-[360px]"
                     />
                     <button
                       type="button"
@@ -1345,7 +1345,7 @@ export default function SermonStudioPage() {
                     className="group flex items-baseline gap-2 text-left cursor-pointer"
                     title="Clique para editar o título deste sermão"
                   >
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-normal tracking-tight text-app-text group-hover:text-gold transition-colors truncate max-w-sm sm:max-w-xl">
+                    <h1 className="text-xl sm:text-3xl md:text-4xl font-serif font-normal tracking-tight text-app-text group-hover:text-gold transition-colors truncate max-w-[220px] xs:max-w-sm sm:max-w-xl">
                       {sermon.title || "Sem título (Clique para nomear)"}
                     </h1>
                     <Edit2 className="w-3.5 h-3.5 text-app-text-muted opacity-40 group-hover:opacity-100 group-hover:text-gold transition-all shrink-0" />
@@ -2851,16 +2851,16 @@ export default function SermonStudioPage() {
       </div>
     </aside>
 
-      {/* ── BOTÃO FLUTUANTE DE LEITURA BÍBLICA ─────────────────────────────────── */}
+      {/* ── BOTÃO FLUTUANTE DE LEITURA BÍBLICA (Substitui o caderno no Estúdio) ── */}
       <button
         type="button"
         data-testid="floating-canonical-bible-btn"
         onClick={handleOpenScripture}
         aria-label="Consultar Bíblia Canônica no Estúdio"
-        className="fixed bottom-6 right-6 z-30 flex items-center justify-center w-12 h-12 rounded-2xl bg-app-surface dark:bg-[#16120d] border border-gold/40 text-gold hover:text-gold shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+        className="fixed bottom-6 right-4 sm:right-6 z-40 flex items-center justify-center w-12 h-12 rounded-full bg-gold text-[#120e09] border border-gold/60 shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer font-bold focus:outline-none focus:ring-2 focus:ring-gold/50"
         title="Consultar Bíblia Canônica no Estúdio"
       >
-        <BookOpen className="w-5 h-5 text-gold" />
+        <BookOpen className="w-5 h-5 text-[#120e09]" />
       </button>
 
       {/* ── DRAWER FLUTUANTE DE TEXTO BÍBLICO CANÔNICO ─────────────────────────── */}

@@ -824,13 +824,13 @@ export default function SermonPulpitPage() {
         {/* ── 1. INTRODUÇÃO (GANCHO DE ENTRADA) ── */}
         <section
           id="sec-intro"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 font-mono text-xs uppercase font-bold tracking-wider">
-              <Flame className="w-3.5 h-3.5" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              <Flame className="w-4 h-4 text-amber-500 shrink-0" />
               <span>INTRODUÇÃO</span>
-            </span>
+            </div>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Início da Ministração</span>
           </div>
           <div className="bg-app-raised/40 dark:bg-black/25 rounded-2xl p-4 sm:p-6 border border-border/50 dark:border-gold/15 text-app-text font-serif leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
@@ -841,13 +841,13 @@ export default function SermonPulpitPage() {
         {/* ── 2. EXEGESE & CONTEXTO HISTÓRICO ── */}
         <section
           id="sec-bloco-1"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-5 overflow-hidden min-w-0"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-gold/10 text-gold border border-gold/30 font-mono text-xs uppercase font-bold tracking-wider">
-              <BookOpen className="w-3.5 h-3.5" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
+              <BookOpen className="w-4 h-4 text-gold shrink-0" />
               <span>EXEGESE & CONTEXTO HISTÓRICO</span>
-            </span>
+            </div>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Fundamento Bíblico</span>
           </div>
 
@@ -870,13 +870,13 @@ export default function SermonPulpitPage() {
         {/* ── 3. TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS) ── */}
         <section
           id="sec-bloco-2"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-6 overflow-hidden min-w-0"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-gold/15 text-gold border border-gold/30 font-mono text-xs uppercase font-bold tracking-wider">
-              <Zap className="w-3.5 h-3.5" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
+              <Zap className="w-4 h-4 text-gold shrink-0" />
               <span>TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS)</span>
-            </span>
+            </div>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Corpo do Sermão</span>
           </div>
 
@@ -958,13 +958,13 @@ export default function SermonPulpitPage() {
         {/* ── 4. APLICAÇÃO PRÁTICA ── */}
         <section
           id="sec-bloco-3"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono text-xs uppercase font-bold tracking-wider">
-              <Target className="w-3.5 h-3.5" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              <Target className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>APLICAÇÃO PRÁTICA (CONEXÃO COM A VIDA)</span>
-            </span>
+            </div>
             <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Segunda-feira</span>
           </div>
           <div className="bg-app-raised/40 dark:bg-black/25 rounded-2xl p-4 sm:p-6 border border-border/50 dark:border-gold/15 text-app-text font-serif leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
@@ -975,13 +975,13 @@ export default function SermonPulpitPage() {
         {/* ── 5. DESFECHO & APELO FINAL (SEM TEXTO MONOLÍTICO E COM QUEBRA DE LINHA) ── */}
         <section
           id="sec-desfecho"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-gold/10 dark:bg-gold/[0.08] border-2 border-gold/50 rounded-3xl p-6 sm:p-8 shadow-md space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-gold/10 dark:bg-gold/[0.08] border-2 border-gold/50 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-md space-y-4 overflow-hidden min-w-0"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-gold/30">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl bg-gold/20 text-gold border border-gold/50 font-mono text-xs uppercase font-bold tracking-wider shadow-xs">
-              <Flame className="w-3.5 h-3.5" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-gold/30">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
+              <Flame className="w-4 h-4 text-gold shrink-0" />
               <span>DESFECHO & APELO ({sermon.desfechoTipo || "Conclusão"})</span>
-            </span>
+            </div>
             <span className="text-[0.68rem] font-mono text-gold font-bold uppercase tracking-wider">
               MOMENTO FINAL
             </span>

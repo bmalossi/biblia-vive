@@ -45,12 +45,15 @@ export default function GlobalNotebookContainer() {
     const [entryModalOpen, setEntryModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<MemorialCategory>('reflection');
 
-    // Ocultar em rotas específicas (como widgets ou exibição em igreja)
+    // Ocultar em rotas específicas (como widgets, exibição em igreja ou estúdio homilético / púlpito)
     const isWidget = location.pathname.startsWith("/widget");
     const isChurchDisplay = location.pathname.startsWith("/church-display");
+    const isEstudio = location.pathname.startsWith("/estudio");
+    const isPulpito = location.pathname.startsWith("/pulpito");
 
     // O botão flutuante deve ser exibido se tivermos um livro e capítulo ativos
-    const showNotebook = !isWidget && !isChurchDisplay && bookId && chapter && version && bookName;
+    const showNotebook =
+        !isWidget && !isChurchDisplay && !isEstudio && !isPulpito && bookId && chapter && version && bookName;
 
     if (!showNotebook) return null;
 
