@@ -416,9 +416,48 @@ export default function SermonStudioPage() {
   };
 
   const scrollToSection = (elementId: string) => {
-    const el = document.getElementById(elementId) || document.querySelector(`[data-testid="${elementId}"]`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (studioViewMode === "consolidada") {
+      setStudioViewMode("construcao");
+    }
+
+    const doScroll = () => {
+      const el =
+        document.getElementById(elementId) ||
+        document.querySelector(`[data-testid="${elementId}"]`);
+      if (el) {
+        const stickyHeader = document.querySelector("header");
+        const headerHeight = stickyHeader
+          ? stickyHeader.getBoundingClientRect().height
+          : 96;
+        const extraPadding = 24;
+        const offset = headerHeight + extraPadding;
+
+        const elementPosition = el.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + (window.pageYOffset || window.scrollY || 0) - offset;
+
+        if (typeof window.scrollTo === "function") {
+          try {
+            window.scrollTo({
+              top: Math.max(0, offsetPosition),
+              behavior: "smooth",
+            });
+            return;
+          } catch {
+            // fallback se window.scrollTo com objeto falhar em ambiente de teste ou browser legado
+          }
+        }
+
+        if (typeof el.scrollIntoView === "function") {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    };
+
+    if (studioViewMode === "consolidada") {
+      setTimeout(doScroll, 50);
+    } else {
+      doScroll();
     }
   };
 
@@ -1625,8 +1664,9 @@ export default function SermonStudioPage() {
         <div className={cn("space-y-6 sm:space-y-7", studioViewMode === "consolidada" ? "hidden" : "block")}>
           {/* ── CARD 1: A CHAMA INICIAL ("EU E DEUS") ─────────────────────────── */}
           <section
+            id="eu-e-deus-section"
             data-testid="eu-e-deus-section"
-            className="rounded-2xl border border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d] p-6 sm:p-7 space-y-4 shadow-lg transition-all"
+            className="scroll-mt-28 lg:scroll-mt-32 rounded-2xl border border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d] p-6 sm:p-7 space-y-4 shadow-lg transition-all"
           >
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2.5 text-gold font-sans font-bold text-xs sm:text-sm tracking-widest uppercase">
@@ -1735,7 +1775,7 @@ export default function SermonStudioPage() {
             id="desfecho-section"
             data-testid="desfecho-section"
             className={cn(
-              "rounded-2xl border p-6 sm:p-7 space-y-5 transition-all shadow-lg relative",
+              "scroll-mt-28 lg:scroll-mt-32 rounded-2xl border p-6 sm:p-7 space-y-5 transition-all shadow-lg relative",
               isUnlocked
                 ? "border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d]"
                 : "border-gold/40 bg-gold/5 dark:bg-[#18130c]/90 ring-1 ring-gold/30"
@@ -1841,7 +1881,7 @@ export default function SermonStudioPage() {
             data-testid="bloco-1-container"
             data-locked={!isUnlocked ? "true" : "false"}
             className={cn(
-              "rounded-2xl border p-6 sm:p-7 space-y-5 transition-all relative shadow-lg",
+              "scroll-mt-28 lg:scroll-mt-32 rounded-2xl border p-6 sm:p-7 space-y-5 transition-all relative shadow-lg",
               !isUnlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
                 : "border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d]"
@@ -1933,7 +1973,7 @@ export default function SermonStudioPage() {
               id="ancoradouro-historico-box"
               data-testid="ancoradouro-historico-box"
               className={cn(
-                "rounded-xl border p-5 space-y-3.5 transition-all shadow-xs",
+                "scroll-mt-28 lg:scroll-mt-32 rounded-xl border p-5 space-y-3.5 transition-all shadow-xs",
                 isBloco2Unlocked
                   ? "bg-gold/5 dark:bg-[#17130e] border-gold/30"
                   : "bg-app-raised/50 dark:bg-[#16120e] border-border/80 dark:border-[#282015]"
@@ -2005,7 +2045,7 @@ export default function SermonStudioPage() {
             data-testid="bloco-2-container"
             data-locked={!isBloco2Unlocked ? "true" : "false"}
             className={cn(
-              "rounded-2xl border p-6 sm:p-7 space-y-6 transition-all relative shadow-lg",
+              "scroll-mt-28 lg:scroll-mt-32 rounded-2xl border p-6 sm:p-7 space-y-6 transition-all relative shadow-lg",
               !isBloco2Unlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
                 : "border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d]"
@@ -2090,7 +2130,7 @@ export default function SermonStudioPage() {
                     key={topic.id || `topic-${index}`}
                     id={`topic-card-${index}`}
                     data-testid={`topic-card-${index}`}
-                    className="p-5 sm:p-6 rounded-2xl border border-border/80 dark:border-[#261f16] bg-app-raised/40 dark:bg-[#15120e] space-y-4 shadow-sm"
+                    className="scroll-mt-28 lg:scroll-mt-32 p-5 sm:p-6 rounded-2xl border border-border/80 dark:border-[#261f16] bg-app-raised/40 dark:bg-[#15120e] space-y-4 shadow-sm"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5 flex-1">
@@ -2264,7 +2304,7 @@ export default function SermonStudioPage() {
             data-testid="bloco-3-container"
             data-locked={!isBloco3Unlocked ? "true" : "false"}
             className={cn(
-              "rounded-2xl border p-6 sm:p-7 space-y-5 transition-all relative shadow-lg",
+              "scroll-mt-28 lg:scroll-mt-32 rounded-2xl border p-6 sm:p-7 space-y-5 transition-all relative shadow-lg",
               !isBloco3Unlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
                 : "border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d]"
@@ -2341,7 +2381,7 @@ export default function SermonStudioPage() {
             data-testid="introducao-container"
             data-locked={!isBloco3Unlocked ? "true" : "false"}
             className={cn(
-              "rounded-2xl border p-6 sm:p-7 space-y-5 transition-all relative shadow-lg",
+              "scroll-mt-28 lg:scroll-mt-32 rounded-2xl border p-6 sm:p-7 space-y-5 transition-all relative shadow-lg",
               !isBloco3Unlocked
                 ? "border-border/60 bg-app-surface/40 opacity-60 pointer-events-none"
                 : "border-border/80 dark:border-[#282015] bg-app-surface dark:bg-[#14110d]"

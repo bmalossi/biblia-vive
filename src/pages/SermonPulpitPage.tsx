@@ -429,9 +429,36 @@ export default function SermonPulpitPage() {
   };
 
   const scrollToSection = (elementId: string) => {
-    const el = document.getElementById(elementId);
+    const el =
+      document.getElementById(elementId) ||
+      document.querySelector(`[data-testid="${elementId}"]`);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      const stickyHeader = document.querySelector("header");
+      const headerHeight = stickyHeader
+        ? stickyHeader.getBoundingClientRect().height
+        : 84;
+      const extraPadding = 20;
+      const offset = headerHeight + extraPadding;
+
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition =
+        elementPosition + (window.pageYOffset || window.scrollY || 0) - offset;
+
+      if (typeof window.scrollTo === "function") {
+        try {
+          window.scrollTo({
+            top: Math.max(0, offsetPosition),
+            behavior: "smooth",
+          });
+          return;
+        } catch {
+          // fallback
+        }
+      }
+
+      if (typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
@@ -731,7 +758,7 @@ export default function SermonPulpitPage() {
         )}
 
         {/* ── TOPO DO PERGAMINHO: TÍTULO & TEMA CENTRALIZADOS ── */}
-        <div id="sec-spark" className="text-center space-y-3 pt-2 pb-2 min-w-0">
+        <div id="sec-spark" className="scroll-mt-24 sm:scroll-mt-28 text-center space-y-3 pt-2 pb-2 min-w-0">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-app-text tracking-tight uppercase min-w-0 break-words [overflow-wrap:anywhere]">
             {sermon.title}
           </h1>
@@ -748,7 +775,7 @@ export default function SermonPulpitPage() {
         {hasPassage && (
           <section
             data-testid="pulpit-base-scripture-section"
-            className="bg-app-surface/90 border border-gold/30 rounded-3xl p-6 sm:p-7 shadow-sm space-y-4 overflow-hidden min-w-0"
+            className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-gold/30 rounded-3xl p-6 sm:p-7 shadow-sm space-y-4 overflow-hidden min-w-0"
           >
             <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-border/60 dark:border-gold/20">
               <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
@@ -795,7 +822,7 @@ export default function SermonPulpitPage() {
         {/* ── 1. INTRODUÇÃO (GANCHO DE ENTRADA) ── */}
         <section
           id="sec-intro"
-          className="bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
         >
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 font-mono text-xs uppercase font-bold tracking-wider">
@@ -812,7 +839,7 @@ export default function SermonPulpitPage() {
         {/* ── 2. EXEGESE & CONTEXTO HISTÓRICO ── */}
         <section
           id="sec-bloco-1"
-          className="bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 overflow-hidden min-w-0"
         >
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-gold/10 text-gold border border-gold/30 font-mono text-xs uppercase font-bold tracking-wider">
@@ -841,7 +868,7 @@ export default function SermonPulpitPage() {
         {/* ── 3. TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS) ── */}
         <section
           id="sec-bloco-2"
-          className="bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 overflow-hidden min-w-0"
         >
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-gold/15 text-gold border border-gold/30 font-mono text-xs uppercase font-bold tracking-wider">
@@ -929,7 +956,7 @@ export default function SermonPulpitPage() {
         {/* ── 4. APLICAÇÃO PRÁTICA ── */}
         <section
           id="sec-bloco-3"
-          className="bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
         >
           <div className="flex items-center justify-between pb-3 border-b border-border/60 dark:border-gold/20">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono text-xs uppercase font-bold tracking-wider">
@@ -946,7 +973,7 @@ export default function SermonPulpitPage() {
         {/* ── 5. DESFECHO & APELO FINAL (SEM TEXTO MONOLÍTICO E COM QUEBRA DE LINHA) ── */}
         <section
           id="sec-desfecho"
-          className="bg-gold/10 dark:bg-gold/[0.08] border-2 border-gold/50 rounded-3xl p-6 sm:p-8 shadow-md space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-gold/10 dark:bg-gold/[0.08] border-2 border-gold/50 rounded-3xl p-6 sm:p-8 shadow-md space-y-4 overflow-hidden min-w-0"
         >
           <div className="flex items-center justify-between pb-3 border-b border-gold/30">
             <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-xl bg-gold/20 text-gold border border-gold/50 font-mono text-xs uppercase font-bold tracking-wider shadow-xs">
