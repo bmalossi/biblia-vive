@@ -28,7 +28,11 @@ import {
   Sun,
   Moon,
   Coffee,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
 } from "lucide-react";
+import { ALL_BOOKS, OLD_TESTAMENT, NEW_TESTAMENT, findBookGlobally } from "@/lib/books";
 import { Button } from "@/components/ui/button";
 import { getSermon, savePreachingLog, type Sermon } from "@/lib/homileticClient";
 import { fetchChapter, type Chapter } from "@/lib/bibleApi";
@@ -264,10 +268,18 @@ export default function SermonPulpitPage() {
   const [seconds, setSeconds] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
 
-  // Card Flutuante de Texto Bíblico
+  // Card e Gaveta Flutuante de Texto Bíblico Canônico
   const [isScriptureOpen, setIsScriptureOpen] = useState(false);
   const [chapterData, setChapterData] = useState<Chapter | null>(null);
   const [loadingScripture, setLoadingScripture] = useState(false);
+  const [canonicalBook, setCanonicalBook] = useState<string>("Lucas");
+  const [canonicalChapter, setCanonicalChapter] = useState<number>(1);
+  const [canonicalVersion, setCanonicalVersion] = useState<string>("acf");
+  const [canonicalError, setCanonicalError] = useState<string | null>(null);
+
+  const resolvedBookObj = useMemo(() => {
+    return findBookGlobally(canonicalBook);
+  }, [canonicalBook]);
 
   // Versículos da Passagem Bíblica Base no Corpo do Pergaminho
   const [passageVerses, setPassageVerses] = useState<Array<{ number: number; text: string }>>([]);
@@ -408,26 +420,69 @@ export default function SermonPulpitPage() {
     };
   }, [sermon?.bookName, sermon?.bookId, sermon?.chapter, sermon?.verse, sermon?.version]);
 
-  // Carregar Texto Bíblico para o Card Flutuante Secundário
-  const handleOpenScripture = async () => {
-    setIsScriptureOpen(true);
-    if (chapterData || !sermon?.bookName || !sermon?.chapter) return;
-
+  // Carregar capítulo canônico sob demanda com resolução de slug
+  const loadCanonicalChapter = async (
+    bookNameOrSlug: string,
+    chapterNum: number,
+    version: string = "acf"
+  ) => {
     setLoadingScripture(true);
-    const book = sermon?.bookName || sermon?.bookId || "Lucas";
-    const chapter = sermon?.chapter || 1;
+    setCanonicalError(null);
     try {
-      const data = await fetchChapter(
-        sermon?.version || "acf",
-        book,
-        String(chapter)
+      const bookObj = findBookGlobally(bookNameOrSlug);
+      const targetSlug = bookObj?.slug || bookNameOrSlug || "lc";
+      const targetBookName = bookObj?.name || bookNameOrSlug || "Lucas";
+      const maxCh = bookObj?.chapters || 150;
+      const validChapter = Math.max(1, Math.min(Number(chapterNum) || 1, maxCh));
+
+      setCanonicalBook(targetBookName);
+      setCanonicalChapter(validChapter);
+      setCanonicalVersion(version);
+
+      const promise = fetchChapter(version, targetSlug, String(validChapter));
+      const data = promise && typeof promise.then === "function" ? await promise : null;
+      setChapterData(data || null);
+    } catch (err: any) {
+      console.error("[ModoPulpito] Erro ao buscar texto canônico:", err);
+      setCanonicalError(
+        err?.message || "Não foi possível carregar este capítulo da Bíblia."
       );
-      setChapterData(data);
-    } catch (err) {
-      console.error("[ModoPulpito] Erro ao buscar passagem bíblica:", err);
+      setChapterData(null);
     } finally {
       setLoadingScripture(false);
     }
+  };
+
+  // Abrir o Drawer Canônico sincronizando com a passagem base ou o último texto
+  const handleOpenScripture = async () => {
+    setIsScriptureOpen(true);
+    const baseBook = sermon?.bookName || sermon?.bookId;
+    const baseChapter = sermon?.chapter ? Number(sermon.chapter) : undefined;
+    const baseVersion = sermon?.version || "acf";
+
+    const targetBook = baseBook || canonicalBook || "Lucas";
+    const targetChapter =
+      baseChapter && !isNaN(baseChapter) ? baseChapter : canonicalChapter || 1;
+    const targetVersion = baseVersion || canonicalVersion || "acf";
+
+    await loadCanonicalChapter(targetBook, targetChapter, targetVersion);
+  };
+
+  // Navegação no Drawer Canônico
+  const handleCanonicalBookChange = async (newBookSlugOrName: string) => {
+    const bookObj = findBookGlobally(newBookSlugOrName);
+    const targetBookName = bookObj?.name || newBookSlugOrName;
+    const maxCh = bookObj?.chapters || 1;
+    const nextChapter = Math.min(canonicalChapter, maxCh);
+    await loadCanonicalChapter(targetBookName, nextChapter, canonicalVersion);
+  };
+
+  const handleCanonicalChapterChange = async (newChapter: number) => {
+    await loadCanonicalChapter(canonicalBook, newChapter, canonicalVersion);
+  };
+
+  const handleCanonicalVersionChange = async (newVersion: string) => {
+    await loadCanonicalChapter(canonicalBook, canonicalChapter, newVersion);
   };
 
   const scrollToSection = (elementId: string) => {
@@ -824,16 +879,15 @@ export default function SermonPulpitPage() {
         {/* ── 1. INTRODUÇÃO (GANCHO DE ENTRADA) ── */}
         <section
           id="sec-intro"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-5 sm:p-7 shadow-sm space-y-3.5 overflow-hidden min-w-0"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-              <Flame className="w-4 h-4 text-amber-500 shrink-0" />
-              <span>INTRODUÇÃO</span>
-            </div>
-            <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Início da Ministração</span>
+          <div className="flex items-center gap-2 pb-2.5 border-b border-border/60 dark:border-gold/20">
+            <Flame className="w-4 h-4 text-amber-500 shrink-0" />
+            <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              INTRODUÇÃO
+            </h2>
           </div>
-          <div className="bg-app-raised/40 dark:bg-black/25 rounded-2xl p-4 sm:p-6 border border-border/50 dark:border-gold/15 text-app-text font-serif leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
+          <div className="text-app-text font-serif text-lg sm:text-xl leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
             {renderPreachingContent(sermon.introducao || "Nenhuma introdução redigida ainda.")}
           </div>
         </section>
@@ -841,18 +895,17 @@ export default function SermonPulpitPage() {
         {/* ── 2. EXEGESE & CONTEXTO HISTÓRICO ── */}
         <section
           id="sec-bloco-1"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-5 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-5 sm:p-7 shadow-sm space-y-4 overflow-hidden min-w-0"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
-              <BookOpen className="w-4 h-4 text-gold shrink-0" />
-              <span>EXEGESE & CONTEXTO HISTÓRICO</span>
-            </div>
-            <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Fundamento Bíblico</span>
+          <div className="flex items-center gap-2 pb-2.5 border-b border-border/60 dark:border-gold/20">
+            <BookOpen className="w-4 h-4 text-gold shrink-0" />
+            <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-gold">
+              EXEGESE & CONTEXTO HISTÓRICO
+            </h2>
           </div>
 
           {sermon.bloco1IntencaoOriginal && (
-            <div className="bg-gold/10 dark:bg-gold/10 border-l-4 border-l-gold border border-gold/30 p-4 sm:p-5 rounded-2xl text-lg sm:text-xl text-app-text font-serif italic leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
+            <div className="bg-gold/10 dark:bg-gold/10 border-l-4 border-l-gold border border-gold/30 p-4 sm:p-5 rounded-2xl text-base sm:text-xl text-app-text font-serif italic leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
               <span className="font-mono text-xs text-gold font-bold uppercase tracking-wider block not-italic mb-1">
                 • Intenção do Autor / Ideia Central:
               </span>
@@ -860,96 +913,107 @@ export default function SermonPulpitPage() {
             </div>
           )}
 
-          {sermon.bloco1Exegese && (
-            <div className="bg-app-raised/40 dark:bg-black/25 rounded-2xl p-4 sm:p-6 border border-border/50 dark:border-gold/15 text-app-text font-serif leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
+          {sermon.bloco1Exegese ? (
+            <div className="text-app-text font-serif text-lg sm:text-xl leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
               {renderPreachingContent(sermon.bloco1Exegese)}
             </div>
+          ) : (
+            <p className="text-sm italic text-app-text-muted">Nenhuma nota exegética registrada.</p>
           )}
         </section>
 
         {/* ── 3. TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS) ── */}
         <section
           id="sec-bloco-2"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-6 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-5 sm:p-7 shadow-sm space-y-4 overflow-hidden min-w-0"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
-              <Zap className="w-4 h-4 text-gold shrink-0" />
-              <span>TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS)</span>
-            </div>
-            <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Corpo do Sermão</span>
+          <div className="flex items-center gap-2 pb-2.5 border-b border-border/60 dark:border-gold/20">
+            <Zap className="w-4 h-4 text-gold shrink-0" />
+            <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-gold">
+              TÓPICOS PRINCIPAIS (COM OS 4 DEGRAUS)
+            </h2>
           </div>
 
           {sermon.bloco2Topicos && sermon.bloco2Topicos.length > 0 ? (
-            sermon.bloco2Topicos.map((top, idx) => (
-              <div
-                key={top.id || idx}
-                className="bg-app-raised/50 dark:bg-black/30 border border-border/60 dark:border-gold/20 rounded-2xl p-5 sm:p-6 space-y-4 overflow-hidden min-w-0"
-              >
-                <h3 className="font-serif font-bold text-xl sm:text-2xl text-app-text uppercase tracking-wide min-w-0 break-words [overflow-wrap:anywhere]">
-                  <span className="text-gold font-mono mr-2">{idx + 1}.</span>
-                  {top.title}
-                </h3>
+            sermon.bloco2Topicos.map((top, idx) => {
+              const hasSteps =
+                top.steps?.stepA_fato ||
+                top.steps?.stepB_porque ||
+                top.steps?.stepC_contraste ||
+                top.steps?.stepD_tensao;
 
-                <div className="space-y-3.5 text-app-text font-serif leading-[1.85] min-w-0">
-                  {top.steps?.stepA_fato && (
-                    <div className="flex items-start gap-3 min-w-0">
-                      <span
-                        data-testid={`badge-degrau-a-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
-                      >
-                        [A · Fato]
-                      </span>
-                      <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere]">
-                        {renderWithDynamicMarkers(top.steps.stepA_fato)}
-                      </div>
-                    </div>
-                  )}
+              return (
+                <div
+                  key={top.id || idx}
+                  className="bg-app-raised/40 dark:bg-black/25 border border-border/60 dark:border-gold/20 rounded-2xl p-4 sm:p-5 space-y-3 overflow-hidden min-w-0"
+                >
+                  <h3 className="font-serif font-bold text-lg sm:text-2xl text-app-text uppercase tracking-wide min-w-0 break-words [overflow-wrap:anywhere] flex items-baseline gap-2">
+                    <span className="text-gold font-mono font-bold text-base sm:text-lg">{idx + 1}.</span>
+                    <span>{top.title}</span>
+                  </h3>
 
-                  {top.steps?.stepB_porque && (
-                    <div className="flex items-start gap-3 min-w-0">
-                      <span
-                        data-testid={`badge-degrau-b-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
-                      >
-                        [B · Porquê]
-                      </span>
-                      <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere]">
-                        {renderWithDynamicMarkers(top.steps.stepB_porque)}
-                      </div>
-                    </div>
-                  )}
+                  {hasSteps ? (
+                    <div className="space-y-3 text-app-text font-serif leading-[1.85] min-w-0 pt-1">
+                      {top.steps?.stepA_fato && (
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <span
+                            data-testid={`badge-degrau-a-${idx}`}
+                            className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2 py-0.5 rounded-lg select-none"
+                          >
+                            [A · Fato]
+                          </span>
+                          <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere]">
+                            {renderWithDynamicMarkers(top.steps.stepA_fato)}
+                          </div>
+                        </div>
+                      )}
 
-                  {top.steps?.stepC_contraste && (
-                    <div className="flex items-start gap-3 min-w-0">
-                      <span
-                        data-testid={`badge-degrau-c-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
-                      >
-                        [C · Contraste]
-                      </span>
-                      <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere]">
-                        {renderWithDynamicMarkers(top.steps.stepC_contraste)}
-                      </div>
-                    </div>
-                  )}
+                      {top.steps?.stepB_porque && (
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <span
+                            data-testid={`badge-degrau-b-${idx}`}
+                            className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2 py-0.5 rounded-lg select-none"
+                          >
+                            [B · Porquê]
+                          </span>
+                          <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere]">
+                            {renderWithDynamicMarkers(top.steps.stepB_porque)}
+                          </div>
+                        </div>
+                      )}
 
-                  {top.steps?.stepD_tensao && (
-                    <div className="flex items-start gap-3 min-w-0">
-                      <span
-                        data-testid={`badge-degrau-d-${idx}`}
-                        className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2.5 py-0.5 rounded-lg select-none shadow-xs"
-                      >
-                        [D · Tensão]
-                      </span>
-                      <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere] text-gold italic">
-                        {renderWithDynamicMarkers(top.steps.stepD_tensao)}
-                      </div>
+                      {top.steps?.stepC_contraste && (
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <span
+                            data-testid={`badge-degrau-c-${idx}`}
+                            className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2 py-0.5 rounded-lg select-none"
+                          >
+                            [C · Contraste]
+                          </span>
+                          <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere]">
+                            {renderWithDynamicMarkers(top.steps.stepC_contraste)}
+                          </div>
+                        </div>
+                      )}
+
+                      {top.steps?.stepD_tensao && (
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <span
+                            data-testid={`badge-degrau-d-${idx}`}
+                            className="shrink-0 mt-1 inline-flex items-center text-[0.72rem] font-mono font-bold uppercase tracking-wider text-gold bg-gold/15 border border-gold/30 px-2 py-0.5 rounded-lg select-none"
+                          >
+                            [D · Tensão]
+                          </span>
+                          <div className="flex-1 min-w-0 break-words [overflow-wrap:anywhere] text-gold italic">
+                            {renderWithDynamicMarkers(top.steps.stepD_tensao)}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-sm text-app-text-muted italic">Sem tópicos definidos no esboço.</p>
           )}
@@ -958,16 +1022,15 @@ export default function SermonPulpitPage() {
         {/* ── 4. APLICAÇÃO PRÁTICA ── */}
         <section
           id="sec-bloco-3"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-sm space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-app-surface/90 border border-border/80 dark:border-gold/25 rounded-3xl p-5 sm:p-7 shadow-sm space-y-3.5 overflow-hidden min-w-0"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-border/60 dark:border-gold/20">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              <Target className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>APLICAÇÃO PRÁTICA (CONEXÃO COM A VIDA)</span>
-            </div>
-            <span className="text-[0.68rem] font-mono text-app-text-muted font-medium">Segunda-feira</span>
+          <div className="flex items-center gap-2 pb-2.5 border-b border-border/60 dark:border-gold/20">
+            <Target className="w-4 h-4 text-emerald-500 shrink-0" />
+            <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              APLICAÇÃO PRÁTICA (CONEXÃO COM A VIDA)
+            </h2>
           </div>
-          <div className="bg-app-raised/40 dark:bg-black/25 rounded-2xl p-4 sm:p-6 border border-border/50 dark:border-gold/15 text-app-text font-serif leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
+          <div className="text-app-text font-serif text-lg sm:text-xl leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
             {renderPreachingContent(sermon.bloco3Aplicacao || "Nenhuma aplicação redigida ainda.")}
           </div>
         </section>
@@ -975,18 +1038,15 @@ export default function SermonPulpitPage() {
         {/* ── 5. DESFECHO & APELO FINAL (SEM TEXTO MONOLÍTICO E COM QUEBRA DE LINHA) ── */}
         <section
           id="sec-desfecho"
-          className="scroll-mt-24 sm:scroll-mt-28 bg-gold/10 dark:bg-gold/[0.08] border-2 border-gold/50 rounded-3xl p-4.5 sm:p-6 md:p-8 shadow-md space-y-4 overflow-hidden min-w-0"
+          className="scroll-mt-24 sm:scroll-mt-28 bg-gold/10 dark:bg-gold/[0.08] border-2 border-gold/50 rounded-3xl p-5 sm:p-7 shadow-md space-y-3.5 overflow-hidden min-w-0"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 border-b border-gold/30">
-            <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-gold">
-              <Flame className="w-4 h-4 text-gold shrink-0" />
-              <span>DESFECHO & APELO ({sermon.desfechoTipo || "Conclusão"})</span>
-            </div>
-            <span className="text-[0.68rem] font-mono text-gold font-bold uppercase tracking-wider">
-              MOMENTO FINAL
-            </span>
+          <div className="flex items-center gap-2 pb-2.5 border-b border-gold/30">
+            <Flame className="w-4 h-4 text-gold shrink-0" />
+            <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-gold">
+              DESFECHO & APELO ({sermon.desfechoTipo || "Conclusão"})
+            </h2>
           </div>
-          <div className="bg-app-surface dark:bg-black/35 rounded-2xl p-5 sm:p-7 border border-gold/40 text-app-text font-serif font-semibold text-xl sm:text-2xl leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
+          <div className="text-app-text font-serif font-semibold text-xl sm:text-2xl leading-[1.85] min-w-0 break-words [overflow-wrap:anywhere]">
             {renderPreachingContent(sermon.desfechoTexto || "Conclusão da mensagem.")}
           </div>
         </section>
@@ -1004,66 +1064,199 @@ export default function SermonPulpitPage() {
         </div>
       </main>
 
-      {/* ── CARD FLUTUANTE DE TEXTO BÍBLICO (Acionado pelo Header se necessário) ── */}
-      {isScriptureOpen && (
-        <div
-          data-testid="biblical-text-floating-card"
-          className="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-[480px] max-h-[70vh] z-50 bg-app-surface/95 dark:bg-[#14100c]/95 backdrop-blur-md border border-gold/40 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
-        >
-          {/* Header do Card */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border/80 dark:border-gold/30 bg-app-raised/80 dark:bg-black/40">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-gold" />
-              <span className="font-mono text-xs font-bold text-app-text">
-                {sermon.bookName} {sermon.chapter}
-                {sermon.verse ? `:${sermon.verse}` : ""}
-              </span>
-              <span className="text-[0.65rem] font-mono text-app-text-muted uppercase">
-                ({sermon.version || "acf"})
-              </span>
-            </div>
+      {/* ── BOTÃO FLUTUANTE DE LEITURA BÍBLICA NO MODO PÚLPITO ── */}
+      <button
+        type="button"
+        data-testid="floating-canonical-bible-btn"
+        onClick={handleOpenScripture}
+        aria-label="Consultar Bíblia Canônica no Púlpito"
+        className="fixed bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gold text-[#120e09] border border-gold/60 shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer font-bold focus:outline-none focus:ring-2 focus:ring-gold/50"
+        title="Consultar Bíblia Canônica no Púlpito"
+      >
+        <BookOpen className="w-4 h-4 text-[#120e09]" />
+        <span className="text-xs font-serif font-bold tracking-tight">Bíblia Canônica</span>
+      </button>
 
+      {/* ── DRAWER FLUTUANTE DE TEXTO BÍBLICO CANÔNICO NO PÚLPITO ── */}
+      {isScriptureOpen && (
+        <>
+          <div
+            data-testid="canonical-bible-backdrop"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 animate-in fade-in duration-200"
+            onClick={() => setIsScriptureOpen(false)}
+          />
+          <div
+            data-testid="biblical-text-floating-card"
+            className="fixed inset-y-0 right-0 z-[60] w-full max-w-lg bg-app-surface/95 dark:bg-[#14110d]/95 backdrop-blur-md border-l border-gold/30 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300"
+          >
+          {/* Header do Drawer */}
+          <div className="flex items-center justify-between border-b border-border/80 dark:border-[#221c15] px-4 py-3.5 bg-app-raised/80 dark:bg-[#120f0c]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center text-gold">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-serif font-bold text-sm text-app-text">Bíblia Canônica</h3>
+                  <span className="text-[0.65rem] font-mono uppercase px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 font-semibold">
+                    {resolvedBookObj?.name || canonicalBook} {canonicalChapter} ({canonicalVersion.toUpperCase()})
+                  </span>
+                </div>
+                <p className="text-[0.68rem] text-app-text-muted font-sans">
+                  Consulta rápida das Sagradas Escrituras no altar
+                </p>
+              </div>
+            </div>
             <Button
-              type="button"
               variant="ghost"
               size="sm"
               onClick={() => setIsScriptureOpen(false)}
               aria-label="Fechar Passagem"
-              className="text-app-text-muted hover:text-app-text p-1 h-auto cursor-pointer"
+              className="text-app-text-muted hover:text-app-text p-1.5 h-auto rounded-lg cursor-pointer"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* Versículos */}
-          <div className="p-4 overflow-y-auto space-y-2 text-sm leading-relaxed text-app-text font-serif">
-            {loadingScripture ? (
-              <div className="py-6 text-center text-xs text-app-text-muted flex items-center justify-center gap-2">
-                <Flame className="w-4 h-4 text-gold animate-spin" />
-                <span>Carregando texto sagrado...</span>
+          {/* Barra de Navegação Canônica (Livro + Versão + Capítulo) */}
+          <div className="p-3 border-b border-border/80 dark:border-[#221c15] bg-app-surface/90 dark:bg-[#16120e] space-y-2.5">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <label className="text-[0.65rem] font-mono uppercase tracking-wider text-app-text-muted block mb-1 font-semibold">
+                  Livro
+                </label>
+                <select
+                  data-testid="canonical-book-select"
+                  aria-label="Selecionar Livro Canônico"
+                  value={resolvedBookObj?.slug || canonicalBook}
+                  onChange={(e) => handleCanonicalBookChange(e.target.value)}
+                  className="w-full text-xs rounded-lg border border-border/80 dark:border-[#2c2317] bg-app-surface dark:bg-[#1a1510] text-app-text py-1.5 px-2 focus:ring-1 focus:ring-gold/50 focus:border-gold outline-none cursor-pointer"
+                >
+                  <optgroup label="Antigo Testamento">
+                    {OLD_TESTAMENT.map((b) => (
+                      <option key={b.slug} value={b.slug}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Novo Testamento">
+                    {NEW_TESTAMENT.map((b) => (
+                      <option key={b.slug} value={b.slug}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
               </div>
-            ) : chapterData?.verses ? (
-              chapterData.verses.map((v) => {
-                const isSelectedVerse = sermon.verse && v.number === sermon.verse;
-                return (
-                  <p
-                    key={v.number}
-                    className={cn(
-                      "py-1 px-2 rounded-lg transition-colors",
-                      isSelectedVerse && "bg-gold/15 text-gold font-semibold border border-gold/30"
-                    )}
-                  >
-                    <sup className="text-gold text-[0.68rem] font-mono mr-1.5 font-bold">{v.number}</sup>
-                    {v.text}
-                  </p>
-                );
-              })
+
+              <div className="w-24 shrink-0">
+                <label className="text-[0.65rem] font-mono uppercase tracking-wider text-app-text-muted block mb-1 font-semibold">
+                  Versão
+                </label>
+                <select
+                  data-testid="canonical-version-select"
+                  aria-label="Selecionar Versão Bíblica"
+                  value={canonicalVersion}
+                  onChange={(e) => handleCanonicalVersionChange(e.target.value)}
+                  className="w-full text-xs font-mono uppercase rounded-lg border border-border/80 dark:border-[#2c2317] bg-app-surface dark:bg-[#1a1510] text-gold font-bold py-1.5 px-2 focus:ring-1 focus:ring-gold/50 focus:border-gold outline-none cursor-pointer"
+                >
+                  <option value="acf">ACF</option>
+                  <option value="nvi">NVI</option>
+                  <option value="arc">ARC</option>
+                  <option value="kja">KJA</option>
+                  <option value="aa">AA</option>
+                  <option value="kjv">KJV</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Linha 2: Navegação de Capítulos */}
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/50 dark:border-[#221c15]">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  data-testid="canonical-prev-chapter-btn"
+                  disabled={canonicalChapter <= 1 || loadingScripture}
+                  onClick={() => handleCanonicalChapterChange(canonicalChapter - 1)}
+                  className="px-2.5 py-1 text-xs rounded-md border border-border/80 dark:border-[#2c2317] text-app-text hover:border-gold/40 hover:text-gold disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Cap. {canonicalChapter > 1 ? canonicalChapter - 1 : 1}</span>
+                </button>
+
+                <button
+                  type="button"
+                  data-testid="canonical-next-chapter-btn"
+                  disabled={
+                    canonicalChapter >= (resolvedBookObj?.chapters || 150) || loadingScripture
+                  }
+                  onClick={() => handleCanonicalChapterChange(canonicalChapter + 1)}
+                  className="px-2.5 py-1 text-xs rounded-md border border-border/80 dark:border-[#2c2317] text-app-text hover:border-gold/40 hover:text-gold disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span>Cap. {canonicalChapter + 1}</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Lista de Versículos com Scroll Confortável */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 font-serif text-base sm:text-lg leading-relaxed text-app-text">
+            {loadingScripture ? (
+              <div className="flex flex-col items-center justify-center h-48 gap-2.5 text-app-text-muted">
+                <Flame className="w-6 h-6 text-gold animate-spin" />
+                <span className="text-xs font-sans">Buscando Escrituras no Cânon...</span>
+              </div>
+            ) : canonicalError ? (
+              <div className="text-center py-10 text-app-text-muted text-xs space-y-3 font-sans">
+                <p className="text-red-400">{canonicalError}</p>
+                <Button
+                  onClick={() => loadCanonicalChapter(canonicalBook, canonicalChapter, "acf")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs border-gold/40 text-gold"
+                >
+                  Tentar versão ACF (Rocha)
+                </Button>
+              </div>
+            ) : chapterData?.verses && chapterData.verses.length > 0 ? (
+              <div className="space-y-2.5">
+                {chapterData.verses.map((v) => {
+                  const range = parseVerseRange(sermon.verse);
+                  const isSermonVerse =
+                    sermon.bookName?.toLowerCase() === canonicalBook?.toLowerCase() &&
+                    sermon.chapter === canonicalChapter &&
+                    (range
+                      ? v.number >= range.start && v.number <= range.end
+                      : sermon.verse === v.number);
+
+                  return (
+                    <div
+                      key={v.number}
+                      className={cn(
+                        "p-2 rounded-xl transition-all",
+                        isSermonVerse
+                          ? "bg-gold/15 text-gold font-semibold border border-gold/40 shadow-xs"
+                          : "hover:bg-app-raised/50 dark:hover:bg-[#1a1510] text-app-text"
+                      )}
+                    >
+                      <sup className="text-xs font-mono text-gold font-bold mr-1.5 select-none">
+                        {v.number}
+                      </sup>
+                      {v.text}
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
-              <p className="text-xs text-app-text-muted">Passagem bíblica não carregada.</p>
+              <div className="text-center py-10 text-app-text-muted text-xs space-y-2 font-sans">
+                <p>Nenhum versículo encontrado neste capítulo.</p>
+              </div>
             )}
           </div>
         </div>
-      )}
+      </>
+    )}
 
       {/* ── MODAL SOLENE DE REGISTRO PÓS-PREGAÇÃO ── */}
       {isPreachingModalOpen && (

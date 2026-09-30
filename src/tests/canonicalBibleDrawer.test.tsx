@@ -308,4 +308,92 @@ describe("Bíblia Canônica no Menu de Ferramentas do Estúdio", () => {
       );
     });
   });
+
+  it("5. Abre a Bíblia Canônica via botão do Header (acessível no mobile/tablet sem a barra lateral direita)", async () => {
+    const sermon: Sermon = {
+      id: "sermon-mobile-header",
+      userId: "user-1",
+      title: "Sermão Mobile Header",
+      status: "draft",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    vi.mocked(homileticClient.getSermon).mockResolvedValue(sermon);
+    vi.mocked(bibleApi.fetchChapter).mockResolvedValue(mockLukeChapter);
+
+    render(
+      <MemoryRouter initialEntries={["/estudio/sermon-mobile-header"]}>
+        <Routes>
+          <Route path="/estudio/:sermonId" element={<SermonStudioPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Sermão Mobile Header")).toBeInTheDocument();
+    });
+
+    const headerBtn = screen.getByTestId("header-canonical-bible-btn");
+    expect(headerBtn).toBeInTheDocument();
+    fireEvent.click(headerBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("biblical-text-floating-card")).toBeInTheDocument();
+    });
+  });
+
+  it("6. Abre a Bíblia Canônica via botão no Card 1 (EU E DEUS) e via Botão Flutuante", async () => {
+    const sermon: Sermon = {
+      id: "sermon-card1-trigger",
+      userId: "user-1",
+      title: "Sermão Card 1 e Flutuante",
+      status: "draft",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    vi.mocked(homileticClient.getSermon).mockResolvedValue(sermon);
+    vi.mocked(bibleApi.fetchChapter).mockResolvedValue(mockLukeChapter);
+
+    render(
+      <MemoryRouter initialEntries={["/estudio/sermon-card1-trigger"]}>
+        <Routes>
+          <Route path="/estudio/:sermonId" element={<SermonStudioPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Sermão Card 1 e Flutuante")).toBeInTheDocument();
+    });
+
+    // 1. Abre via Card 1
+    const card1Btn = screen.getByTestId("card1-canonical-bible-btn");
+    expect(card1Btn).toBeInTheDocument();
+    fireEvent.click(card1Btn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("biblical-text-floating-card")).toBeInTheDocument();
+    });
+
+    // Fecha pelo backdrop
+    const backdrop = screen.getByTestId("canonical-bible-backdrop");
+    expect(backdrop).toBeInTheDocument();
+    fireEvent.click(backdrop);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("biblical-text-floating-card")).not.toBeInTheDocument();
+    });
+
+    // 2. Abre via Botão Flutuante (FAB)
+    const floatingBtn = screen.getByTestId("floating-canonical-bible-btn");
+    expect(floatingBtn).toBeInTheDocument();
+    fireEvent.click(floatingBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("biblical-text-floating-card")).toBeInTheDocument();
+    });
+  });
 });
+

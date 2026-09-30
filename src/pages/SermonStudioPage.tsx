@@ -1479,6 +1479,20 @@ export default function SermonStudioPage() {
             )}
 
 
+            {/* Botão de Acesso Direto à Bíblia Canônica no Header */}
+            <Button
+              type="button"
+              data-testid="header-canonical-bible-btn"
+              onClick={handleOpenScripture}
+              variant="outline"
+              className="border-gold/40 hover:border-gold/80 bg-gold/10 hover:bg-gold/15 text-gold text-xs font-semibold px-3 sm:px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
+              title="Consultar Bíblia Canônica (66 Livros)"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-gold" />
+              <span className="hidden sm:inline">Bíblia Canônica</span>
+              <span className="sm:hidden font-bold">Bíblia</span>
+            </Button>
+
             <Button
               type="button"
               data-testid="test-orthodoxy-btn"
@@ -1848,7 +1862,7 @@ export default function SermonStudioPage() {
                 <Flame className="w-4 h-4 text-gold" />
                 <span>EU E DEUS — A CHAMA INICIAL</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
                   data-testid="open-full-inspiration-btn"
@@ -1858,6 +1872,16 @@ export default function SermonStudioPage() {
                 >
                   <Sparkles className="w-3.5 h-3.5 text-gold" />
                   <span>Inspiração Completa</span>
+                </button>
+                <button
+                  type="button"
+                  data-testid="card1-canonical-bible-btn"
+                  onClick={handleOpenScripture}
+                  className="border border-gold/40 hover:border-gold text-gold hover:bg-gold/10 font-medium text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer shadow-xs bg-app-raised/80 dark:bg-[#1a1612]"
+                  title="Consultar Bíblia Canônica Completa (66 Livros)"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-gold" />
+                  <span>Bíblia Canônica</span>
                 </button>
                 <button
                   type="button"
@@ -2851,24 +2875,33 @@ export default function SermonStudioPage() {
       </div>
     </aside>
 
-      {/* ── BOTÃO FLUTUANTE DE LEITURA BÍBLICA (Substitui o caderno no Estúdio) ── */}
+      {/* ── BOTÃO FLUTUANTE DE LEITURA BÍBLICA (Acesso Direto em Mobile & Desktop) ── */}
       <button
         type="button"
         data-testid="floating-canonical-bible-btn"
         onClick={handleOpenScripture}
         aria-label="Consultar Bíblia Canônica no Estúdio"
-        className="fixed bottom-6 right-4 sm:right-6 z-40 flex items-center justify-center w-12 h-12 rounded-full bg-gold text-[#120e09] border border-gold/60 shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer font-bold focus:outline-none focus:ring-2 focus:ring-gold/50"
+        className="fixed bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gold text-[#120e09] border border-gold/60 shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer font-bold focus:outline-none focus:ring-2 focus:ring-gold/50"
         title="Consultar Bíblia Canônica no Estúdio"
       >
-        <BookOpen className="w-5 h-5 text-[#120e09]" />
+        <BookOpen className="w-4 h-4 text-[#120e09]" />
+        <span className="text-xs font-serif font-bold tracking-tight">Bíblia Canônica</span>
       </button>
 
       {/* ── DRAWER FLUTUANTE DE TEXTO BÍBLICO CANÔNICO ─────────────────────────── */}
       {isScriptureOpen && (
-        <div
-          data-testid="biblical-text-floating-card"
-          className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-app-surface/95 dark:bg-[#14110d]/95 backdrop-blur-md border-l border-gold/30 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300"
-        >
+        <>
+          {/* Backdrop escurecido para mobile/tablet e clique externo para fechar */}
+          <div
+            data-testid="canonical-bible-backdrop"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 animate-in fade-in duration-200"
+            onClick={() => setIsScriptureOpen(false)}
+          />
+
+          <div
+            data-testid="biblical-text-floating-card"
+            className="fixed inset-y-0 right-0 z-[60] w-full sm:max-w-lg bg-app-surface dark:bg-[#14110d] border-l border-gold/30 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 h-full max-h-screen"
+          >
           {/* Header do Drawer */}
           <div className="flex items-center justify-between border-b border-border/80 dark:border-[#221c15] px-4 py-3.5 bg-app-raised/80 dark:bg-[#120f0c]">
             <div className="flex items-center gap-2.5">
@@ -2952,8 +2985,8 @@ export default function SermonStudioPage() {
             </div>
 
             {/* Linha 2: Navegação de Capítulo + Ações Rápidas */}
-            <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/50 dark:border-[#221c15]">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/50 dark:border-[#221c15] flex-wrap">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   type="button"
                   data-testid="canonical-prev-chapter-btn"
@@ -2998,7 +3031,7 @@ export default function SermonStudioPage() {
               </div>
 
               {/* Ações Rápidas */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 ml-auto">
                 {isCurrentSermonBase ? (
                   <span className="text-[0.68rem] font-mono text-gold flex items-center gap-1 bg-gold/10 px-2 py-1 rounded-md border border-gold/30 font-medium">
                     <CheckCheck className="w-3 h-3 text-gold" />
@@ -3085,7 +3118,7 @@ export default function SermonStudioPage() {
                           {v.number}
                         </sup>
                         <p className="flex-1 leading-relaxed">{verseText}</p>
-                        <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 shrink-0 transition-opacity">
+                        <div className="opacity-80 sm:opacity-0 sm:group-hover:opacity-100 flex items-center gap-1 shrink-0 transition-opacity">
                           <button
                             type="button"
                             onClick={() => handleCopyVerse(v.number ?? 0, verseText)}
@@ -3123,7 +3156,8 @@ export default function SermonStudioPage() {
             )}
           </div>
         </div>
-      )}
+      </>
+    )}
 
       {/* ── POPUP MODAL: INSPIRAÇÃO SAGRADA COMPLETA ───────────────────────────── */}
       {isFullPassageModalOpen && (
