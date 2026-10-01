@@ -64,3 +64,8 @@ docs/plan-*.md
 # Cloudflare Wrangler dev state
 .wrangler/
 **/.wrangler/
+
+# Local Scratch & Video Production
+.scratch/
+video-production/
+

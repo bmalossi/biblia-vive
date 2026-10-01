@@ -728,7 +728,8 @@ export default function HarpaReadingPage() {
                     <button
                       type="button"
                       onClick={toggleMute}
-                      title="Mutar/Desmutar"
+                      title={playerState.isMuted ? "Desmutar áudio" : "Mutar áudio"}
+                      aria-label={playerState.isMuted ? "Desmutar áudio" : "Mutar áudio"}
                       className="text-app-text-muted hover:text-gold transition-colors p-1"
                     >
                       {playerState.isMuted ? (
@@ -741,6 +742,7 @@ export default function HarpaReadingPage() {
                       type="button"
                       onClick={toggleLoop}
                       title={playerState.loopMode ? "Desativar repetição" : "Repetir hino"}
+                      aria-label={playerState.loopMode ? "Desativar repetição do hino" : "Repetir hino"}
                       className={cn(
                         "transition-colors p-1",
                         playerState.loopMode ? "text-gold" : "text-app-text-muted hover:text-gold"

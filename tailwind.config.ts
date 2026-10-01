@@ -18,6 +18,9 @@ export default {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-mono)"],
       },
+      fontSize: {
+        micro: ["0.625rem", { lineHeight: "0.875rem", letterSpacing: "0.05em" }],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

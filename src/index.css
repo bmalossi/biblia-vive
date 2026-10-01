@@ -25,6 +25,7 @@ All colors MUST be HSL.
     --text-muted: 30 13% 40%;
     --gold: 38 46% 45%;
     --gold-bg: 40 57% 87%;
+    --words-of-god: 0 65% 45%;
 
     --background: var(--bg);
     --foreground: var(--text);
@@ -97,6 +98,7 @@ All colors MUST be HSL.
     --text-muted: 35 16% 74%;
     --gold: 41 60% 56%;
     --gold-bg: 39 35% 25%;
+    --words-of-god: 0 85% 75%;
     --border: 30 11% 28%;
 
     --background: var(--bg);
@@ -278,6 +280,16 @@ All colors MUST be HSL.
     font-family: var(--font-mono);
   }
 
+  .text-micro {
+    font-size: 0.625rem;
+    line-height: 0.875rem;
+    letter-spacing: 0.05em;
+  }
+
+  .text-words-of-god {
+    color: hsl(var(--words-of-god));
+  }
+
   /* Hebrew original text: Noto Serif Hebrew, applied only to biblical Hebrew content */
   .font-hebrew {
     font-family: var(--font-hebrew);
@@ -346,7 +358,7 @@ All colors MUST be HSL.
 }
 
 .church-display-page .verse-reference {
-  color: #c9a84c;
+  color: hsl(var(--gold));
   font-size: 0.875rem;
   text-align: right;
   margin-top: 0.5rem;
@@ -354,7 +366,7 @@ All colors MUST be HSL.
 
 .church-display-page .logo-text {
   font-family: var(--font-serif);
-  color: #c9a84c;
+  color: hsl(var(--gold));
   font-size: 3rem;
   text-align: center;
 }

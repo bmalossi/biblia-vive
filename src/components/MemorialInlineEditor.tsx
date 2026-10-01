@@ -406,6 +406,7 @@ export default function MemorialInlineEditor({
                             onClick={handleDelete}
                             className="p-1.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
                             title="Excluir Registro"
+                            aria-label="Excluir Registro"
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>

@@ -91,7 +91,7 @@ function PanelBody({ preferences, updatePreference, onReset, hasPortugueseVoice 
               >
                 <div className="mb-1 flex items-center justify-between">
                   <p className="font-sans text-sm text-app-text">{option.title}</p>
-                  {option.badge && <span className="rounded-full bg-accent px-2 py-0.5 text-[0.64rem] text-app-text">{option.badge}</span>}
+                  {option.badge && <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-app-text">{option.badge}</span>}
                 </div>
                 <p className={cn("text-base text-app-text", option.previewClass)}>{t("settings.fontPreview")}</p>
                 <p className="mt-1 text-xs text-app-text-muted">{option.description}</p>
@@ -139,7 +139,7 @@ function PanelBody({ preferences, updatePreference, onReset, hasPortugueseVoice 
           ))}
         </div>
 
-        <p className="text-[0.68rem] text-app-text-muted">{t("settings.fontSizeNames")}</p>
+        <p className="text-xs text-app-text-muted">{t("settings.fontSizeNames")}</p>
       </section>
 
       <section className="space-y-3 border-b border-border/60 py-5">
@@ -155,7 +155,7 @@ function PanelBody({ preferences, updatePreference, onReset, hasPortugueseVoice 
           step={0.1}
           value={[preferences.verseSpacing]}
         />
-        <p className="text-[0.68rem] text-app-text-muted">{t("settings.verseSpacingDesc")}</p>
+        <p className="text-xs text-app-text-muted">{t("settings.verseSpacingDesc")}</p>
       </section>
 
       <section className="space-y-3 border-b border-border/60 py-5">
@@ -207,14 +207,24 @@ function PanelBody({ preferences, updatePreference, onReset, hasPortugueseVoice 
       </section>
 
       <section className="space-y-3 py-5">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-app-bg px-3 py-2">
-          <Label className="text-sm text-app-text" htmlFor="focus-mode-toggle">
-            {t("settings.focusMode")}
-          </Label>
+        <div className="flex items-center justify-between rounded-lg border border-border bg-app-bg px-3.5 py-3 transition-colors hover:border-gold/30">
+          <div className="flex flex-col pr-3">
+            <Label className="text-sm font-medium text-app-text flex items-center gap-2 cursor-pointer" htmlFor="focus-mode-toggle">
+              <span className="font-serif">Modo Clausura</span>
+              <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-app-surface text-gold border border-gold/30 font-normal">
+                Atalho: F
+              </span>
+            </Label>
+            <span className="text-xs text-app-text-muted mt-1 leading-relaxed">
+              Recolhimento monástico: oculta menus, barras e distrações para uma leitura pura, serena e contemplativa das Escrituras.
+            </span>
+          </div>
           <Switch
             checked={preferences.focusMode}
             id="focus-mode-toggle"
             onCheckedChange={(checked) => updatePreference("focusMode", checked)}
+            className="data-[state=checked]:bg-gold shrink-0"
+            aria-label="Ativar ou desativar Modo Clausura"
           />
         </div>
 
@@ -223,7 +233,7 @@ function PanelBody({ preferences, updatePreference, onReset, hasPortugueseVoice 
             <Label className="text-sm text-gold font-medium" htmlFor="words-of-god-toggle">
               Destacar Palavras de Deus
             </Label>
-            <span className="text-[0.65rem] text-app-text-muted mt-0.5">Realça aspas identificadas após falas divinas (Experimental)</span>
+            <span className="text-xs text-app-text-muted mt-0.5">Realça aspas identificadas após falas divinas (Experimental)</span>
           </div>
           <Switch
             checked={preferences.wordsOfGod}

@@ -183,7 +183,11 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                         <ImageIcon className="h-5 w-5 text-gold" />
                         <h2 className="font-serif text-lg">Biblioteca de Mídia</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-app-bg rounded-lg text-app-text-muted transition-colors">
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-app-bg rounded-lg text-app-text-muted transition-colors"
+                        aria-label="Fechar biblioteca de mídia"
+                    >
                         <X className="h-5 w-5" />
                     </button>
                 </div>
@@ -195,6 +199,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                         <input
                             type="text"
                             placeholder="Buscar por nome..."
+                            aria-label="Buscar imagem por nome"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full bg-app-bg border border-border rounded-xl pl-9 pr-4 py-2 text-sm text-app-text focus:outline-none focus:border-gold"
@@ -264,6 +269,7 @@ export default function ImageLibraryModal({ isOpen, onClose }: ImageLibraryModal
                                             onClick={() => copyToClipboard(img.url)}
                                             className="p-2 bg-app-surface border border-border rounded-lg text-app-text hover:text-gold transition-colors"
                                             title="Copiar Link"
+                                            aria-label={`Copiar link da imagem ${img.filename}`}
                                         >
                                             {copiedUrl === img.url ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                                         </button>

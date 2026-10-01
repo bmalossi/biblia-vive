@@ -271,6 +271,7 @@ export default function MemorialEntryModal({
                         type="button"
                         onClick={onClose}
                         className="p-1 rounded-lg hover:bg-app-raised text-app-text-muted hover:text-app-text transition-colors"
+                        aria-label="Fechar modal do memorial"
                     >
                         <X className="h-4 w-4" />
                     </button>

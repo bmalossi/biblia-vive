@@ -142,7 +142,11 @@ function EditModal({
                         <h2 className="font-serif text-lg text-app-text font-bold">Editar Plano</h2>
                         <p className="text-xs text-app-text-muted mt-0.5 truncate max-w-[320px]">{edit.email}</p>
                     </div>
-                    <button onClick={onClose} className="rounded-lg p-1.5 text-app-text-muted hover:bg-app-surface transition-colors">
+                    <button
+                        onClick={onClose}
+                        className="rounded-lg p-1.5 text-app-text-muted hover:bg-app-surface transition-colors"
+                        aria-label="Fechar edição de plano"
+                    >
                         <X className="h-4 w-4" />
                     </button>
                 </div>
@@ -521,6 +525,7 @@ export default function AdminUsuariosPage() {
                         <input
                             type="search"
                             placeholder="Buscar por e-mail..."
+                            aria-label="Buscar usuário por e-mail"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             className="w-full rounded-xl border border-border bg-app-bg pl-10 pr-4 py-2.5 text-sm text-app-text focus:outline-none focus:border-gold transition-colors placeholder:text-app-text-muted/60"
@@ -533,6 +538,7 @@ export default function AdminUsuariosPage() {
                         disabled={loading}
                         className="h-10 w-10 rounded-xl border-border hover:border-gold/40 flex-shrink-0"
                         title="Atualizar lista"
+                        aria-label="Atualizar lista de usuários"
                     >
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </Button>
@@ -590,6 +596,7 @@ export default function AdminUsuariosPage() {
                                         size="sm"
                                         variant="ghost"
                                         onClick={() => openEdit(u)}
+                                        aria-label={`Editar plano do usuário ${u.email}`}
                                         className="h-8 gap-1.5 text-xs text-app-text-muted hover:text-gold hover:bg-gold/10 opacity-0 group-hover:opacity-100 transition-all"
                                     >
                                         <Edit3 className="h-3.5 w-3.5" /> Editar
@@ -607,10 +614,24 @@ export default function AdminUsuariosPage() {
                             Página {page + 1} de {totalPages} · {totalCount} usuários
                         </p>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0 || loading} className="gap-1.5 h-8 text-xs">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage(p => Math.max(0, p - 1))}
+                                disabled={page === 0 || loading}
+                                className="gap-1.5 h-8 text-xs"
+                                aria-label="Ir para a página anterior"
+                            >
                                 <ChevronLeft className="h-3.5 w-3.5" /> Anterior
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1 || loading} className="gap-1.5 h-8 text-xs">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                                disabled={page >= totalPages - 1 || loading}
+                                className="gap-1.5 h-8 text-xs"
+                                aria-label="Ir para a próxima página"
+                            >
                                 Próxima <ChevronRight className="h-3.5 w-3.5" />
                             </Button>
                         </div>

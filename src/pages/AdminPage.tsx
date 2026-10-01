@@ -283,6 +283,7 @@ export default function AdminPage() {
                             <button
                                 type="button"
                                 role="switch"
+                                aria-label="Ativar contingência Fallback Web Speech"
                                 aria-checked={isFallbackEnabled}
                                 onClick={toggleFallback}
                                 className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none ${

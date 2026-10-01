@@ -354,20 +354,38 @@ export default function AdminAutoresPage() {
                                             <Link to={`/autor/${author.slug}`} target="_blank" className="text-xs text-gold hover:underline mr-auto self-center">
                                                 Ver perfil público
                                             </Link>
-                                            <button onClick={() => startEdit(author)} className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold" title="Editar">
+                                            <button
+                                                onClick={() => startEdit(author)}
+                                                className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold"
+                                                title="Editar"
+                                                aria-label={`Editar autor ${author.name}`}
+                                            >
                                                 <Edit className="h-4 w-4" />
                                             </button>
                                             {deleteConfirm === author.id ? (
                                                 <div className="flex items-center gap-1">
-                                                    <button onClick={() => handleDelete(author.id)} className="rounded-lg bg-red-500/20 px-2 py-1 text-xs text-red-400 hover:bg-red-500/30">
+                                                    <button
+                                                        onClick={() => handleDelete(author.id)}
+                                                        className="rounded-lg bg-red-500/20 px-2 py-1 text-xs text-red-400 hover:bg-red-500/30"
+                                                        aria-label={`Confirmar exclusão do autor ${author.name}`}
+                                                    >
                                                         Confirmar
                                                     </button>
-                                                    <button onClick={() => setDeleteConfirm(null)} className="rounded-lg bg-border px-2 py-1 text-xs text-app-text-muted">
+                                                    <button
+                                                        onClick={() => setDeleteConfirm(null)}
+                                                        className="rounded-lg bg-border px-2 py-1 text-xs text-app-text-muted"
+                                                        aria-label="Cancelar exclusão"
+                                                    >
                                                         Cancelar
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <button onClick={() => setDeleteConfirm(author.id)} className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-red-400" title="Excluir">
+                                                <button
+                                                    onClick={() => setDeleteConfirm(author.id)}
+                                                    className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-red-400"
+                                                    title="Excluir"
+                                                    aria-label={`Excluir autor ${author.name}`}
+                                                >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                             )}

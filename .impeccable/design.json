@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-01T08:16:30Z",
+  "title": "Design System: Bíblia Vive",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Dourado Bíblico Sagrado",
+        "canonical": "hsl(38 46% 45%)",
+        "tonalRamp": ["hsl(40 57% 87%)", "hsl(39 50% 65%)", "hsl(38 46% 45%)", "hsl(37 55% 32%)"]
+      },
+      "parchment-bg": {
+        "role": "neutral",
+        "displayName": "Pergaminho Devocional",
+        "canonical": "hsl(42 32% 94%)",
+        "tonalRamp": ["hsl(42 32% 96%)", "hsl(42 32% 94%)", "hsl(44 30% 91%)", "hsl(44 26% 88%)"]
+      },
+      "night-bg": {
+        "role": "neutral",
+        "displayName": "Noite Contemplativa",
+        "canonical": "hsl(30 13% 10%)",
+        "tonalRamp": ["hsl(30 13% 10%)", "hsl(28 12% 14%)", "hsl(30 11% 18%)", "hsl(30 11% 28%)"]
+      },
+      "memorial-revelation": {
+        "role": "accent",
+        "displayName": "Dourado Revelação (SOAP)",
+        "canonical": "hsl(38 46% 45%)",
+        "tonalRamp": ["hsl(40 57% 87%)", "hsl(38 46% 45%)"]
+      },
+      "memorial-prayer": {
+        "role": "accent",
+        "displayName": "Azul Prece",
+        "canonical": "hsl(215 50% 48%)",
+        "tonalRamp": ["hsl(215 50% 90%)", "hsl(215 50% 48%)"]
+      },
+      "memorial-testimony": {
+        "role": "accent",
+        "displayName": "Verde Aliança",
+        "canonical": "hsl(142 40% 40%)",
+        "tonalRamp": ["hsl(142 40% 88%)", "hsl(142 40% 40%)"]
+      },
+      "memorial-altar": {
+        "role": "accent",
+        "displayName": "Cinza Altar",
+        "canonical": "hsl(215 14% 48%)",
+        "tonalRamp": ["hsl(215 14% 88%)", "hsl(215 14% 48%)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display Nobre", "purpose": "Títulos de livros bíblicos e capas editoriais." },
+      "reading": { "displayName": "Corpo Bíblico", "purpose": "Texto sagrado contínuo em Lora, 18px, entrelinha 1.7." },
+      "body": { "displayName": "Interface Funcional", "purpose": "Artigos, comentários e UI em DM Sans." },
+      "label": { "displayName": "Rótulo & Botões", "purpose": "Botões, badges e navegação." },
+      "mono": { "displayName": "Metadados & Strong", "purpose": "Lemas originais, números Strong e metadados léxicos." }
+    },
+    "shadows": [
+      {
+        "name": "btn-puffed-sepia",
+        "value": "0 2px 5px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.50)",
+        "purpose": "Acabamento tátil suave em botões no tema sépia e claro."
+      },
+      {
+        "name": "btn-puffed-dark",
+        "value": "0 3px 8px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)",
+        "purpose": "Acabamento tátil amortecido em botões no tema escuro."
+      },
+      {
+        "name": "shadow-gold-glow",
+        "value": "0 0 15px hsl(38 46% 45% / 0.4)",
+        "purpose": "Brilho dourado sagrado no botão de Modo Clausura ativo e lembretes."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Transições padrão de interface e hover."
+      },
+      {
+        "name": "church-fade-in",
+        "value": "400ms ease-out",
+        "purpose": "Entrada suave e reverente de versículos e elementos de leitura."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1400px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão Primário Tátil",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Botão de ação principal com acabamento tátil puffed e dourado bíblico.",
+      "html": "<button class=\"btn-puffed bg-primary text-white px-4 py-2 rounded-md font-medium text-sm\">Acessar Palavra</button>",
+      "css": ".btn-puffed { background: hsl(38, 46%, 45%); color: #fff; padding: 10px 16px; border-radius: 6px; font-weight: 500; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5); transition: transform 0.15s, box-shadow 0.15s; } .btn-puffed:hover { transform: translateY(1px); }"
+    },
+    {
+      "name": "Card Pergaminho",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Container tonal para notas, reflexões e versículos de apoio.",
+      "html": "<div class=\"p-6 rounded-lg border border-border bg-card text-card-foreground\">Conteúdo do Estudo</div>",
+      "css": ".card-parchment { background: hsl(44, 26%, 88%); border: 1px solid hsl(35, 23%, 78%); border-radius: 8px; padding: 24px; color: hsl(28, 25%, 19%); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Santuário Editorial (The Editorial Sanctuary)",
+    "overview": "O Bíblia Vive é concebido como um refúgio digital de permanência, recolhimento e contemplação diária na Palavra de Deus. A experiência visual rejeita a agitação frenética das interfaces contemporâneas em favor de uma estética editorial refinada, calorosa e atemporal, inspirada na nobreza dos códices e livros encadernados.",
+    "keyCharacteristics": [
+      "Centralidade Bíblica: O texto sagrado é a autoridade visual máxima.",
+      "Tipografia Nobre: Lora (serif) para títulos e leitura bíblica + DM Sans (sans) para interface funcional.",
+      "Tonal Layering Acolhedor: Camadas ópticas de luz e sombra natural em três temas (Sépia, Escuro e Claro).",
+      "Acabamento Tátil e Reverente: Botões com relevo tátil puffed suave e anéis de foco dourados discretos."
+    ],
+    "rules": [
+      {
+        "name": "A Regra da Centralidade da Palavra",
+        "body": "A Palavra de Deus é a autoridade visual máxima. Nenhum elemento de interface pode competir em saturação ou escala com o texto da Escritura.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra Anti-SaaS",
+        "body": "É estritamente proibido o uso de gradientes roxo-azulados, chips flutuantes apelativos de IA ou cards agrupados dentro de cards sem propósito.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra da Leitura Ininterrupta",
+        "body": "O container de leitura bíblica respeita a largura ideal de 65 a 80 caracteres (860px), com entrelinha de 1.7 e espaçamento entre versículos de 0.8rem.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra da Calmaria em Repouso",
+        "body": "Superfícies em repouso são tonais e planas. Sombras pronunciadas existem apenas como resposta a elevação física direta ou toque tátil deliberado.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Priorizar a legibilidade da Palavra com tipografia serifada nobre (Lora) e proporções de entrelinha generosas (1.6 a 1.7).",
+      "Preservar a harmonia da paleta de três temas (Sépia, Claro e Escuro).",
+      "Aplicar o efeito .btn-puffed em botões de ação principal para proporcionar sensação tátil calorosa.",
+      "Respeitar o vocabulário canônico: Leitor, Visitante, Meu Memorial, Referência, Plano de Leitura, Modo Clausura.",
+      "Garantir alvos de toque mínimos de 44x44px em todos os controles interativos."
+    ],
+    "donts": [
+      "Não utilizar gradientes roxos, azuis elétricos ou estéticas futuristas de IA.",
+      "Não usar pretos puros (#000000) ou brancos puros (#ffffff) como superfícies principais de leitura.",
+      "Não quebrar a concentração do Leitor com pop-ups agressivos ou contadores coercitivos de streak.",
+      "Não aninhar cards dentro de cards repetidamente.",
+      "Não cobrir versículos bíblicos com botões flutuantes durante o scroll."
+    ]
+  }
+}

@@ -284,7 +284,7 @@ export default function Header() {
     const cls =
       size === "md"
         ? "h-10 w-10 text-sm"
-        : "h-8 w-8 text-[0.65rem]";
+        : "h-8 w-8 text-micro";
     return (
       <span
         className={`relative inline-flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-app-surface overflow-hidden ${cls}`}
@@ -383,7 +383,7 @@ export default function Header() {
         <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-2 px-4 md:h-[60px] md:px-6">
           {/* LEFT: Logo + Chapter Title (Permanent) */}
           <div className="flex items-center gap-4 md:gap-6">
-            <Link className="flex-shrink-0 flex items-center gap-2 group" onClick={onLogoClick} to="/">
+            <Link className="flex-shrink-0 flex items-center gap-2 group" onClick={onLogoClick} to="/" aria-label="Bíblia Vive - Início">
               <img
                 alt="Bíblia Vive"
                 width="160"
@@ -437,6 +437,7 @@ export default function Header() {
             className="flex-shrink-0 flex items-center gap-2 group"
             onClick={onLogoClick}
             to="/"
+            aria-label="Bíblia Vive - Início"
           >
             <img
               alt="Bíblia Vive"
@@ -572,7 +573,7 @@ export default function Header() {
                 {user ? (
                   <AvatarCircle size="sm" />
                 ) : (
-                  <span className="relative inline-flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-app-surface h-7 w-7 text-[0.68rem] font-semibold text-app-text select-none">
+                  <span className="relative inline-flex flex-shrink-0 items-center justify-center rounded-full border border-border bg-app-surface h-7 w-7 text-micro font-semibold text-app-text select-none">
                     BV
                   </span>
                 )}
@@ -690,7 +691,7 @@ export default function Header() {
               <div className="px-4 py-3 border-b border-border bg-app-surface/40 space-y-3">
                 {/* Linha 1: Versão Bíblica & Idioma */}
                 <div className="space-y-1.5">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                  <p className="text-micro font-semibold uppercase tracking-wider text-app-text-muted">
                     Texto & Versão
                   </p>
                   <div className="grid grid-cols-2 gap-2">
@@ -702,10 +703,10 @@ export default function Header() {
                 {/* Linha 2: Tema da Página (White / Sépia / Dark) */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                    <p className="text-micro font-semibold uppercase tracking-wider text-app-text-muted">
                       Tema de Leitura
                     </p>
-                    <span className="text-[0.62rem] font-mono text-app-text-muted capitalize">
+                    <span className="text-micro font-mono text-app-text-muted capitalize">
                       {theme === "light" ? "White" : theme === "sepia" ? "Sépia" : "Dark"}
                     </span>
                   </div>
@@ -741,7 +742,7 @@ export default function Header() {
 
               {/* ── Nav links ── */}
               <div className="px-3 py-2 border-t border-border">
-                <p className="px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                <p className="px-3 py-1 text-micro font-semibold uppercase tracking-wider text-app-text-muted">
                   Navegar
                 </p>
                 {navItems.map((item) => (
@@ -823,7 +824,7 @@ export default function Header() {
 
               {/* ── Account section ── */}
               <div className="px-3 py-2 border-t border-border">
-                <p className="px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                <p className="px-3 py-1 text-micro font-semibold uppercase tracking-wider text-app-text-muted">
                   Conta
                 </p>
                 {user ? (
@@ -836,7 +837,7 @@ export default function Header() {
                         <p className="text-xs text-app-text-muted truncate">{user.email}</p>
                       </div>
                       {isPro && !proLoading && (
-                        <span className="ml-auto flex-shrink-0 flex items-center gap-0.5 rounded-full bg-gold/15 border border-gold/25 px-2 py-0.5 text-[0.6rem] font-bold text-gold tracking-widest">
+                        <span className="ml-auto flex-shrink-0 flex items-center gap-0.5 rounded-full bg-gold/15 border border-gold/25 px-2 py-0.5 text-micro font-bold text-gold tracking-widest">
                           <StarIcon className="h-2.5 w-2.5" /> PRO
                         </span>
                       )}

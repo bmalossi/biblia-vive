@@ -10,7 +10,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import StudyPanel from "@/components/StudyPanel";
 import { prefetchLexicons, getLanguageLabel } from "@/lib/strongs";
 import AudioPlayer from "@/components/AudioPlayer";
-import WorshipCard from "@/components/WorshipCard";
+import ReadingAmbientOrchestrator from "@/components/ReadingAmbientOrchestrator";
 import VerseToolbar from "@/components/VerseToolbar";
 import { QuickLookSheet } from "@/components/QuickLookSheet";
 import { useVerseCommentCache } from "@/hooks/useVerseCommentCache";
@@ -30,9 +30,7 @@ import { getSession } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useNotesHighlights } from "@/hooks/useNotesHighlights";
 import { createNoteStore, type MemorialEntry, type EchoResult } from "@/lib/noteStore";
-import EchoBanner from "@/components/EchoBanner";
 import EchoModal from "@/components/EchoModal";
-import ScriptureThreadBanner from "@/components/ScriptureThreadBanner";
 import ScriptureThreadModal from "@/components/ScriptureThreadModal";
 import { evaluateScriptureThread, getNotesVersion, type ScriptureThreadResult } from "@/lib/scriptureThread";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -80,7 +78,7 @@ import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi"
 import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS, getVersionLanguage } from "@/lib/themes";
 import { useSectionHeadings } from "@/hooks/useSectionHeadings";
-import { Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen, ChevronRight } from "lucide-react";
+import { Eye, EyeOff, Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen, ChevronRight } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -308,7 +306,6 @@ export default function ReadingPage() {
   const [isBookPickerOpen, setIsBookPickerOpen] = useState(false);
   const [isVersionPickerOpen, setIsVersionPickerOpen] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
-  const [focusTopVisible, setFocusTopVisible] = useState(true);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
@@ -636,16 +633,35 @@ export default function ReadingPage() {
   const tts = useTTS(preferences.ttsRate);
   const [isAudioPlayerPlaying, setIsAudioPlayerPlaying] = useState(false);
 
-  // Estado manual do Modo Clausura (exclusivo para desktop)
-  const [isClausuraActive, setIsClausuraActive] = useState(false);
+  // Modo Clausura Unificado (Canônico de Bíblia Vive — O Santuário Editorial)
+  const isClausuraActive = preferences.focusMode;
+  const [showClausuraToast, setShowClausuraToast] = useState(false);
 
-  // Reseta o Modo Clausura ao trocar de capítulo
+  const handleToggleClausura = useCallback(() => {
+    const nextState = !preferences.focusMode;
+    updatePreference("focusMode", nextState);
+    if (nextState) {
+      setShowClausuraToast(true);
+    } else {
+      setShowClausuraToast(false);
+    }
+  }, [preferences.focusMode, updatePreference]);
+
+  const handleExitClausura = useCallback(() => {
+    updatePreference("focusMode", false);
+    setShowClausuraToast(false);
+  }, [updatePreference]);
+
   useEffect(() => {
-    setIsClausuraActive(false);
-  }, [chapterNumber, selectedBook?.id]);
+    if (!showClausuraToast) return;
+    const timer = setTimeout(() => {
+      setShowClausuraToast(false);
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [showClausuraToast]);
 
-  // Centraliza o texto bíblico com max-w-2xl mx-auto quando a barra lateral estiver fechada, em modo foco ou em clausura
-  const isCenteredLayout = (!isChapterSidebarOpen || preferences.focusMode || isClausuraActive) && !compareEnabled;
+  // Centraliza o texto bíblico com max-w-2xl mx-auto quando a barra lateral estiver fechada ou em Modo Clausura
+  const isCenteredLayout = (!isChapterSidebarOpen || isClausuraActive) && !compareEnabled;
 
   const setVerseRef = useCallback(
     (key: string) => (element: HTMLDivElement | null) => {
@@ -804,7 +820,7 @@ export default function ReadingPage() {
 
       if (event.key.toLowerCase() === "f" && !typingInField) {
         event.preventDefault();
-        updatePreference("focusMode", !preferences.focusMode);
+        handleToggleClausura();
         return;
       }
 
@@ -815,7 +831,7 @@ export default function ReadingPage() {
         }
 
         if (preferences.focusMode) {
-          updatePreference("focusMode", false);
+          handleExitClausura();
         }
         return;
       }
@@ -839,6 +855,8 @@ export default function ReadingPage() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
     chapterNumber,
+    handleExitClausura,
+    handleToggleClausura,
     isChapterPickerOpen,
     isSettingsOpen,
     isNoteModalOpen,
@@ -848,7 +866,6 @@ export default function ReadingPage() {
     selectedBook,
     selectedVerse,
     selectedVersion,
-    updatePreference,
   ]);
 
   useEffect(() => {
@@ -870,30 +887,11 @@ export default function ReadingPage() {
     if (!preferences.focusMode) return;
 
     window.history.pushState({ focusMode: true }, "", window.location.href);
-    const onPopState = () => updatePreference("focusMode", false);
+    const onPopState = () => handleExitClausura();
     window.addEventListener("popstate", onPopState);
 
     return () => window.removeEventListener("popstate", onPopState);
-  }, [preferences.focusMode, updatePreference]);
-
-  useEffect(() => {
-    let previousY = window.scrollY;
-
-    if (!preferences.focusMode) {
-      setFocusTopVisible(true);
-      return;
-    }
-
-    const onScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > previousY + 8) setFocusTopVisible(false);
-      if (currentY < previousY - 8) setFocusTopVisible(true);
-      previousY = currentY;
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [preferences.focusMode]);
+  }, [preferences.focusMode, handleExitClausura]);
 
   useEffect(() => {
     setSelectedVerse(null);
@@ -1557,7 +1555,7 @@ export default function ReadingPage() {
               <span>
                 {parts.map((part, i) =>
                   i % 2 === 1 ? (
-                    <span className="text-[#c13030] dark:text-[#ff8f8f] transition-colors" key={i}>{part}</span>
+                    <span className="text-words-of-god transition-colors" key={i}>{part}</span>
                   ) : (
                     <span key={i}>{part}</span>
                   )
@@ -1571,12 +1569,12 @@ export default function ReadingPage() {
               return (
                 <span>
                   <span>{colonSplit[0]}:</span>
-                  <span className="text-[#c13030] dark:text-[#ff8f8f] transition-colors">{colonSplit[1]}</span>
+                  <span className="text-words-of-god transition-colors">{colonSplit[1]}</span>
                 </span>
               );
             } else {
               // If no delimiter is found but it is a red letter verse, color it completely.
-              return <span className="text-[#c13030] dark:text-[#ff8f8f] transition-colors">{plainText}</span>;
+              return <span className="text-words-of-god transition-colors">{plainText}</span>;
             }
           }
         }
@@ -1587,14 +1585,7 @@ export default function ReadingPage() {
       <span>
         {tokens.map((tok, ti) => (
           <span key={ti}>{tok.type === "different" ? (
-            <mark
-              style={{
-                background: "hsl(var(--gold) / 0.18)",
-                color: "inherit",
-                borderRadius: "3px",
-                padding: "0 1px",
-              }}
-            >
+            <mark className="rounded-xs bg-gold/20 text-inherit px-0.5">
               {tok.word}
             </mark>
           ) : tok.word}{" "}</span>
@@ -1680,7 +1671,7 @@ export default function ReadingPage() {
       hideFooter={true}
       isClausuraActive={isClausuraActive}
       maxWidthClassName="max-w-[1400px] px-2 sm:px-4 md:px-8"
-      className={isDark ? "bg-[#151311]" : isSepia ? "bg-[#f4ede2]" : "bg-[#ffffff]"}
+      className="bg-app-bg text-app-text"
     >
       <GoldenAmbientMist />
       <div
@@ -1692,19 +1683,7 @@ export default function ReadingPage() {
         ref={toolbarLayerRef}
       >
 
-        {!preferences.focusMode && (
-          <>
-            <section className={cn("mx-auto w-full max-w-[1600px] px-2 sm:px-4 md:px-6 transition-opacity", isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0")}>
-              {chapterData?.fallbackNotice && (
-                <Alert className="mb-4 border-gold/40 bg-gold-bg/20 text-app-text">
-                  <AlertTitle className="font-medium text-gold flex items-center gap-2">
-                    <span>📡 Modo OfflineAtivo</span>
-                  </AlertTitle>
-                  <AlertDescription className="text-xs text-app-text-muted">
-                    {chapterData.fallbackNotice}
-                  </AlertDescription>
-                </Alert>
-              )}
+        <section className={cn("mx-auto w-full max-w-[1600px] px-2 sm:px-4 md:px-6 transition-opacity", isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0")}>
               {churchMode.isActive && (
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gold/30 bg-gold-bg/10 px-4 py-2">
                   <div className="flex items-center gap-2">
@@ -1749,33 +1728,6 @@ export default function ReadingPage() {
                       Enviar capítulo
                     </Button>
                   </div>
-                </div>
-              )}
-
-              {/* Banner do Modo Plano de Leitura */}
-              {isPlanReading && activePlan && (
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e5b869]/40 bg-[#1a1714]/95 px-5 py-3.5 shadow-xl backdrop-blur-md">
-                  <div className="flex items-center gap-3.5">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2a2219] border border-[#e5b869]/50 text-[#e5b869] text-xs font-bold font-mono">
-                      {planDayNumber}
-                    </span>
-                    <div>
-                      <p className="font-serif text-sm font-medium text-[#f4efea] leading-tight">
-                        Plano: {activePlan.name}
-                      </p>
-                      <p className="font-mono text-[0.72rem] text-[#e5b869] leading-tight mt-0.5">
-                        Dia {planDayNumber} • Leitura {currentPlanStep + 1} de {currentPlanRefs.length} ({selectedBook?.name} {chapterNumber})
-                      </p>
-                    </div>
-                  </div>
-
-                  <Link
-                    to={`/planos?id=${activePlan.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#382f23] bg-[#221c17] px-3.5 py-1.5 text-xs font-mono text-[#a89b8c] hover:border-[#e5b869]/50 hover:text-[#e5b869] transition-all"
-                  >
-                    <span>Ver plano</span>
-                    <ChevronRight className="h-3 w-3" />
-                  </Link>
                 </div>
               )}
               <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1825,14 +1777,7 @@ export default function ReadingPage() {
                           </DialogTrigger>
                           <DialogContent
                             aria-label={t("reading.selectChapter")}
-                            className={cn(
-                              "max-w-xl border sm:rounded-2xl transition-colors duration-300",
-                              isDark
-                                ? "border-[#382f23]/80 bg-[#161412] text-[#f5f5f0]"
-                                : isSepia
-                                  ? "border-[#d8c8b0] bg-[#f6f0e4] text-[#2e241d]"
-                                  : "border-neutral-200 bg-white text-neutral-900"
-                            )}
+                            className="max-w-xl border border-border/80 bg-app-surface text-app-text sm:rounded-2xl shadow-xl transition-colors duration-300"
                             role="dialog"
                           >
                             <DialogHeader>
@@ -1850,12 +1795,8 @@ export default function ReadingPage() {
                                     aria-current={active ? "true" : undefined}
                                     className={cn(
                                       active
-                                        ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg"
-                                        : isDark
-                                          ? "border-[#382f23]/50 text-[#ded9ce] hover:bg-[#221e1a]"
-                                          : isSepia
-                                            ? "border-[#d8c8b0] text-[#4a3a2d] hover:bg-[#ede4d4]"
-                                            : "border-neutral-200 text-neutral-800 hover:bg-neutral-100"
+                                        ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg font-semibold"
+                                        : "border-border/60 text-app-text-muted hover:text-app-text hover:bg-accent/40"
                                     )}
                                     data-chapter={item}
                                     key={item}
@@ -1879,142 +1820,160 @@ export default function ReadingPage() {
                   </Breadcrumb>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                  <div className="hidden items-center gap-3 flex-shrink-0 rounded-md h-10 border border-border bg-app-surface px-4 sm:flex">
-                    <Label className="text-xs text-app-text-muted cursor-pointer font-medium" htmlFor="compare-toggle-inline">
-                      {t("reading.compare")}
-                    </Label>
-                    <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
-                    {compareEnabled && (
-                      <>
-                        <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
-                          <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
-                              <SelectItem key={item} value={item}>
-                                {item.toUpperCase()}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
-                          <Label className="text-[0.65rem] text-gold/80 uppercase tracking-wider cursor-pointer" htmlFor="diff-toggle">
-                            Difs
-                          </Label>
-                          <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
-                        </div>
-                      </>
+                <div className="flex flex-wrap items-center justify-end gap-2.5">
+                  {/* Grupo A: Ferramentas de Estudo e Modos Secundários */}
+                  <div className="flex items-center gap-2">
+                    <div className="hidden items-center gap-3 flex-shrink-0 rounded-md h-10 border border-border bg-app-surface px-4 sm:flex">
+                      <Label className="text-xs text-app-text-muted cursor-pointer font-medium" htmlFor="compare-toggle-inline">
+                        {t("reading.compare")}
+                      </Label>
+                      <Switch checked={compareEnabled} id="compare-toggle-inline" onCheckedChange={setCompareEnabled} />
+                      {compareEnabled && (
+                        <>
+                          <Select onValueChange={(value) => setCompareVersion(value as BibleVersion)} value={compareVersion}>
+                            <SelectTrigger className="h-8 w-20 border-border bg-app-raised text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {VERSION_OPTIONS.filter((item) => item !== selectedVersion).map((item) => (
+                                <SelectItem key={item} value={item}>
+                                  {item.toUpperCase()}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-border/50">
+                            <Label className="text-xs text-gold/90 font-mono tracking-wider cursor-pointer" htmlFor="diff-toggle" title="Destacar variações textuais entre as versões">
+                              Variações
+                            </Label>
+                            <Switch checked={showDiff} id="diff-toggle" onCheckedChange={setShowDiff} className="data-[state=checked]:bg-gold/80" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {!compareEnabled && selectedBook && (
+                      <Button
+                        aria-label={isChapterSidebarOpen ? "Recolher painel de capítulos" : "Expandir painel de capítulos"}
+                        title={isChapterSidebarOpen ? "Recolher painel de capítulos" : "Mostrar painel de capítulos"}
+                        className="hidden lg:inline-flex"
+                        onClick={toggleChapterSidebar}
+                        size="icon"
+                        type="button"
+                        variant="outline"
+                      >
+                        {isChapterSidebarOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+                      </Button>
                     )}
+
+                    {notes.length > 0 && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            aria-label="Baixar Notas do Capítulo (PDF)"
+                            size="icon"
+                            type="button"
+                            variant="outline"
+                            title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
+                            className="text-gold border-gold/40 hover:bg-gold/10"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-app-text-muted">
+                              {isPro
+                                ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
+                                : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter className="mt-4">
+                            <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
+                            {isPro ? (
+                              <AlertDialogAction
+                                onClick={() => exportNotesToPDF(notes, true)}
+                                className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                              >
+                                Sim, Baixar PDF
+                              </AlertDialogAction>
+                            ) : (
+                              <AlertDialogAction
+                                onClick={() => navigate("/pro")}
+                                className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
+                              >
+                                Conhecer Premium
+                              </AlertDialogAction>
+                            )}
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+
+                    <Button
+                      aria-label={churchMode.isActive ? "Desativar Modo Igreja" : "Ativar Modo Igreja"}
+                      title={churchMode.isActive ? "Desativar Modo Igreja" : isTemplo ? "Modo Igreja — projeta versículos em outra aba" : "Modo Igreja (Exclusivo Plano Templo)"}
+                      onClick={() => {
+                        if (isTemplo) {
+                          churchMode.toggleChurchMode();
+                        } else {
+                          navigate('/pro');
+                        }
+                      }}
+                      size="icon"
+                      type="button"
+                      variant="outline"
+                      className={churchMode.isActive ? "border-gold/50 text-gold bg-gold-bg/20 shadow-gold-glow" : !isTemplo ? "opacity-60" : ""}
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </Button>
                   </div>
 
-                  <AudioPlayer
-                    bookId={selectedBook?.id}
-                    chapter={chapterNumber}
-                    version={selectedVersion}
-                    onPlayStateChange={setIsAudioPlayerPlaying}
-                  />
+                  {/* Separador Sóbrio */}
+                  <div className="hidden sm:block h-5 w-px bg-border/80 self-center" aria-hidden="true" />
 
-                  <Button
-                    aria-label={t("reading.toggleFocusMode")}
-                    onClick={() => updatePreference("focusMode", !preferences.focusMode)}
-                    size="icon"
-                    type="button"
-                    variant="outline"
-                  >
-                    {preferences.focusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  </Button>
+                  {/* Grupo B: Leitura Devocional e Imersão Sagrada */}
+                  <div className="flex items-center gap-2">
+                    <AudioPlayer
+                      bookId={selectedBook?.id}
+                      chapter={chapterNumber}
+                      version={selectedVersion}
+                      onPlayStateChange={setIsAudioPlayerPlaying}
+                    />
 
-                  {!compareEnabled && selectedBook && (
                     <Button
-                      aria-label={isChapterSidebarOpen ? "Recolher painel de capítulos" : "Expandir painel de capítulos"}
-                      title={isChapterSidebarOpen ? "Recolher painel de capítulos" : "Mostrar painel de capítulos"}
-                      className="hidden lg:inline-flex"
-                      onClick={toggleChapterSidebar}
+                      aria-label={isClausuraActive ? t("reading.exitFocus") : t("reading.toggleFocusMode")}
+                      title={isClausuraActive ? "Sair do Modo Clausura (Esc)" : "Modo Clausura (Atalho: F) — Leitura contemplativa sem distrações"}
+                      onClick={handleToggleClausura}
+                      type="button"
+                      variant={isClausuraActive ? "default" : "outline"}
+                      className={cn(
+                        "transition-all duration-200 gap-1.5 h-9",
+                        isClausuraActive
+                          ? "bg-gold text-black border-gold shadow-gold-glow hover:bg-gold/90 px-3"
+                          : "hover:border-gold/40 hover:text-gold px-2.5 sm:px-3"
+                      )}
+                    >
+                      {isClausuraActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      <span className="hidden sm:inline font-mono text-xs">
+                        {isClausuraActive ? "Sair da Clausura" : "Clausura (F)"}
+                      </span>
+                    </Button>
+
+                    <Button
+                      aria-label={t("reading.openSettings")}
+                      className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
+                      onClick={() => setIsSettingsOpen(true)}
                       size="icon"
                       type="button"
                       variant="outline"
                     >
-                      {isChapterSidebarOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+                      <Settings className="h-4 w-4" />
                     </Button>
-                  )}
-
-                  {notes.length > 0 && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          aria-label="Baixar Notas do Capítulo (PDF)"
-                          size="icon"
-                          type="button"
-                          variant="outline"
-                          title={`Baixar Anotações de ${selectedBook?.name} ${chapterNumber} (PDF)`}
-                          className="text-gold border-gold/40 hover:bg-gold/10"
-                        >
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-app-bg border-border text-app-text sm:max-w-md w-[95vw] rounded-2xl">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            {isPro ? "Gerar PDF de Anotações?" : "Recurso Premium"}
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-app-text-muted">
-                            {isPro
-                              ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
-                              : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="mt-4">
-                          <AlertDialogCancel className="border-border text-app-text hover:bg-app-surface rounded-lg">Cancelar</AlertDialogCancel>
-                          {isPro ? (
-                            <AlertDialogAction
-                              onClick={() => exportNotesToPDF(notes, true)}
-                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                            >
-                              Sim, Baixar PDF
-                            </AlertDialogAction>
-                          ) : (
-                            <AlertDialogAction
-                              onClick={() => navigate("/pro")}
-                              className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
-                            >
-                              Conhecer Premium
-                            </AlertDialogAction>
-                          )}
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-
-                  <Button
-                    aria-label={churchMode.isActive ? "Desativar Modo Igreja" : "Ativar Modo Igreja"}
-                    title={churchMode.isActive ? "Desativar Modo Igreja" : isTemplo ? "Modo Igreja — projeta versículos em outra aba" : "Modo Igreja (Exclusivo Plano Templo)"}
-                    onClick={() => {
-                      if (isTemplo) {
-                        churchMode.toggleChurchMode();
-                      } else {
-                        navigate('/pro');
-                      }
-                    }}
-                    size="icon"
-                    type="button"
-                    variant="outline"
-                    className={churchMode.isActive ? "border-gold/50 text-gold bg-gold-bg/20 shadow-gold-glow" : !isTemplo ? "opacity-60" : ""}
-                  >
-                    <Monitor className="h-4 w-4" />
-                  </Button>
-
-                  <Button
-                    aria-label={t("reading.openSettings")}
-                    className={isSettingsOpen ? "text-gold transition-transform duration-200 rotate-12" : ""}
-                    onClick={() => setIsSettingsOpen(true)}
-                    size="icon"
-                    type="button"
-                    variant="outline"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -2030,8 +1989,6 @@ export default function ReadingPage() {
               preferences={preferences}
               updatePreference={updatePreference}
             />
-          </>
-        )}
 
         {error ? (
           <div className="mx-auto flex min-h-[360px] w-full max-w-[680px] flex-col items-center justify-center px-4 text-center md:px-6">
@@ -2066,74 +2023,54 @@ export default function ReadingPage() {
                   : (COLUMN_WIDTH_MAP[preferences.columnWidth] || "var(--column-width, 860px)"),
               }}
             >
-              {/* Fio da Escritura (TypeSafe AI / JEV) — Posicionado acima do título do capítulo */}
-              <ScriptureThreadBanner
-                result={scriptureThreadResult}
-                candidateNote={scriptureThreadCandidate}
-                chapterRef={selectedBook ? `${selectedBook.name} ${chapterNumber}` : undefined}
-                onOpenModal={() => setIsScriptureThreadModalOpen(true)}
-              />
-
               <div className={cn(
                 "transition-all duration-300",
                 isClausuraActive
-                  ? cn(
-                      "sticky top-0 z-40 py-3.5 mb-6 backdrop-blur-md border-b shadow-xs",
-                      isDark
-                        ? "bg-[#151311]/90 border-[#382f23]/60"
-                        : isSepia
-                          ? "bg-[#f4ede2]/90 border-[#d8c8b0]"
-                          : "bg-white/90 border-neutral-200"
-                    )
+                  ? "sticky top-0 z-40 py-3.5 mb-6 backdrop-blur-md border-b border-border/80 bg-app-surface/90 shadow-xs"
                   : "mb-6"
               )}>
                 <h1 className={cn(
-                  "font-serif font-semibold tracking-tight transition-all duration-300",
-                  isClausuraActive ? "text-xl sm:text-2xl text-center md:text-left" : "text-3xl sm:text-4xl",
-                  isDark ? "text-[#f5f5f0]" : isSepia ? "text-[#2e241d]" : "text-neutral-900"
+                  "font-serif font-semibold tracking-tight transition-all duration-300 text-app-text",
+                  isClausuraActive ? "text-xl sm:text-2xl text-center md:text-left" : "text-3xl sm:text-4xl"
                 )}>
                   {selectedBook?.name} — {t("home.chapter")} {chapterNumber}
                 </h1>
                 {!isClausuraActive && user && previousViewedAt && (
-                  <p className={cn(
-                    "mt-2 font-sans text-xs transition-colors duration-300",
-                    isDark ? "text-[#a89f91]" : isSepia ? "text-[#7d6c5d]" : "text-neutral-500"
-                  )}>
+                  <p className="mt-2 font-sans text-xs text-app-text-muted transition-colors duration-300">
                     Última visualização: {formatViewedAt(previousViewedAt)}
                   </p>
                 )}
                 {!isClausuraActive && (
-                  <div className={cn(
-                    "w-full h-px mt-5 mb-6 transition-colors duration-300",
-                    isDark ? "bg-[#382f23]/60" : isSepia ? "bg-[#d8c8b0]" : "bg-neutral-200"
-                  )} />
+                  <div className="w-full h-px mt-5 mb-6 bg-border/80 transition-colors duration-300" />
                 )}
               </div>
-              {chapterData?.fallbackNotice && (
-                <Alert className="mb-4 border-gold/40 bg-gold/10 text-gold-dark dark:text-gold-light">
-                  <AlertTitle className="flex items-center gap-2 font-semibold text-sm">
-                    ⚡ Modo Offline — Bíblia em Cache
-                  </AlertTitle>
-                  <AlertDescription className="text-xs opacity-90">
-                    {chapterData.fallbackNotice}
-                  </AlertDescription>
-                </Alert>
-              )}
-              <WorshipCard bookId={selectedBook?.id} chapter={chapterNumber} />
 
-              {/* Eco do Memorial — banner sóbrio mostrado quando o leitor já possui uma memória neste capítulo */}
-              {!loading && !error && echoEntry && (
-                <EchoBanner
-                  entry={echoEntry}
-                  echoContext={echoContext}
-                  onOpenModal={() => setIsEchoModalOpen(true)}
-                />
-              )}
+              {/* Orquestrador Contextual Sóbrio (Regra Estrita de Precedência: Máximo 1 aviso visível por vez) */}
+              <ReadingAmbientOrchestrator
+                fallbackNotice={chapterData?.fallbackNotice}
+                isPlanReading={isPlanReading}
+                activePlan={activePlan}
+                planDayNumber={planDayNumber}
+                currentPlanStep={currentPlanStep}
+                totalPlanSteps={currentPlanRefs?.length ?? 1}
+                bookName={selectedBook?.name}
+                chapterNumber={chapterNumber}
+                echoEntry={!loading && !error ? echoEntry : null}
+                echoContext={echoContext}
+                onOpenEchoModal={() => setIsEchoModalOpen(true)}
+                scriptureThreadResult={scriptureThreadResult}
+                scriptureThreadCandidate={scriptureThreadCandidate}
+                chapterRef={selectedBook ? `${selectedBook.name} ${chapterNumber}` : undefined}
+                onOpenScriptureThreadModal={() => setIsScriptureThreadModalOpen(true)}
+                bookId={selectedBook?.id}
+                isPsalm={selectedBook?.id === "ps"}
+                className={isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-200"}
+              />
 
               <div className={compareEnabled ? "grid gap-6 lg:grid-cols-2" : "block"}>
                 <section>
                   {!preferences.focusMode && (
-                    <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.08em] text-app-text-muted">{selectedVersion.toUpperCase()}</p>
+                    <p className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-app-text-muted">{selectedVersion.toUpperCase()}</p>
                   )}
                   {loading ? (
                     <div aria-label={t("reading.loadingChapter")}>
@@ -2208,7 +2145,7 @@ export default function ReadingPage() {
                             onBlur={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
                             ref={setVerseRef(anchorKey)}
                             role="listitem"
-                            tabIndex={0}
+                            tabIndex={selectedVerse ? (isSelected ? 0 : -1) : (index === 0 ? 0 : -1)}
                             style={{ marginBottom: "var(--verse-spacing)" }}
                           >
                             <div className="flex items-start gap-3 sm:gap-4">
@@ -2230,6 +2167,7 @@ export default function ReadingPage() {
                               <span
                                 className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none transition-opacity duration-100"
                                 style={{ opacity: isHovered ? 1 : 0.75 }}
+                                aria-label={`Versículo ${verseNumber}`}
                               >
                                 {verseNumber}
                                 {hasCacheForVerse(verse.number) && (
@@ -2261,14 +2199,12 @@ export default function ReadingPage() {
                         const verseWithHeadings = (
                           <>
                             {mainSectionHeadings.map((heading) => (
-                              <p
+                              <h2
                                 key={`heading-main-${verse.number}-${heading.before_verse}-${heading.text}`}
-                                aria-hidden="true"
-                                className="mt-6 mb-1 select-none uppercase tracking-widest text-app-text-muted font-serif"
-                                style={{ fontSize: "calc(var(--font-size-reading, 1rem) * 1.05)" }}
+                                className="mt-7 mb-2 text-app-text font-serif font-semibold tracking-normal text-base sm:text-lg"
                               >
                                 {heading.text}
-                              </p>
+                              </h2>
                             ))}
                             {verseNote ? (
                               <NotePopover
@@ -2299,7 +2235,7 @@ export default function ReadingPage() {
 
                 {compareEnabled && (
                   <section className="border-t border-border pt-6 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-                    <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.08em] text-app-text-muted">{compareVersion.toUpperCase()}</p>
+                    <p className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-app-text-muted">{compareVersion.toUpperCase()}</p>
                     {compareError && (
                       <Alert className="mb-4 border-border bg-app-surface">
                         <AlertTitle>{t("reading.compareUnavailable")}</AlertTitle>
@@ -2331,14 +2267,12 @@ export default function ReadingPage() {
                           return (
                             <React.Fragment key={verse.id}>
                               {compareSectionHeadings.map((heading) => (
-                                <p
+                                <h2
                                   key={`heading-compare-${verse.number}-${heading.before_verse}-${heading.text}`}
-                                  aria-hidden="true"
-                                  className="mt-6 mb-1 select-none uppercase tracking-widest text-app-text-muted font-serif"
-                                  style={{ fontSize: "calc(var(--font-size-reading, 1rem) * 1.05)" }}
+                                  className="mt-7 mb-2 text-app-text font-serif font-semibold tracking-normal text-base sm:text-lg"
                                 >
                                   {heading.text}
-                                </p>
+                                </h2>
                               ))}
                               <div
                                 aria-selected={isSelected}
@@ -2360,11 +2294,11 @@ export default function ReadingPage() {
                                 onBlur={() => setHoveredVerseNumber((current) => (current === verseNumber ? null : current))}
                                 ref={setVerseRef(anchorKey)}
                                 role="listitem"
-                                tabIndex={0}
+                                tabIndex={index === 0 ? 0 : -1}
                                 style={{ marginBottom: "var(--verse-spacing)" }}
                               >
                                 <div className="flex items-start gap-3 sm:gap-4">
-                                  <span className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none opacity-80">
+                                  <span className="shrink-0 w-7 sm:w-8 text-right font-mono text-xs sm:text-sm font-semibold text-gold pt-0.5 select-none opacity-80" aria-label={`Versículo ${verseNumber}`}>
                                     {verseNumber}
                                   </span>
                                   <p
@@ -2389,8 +2323,11 @@ export default function ReadingPage() {
                 )}
               </div>
 
-              {/* Barra inferior de navegação */}
-              {!preferences.focusMode && (
+              {/* Seção pós-leitura (Navegação, badges de plano e memórias) — Esmaece suavemente na Clausura */}
+              <div className={cn(
+                "transition-opacity",
+                isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-200"
+              )}>
                 <ReadingBottomNav
                   currentVersion={selectedVersion}
                   onVersionChange={handleVersionChange}
@@ -2404,36 +2341,36 @@ export default function ReadingPage() {
                   onFinish={() => navigate("/")}
                   planNavInfo={planNavInfo}
                 />
-              )}
 
-              {!loading && !error && isPlanReading && activePlan && (
-                <DailyReadingBadge
-                  planName={activePlan.name}
-                  planId={activePlan.id}
-                  todayDayIndex={planDayNumber}
-                  isTodayCompleted={isTodayCompleted}
-                  isRefCompleted={todayReadRefs?.includes(currentRef) ?? false}
-                  totalRefs={currentPlanRefs?.length ?? 0}
-                  completedRefs={todayReadRefs?.length ?? 0}
-                  onMarkComplete={() => markRefRead(currentRef)}
-                  nextChapterName={nextPlanChapterInfo ? `${nextPlanChapterInfo.bookName} ${nextPlanChapterInfo.chapter}` : undefined}
-                  onAdvanceNextReading={hasNextPlanRef ? handleAdvanceToNextPlanReading : undefined}
-                  onCompleteDay={isLastPlanRef ? handleCompletePlanDay : undefined}
-                />
-              )}
+                {!loading && !error && isPlanReading && activePlan && (
+                  <DailyReadingBadge
+                    planName={activePlan.name}
+                    planId={activePlan.id}
+                    todayDayIndex={planDayNumber}
+                    isTodayCompleted={isTodayCompleted}
+                    isRefCompleted={todayReadRefs?.includes(currentRef) ?? false}
+                    totalRefs={currentPlanRefs?.length ?? 0}
+                    completedRefs={todayReadRefs?.length ?? 0}
+                    onMarkComplete={() => markRefRead(currentRef)}
+                    nextChapterName={nextPlanChapterInfo ? `${nextPlanChapterInfo.bookName} ${nextPlanChapterInfo.chapter}` : undefined}
+                    onAdvanceNextReading={hasNextPlanRef ? handleAdvanceToNextPlanReading : undefined}
+                    onCompleteDay={isLastPlanRef ? handleCompletePlanDay : undefined}
+                  />
+                )}
 
-              {/* Bloco "O que nasceu desta leitura" */}
-              {selectedBook && (
-                <ChapterMemorialBlock
-                  bookId={selectedBook.id}
-                  chapter={Number(chapterNumber)}
-                  userId={user?.id ?? null}
-                />
-              )}
+                {/* Bloco "O que nasceu desta leitura" */}
+                {selectedBook && (
+                  <ChapterMemorialBlock
+                    bookId={selectedBook.id}
+                    chapter={Number(chapterNumber)}
+                    userId={user?.id ?? null}
+                  />
+                )}
+              </div>
             </article>
 
             {/* Column 2: Sticky Chapter Grid Card on Desktop */}
-            {!compareEnabled && selectedBook && isChapterSidebarOpen && !preferences.focusMode && !isClausuraActive && (
+            {!compareEnabled && selectedBook && isChapterSidebarOpen && !isClausuraActive && (
               <aside className="hidden lg:flex flex-col gap-5 shrink-0 sticky top-24 w-[250px] xl:w-[270px] max-h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar pr-1 transition-all duration-300">
                 <ReadingChapterGridCard
                   totalChapters={selectedBook.chapters}
@@ -2453,14 +2390,7 @@ export default function ReadingPage() {
                 />
 
                 {/* Chapter Commentary Button in Sidebar */}
-                <div className={cn(
-                  "w-full rounded-2xl border backdrop-blur-md p-4 flex flex-col items-center justify-center transition-colors duration-300",
-                  isDark
-                    ? "border-[#382f23]/80 bg-[#161412]/90 shadow-2xl"
-                    : isSepia
-                      ? "border-[#d8c8b0] bg-[#ede4d4]/90 shadow-xl"
-                      : "border-neutral-200 bg-white/95 shadow-xl"
-                )}>
+                <div className="w-full rounded-2xl border border-border/80 bg-app-surface/95 backdrop-blur-md p-4 flex flex-col items-center justify-center shadow-xs transition-colors duration-300">
                   {!isPro && freeChapterCommentaryCount === 0 && !cachedChapterCommentary ? (
                     <div className="w-full rounded-xl border border-gold/20 bg-gold-bg/10 p-4 text-center space-y-2.5 animate-in fade-in">
                       <div className="mx-auto w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center">
@@ -2468,7 +2398,7 @@ export default function ReadingPage() {
                       </div>
                       <div className="space-y-1">
                         <h3 className="text-xs font-semibold text-app-text">Recurso Exclusivo PRO</h3>
-                        <p className="text-[0.7rem] text-app-text-muted leading-relaxed">
+                        <p className="text-xs text-app-text-muted leading-relaxed">
                           Você já utilizou seus 3 comentários gratuitos de capítulos. Assine para ter acesso ilimitado a comentários.
                         </p>
                       </div>
@@ -2496,14 +2426,14 @@ export default function ReadingPage() {
                           <Loader2 className="h-4 w-4 animate-spin text-app-text-muted mr-2 inline-block" />
                         )}
                         <span className={cn(
-                          "text-[0.72rem] font-medium tracking-wide leading-tight",
+                          "text-xs font-medium tracking-wide leading-tight",
                           isChapterCommentaryLoading && "opacity-70 text-app-text-muted"
                         )}>
                           {isChapterCommentaryLoading ? "Analisando..." : cachedChapterCommentary ? "Ver Comentários" : "Comentários do Capítulo"}
                         </span>
                       </Button>
                       {!isPro && !cachedChapterCommentary && (
-                        <p className="text-[0.68rem] text-app-text-muted mt-2 text-center">
+                        <p className="text-xs text-app-text-muted mt-2 text-center">
                           Você tem <strong className="text-gold">{freeChapterCommentaryCount}</strong> {freeChapterCommentaryCount === 1 ? 'comentário gratuito de capítulo disponível' : 'comentários gratuitos de capítulos disponíveis'}.
                         </p>
                       )}
@@ -2517,8 +2447,8 @@ export default function ReadingPage() {
                           <FileText className="h-4 w-4" />
                         </div>
                         <div>
-                          <h3 className="font-serif text-[1rem] font-bold text-app-text leading-tight mt-1">Acervo Teológico</h3>
-                          <p className="text-[0.65rem] text-app-text-muted uppercase tracking-widest font-mono mt-0.5">
+                          <h3 className="font-serif text-base font-bold text-app-text leading-tight mt-1">Acervo Teológico</h3>
+                          <p className="text-xs text-app-text-muted uppercase tracking-widest font-mono mt-0.5">
                             {selectedBook?.name} {chapterNumber}
                           </p>
                         </div>
@@ -2544,7 +2474,7 @@ export default function ReadingPage() {
 
 
             {/* Botão flutuante para reabrir painel lateral de capítulos quando colapsado */}
-            {!compareEnabled && selectedBook && !isChapterSidebarOpen && !preferences.focusMode && (
+            {!compareEnabled && selectedBook && !isChapterSidebarOpen && !isClausuraActive && (
               <div
                 className={cn(
                   "hidden lg:block fixed right-4 top-28 z-30 transition-opacity",
@@ -2560,7 +2490,7 @@ export default function ReadingPage() {
                   title="Mostrar painel de capítulos"
                 >
                   <PanelRightOpen className="h-3.5 w-3.5 text-gold" />
-                  <span className="font-mono text-[0.7rem] uppercase tracking-wider">Capítulos</span>
+                  <span className="font-mono text-xs uppercase tracking-wider">Capítulos</span>
                 </Button>
               </div>
             )}
@@ -2655,38 +2585,6 @@ export default function ReadingPage() {
           onClose={() => setIsAuthModalOpen(false)}
         />
 
-        {selectedBook && preferences.focusMode && (
-          <div
-            className={cn(
-              "fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-4 right-4 z-50 flex items-center gap-2 transition-opacity",
-              isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
-            )}
-          >
-            <Button className="min-h-[44px] h-11 sm:h-8 sm:min-h-0 px-3 text-xs bg-app-surface border-border hover:bg-app-raised" onClick={() => updatePreference("focusMode", false)} type="button" variant="outline">
-              {t("reading.exitFocus")}
-            </Button>
-            <Button
-              className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0 p-0 text-xs bg-app-surface border-border hover:bg-app-raised flex items-center justify-center"
-              disabled={!prevChapterInfo}
-              onClick={() => prevChapterInfo && goToChapter(prevChapterInfo.chapter, prevChapterInfo.book.slug)}
-              type="button"
-              variant="outline"
-              aria-label="Capítulo anterior"
-            >
-              ←
-            </Button>
-            <Button
-              className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0 p-0 text-xs bg-app-surface border-border hover:bg-app-raised flex items-center justify-center"
-              disabled={!nextChapterInfo}
-              onClick={() => nextChapterInfo && goToChapter(nextChapterInfo.chapter, nextChapterInfo.book.slug)}
-              type="button"
-              variant="outline"
-              aria-label="Próximo capítulo"
-            >
-              →
-            </Button>
-          </div>
-        )}
         {cardModalData && (
           <VerseCardModal
             isOpen={isCardModalOpen}
@@ -2765,12 +2663,27 @@ export default function ReadingPage() {
           onSelectVersion={handleVersionChange}
         />
 
-        {/* Botão Flutuante Persistente do Modo Clausura (Exclusivo Desktop) */}
+        {/* Botão Flutuante Persistente do Modo Clausura (Desktop e Mobile) */}
         <ClausuraFloatingButton
           isActive={isClausuraActive}
-          onToggle={() => setIsClausuraActive((prev) => !prev)}
-          isFocusMode={preferences.focusMode}
+          onToggle={handleToggleClausura}
         />
+
+        {/* Notificação Sutil de Boas-Vindas ao Modo Clausura */}
+        {showClausuraToast && isClausuraActive && (
+          <aside
+            role="status"
+            aria-live="polite"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2.5 rounded-full border border-gold/40 bg-app-surface/95 px-5 py-2.5 text-xs font-medium text-app-text shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-none"
+          >
+            <span className="flex h-2 w-2 rounded-full bg-gold animate-pulse" />
+            <span className="font-serif text-gold font-semibold">Modo Clausura</span>
+            <span className="text-app-text-muted">&bull;</span>
+            <span className="text-app-text">
+              Leitura sem distrações. Pressione <kbd className="font-mono text-xs bg-app-bg px-1.5 py-0.5 rounded border border-border text-gold">Esc</kbd> ou <kbd className="font-mono text-xs bg-app-bg px-1.5 py-0.5 rounded border border-border text-gold">F</kbd> para sair
+            </span>
+          </aside>
+        )}
 
         {/* O caderno e o botão flutuante são renderizados globalmente em GlobalNotebookContainer */}
       </div>

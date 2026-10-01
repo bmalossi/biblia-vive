@@ -1090,7 +1090,7 @@ export default function SermonStudioPage() {
       <aside className="hidden lg:flex flex-col w-56 xl:w-64 shrink-0 border-r border-border/80 dark:border-[#221c15] bg-app-bg dark:bg-[#0c0a08] h-screen sticky top-0 z-30 p-4 2xl:p-5 overflow-y-auto space-y-6 select-none">
         <div className="space-y-6">
           {/* Logo Oficial Bíblia Vive */}
-          <Link to="/" className="flex items-center group py-0.5" title="Ir para o início">
+          <Link to="/" className="flex items-center group py-0.5" title="Ir para o início" aria-label="Bíblia Vive - Início">
             <img
               src="/logo-transparente-lateral.webp"
               alt="Logo Bíblia Vive"
@@ -1270,6 +1270,7 @@ export default function SermonStudioPage() {
               to="/estudio"
               className="mt-0.5 sm:mt-0 w-9 h-9 rounded-full bg-app-surface dark:bg-[#16120d] border border-border/80 dark:border-[#2a2217] hover:border-gold/50 flex items-center justify-center text-app-text-muted hover:text-gold transition-all shrink-0 cursor-pointer shadow-xs"
               title="Voltar ao Estúdio"
+              aria-label="Voltar ao Estúdio"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
@@ -1330,6 +1331,7 @@ export default function SermonStudioPage() {
                       onClick={handleSaveTitle}
                       className="p-1.5 rounded-xl bg-gold text-[#1a1208] hover:bg-gold/90 cursor-pointer shadow-xs"
                       title="Salvar Título"
+                      aria-label="Salvar título do sermão"
                     >
                       <Check className="w-4 h-4" />
                     </button>
@@ -1407,6 +1409,7 @@ export default function SermonStudioPage() {
                       onClick={handleSavePassage}
                       className="p-1 rounded bg-gold text-[#1a1208] hover:bg-gold/90 cursor-pointer"
                       title="Salvar Passagem"
+                      aria-label="Salvar passagem bíblica"
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
@@ -3055,6 +3058,7 @@ export default function SermonStudioPage() {
                   data-testid="copy-canonical-chapter-btn"
                   onClick={handleCopyCanonicalChapter}
                   title="Copiar texto de todo o capítulo"
+                  aria-label="Copiar texto de todo o capítulo bíblico"
                   className="w-7 h-7 rounded-md border border-border/80 dark:border-[#2c2317] text-app-text-muted hover:text-gold hover:border-gold/40 flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <Copy className="w-3.5 h-3.5" />

@@ -481,26 +481,57 @@ export default function AdminArtigosPage() {
                                             <p className="text-xs text-app-text-muted">/{article.slug}</p>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => toggleFeatured(article)} className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold" title={article.featured ? "Remover destaque" : "Destacar"}>
+                                            <button
+                                                onClick={() => toggleFeatured(article)}
+                                                className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold"
+                                                title={article.featured ? "Remover destaque" : "Destacar"}
+                                                aria-label={article.featured ? `Remover destaque do artigo "${article.title}"` : `Destacar artigo "${article.title}"`}
+                                            >
                                                 {article.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
                                             </button>
-                                            <Link to={`/artigos/${article.slug}`} target="_blank" className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold" title="Visualizar">
+                                            <Link
+                                                to={`/artigos/${article.slug}`}
+                                                target="_blank"
+                                                className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold"
+                                                title="Visualizar"
+                                                aria-label={`Visualizar artigo "${article.title}"`}
+                                            >
                                                 <Eye className="h-4 w-4" />
                                             </Link>
-                                            <button onClick={() => startEdit(article)} className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold" title="Editar">
+                                            <button
+                                                onClick={() => startEdit(article)}
+                                                className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg hover:text-gold"
+                                                title="Editar"
+                                                aria-label={`Editar artigo "${article.title}"`}
+                                            >
                                                 <Edit className="h-4 w-4" />
                                             </button>
                                             {deleteConfirm === article.id ? (
                                                 <div className="flex items-center gap-1">
-                                                    <button onClick={() => handleDelete(article.id)} className="rounded-lg p-2 text-red-400 hover:bg-red-500/10" title="Confirmar exclusão">
+                                                    <button
+                                                        onClick={() => handleDelete(article.id)}
+                                                        className="rounded-lg p-2 text-red-400 hover:bg-red-500/10"
+                                                        title="Confirmar exclusão"
+                                                        aria-label={`Confirmar exclusão do artigo "${article.title}"`}
+                                                    >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
-                                                    <button onClick={() => setDeleteConfirm(null)} className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg" title="Cancelar">
+                                                    <button
+                                                        onClick={() => setDeleteConfirm(null)}
+                                                        className="rounded-lg p-2 text-app-text-muted hover:bg-app-bg"
+                                                        title="Cancelar"
+                                                        aria-label="Cancelar exclusão"
+                                                    >
                                                         <XCircle className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <button onClick={() => setDeleteConfirm(article.id)} className="rounded-lg p-2 text-app-text-muted hover:bg-red-500/10 hover:text-red-400" title="Excluir">
+                                                <button
+                                                    onClick={() => setDeleteConfirm(article.id)}
+                                                    className="rounded-lg p-2 text-app-text-muted hover:bg-red-500/10 hover:text-red-400"
+                                                    title="Excluir"
+                                                    aria-label={`Excluir artigo "${article.title}"`}
+                                                >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                             )}

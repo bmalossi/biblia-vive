@@ -129,8 +129,7 @@ describe("ReadingPage — Subtítulos de Seção Bíblica", () => {
     });
 
     const headingEl = screen.getByText("O Princípio");
-    expect(headingEl.tagName).toBe("P");
-    expect(headingEl.className).toContain("uppercase");
+    expect(headingEl.tagName).toBe("H2");
     expect(headingEl.className).toContain("font-serif");
   });
 

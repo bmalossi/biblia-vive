@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Clipboard, Highlighter, PencilLine, Share2, BookOpen, Sparkles, X } from "lucide-react";
+import { Clipboard, Highlighter, PencilLine, Share2, BookOpen, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/i18n";
 import HighlightPicker, { HIGHLIGHT_CLASSES } from "@/components/HighlightPicker";
@@ -71,9 +71,9 @@ export default function VerseToolbar({
   const hlBadge = activeHighlight ? HIGHLIGHT_CLASSES[activeHighlight] : undefined;
 
   const buttonClassName = cn(
-    "font-medium transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold shrink-0",
+    "font-medium transition-colors hover:bg-gold hover:text-primary-foreground hover:border-gold shrink-0 touch-manipulation",
     isMobile
-      ? "h-7 text-[0.7rem] px-2.5 gap-1 [&_svg]:size-3"
+      ? "min-h-[38px] text-xs px-3 py-2 gap-1.5 [&_svg]:size-3.5 relative before:absolute before:-inset-1 before:content-['']"
       : "h-8 text-xs px-3.5 gap-1.5 [&_svg]:size-3.5",
   );
 
@@ -90,15 +90,15 @@ export default function VerseToolbar({
       role="toolbar"
       style={floatingStyle}
     >
-      {/* Close Button - positioned offboard at the top right */}
+      {/* Close Button - positioned offboard at the top right with 44px touch hitbox */}
       <button
         aria-label={t("settings.close")}
-        className="absolute z-50 h-5 w-5 rounded-full bg-app-surface border border-border text-app-text-muted hover:text-app-text hover:bg-app-raised flex items-center justify-center shadow-md transition-colors shrink-0"
+        className="absolute z-50 h-6 w-6 sm:h-5 sm:w-5 rounded-full bg-app-surface border border-border text-app-text-muted hover:text-app-text hover:bg-app-raised flex items-center justify-center shadow-md transition-colors shrink-0 touch-manipulation before:absolute before:-inset-2.5 before:content-['']"
         onClick={onClose}
-        style={{ top: "-6px", right: "-6px" }}
+        style={{ top: "-8px", right: "-8px" }}
         type="button"
       >
-        <X className="h-3 w-3" />
+        <X className="h-3.5 w-3.5 sm:h-3 sm:w-3" />
       </button>
 
       <div className={cn("flex items-center flex-wrap", isMobile ? "gap-1" : "gap-1.5")}>
@@ -116,7 +116,7 @@ export default function VerseToolbar({
             type="button"
             variant="outline"
           >
-            <Sparkles className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
+            <BookOpen className={isMobile ? "h-3 w-3" : "h-3.5 w-3.5"} />
             {t("toolbar.viewComments")}
           </Button>
         ) : (

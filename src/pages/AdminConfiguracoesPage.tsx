@@ -292,6 +292,7 @@ export default function AdminConfiguracoesPage() {
                                 id="fallback-toggle"
                                 type="button"
                                 role="switch"
+                                aria-label="Ativar fallback para Web Speech"
                                 aria-checked={isFallbackEnabled}
                                 onClick={handleToggleFallback}
                                 className={`relative inline-flex h-7 w-13 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
@@ -364,6 +365,7 @@ export default function AdminConfiguracoesPage() {
                                         id="thread-toggle"
                                         type="button"
                                         role="switch"
+                                        aria-label="Ativação global do Fio da Escritura"
                                         aria-checked={threadConfig.enabled}
                                         onClick={handleToggleThreadEnabled}
                                         disabled={savingThreadKey === "enabled"}
@@ -473,6 +475,7 @@ export default function AdminConfiguracoesPage() {
                                         id="thread-pro-toggle"
                                         type="button"
                                         role="switch"
+                                        aria-label="Ativação do Fio da Escritura exclusivo para PRO"
                                         aria-checked={threadConfig.requirePro}
                                         onClick={handleToggleRequirePro}
                                         disabled={savingThreadKey === "requirePro"}

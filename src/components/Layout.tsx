@@ -37,6 +37,13 @@ export default function Layout({
 
   return (
     <div className={cn("min-h-screen bg-app-bg text-app-text", className)}>
+      {/* Atalho de acessibilidade para saltar navegação (WCAG 2.1 - 2.4.1 Bypass Blocks) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-gold focus:text-black focus:font-medium focus:text-sm focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-black"
+      >
+        Pular para o conteúdo principal
+      </a>
       <div
         className={cn(
           "transition-opacity",
@@ -121,7 +128,7 @@ export default function Layout({
                   to={target}
                 >
                   <Icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.5} />
-                  <span className="text-[0.62rem] font-sans font-medium uppercase tracking-[0.05em]">{item.label}</span>
+                  <span className="text-micro font-sans font-medium uppercase tracking-[0.05em]">{item.label}</span>
                 </Link>
               </li>
             );
