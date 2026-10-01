@@ -68,7 +68,7 @@ export default function HarpaPlayerBar() {
         <div
             className={cn(
                 "fixed inset-x-0 z-[45] transition-all duration-300",
-                "bottom-[53px] md:bottom-0",
+                "bottom-[calc(53px+env(safe-area-inset-bottom,0px))] md:bottom-0",
                 "border-t border-gold/20 bg-app-surface/95 backdrop-blur-md shadow-lg",
                 "animate-in slide-in-from-bottom-2 duration-300"
             )}

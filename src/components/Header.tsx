@@ -579,10 +579,10 @@ export default function Header() {
                 <ChevronDown className="h-3 w-3 text-app-text-muted" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[200px]">
+            <DropdownMenuContent align="end" className="w-64 bg-app-surface border-border p-2">
               {user ? (
                 <>
-                  <DropdownMenuLabel className="font-normal">
+                  <DropdownMenuLabel className="font-normal px-2 py-1.5">
                     <p className="text-xs font-semibold text-app-text truncate">{displayName}</p>
                     <p className="text-xs text-app-text-muted truncate">{user.email}</p>
                   </DropdownMenuLabel>
@@ -596,10 +596,12 @@ export default function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {/* Selectors inside dropdown */}
-                  <div className="px-2 py-1 flex items-center gap-2">
-                    <LanguageSelector />
-                    <VersionSelector />
-                    <ThemeToggle />
+                  <div className="space-y-2 p-1">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <VersionSelector className="w-full text-center" />
+                      <LanguageSelector className="w-full text-center" />
+                    </div>
+                    <ThemeToggle fullWidth />
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -625,10 +627,12 @@ export default function Header() {
                     Entrar na Conta
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <div className="px-2 py-1 flex items-center gap-2">
-                    <LanguageSelector />
-                    <VersionSelector />
-                    <ThemeToggle />
+                  <div className="space-y-2 p-1">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <VersionSelector className="w-full text-center" />
+                      <LanguageSelector className="w-full text-center" />
+                    </div>
+                    <ThemeToggle fullWidth />
                   </div>
                 </>
               )}
@@ -662,7 +666,7 @@ export default function Header() {
 
             <SheetContent
               side="right"
-              className="flex flex-col gap-0 p-0 bg-app-bg border-l border-border w-[280px]"
+              className="flex flex-col gap-0 p-0 bg-app-bg border-l border-border w-[300px] sm:w-[320px] max-w-[88vw]"
             >
               <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
               {/* ── Drawer header ── */}
@@ -682,17 +686,30 @@ export default function Header() {
                 </Link>
               </div>
 
-              {/* ── Quick Version & Theme Selector (Top of drawer) ── */}
-              <div className="px-4 py-3 border-b border-border bg-app-surface/50">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted mb-2">
-                  Versão & Tema
-                </p>
-                <div className="flex items-center justify-between gap-2">
-                  <VersionSelector />
-                  <div className="flex items-center gap-1.5">
-                    <LanguageSelector />
-                    <ThemeToggle />
+              {/* ── Quick Version, Language & Theme Selector (Top of drawer) ── */}
+              <div className="px-4 py-3 border-b border-border bg-app-surface/40 space-y-3">
+                {/* Linha 1: Versão Bíblica & Idioma */}
+                <div className="space-y-1.5">
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                    Texto & Versão
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <VersionSelector className="w-full text-center" />
+                    <LanguageSelector className="w-full text-center" />
                   </div>
+                </div>
+
+                {/* Linha 2: Tema da Página (White / Sépia / Dark) */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-app-text-muted">
+                      Tema de Leitura
+                    </p>
+                    <span className="text-[0.62rem] font-mono text-app-text-muted capitalize">
+                      {theme === "light" ? "White" : theme === "sepia" ? "Sépia" : "Dark"}
+                    </span>
+                  </div>
+                  <ThemeToggle fullWidth />
                 </div>
               </div>
 

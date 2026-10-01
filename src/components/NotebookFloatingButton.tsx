@@ -72,7 +72,9 @@ export default function NotebookFloatingButton({
             title={accessibleName}
             className={cn(
                 "fixed right-4 z-40",
-                isFocusMode ? "bottom-6" : "bottom-20 md:bottom-6",
+                isFocusMode
+                    ? "bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))]"
+                    : "bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:bottom-6",
                 "md:right-6 md:bottom-6",
                 "flex h-12 w-12 items-center justify-center rounded-full shadow-lg",
                 // Desativa transições durante o blink para que os keyframes não conflitem com transition-all

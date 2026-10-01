@@ -21,13 +21,13 @@ function MockFloatingButtonRead() {
         </p>
       </div>
 
-      {/* Botão Flutuante do Caderno no canto inferior esquerdo */}
+      {/* Botão Flutuante do Memorial */}
       <div className="pt-2 flex items-center justify-between border-t border-border/40">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-black font-bold shadow-lg border border-gold animate-bounce">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-black font-bold shadow-lg border border-gold animate-pulse">
             <Notebook className="h-4 w-4" />
           </div>
-          <span className="text-[0.62rem] font-medium text-gold font-sans">← Clique no botão do Caderno</span>
+          <span className="text-[0.62rem] font-medium text-gold font-sans">← Clique no botão do Memorial</span>
         </div>
       </div>
     </div>
@@ -36,12 +36,12 @@ function MockFloatingButtonRead() {
 
 function MockCadernoDrawer() {
   return (
-    <div className="rounded-xl border border-border bg-[#141414] w-full max-w-[320px] mx-auto shadow-2xl overflow-hidden text-app-text font-sans">
+    <div className="rounded-xl border border-border bg-app-surface w-full max-w-[320px] mx-auto shadow-2xl overflow-hidden text-app-text font-sans">
       {/* Header do Drawer */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border/60 bg-[#181818]">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border/60 bg-app-raised">
         <div className="flex items-center gap-1.5 text-[0.65rem] font-semibold tracking-wider text-app-text font-mono">
           <Notebook className="h-3.5 w-3.5 text-gold" />
-          <span>MEU CADERNO</span>
+          <span>MEU MEMORIAL</span>
         </div>
         <span className="text-[0.65rem] text-app-text-muted">✕</span>
       </div>
@@ -49,7 +49,7 @@ function MockCadernoDrawer() {
       {/* Tabs */}
       <div className="flex border-b border-border/60 text-[0.62rem] font-medium">
         <div className="flex-1 py-2 text-center text-gold border-b-2 border-gold font-semibold">Neste Capítulo</div>
-        <div className="flex-1 py-2 text-center text-app-text-muted">Todos os Cadernos</div>
+        <div className="flex-1 py-2 text-center text-app-text-muted">Todo o Memorial</div>
       </div>
 
       {/* Corpo do Caderno */}
@@ -77,7 +77,7 @@ function MockCadernoDrawer() {
 
           <div className="pt-1">
             <button className="w-full py-2 rounded-lg bg-gold text-black font-semibold text-[0.68rem] text-center shadow">
-              + Novo caderno livre
+              + Nova anotação livre
             </button>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function HowToMemorialTab() {
       title: "Ler",
       lines: [
         "Abra a Bíblia e leia normalmente.",
-        "Quando algo tocar seu coração, clique no botão do Caderno no canto inferior esquerdo da tela.",
+        "Quando algo tocar seu coração, clique no botão do Memorial no canto inferior da tela.",
       ],
       visual: <MockFloatingButtonRead />,
     },

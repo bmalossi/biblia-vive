@@ -3,8 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, getVersionsForLocale, getVersionInfo } from "@/lib/themes";
 import { useTranslation } from "@/i18n";
 import { useSubscription } from "@/hooks/useSubscription";
+import { cn } from "@/lib/utils";
 
-export default function VersionSelector() {
+export interface VersionSelectorProps {
+  className?: string;
+}
+
+export default function VersionSelector({ className }: VersionSelectorProps = {}) {
   const navigate = useNavigate();
   const location = useLocation();
   const { locale } = useTranslation();
@@ -59,7 +64,10 @@ export default function VersionSelector() {
   return (
     <select
       aria-label="Selecionar versão da Bíblia"
-      className="h-8 rounded-full border border-border bg-app-raised px-3 font-sans text-[0.68rem] uppercase tracking-[0.08em] text-app-text outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        "h-8 rounded-full border border-border bg-app-raised px-3 font-sans text-[0.68rem] uppercase tracking-[0.08em] text-app-text outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring transition-colors",
+        className
+      )}
       onChange={(event) => handleVersionChange(event.target.value as BibleVersion)}
       value={currentVersion}
     >

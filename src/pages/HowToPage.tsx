@@ -130,7 +130,7 @@ export default function HowToPage() {
           </p>
 
           {/* Quick stats */}
-          <div className="inline-flex gap-6 sm:gap-10 rounded-2xl border border-border bg-app-surface/60 backdrop-blur px-6 py-4">
+          <div className="flex flex-wrap sm:inline-flex items-center justify-center gap-4 sm:gap-10 rounded-2xl border border-border bg-app-surface/60 backdrop-blur px-4 sm:px-6 py-4 max-w-full">
             {[
               { value: "5", label: "Guias" },
               { value: "6", label: "Passos no tutorial" },

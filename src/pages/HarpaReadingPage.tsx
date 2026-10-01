@@ -516,7 +516,7 @@ export default function HarpaReadingPage() {
                   onClick={toggleFavorite}
                   title={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}
                   aria-label={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}
-                  className="p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
                 >
                   <Bookmark
                     className={cn("h-4 w-4", isFavorite && "fill-gold text-gold")}
@@ -529,7 +529,7 @@ export default function HarpaReadingPage() {
                   onClick={handleShare}
                   title="Compartilhar hino"
                   aria-label="Compartilhar hino"
-                  className="p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>
@@ -540,7 +540,7 @@ export default function HarpaReadingPage() {
                   onClick={handleCopyLyrics}
                   title="Copiar letra completa"
                   aria-label="Copiar letra completa"
-                  className="p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2 rounded-lg text-app-text-muted hover:text-gold hover:bg-app-raised border border-transparent hover:border-border transition-colors cursor-pointer"
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </button>
@@ -551,7 +551,7 @@ export default function HarpaReadingPage() {
                     type="button"
                     onClick={() => setFontSize("sm")}
                     className={cn(
-                      "px-2 py-0.5 text-xs font-serif rounded transition-colors cursor-pointer",
+                      "h-9 min-w-9 px-2.5 flex items-center justify-center text-xs font-serif rounded transition-colors cursor-pointer",
                       fontSize === "sm"
                         ? "bg-app-surface text-gold font-bold"
                         : "text-app-text-muted hover:text-app-text"
@@ -564,7 +564,7 @@ export default function HarpaReadingPage() {
                     type="button"
                     onClick={() => setFontSize("base")}
                     className={cn(
-                      "px-2 py-0.5 text-sm font-serif rounded transition-colors cursor-pointer",
+                      "h-9 min-w-9 px-2.5 flex items-center justify-center text-sm font-serif rounded transition-colors cursor-pointer",
                       fontSize === "base"
                         ? "bg-app-surface text-gold font-bold"
                         : "text-app-text-muted hover:text-app-text"
@@ -577,7 +577,7 @@ export default function HarpaReadingPage() {
                     type="button"
                     onClick={() => setFontSize("lg")}
                     className={cn(
-                      "px-2 py-0.5 text-base font-serif rounded transition-colors cursor-pointer",
+                      "h-9 min-w-9 px-2.5 flex items-center justify-center text-base font-serif rounded transition-colors cursor-pointer",
                       fontSize === "lg"
                         ? "bg-app-surface text-gold font-bold"
                         : "text-app-text-muted hover:text-app-text"

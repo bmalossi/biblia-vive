@@ -14,7 +14,7 @@ export function ToastViewport() {
   const { toasts } = useToast();
 
   return (
-    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-8 z-[1100] flex flex-col items-center gap-3 px-4" role="status">
+    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-8 z-[1100] flex flex-col items-center gap-3 px-4" role="status">
       {toasts.map((item) => {
         if (item.type === "prompt") {
           return (

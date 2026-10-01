@@ -221,8 +221,15 @@ All colors MUST be HSL.
     --tw-prose-invert-td-borders:  hsl(var(--border));
   }
 }
-
-/* prefers-reduced-motion removed to allow spinners */
+/* Respect prefers-reduced-motion while preserving loading spinners */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin):not([data-allow-motion]) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* == Puffed button ========================================================
    Light/sepia: soft warm shadow + top white highlight.

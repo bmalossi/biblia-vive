@@ -58,7 +58,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
           }
         }}
         aria-label={`Ler reflexão completa: ${title}`}
-        className="group relative overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border border-[#382f23]/80 bg-gradient-to-br from-[#1c1814] via-[#151311] to-[#100f0d] p-5 sm:p-6 md:p-7 lg:p-8 shadow-xl cursor-pointer hover:border-gold/50 hover:shadow-2xl hover:shadow-gold/5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold/60 select-none"
+        className="group relative overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border border-border/80 bg-gradient-to-br from-app-surface via-app-surface/95 to-app-bg p-5 sm:p-6 md:p-7 lg:p-8 shadow-xl cursor-pointer hover:border-gold/50 hover:shadow-2xl hover:shadow-gold/5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold/60 select-none"
       >
         {/* Detalhes modernos: Arcos Concêntricos Dourados no Lado Direito */}
         <div className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 h-[150%] w-1/2 max-w-[380px] select-none overflow-hidden flex items-center justify-end">
@@ -98,19 +98,19 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
             </div>
 
             {/* Título Principal em Tipografia Clássica */}
-            <h2 className="font-serif text-lg sm:text-xl md:text-2xl lg:text-[1.75rem] font-normal leading-snug tracking-tight text-[#f5f5f0] mb-2.5 text-balance group-hover:text-gold-light transition-colors">
+            <h2 className="font-serif text-lg sm:text-xl md:text-2xl lg:text-[1.75rem] font-normal leading-snug tracking-tight text-app-text mb-2.5 text-balance group-hover:text-gold-light transition-colors">
               {title}
             </h2>
 
             {/* Parágrafo de Introdução / Reflexão com indicador delimitado a 2 linhas */}
-            <p className="font-sans text-xs sm:text-[0.82rem] text-neutral-300/80 leading-relaxed mb-3 font-light max-w-lg line-clamp-2">
+            <p className="font-sans text-xs sm:text-[0.82rem] text-app-text-muted leading-relaxed mb-3 font-light max-w-lg line-clamp-2">
               {previewText}
             </p>
 
             {/* Barra inferior de tags e ação de abrir */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Tag / Pílula da Referência Bíblica */}
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700/60 bg-neutral-900/40 px-2.5 py-1 text-[0.7rem] text-neutral-300 backdrop-blur-xs">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-app-raised/50 px-2.5 py-1 text-[0.7rem] text-app-text backdrop-blur-xs">
                 <BookOpen className="h-3 w-3 text-gold/90" />
                 <span className="font-sans font-medium tracking-wide">{referenceText}</span>
               </div>
@@ -127,7 +127,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
             <Link
               to={targetLink}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gold px-5 py-2 text-xs font-semibold text-[#121110] shadow-sm transition-all duration-200 hover:bg-gold/90 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex min-h-[44px] sm:min-h-0 items-center justify-center gap-2 rounded-full bg-gold px-6 py-2.5 sm:px-5 sm:py-2 text-xs font-semibold text-black shadow-sm transition-all duration-200 hover:bg-gold/90 hover:scale-[1.02] active:scale-[0.98]"
             >
               <span>Ler capítulo</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -136,7 +136,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
             <Link
               to="/jornadas"
               onClick={(e) => e.stopPropagation()}
-              className="group/jornada inline-flex items-center gap-1 mt-2 text-[0.7rem] font-medium text-neutral-400 hover:text-neutral-200 transition-colors"
+              className="group/jornada inline-flex min-h-[36px] sm:min-h-0 items-center gap-1 mt-2 text-[0.7rem] font-medium text-neutral-400 hover:text-neutral-200 transition-colors py-1 sm:py-0"
             >
               <span>Ver toda a jornada</span>
               <ArrowRight className="h-3 w-3 transition-transform group-hover/jornada:translate-x-0.5" />
@@ -147,15 +147,15 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
 
       {/* Modal Popup com o Texto Completo da Reflexão */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-xl sm:max-w-2xl border-[#382f23] bg-[#161412] text-[#f5f5f0] p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
-          <DialogHeader className="space-y-2 text-left border-b border-[#382f23]/60 pb-4 shrink-0">
+        <DialogContent className="max-w-xl sm:max-w-2xl border-border bg-app-surface text-app-text p-6 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
+          <DialogHeader className="space-y-2 text-left border-b border-border/60 pb-4 shrink-0">
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-[0.62rem] sm:text-[0.68rem] font-semibold tracking-[0.2em] uppercase text-gold">
                 CAPÍTULO DE HOJE &bull; {seriesName}
               </span>
             </div>
 
-            <DialogTitle className="font-serif text-xl sm:text-2xl md:text-[1.65rem] font-normal text-[#f5f5f0] leading-snug">
+            <DialogTitle className="font-serif text-xl sm:text-2xl md:text-[1.65rem] font-normal text-app-text leading-snug">
               {title}
             </DialogTitle>
 
@@ -163,14 +163,14 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
               Texto completo da reflexão do capítulo de hoje sobre {referenceText}
             </DialogDescription>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700/60 bg-neutral-900/60 px-3 py-1 text-[0.72rem] text-neutral-300 w-fit mt-1">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-app-raised/60 px-3 py-1 text-[0.72rem] text-app-text-muted w-fit mt-1">
               <BookOpen className="h-3.5 w-3.5 text-gold" />
               <span className="font-sans font-medium tracking-wide">{referenceText}</span>
             </div>
           </DialogHeader>
 
           {/* Conteúdo com os Parágrafos Completos da Reflexão */}
-          <div className="my-5 overflow-y-auto pr-2 space-y-4 font-serif text-sm sm:text-base text-neutral-200/90 leading-relaxed custom-scrollbar flex-1">
+          <div className="my-5 overflow-y-auto pr-2 space-y-4 font-serif text-sm sm:text-base text-app-text/90 leading-relaxed custom-scrollbar flex-1">
             {paragraphs.map((para, index) => (
               <p key={index} className="text-balance font-light leading-relaxed">
                 {para}
@@ -179,11 +179,11 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
           </div>
 
           {/* Rodapé com CTA para Leitura Bíblica e Fechar */}
-          <div className="pt-4 border-t border-[#382f23]/60 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
+          <div className="pt-4 border-t border-border/60 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-[#382f23] text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-border text-app-text-muted hover:text-app-text text-xs font-medium transition-colors cursor-pointer"
             >
               Fechar
             </button>
@@ -191,7 +191,7 @@ Permanecer diante do texto é permitir que a esperança seja renovada e que a ve
             <Link
               to={targetLink}
               onClick={() => setIsModalOpen(false)}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-2.5 text-xs font-semibold text-[#121110] shadow-md hover:bg-gold/90 transition-all cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-2.5 text-xs font-semibold text-black shadow-md hover:bg-gold/90 transition-all cursor-pointer"
             >
               <span>Ler capítulo na Bíblia ({referenceText})</span>
               <ArrowRight className="h-3.5 w-3.5" />

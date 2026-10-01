@@ -452,7 +452,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                     <Button
                         size="icon"
                         variant="ghost"
-                        className="h-7 w-7 text-app-text-muted hover:text-app-text"
+                        className="h-10 w-10 sm:h-7 sm:w-7 min-h-[40px] sm:min-h-0 min-w-[40px] sm:min-w-0 text-app-text-muted hover:text-app-text rounded-full"
                         onClick={onClose}
                         aria-label={t("study.closePanel")}
                     >

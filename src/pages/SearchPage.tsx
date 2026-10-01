@@ -361,7 +361,7 @@ export default function SearchPage() {
 
         {/* ── CABEÇALHO EDITORIAL ── */}
         <div className="space-y-1">
-          <h1 className="font-serif text-3xl sm:text-4xl text-[#F4EFEA] font-normal tracking-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl text-app-text font-normal tracking-tight">
             Buscar na Bíblia
           </h1>
           <p className="font-sans text-sm text-app-text-muted">
@@ -371,7 +371,7 @@ export default function SearchPage() {
 
         {/* ── BARRA DE BUSCA EM PÍLULA COM SELETOR DE VERSÃO INTEGRADO ── */}
         <form onSubmit={handleSubmit} className="mt-6 sm:mt-7">
-          <div className="relative flex items-center rounded-full border border-border/80 bg-[#161412]/80 px-4 sm:px-6 py-2.5 sm:py-3 shadow-inner hover:border-gold/50 focus-within:border-gold/70 transition-all">
+          <div className="relative flex items-center rounded-full border border-border/80 bg-app-surface/90 px-4 sm:px-6 py-2.5 sm:py-3 shadow-inner hover:border-gold/50 focus-within:border-gold/70 transition-all">
             <Search className="h-5 w-5 text-app-text-muted/70 shrink-0 mr-3" />
             <input
               type="text"
@@ -392,7 +392,7 @@ export default function SearchPage() {
                 type="submit"
                 aria-label="Buscar"
                 data-testid="search-submit-btn"
-                className="mr-3 inline-flex items-center gap-1.5 rounded-full bg-gold px-3.5 py-1 text-xs sm:text-sm font-medium text-[#121110] hover:bg-gold-light transition-all shadow-xs shrink-0 cursor-pointer animate-in fade-in zoom-in-95 duration-150"
+                className="mr-3 inline-flex items-center gap-1.5 rounded-full bg-gold px-3.5 py-1 text-xs sm:text-sm font-medium text-black hover:bg-gold-light transition-all shadow-xs shrink-0 cursor-pointer animate-in fade-in zoom-in-95 duration-150"
               >
                 <Search className="h-3.5 w-3.5" />
                 <span>Buscar</span>
@@ -410,22 +410,22 @@ export default function SearchPage() {
                 }}
                 className="appearance-none bg-transparent pr-5 py-1 text-xs sm:text-sm font-sans font-medium uppercase text-app-text-muted hover:text-gold cursor-pointer outline-hidden transition-colors"
               >
-                <option value="kja" className="bg-[#1a1715] text-app-text">
+                <option value="kja" className="bg-app-surface text-app-text">
                   KJA
                 </option>
-                <option value="nvi" className="bg-[#1a1715] text-app-text">
+                <option value="nvi" className="bg-app-surface text-app-text">
                   NVI
                 </option>
-                <option value="acf" className="bg-[#1a1715] text-app-text">
+                <option value="acf" className="bg-app-surface text-app-text">
                   ACF
                 </option>
-                <option value="arc" className="bg-[#1a1715] text-app-text">
+                <option value="arc" className="bg-app-surface text-app-text">
                   ARC
                 </option>
-                <option value="aa" className="bg-[#1a1715] text-app-text">
+                <option value="aa" className="bg-app-surface text-app-text">
                   AA
                 </option>
-                <option value="all" className="bg-[#1a1715] text-app-text">
+                <option value="all" className="bg-app-surface text-app-text">
                   Todas
                 </option>
               </select>
@@ -479,7 +479,7 @@ export default function SearchPage() {
           <div className="mt-4 space-y-3">
             {similarReference && !parsedReference && (
               <button
-                className="flex w-full items-center justify-between rounded-xl border border-border/80 bg-[#161412]/80 px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold"
+                className="flex w-full items-center justify-between rounded-xl border border-border/80 bg-app-surface/90 px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold"
                 onClick={() =>
                   goToBookChapter(
                     similarReference.book,
@@ -498,7 +498,7 @@ export default function SearchPage() {
             )}
 
             {instantBookSuggestions.length > 0 && (
-              <div className="rounded-xl border border-border/80 bg-[#161412]/80 p-3">
+              <div className="rounded-xl border border-border/80 bg-app-surface/90 p-3">
                 <p className="font-sans text-xs uppercase tracking-[0.08em] text-app-text-muted">
                   {t("search.instantSuggestions")}
                 </p>
@@ -530,7 +530,7 @@ export default function SearchPage() {
                       <div className="mt-3 flex flex-wrap gap-2">
                         {chapterPreview.map((chapter) => (
                           <Button
-                            className="h-8 min-w-8"
+                            className="h-10 min-w-10 sm:h-8 sm:min-w-8"
                             key={`${book.id}-${chapter}`}
                             onClick={() => goToBookChapter(book, chapter)}
                             size="sm"
@@ -552,7 +552,7 @@ export default function SearchPage() {
         {/* ── REFERÊNCIA PARSEADA (ATALHO DIRETO) ── */}
         {parsedReference && (
           <button
-            className={`mt-4 flex w-full items-center justify-between rounded-xl border border-border/80 bg-[#161412]/80 px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold ${
+            className={`mt-4 flex w-full items-center justify-between rounded-xl border border-border/80 bg-app-surface/90 px-4 py-3 text-left text-sm text-app-text transition-colors hover:border-gold ${
               referenceExists === false ? "opacity-90" : ""
             }`}
             onClick={() => {
@@ -592,7 +592,7 @@ export default function SearchPage() {
 
         {/* ── ERRO DE BUSCA ── */}
         {error && (
-          <Alert className="mt-6 border-border bg-[#161412]/80" variant="destructive">
+          <Alert className="mt-6 border-border bg-app-surface/90" variant="destructive">
             <AlertTitle>{t("search.errorTitle")}</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
             <Button
@@ -609,7 +609,7 @@ export default function SearchPage() {
 
         {/* ── SUGESTÕES POPULARES (QUANDO NÃO HÁ QUERY) ── */}
         {!queryParam && !loading && !error && (
-          <div className="mt-8 rounded-2xl border border-border/80 bg-[#161412]/50 p-5 sm:p-6">
+          <div className="mt-8 rounded-2xl border border-border/80 bg-app-surface/60 p-5 sm:p-6">
             <p className="font-sans text-xs uppercase tracking-wider text-app-text-muted">
               {t("search.popularToday")}
             </p>
@@ -664,7 +664,7 @@ export default function SearchPage() {
         {!loading && !!queryParam && !error && mode === "text" && (
           <div className="mt-6 space-y-2">
             {queryBookMatch ? (
-              <div className="rounded-xl border border-border/80 bg-[#161412]/80 p-5">
+              <div className="rounded-xl border border-border/80 bg-app-surface/90 p-5">
                 <p className="font-serif text-xl text-app-text">{queryBookMatch.name}</p>
                 <p className="mt-1 font-sans text-xs text-app-text-muted">
                   {t("search.chooseChapter")}
@@ -687,7 +687,7 @@ export default function SearchPage() {
                 </div>
               </div>
             ) : memoizedResults.length === 0 ? (
-              <div className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-border/80 bg-[#161412]/50 px-4 text-center">
+              <div className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-border/80 bg-app-surface/60 px-4 text-center">
                 <SearchX className="h-8 w-8 text-app-text-muted" />
                 <p className="mt-3 font-sans text-sm text-app-text-muted">
                   {t("search.noResults", { query: queryParam })}
@@ -778,7 +778,7 @@ export default function SearchPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-app-text-muted">Resultados por página:</span>
                       <select
-                        className="bg-[#161412] border border-border text-app-text text-xs rounded-md px-2 py-1 outline-hidden focus:border-gold cursor-pointer"
+                        className="bg-app-surface border border-border text-app-text text-xs rounded-md px-2 py-1 outline-hidden focus:border-gold cursor-pointer"
                         value={pageSize}
                         onChange={(e) => {
                           setPageSize(Number(e.target.value));

@@ -70,7 +70,7 @@ export default function BookGrid({
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         {/* ── CARD 1: ANTIGO TESTAMENTO ── */}
-        <div className="rounded-2xl border border-border/80 bg-app-surface/60 p-5 sm:p-6 lg:p-7 shadow-xs hover:border-[#382f23] transition-all">
+        <div className="rounded-2xl border border-border/80 bg-app-surface/60 p-5 sm:p-6 lg:p-7 shadow-xs hover:border-gold/40 transition-all">
           <div className="flex items-center justify-between mb-3.5 sm:mb-4 pb-2 border-b border-border/40">
             <h3 className="font-serif text-lg sm:text-xl font-medium text-gold">
               {t("home.oldTestament")}
@@ -94,7 +94,7 @@ export default function BookGrid({
         </div>
 
         {/* ── CARD 2: NOVO TESTAMENTO ── */}
-        <div className="rounded-2xl border border-border/80 bg-app-surface/60 p-5 sm:p-6 lg:p-7 shadow-xs hover:border-[#382f23] transition-all">
+        <div className="rounded-2xl border border-border/80 bg-app-surface/60 p-5 sm:p-6 lg:p-7 shadow-xs hover:border-gold/40 transition-all">
           <div className="flex items-center justify-between mb-3.5 sm:mb-4 pb-2 border-b border-border/40">
             <h3 className="font-serif text-lg sm:text-xl font-medium text-gold">
               {t("home.newTestament")}

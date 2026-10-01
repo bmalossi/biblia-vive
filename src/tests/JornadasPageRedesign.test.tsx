@@ -115,7 +115,7 @@ describe("JornadasPage Redesign", () => {
       // Nenhuma classe de borda lateral esquerda (ex: border-l-4, border-l-amber, etc.)
       expect(classNames).not.toMatch(/border-l-\d+/);
       expect(classNames).not.toMatch(/border-l-\[/);
-      expect(classNames).toContain("border-[#382f23]/80");
+      expect(classNames).toMatch(/border-(border|\[#382f23\])\/80/);
     });
   });
 

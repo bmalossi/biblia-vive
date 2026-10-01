@@ -2569,14 +2569,14 @@ export default function ReadingPage() {
         )}
         {/* Floating batch-send button (Church Mode, autoSend OFF) */}
         {churchMode.isActive && !churchMode.autoSend && churchMode.selectedVerses.length > 0 && (
-          <div className="fixed bottom-20 right-4 z-50 flex items-center gap-2">
+          <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-20 right-4 z-50 flex items-center gap-2">
             <button
               type="button"
               onClick={() => {
                 churchMode.sendToDisplay(churchMode.selectedVerses);
                 churchMode.clearSelection();
               }}
-              className="flex items-center gap-2 rounded-full bg-gold text-app-bg px-4 py-2.5 text-sm font-semibold shadow-lg hover:bg-gold/90 transition-colors"
+              className="flex items-center gap-2 rounded-full bg-gold text-app-bg px-4 py-2.5 text-sm font-semibold shadow-lg hover:bg-gold/90 transition-colors min-h-[44px]"
             >
               <Monitor className="h-4 w-4" />
               Enviar {churchMode.selectedVerses.length} versículo{churchMode.selectedVerses.length !== 1 ? 's' : ''}
@@ -2585,7 +2585,7 @@ export default function ReadingPage() {
               type="button"
               onClick={churchMode.clearSelection}
               aria-label="Limpar seleção"
-              className="h-9 w-9 rounded-full bg-app-surface border border-border text-app-text-muted flex items-center justify-center hover:bg-app-raised transition-colors"
+              className="h-11 w-11 sm:h-9 sm:w-9 rounded-full bg-app-surface border border-border text-app-text-muted flex items-center justify-center hover:bg-app-raised transition-colors"
             >
               ×
             </button>
@@ -2658,15 +2658,15 @@ export default function ReadingPage() {
         {selectedBook && preferences.focusMode && (
           <div
             className={cn(
-              "fixed bottom-4 right-4 z-50 flex items-center gap-2 transition-opacity",
+              "fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-4 right-4 z-50 flex items-center gap-2 transition-opacity",
               isClausuraActive ? "pointer-events-none opacity-0 duration-1000" : "opacity-100 duration-0"
             )}
           >
-            <Button className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised" onClick={() => updatePreference("focusMode", false)} type="button" variant="outline">
+            <Button className="min-h-[44px] h-11 sm:h-8 sm:min-h-0 px-3 text-xs bg-app-surface border-border hover:bg-app-raised" onClick={() => updatePreference("focusMode", false)} type="button" variant="outline">
               {t("reading.exitFocus")}
             </Button>
             <Button
-              className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised"
+              className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0 p-0 text-xs bg-app-surface border-border hover:bg-app-raised flex items-center justify-center"
               disabled={!prevChapterInfo}
               onClick={() => prevChapterInfo && goToChapter(prevChapterInfo.chapter, prevChapterInfo.book.slug)}
               type="button"
@@ -2676,7 +2676,7 @@ export default function ReadingPage() {
               ←
             </Button>
             <Button
-              className="h-8 px-3 text-xs bg-app-surface border-border hover:bg-app-raised"
+              className="min-h-[44px] min-w-[44px] h-11 w-11 sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0 p-0 text-xs bg-app-surface border-border hover:bg-app-raised flex items-center justify-center"
               disabled={!nextChapterInfo}
               onClick={() => nextChapterInfo && goToChapter(nextChapterInfo.chapter, nextChapterInfo.book.slug)}
               type="button"

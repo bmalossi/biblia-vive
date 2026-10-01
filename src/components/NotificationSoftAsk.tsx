@@ -20,7 +20,6 @@ export default function NotificationSoftAsk() {
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const cardRef = useRef<HTMLDivElement>(null);
   const primaryBtnRef = useRef<HTMLButtonElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
@@ -206,7 +205,6 @@ export default function NotificationSoftAsk() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          ref={cardRef}
           role="dialog"
           aria-labelledby="softask-title"
           aria-describedby="softask-description"
@@ -215,7 +213,7 @@ export default function NotificationSoftAsk() {
           animate="visible"
           exit="exit"
           variants={animationVariants}
-          className="fixed bottom-20 left-4 right-4 z-[60] sm:left-auto sm:right-6 md:bottom-6 md:w-[380px] p-5 rounded-2xl border border-border bg-app-surface text-app-text shadow-2xl backdrop-blur-md"
+          className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] left-4 right-4 z-[60] sm:left-auto sm:right-6 md:bottom-6 md:w-[380px] p-5 rounded-2xl border border-border bg-app-surface text-app-text shadow-2xl backdrop-blur-md"
         >
           {/* Botão de Fechar X */}
           <button

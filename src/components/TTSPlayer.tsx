@@ -34,18 +34,18 @@ export default function TTSPlayer({
   return (
     <div className="flex items-center gap-2 rounded-full border border-border bg-app-surface px-2 py-1">
       {isPaused ? (
-        <Button aria-label={t("tts.resumeAria")} className="h-8 gap-1.5" onClick={onResume} size="sm" type="button" variant="ghost">
+        <Button aria-label={t("tts.resumeAria")} className="h-10 sm:h-8 min-h-[40px] sm:min-h-[32px] px-3 gap-1.5" onClick={onResume} size="sm" type="button" variant="ghost">
           <Play className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">{t("tts.resume")}</span>
         </Button>
       ) : (
-        <Button aria-label={t("tts.pauseAria")} className="h-8 gap-1.5" onClick={onPause} size="sm" type="button" variant="ghost">
+        <Button aria-label={t("tts.pauseAria")} className="h-10 sm:h-8 min-h-[40px] sm:min-h-[32px] px-3 gap-1.5" onClick={onPause} size="sm" type="button" variant="ghost">
           <Pause className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">{t("tts.pause")}</span>
         </Button>
       )}
 
-      <Button className="h-8 gap-1.5" onClick={onStop} size="sm" type="button" variant="ghost">
+      <Button aria-label={t("tts.stop")} className="h-10 sm:h-8 min-h-[40px] sm:min-h-[32px] px-3 gap-1.5" onClick={onStop} size="sm" type="button" variant="ghost">
         <Square className="h-3.5 w-3.5" />
         <span className="hidden sm:inline">{t("tts.stop")}</span>
       </Button>
