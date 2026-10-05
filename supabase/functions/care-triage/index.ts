@@ -1,5 +1,5 @@
-// @ts-ignore - Deno runtime
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2?target=deno&no-check";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,7 +48,8 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const openAiApiKey = Deno.env.get("OPENAI_API_KEY") ?? "";
+    const typesafeApiKey = (Deno.env.get("TYPESAFE_API_KEY") ?? "").trim();
+    const openAiApiKey = (Deno.env.get("OPENAI_API_KEY") ?? "").trim();
 
     if (!supabaseUrl || !supabaseServiceKey) {
       return new Response(
@@ -90,9 +91,62 @@ Deno.serve(async (req: Request) => {
     }
 
     let isEligible = false;
+    let evaluatedWithJev = false;
 
-    // 3. Avaliação semântica via OpenAI gpt-4o-mini (se chave configurada nos Secrets)
-    if (openAiApiKey) {
+    // 3.1. Avaliação prioritária via TypeSafe JEV (System One) - latência ~150ms, zero alucinação, tokens de saída grátis
+    if (typesafeApiKey) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+
+        const jevResponse = await fetch("https://api.typesafe.ai/v1/systemone", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${typesafeApiKey}`,
+          },
+          body: JSON.stringify({
+            model: "jev-latest",
+            state: `[RELATO CONFIDENCIAL DO LEITOR]\n"""\n${text.slice(0, 3000)}\n"""`,
+            questions: {
+              indicates_deep_distress: {
+                type: "noul",
+                instructions:
+                  "O relato pessoal do leitor expressa dor profunda, angústia aguda, desespero, solidão sufocante, esgotamento espiritual ou luto inconsolável, onde acolhimento ou apoio pastoral fraterno seria humanamente benéfico?",
+              },
+            },
+          }),
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeout));
+
+        if (jevResponse.ok) {
+          const jevData = await jevResponse.json();
+          const answers = jevData?.answers || jevData?.results || jevData;
+          const qDistress = answers?.indicates_deep_distress;
+
+          let distressProb = 0;
+          if (qDistress) {
+            if (typeof qDistress.probability === "number") distressProb = qDistress.probability;
+            else if (typeof qDistress.noul === "number") distressProb = qDistress.noul;
+            else if (typeof qDistress.answer === "number") distressProb = qDistress.answer;
+            else if (qDistress.answer === true) distressProb = 1;
+          }
+
+          // Calibração do limiar Noul: probabilidade >= 0.70
+          isEligible = distressProb >= 0.70;
+          evaluatedWithJev = true;
+          console.log(`[care-triage] TypeSafe JEV avaliado com sucesso. Probabilidade: ${distressProb.toFixed(3)} -> Elegível: ${isEligible}`);
+        } else {
+          const errText = await jevResponse.text().catch(() => "");
+          console.warn("[care-triage] TypeSafe JEV erro HTTP:", jevResponse.status, errText);
+        }
+      } catch (jevErr) {
+        console.warn("[care-triage] Exceção ao consultar TypeSafe JEV:", jevErr);
+      }
+    }
+
+    // 3.2. Fallback OpenAI gpt-4o-mini (somente se o JEV não estiver configurado ou falhar)
+    if (!evaluatedWithJev && openAiApiKey) {
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 6000);
@@ -129,16 +183,16 @@ Deno.serve(async (req: Request) => {
           const aiData = await aiResponse.json();
           const parsed = JSON.parse(aiData?.choices?.[0]?.message?.content || "{}");
           isEligible = Boolean(parsed.eligible);
+          console.log(`[care-triage] OpenAI gpt-4o-mini fallback executado -> Elegível: ${isEligible}`);
         } else {
-          // Fallback para heurística caso API de IA falhe
           isEligible = DISTRESS_PATTERNS.some((pat) => pat.test(text));
         }
       } catch (aiErr) {
-        console.warn("[care-triage] Erro na avaliação por IA, aplicando fallback:", aiErr);
+        console.warn("[care-triage] Erro na avaliação OpenAI, aplicando fallback:", aiErr);
         isEligible = DISTRESS_PATTERNS.some((pat) => pat.test(text));
       }
-    } else {
-      // Sem chave externa nos Secrets: usa heurística linguística respeitosa
+    } else if (!evaluatedWithJev) {
+      // Sem chaves externas: usa heurística linguística respeitosa
       isEligible = DISTRESS_PATTERNS.some((pat) => pat.test(text));
     }
 
