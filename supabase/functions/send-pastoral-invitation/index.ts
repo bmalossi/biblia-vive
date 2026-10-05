@@ -31,7 +31,7 @@ Deno.serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
     const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") ?? "Atalaia <atalaia@bibliavive.com.br>";
-    const webBaseUrl = (Deno.env.get("WEB_BASE_URL") ?? "https://bibliavive.com.br").replace(/\/$/, "");
+    const webBaseUrl = (Deno.env.get("WEB_BASE_URL") ?? "https://www.bibliavive.com.br").replace(/\/$/, "");
 
     if (!supabaseUrl || !supabaseServiceKey) {
       return new Response(
@@ -152,11 +152,15 @@ Deno.serve(async (req: Request) => {
       <strong>${requesterName}</strong> indicou você como pessoa de confiança e porto seguro de oração no aplicativo Memorial.
     </p>
 
-    <div style="background-color: #211F27; border-left: 3px solid #E7B075; padding: 16px; border-radius: 6px; margin: 24px 0;">
-      <p style="font-size: 13px; font-weight: 600; color: #E7B075; margin: 0 0 6px 0;">
+    <div style="background-color: #141318; border: 1px solid #282531; border-radius: 8px; padding: 22px 24px; margin: 28px 0; text-align: center;">
+      <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #D6A369; margin-bottom: 6px; font-weight: 700;">
+        Pacto de Confidencialidade
+      </div>
+      <div style="font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 15px; color: #F5F2EB; margin-bottom: 10px;">
         "O Memorial guarda. O Atalaia cuida."
-      </p>
-      <p style="font-size: 13px; line-height: 1.6; color: #9E988D; margin: 0;">
+      </div>
+      <div style="width: 28px; height: 1px; background-color: #383446; margin: 0 auto 12px auto;"></div>
+      <p style="font-size: 13px; line-height: 1.6; color: #9E988D; margin: 0; text-align: left;">
         O Memorial é o espaço secreto onde o leitor registra orações e reflexões íntimas diante de Deus.
         Você <strong>nunca terá acesso às anotações</strong> ou ao conteúdo das memórias do leitor.
         Seu papel é exclusivamente espiritual: ser um porto seguro para orar e enviar uma palavra de afeto caso ele solicite ou precise de aproximação.

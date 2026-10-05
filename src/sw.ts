@@ -185,7 +185,7 @@ registerRoute(
       return (await caches.match("/offline.html")) || Response.error();
     },
     {
-      denylist: [/^\/offline\.html$/, /^\/api\//],
+      denylist: [/^\/offline\.html$/, /^\/api\//, /^\/atalaia\//],
     }
   )
 );

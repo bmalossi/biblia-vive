@@ -198,11 +198,15 @@ Deno.serve(async (req: Request) => {
       ${mainMessage}
     </p>
 
-    <div style="background-color: #211F27; border-left: 3px solid #E7B075; padding: 16px; border-radius: 6px; margin: 24px 0;">
-      <p style="font-size: 13px; font-weight: 600; color: #E7B075; margin: 0 0 6px 0;">
+    <div style="background-color: #141318; border: 1px solid #282531; border-radius: 8px; padding: 22px 24px; margin: 28px 0; text-align: center;">
+      <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #D6A369; margin-bottom: 6px; font-weight: 700;">
+        Pacto de Confidencialidade
+      </div>
+      <div style="font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 15px; color: #F5F2EB; margin-bottom: 10px;">
         "O Memorial guarda. O Atalaia cuida."
-      </p>
-      <p style="font-size: 13px; line-height: 1.6; color: #9E988D; margin: 0;">
+      </div>
+      <div style="width: 28px; height: 1px; background-color: #383446; margin: 0 auto 12px auto;"></div>
+      <p style="font-size: 13px; line-height: 1.6; color: #9E988D; margin: 0; text-align: left;">
         Nenhuma palavra das reflexões íntimas dele foi compartilhada. O diário espiritual dele diante de Deus continua totalmente privado e inviolável.
       </p>
     </div>
