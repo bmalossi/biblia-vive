@@ -87,77 +87,83 @@ Deno.serve(async (req: Request) => {
     }
 
     // 4. Buscar histórico de alertas para checar Rate Limiting (ADR 0004)
-    const { data: previousAlerts, error: alertsError } = await supabase
-      .from("pastoral_alerts")
-      .select("id, trigger_type, note_id, sent_at, delivery_status")
-      .eq("user_id", user.id)
-      .in("delivery_status", ["delivered", "pending"])
-      .order("sent_at", { ascending: false });
+    const isAdmin = (user?.app_metadata as any)?.role === "admin" || user?.email === "contato@automab.dev";
 
-    const nowMs = Date.now();
-    const alerts = previousAlerts || [];
+    if (!isAdmin) {
+      const { data: previousAlerts, error: alertsError } = await supabase
+        .from("pastoral_alerts")
+        .select("id, trigger_type, note_id, sent_at, delivery_status")
+        .eq("user_id", user.id)
+        .in("delivery_status", ["delivered", "pending"])
+        .order("sent_at", { ascending: false });
 
-    // Checagem de Rate Limiting
-    if (triggerType === "explicit_help") {
-      const lastExplicit = alerts.find((a: any) => a.trigger_type === "explicit_help");
-      if (lastExplicit) {
-        const diffMs = nowMs - new Date(lastExplicit.sent_at).getTime();
-        const limit24hMs = 24 * 60 * 60 * 1000;
-        if (diffMs < limit24hMs) {
-          const remainingHours = Math.ceil((limit24hMs - diffMs) / (1000 * 60 * 60));
-          return new Response(
-            JSON.stringify({
-              error: "rate_limited",
-              reason: "explicit_help_24h",
-              remaining_hours: remainingHours,
-              message: "Você já enviou um pedido de ajuda hoje. Seu contato foi notificado e pode entrar em contato a qualquer momento.",
-            }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-      }
-    } else if (triggerType === "care_signal") {
-      // Trava 7 dias mesmo registro
-      if (noteId) {
-        const sameNoteAlert = alerts.find(
-          (a: any) => a.trigger_type === "care_signal" && a.note_id === noteId
-        );
-        if (sameNoteAlert) {
-          const diffMs = nowMs - new Date(sameNoteAlert.sent_at).getTime();
-          const limit7dMs = 7 * 24 * 60 * 60 * 1000;
-          if (diffMs < limit7dMs) {
-            const remainingHours = Math.ceil((limit7dMs - diffMs) / (1000 * 60 * 60));
+      const nowMs = Date.now();
+      const alerts = previousAlerts || [];
+
+      // Checagem de Rate Limiting
+      if (triggerType === "explicit_help") {
+        const lastExplicit = alerts.find((a: any) => a.trigger_type === "explicit_help");
+        if (lastExplicit) {
+          const diffMs = nowMs - new Date(lastExplicit.sent_at).getTime();
+          const limit24hMs = 24 * 60 * 60 * 1000;
+          if (diffMs < limit24hMs) {
+            const remainingHours = Math.ceil((limit24hMs - diffMs) / (1000 * 60 * 60));
             return new Response(
               JSON.stringify({
                 error: "rate_limited",
-                reason: "same_note_7d",
+                reason: "explicit_help_24h",
                 remaining_hours: remainingHours,
-                message: "Um sinal de cuidado sobre este registro já foi enviado recentemente (cooldown de 7 dias).",
+                message: "Você já enviou um pedido de ajuda hoje. Seu contato foi notificado e pode entrar em contato a qualquer momento.",
+              }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      } else if (triggerType === "care_signal") {
+        // Trava 7 dias mesmo registro
+        if (noteId) {
+          const sameNoteAlert = alerts.find(
+            (a: any) => a.trigger_type === "care_signal" && a.note_id === noteId
+          );
+          if (sameNoteAlert) {
+            const diffMs = nowMs - new Date(sameNoteAlert.sent_at).getTime();
+            const limit7dMs = 7 * 24 * 60 * 60 * 1000;
+            if (diffMs < limit7dMs) {
+              const remainingHours = Math.ceil((limit7dMs - diffMs) / (1000 * 60 * 60));
+              return new Response(
+                JSON.stringify({
+                  error: "rate_limited",
+                  reason: "same_note_7d",
+                  remaining_hours: remainingHours,
+                  message: "Um sinal de cuidado sobre este registro já foi enviado recentemente (cooldown de 7 dias).",
+                }),
+                { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+              );
+            }
+          }
+        }
+
+        // Trava 48 horas registro distinto
+        const lastCareSignal = alerts.find((a: any) => a.trigger_type === "care_signal");
+        if (lastCareSignal) {
+          const diffMs = nowMs - new Date(lastCareSignal.sent_at).getTime();
+          const limit48hMs = 48 * 60 * 60 * 1000;
+          if (diffMs < limit48hMs) {
+            const remainingHours = Math.ceil((limit48hMs - diffMs) / (1000 * 60 * 60));
+            return new Response(
+              JSON.stringify({
+                error: "rate_limited",
+                reason: "distinct_note_48h",
+                remaining_hours: remainingHours,
+                message: "Um sinal de cuidado foi enviado nas últimas 48 horas. Aguarde a aproximação pastoral natural antes de um novo aviso.",
               }),
               { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
           }
         }
       }
-
-      // Trava 48 horas registro distinto
-      const lastCareSignal = alerts.find((a: any) => a.trigger_type === "care_signal");
-      if (lastCareSignal) {
-        const diffMs = nowMs - new Date(lastCareSignal.sent_at).getTime();
-        const limit48hMs = 48 * 60 * 60 * 1000;
-        if (diffMs < limit48hMs) {
-          const remainingHours = Math.ceil((limit48hMs - diffMs) / (1000 * 60 * 60));
-          return new Response(
-            JSON.stringify({
-              error: "rate_limited",
-              reason: "distinct_note_48h",
-              remaining_hours: remainingHours,
-              message: "Um sinal de cuidado foi enviado nas últimas 48 horas. Aguarde a aproximação pastoral natural antes de um novo aviso.",
-            }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-      }
+    } else {
+      console.log(`[send-pastoral-alert] Modo Administrador ativo para ${user.email}: Limites de 48h/7d ignorados.`);
     }
 
     // 5. Montar e-mail afetuoso e discreto (Zero text leaks)
