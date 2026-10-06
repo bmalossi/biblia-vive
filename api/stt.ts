@@ -68,13 +68,28 @@ export default async function handler(req: any, res?: any) {
         ""
     ).trim().replace(/^["']|["']$/g, "");
 
+    const corsHeaders: Record<string, string> = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    };
+
+    if (method === "OPTIONS") {
+        if (res && typeof res.status === "function") {
+            Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+            return res.status(204).end();
+        }
+        return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
     const respondJson = (data: any, status = 200) => {
         if (res && typeof res.status === "function") {
+            Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
             return res.status(status).json(data);
         }
         return new Response(JSON.stringify(data), {
             status,
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json", ...corsHeaders }
         });
     };
 
