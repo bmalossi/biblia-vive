@@ -53,6 +53,7 @@ const JornadasPage = lazy(() => import('./pages/JornadasPage'));
 const AuthorPage = lazy(() => import('./pages/AuthorPage'));
 const AtalaiaConfirmPage = lazy(() => import('./pages/AtalaiaConfirmPage'));
 const MemorialConfirmadoPage = lazy(() => import('./pages/MemorialConfirmadoPage'));
+const MemorialAuthCallbackPage = lazy(() => import('./pages/MemorialAuthCallbackPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -130,6 +131,8 @@ const App = () => (
                   <Route path="/atalaia/confirmar" element={<AtalaiaConfirmPage />} />
                   <Route path="/atalaia/aceitar" element={<Navigate to="/atalaia/confirmar" replace />} />
                   <Route path="/memorial/confirmado" element={<MemorialConfirmadoPage />} />
+                  <Route path="/memorial/auth/callback" element={<MemorialAuthCallbackPage />} />
+                  <Route path="/memorial/callback" element={<Navigate to="/memorial/auth/callback" replace />} />
                   <Route path="/auth/callback" element={<AuthCallbackPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
