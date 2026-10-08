@@ -1,106 +1,156 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // MemorialConfirmadoPage.tsx — Bíblia Vive & Memorial
 //
-// Tela apropriada do Memorial exibida ao clicar no link de confirmação
-// de e-mail enviado pelo Supabase. Permite abrir o app Memorial no celular
-// ou continuar para a versão web do Memorial.
+// Página de confirmação de cadastro do Memorial.
+// Segue rigorosamente o padrão editorial nobre e contemplativo do Memorial:
+// Dual-tone sóbrio, tipografia solene, zero AI-slop e integração com deep link móvel.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Smartphone, Globe, ArrowRight } from 'lucide-react';
+import { ArrowUpRight, ArrowLeft } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function MemorialConfirmadoPage() {
     usePageMeta({
-        title: "E-mail Confirmado — Memorial",
-        description: "Confirmação de e-mail realizada com sucesso no Memorial e Bíblia Vive.",
+        title: "Cadastro Confirmado — Memorial",
+        description: "Seu acesso unificado ao Memorial e Bíblia Vive foi confirmado com sucesso.",
         robots: "noindex, nofollow",
     });
 
     const [isMobile, setIsMobile] = useState(false);
-    const [openedApp, setOpenedApp] = useState(false);
+    const [redirectAttempted, setRedirectAttempted] = useState(false);
+
+    // Constrói o link profundo preservando os parâmetros de token ou hash para o app mobile
+    const getDeepLinkUrl = (scheme: string) => {
+        const hash = typeof window !== 'undefined' ? window.location.hash : '';
+        const search = typeof window !== 'undefined' ? window.location.search : '';
+        const payload = hash || search || '';
+        return `${scheme}://auth/callback${payload}`;
+    };
 
     useEffect(() => {
-        const mobileCheck = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const mobileCheck = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         setIsMobile(mobileCheck);
 
-        // Se estiver em dispositivo móvel, tenta acionar a abertura suave do aplicativo Memorial
+        // Se estiver em smartphone, realiza o disparo suave para abrir o app Memorial instalado
         if (mobileCheck) {
             const timer = setTimeout(() => {
-                window.location.href = 'memorial://auth/callback';
-            }, 600);
+                setRedirectAttempted(true);
+                window.location.href = getDeepLinkUrl('memorial');
+            }, 500);
             return () => clearTimeout(timer);
         }
     }, []);
 
-    const handleOpenApp = () => {
-        setOpenedApp(true);
-        // Tenta esquema customizado memorial:// e fallback exp+memorial-app://
-        window.location.href = 'memorial://auth/callback';
+    const handleOpenMobileApp = () => {
+        setRedirectAttempted(true);
+        // Tenta esquema canônico memorial:// com fallback para exp+memorial-app://
+        window.location.href = getDeepLinkUrl('memorial');
         setTimeout(() => {
-            window.location.href = 'exp+memorial-app://auth/callback';
-        }, 800);
+            window.location.href = getDeepLinkUrl('exp+memorial-app');
+        }, 900);
     };
 
     return (
-        <Layout>
-            <div className="flex min-h-[75vh] items-center justify-center px-4 py-12">
-                <div className="w-full max-w-md rounded-2xl border border-app-border bg-app-surface p-8 text-center shadow-xl">
-                    {/* Selo / Header Solene */}
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-500">
-                        <span>Memorial</span>
-                        <span className="text-app-text-muted">·</span>
-                        <span>Bíblia Vive</span>
+        <Layout hideHeader hideMobileNav hideFooter className="bg-[#0E0D11]">
+            <main
+                id="main-content"
+                className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12 selection:bg-[#E7B075]/20 selection:text-[#F7F5F0]"
+            >
+                {/* Iluminação ambiente dourada muito difusa e contemplativa */}
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 overflow-hidden"
+                >
+                    <div className="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E7B075]/[0.035] blur-[100px]" />
+                </div>
+
+                {/* Card de Confirmação Editorial (Padrão Memorial) */}
+                <div className="relative z-10 w-full max-w-md rounded-2xl border border-[#2B2836] bg-[#18171D] p-8 text-center shadow-2xl md:p-10">
+                    
+                    {/* Círculo do Logotipo do Memorial */}
+                    <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-[#E7B075]/20 bg-[#211F28] shadow-inner">
+                        <img
+                            src="/images/memorial-logo.png"
+                            alt="Logotipo Memorial"
+                            className="h-8 w-8 object-contain"
+                            onError={(e) => {
+                                // Fallback elegante em caso de ausência do arquivo local
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                            }}
+                        />
                     </div>
 
-                    {/* Ícone de Sucesso */}
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 ring-8 ring-emerald-500/5">
-                        <CheckCircle2 className="h-8 w-8" />
-                    </div>
+                    {/* Kicker Editorial */}
+                    <p className="font-mono text-[10.5px] font-medium uppercase tracking-[0.28em] text-[#E7B075]">
+                        MEMORIAL · BÍBLIA VIVE
+                    </p>
 
-                    {/* Títulos */}
-                    <h1 className="mb-2 font-serif text-2xl font-bold tracking-tight text-app-text">
-                        E-mail Confirmado com Sucesso!
+                    {/* Título Serif */}
+                    <h1 className="mt-2 font-serif text-2xl font-normal tracking-tight text-[#F7F5F0] sm:text-3xl">
+                        Conta confirmada
                     </h1>
-                    <p className="mb-8 text-sm leading-relaxed text-app-text-secondary">
-                        Sua conta unificada está ativa. Agora você pode registrar suas orações, reflexões e testemunhos com total privacidade e cobertura pastoral.
+
+                    {/* Divisor minimalista */}
+                    <div className="mx-auto my-4 h-px w-10 bg-[#E7B075]/20" />
+
+                    {/* Mensagem Solene */}
+                    <p className="mx-auto max-w-sm text-sm leading-relaxed text-[#A6A19A]">
+                        Seu acesso unificado foi validado. Você já pode retornar ao aplicativo para registrar e guardar suas memórias, orações e reflexões espirituais.
                     </p>
 
                     {/* Ações */}
-                    <div className="flex flex-col gap-3">
-                        {/* Botão de Abrir App */}
+                    <div className="mt-8 flex flex-col gap-3">
+                        {/* Botão Primário: Retornar / Abrir App */}
                         <button
-                            onClick={handleOpenApp}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-3.5 text-sm font-semibold text-stone-950 shadow-md transition-all hover:brightness-105 active:scale-[0.99]"
+                            type="button"
+                            onClick={handleOpenMobileApp}
+                            className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#B87E28] px-5 py-3.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-[#C98B32] active:scale-[0.99]"
                         >
-                            <Smartphone className="h-4 w-4" />
                             <span>Abrir no Aplicativo Memorial</span>
+                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                         </button>
 
-                        {/* Botão de Continuar na Web */}
+                        {/* Botão Secundário: Continuar no Memorial Web */}
                         <Link
                             to="/memorial"
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-app-border bg-app-raised px-5 py-3 text-sm font-medium text-app-text transition-colors hover:bg-app-surface-hover"
+                            className="inline-flex w-full items-center justify-center rounded-xl border border-[#2B2836] bg-[#211F28] px-5 py-3 text-xs font-medium text-[#CBC7BD] transition-colors hover:bg-[#2A2733] hover:text-[#F7F5F0]"
                         >
-                            <Globe className="h-4 w-4 text-app-text-muted" />
-                            <span>Acessar Memorial na Web</span>
+                            <span>Continuar no navegador web</span>
                         </Link>
                     </div>
 
-                    {/* Link para Bíblia Vive */}
-                    <div className="mt-8 border-t border-app-border/60 pt-6">
-                        <Link
-                            to="/planos"
-                            className="inline-flex items-center gap-1.5 text-xs text-app-text-muted transition-colors hover:text-amber-500"
-                        >
-                            <span>Ir para Planos de Leitura no Bíblia Vive</span>
-                            <ArrowRight className="h-3 w-3" />
-                        </Link>
+                    {/* Se o redirecionamento automático falhar ou estiver em desktop */}
+                    {isMobile && redirectAttempted && (
+                        <p className="mt-4 text-[11.5px] leading-relaxed text-[#7A756E]">
+                            Se o aplicativo não abrir automaticamente, toque no botão acima ou abra o app diretamente no seu telefone.
+                        </p>
+                    )}
+
+                    {/* Citação Escritural de Fechamento */}
+                    <div className="mt-8 border-t border-[#2B2836]/70 pt-6">
+                        <blockquote className="font-serif text-xs italic tracking-wide text-[#7A756E]">
+                            “Tudo o que Deus tem feito, permanece.”
+                            <span className="block not-italic text-[10.5px] text-[#635E57] mt-1 font-sans">
+                                Eclesiastes 3:14
+                            </span>
+                        </blockquote>
                     </div>
                 </div>
-            </div>
+
+                {/* Link Discreto de Retorno ao Bíblia Vive */}
+                <div className="relative z-10 mt-6 text-center">
+                    <Link
+                        to="/"
+                        className="inline-flex items-center gap-1.5 text-xs text-[#635E57] transition-colors hover:text-[#A6A19A]"
+                    >
+                        <ArrowLeft className="h-3 w-3" />
+                        <span>Voltar para a página inicial do Bíblia Vive</span>
+                    </Link>
+                </div>
+            </main>
         </Layout>
     );
 }
