@@ -10,27 +10,30 @@ interface TriageRequestBody {
   text: string;
   category?: string;
   platform?: "android" | "ios" | "web";
+  is_answered?: boolean;
+  bible_ref?: { display?: string; book?: string };
+  mode?: string;
 }
 
-// Padrões de ressonância de dor profunda e clamor por socorro (heurística complementar/fallback)
-const DISTRESS_PATTERNS = [
-  /n[ãa]o aguent(o|ei) mais/i,
-  /quer(o|ia) sumir/i,
-  /vontade de desistir/i,
+type PastoralPillarChoice =
+  | "CRISIS"
+  | "THANKSGIVING"
+  | "THEOLOGICAL_QUERY"
+  | "ANSWERED_PRAYER"
+  | "NEUTRAL_NOTE";
+
+// Padrões de emergência extrema (ideação de morte/suicídio explícita).
+// Utilizado apenas como safety-net caso os motores de IA estejam indisponíveis.
+const EMERGENCY_CRISIS_PATTERNS = [
   /vontade de morrer/i,
+  /quer(o|ia) morrer/i,
+  /preferia morrer/i,
   /tirar a (pr[óo]pria )?vida/i,
-  /acabar com tudo/i,
-  /dor insuport[áa]vel/i,
-  /ang[úu]stia profunda/i,
-  /vazio sem fim/i,
-  /desespero/i,
-  /solid[ãa]o insuport[áa]vel/i,
-  /ningu[ée]m se importa/i,
-  /completamente sozinh[oa]/i,
-  /perd(i|endo) as esperan[çc]as/i,
-  /pedindo socorro/i,
-  /socorro de deus/i,
-  /sem for[çc]as para continuar/i,
+  /tirar minha vida/i,
+  /acabar com a minha vida/i,
+  /suic[íi]d(io|a)/i,
+  /desistir de viver/i,
+  /desistir da vida/i,
 ];
 
 Deno.serve(async (req: Request) => {
@@ -78,57 +81,93 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // 2. Extração transitória do texto
+    // 2. Extração transitória do payload
     const body: TriageRequestBody = await req.json().catch(() => ({ text: "" }));
     const text = (body.text || "").trim();
     const platform = body.platform || "android";
 
     if (!text || text.length < 5) {
       return new Response(
-        JSON.stringify({ eligible_for_care_prompt: false }),
+        JSON.stringify({
+          eligible_for_care_prompt: false,
+          pastoral_intent: null,
+          confidence: 0.0,
+          reason: "Texto insuficiente para classificação.",
+        }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     let isEligible = false;
-    const isAdmin = (user?.app_metadata as any)?.role === "admin" || user?.email?.toLowerCase().trim() === "contato@automab.dev";
-    const hasDistressPattern = DISTRESS_PATTERNS.some((pat) => pat.test(text));
+    let pastoralIntent: "CRISIS" | "THANKSGIVING" | "THEOLOGICAL_QUERY" | "ANSWERED_PRAYER" | null = null;
+    let intentConfidence = 0.0;
+    let intentReason = "Classificação contextual efêmera JEV.";
+    let evaluatedByAi = false;
 
-    // 1. Rede de Segurança Imediata (Heurística de Padrões Explícitos)
-    if (hasDistressPattern) {
-      isEligible = true;
-      console.log(`[care-triage] Padrão explícito de sofrimento/desespero reconhecido no texto.`);
+    const isAdmin =
+      (user?.app_metadata as any)?.role === "admin" ||
+      user?.email?.toLowerCase().trim() === "contato@automab.dev";
+
+    // ── Determinações Explícitas Pré-IA ──────────────────────────────────────────
+
+    // A. Marcação explícita de oração respondida pelo usuário
+    if (body.is_answered === true) {
+      pastoralIntent = "ANSWERED_PRAYER";
+      intentConfidence = 0.99;
+      intentReason = "Oração explicitamente marcada como respondida pelo usuário.";
     }
 
-    // 2. Modo Administrador: Facilita testes imediatos para a conta admin
-    if (isAdmin && (hasDistressPattern || /teste|desespero|angustia|socorro|dor|ajuda|tristeza|vazio/i.test(text))) {
-      isEligible = true;
-      console.log(`[care-triage] Administrador em teste detectado (${user.email}) -> elegível ativado.`);
+    // B. Comandos explícitos de teste para Administrador
+    if (isAdmin) {
+      if (/#teste-?crise/i.test(text)) {
+        isEligible = true;
+        pastoralIntent = "CRISIS";
+        intentConfidence = 0.99;
+        intentReason = "Teste de Crise (Administrador via #teste-crise).";
+      } else if (/#teste-?gracas/i.test(text)) {
+        isEligible = false;
+        pastoralIntent = "THANKSGIVING";
+        intentConfidence = 0.99;
+        intentReason = "Teste de Ação de Graças (Administrador via #teste-gracas).";
+      } else if (/#teste-?estudo/i.test(text)) {
+        isEligible = false;
+        pastoralIntent = "THEOLOGICAL_QUERY";
+        intentConfidence = 0.99;
+        intentReason = "Teste de Estudo Bíblico (Administrador via #teste-estudo).";
+      }
     }
 
-    // 3. Avaliação semântica via TypeSafe JEV (System One) se ainda não elegível
-    if (!isEligible && typesafeApiKey) {
+    // ── 3. Classificação Semântica Contextual TypeSafe JEV (Choice) ───────────────
+    if (!pastoralIntent && typesafeApiKey) {
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000);
+        const timeout = setTimeout(() => controller.abort(), 4500);
 
         const jevResponse = await fetch("https://api.typesafe.ai/v1/systemone", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${typesafeApiKey}`,
+            Authorization: `Bearer ${typesafeApiKey}`,
           },
           body: JSON.stringify({
             model: "jev-latest",
             state: `[RELATO CONFIDENCIAL DO LEITOR]\n"""\n${text.slice(0, 3000)}\n"""`,
             questions: {
-              indicates_deep_distress: {
-                type: "noul",
+              pastoral_intent: {
+                type: "choice",
                 instructions:
-                  "O relato pessoal do leitor expressa dor profunda, angústia aguda, desespero, solidão sufocante, esgotamento espiritual ou luto inconsolável, onde acolhimento ou apoio pastoral fraterno seria humanamente benéfico?",
+                  "Qual é a intenção pastoral e natureza predominante deste relato pessoal do leitor?",
                 criteria: {
-                  true: "O relato expressa desespero, aflição, sofrimento agudo, angústia, solidão, cansaço espiritual ou busca por socorro.",
-                  false: "O relato é sereno, alegre, reflexivo, doutrinário ou sem sinais de sofrimento ou angústia.",
+                  CRISIS:
+                    "O AUTOR do relato descreve, em primeira pessoa, sofrimento agudo atual, dor emocional insuportável, desespero pessoal, solidão extrema, vontade de desistir ou clamor por socorro. Descarte menções a sofrimento de terceiros, sermões anotados ou críticas eclesiológicas.",
+                  THANKSGIVING:
+                    "O autor expressa gratidão, celebração, bênção recebida, conquista, nova oportunidade de emprego/trabalho, vitória, milagre ou testemunho do agir de Deus na sua vida.",
+                  THEOLOGICAL_QUERY:
+                    "Dúvida sincera sobre fé, estudo bíblico profundo, reflexão apologética ou dúvida exegética/hermenêutica sobre o sentido de uma passagem bíblica.",
+                  ANSWERED_PRAYER:
+                    "Celebração específica de uma oração respondida por Deus, cumprimento de clamor ou promessa que havia sido apresentada em oração.",
+                  NEUTRAL_NOTE:
+                    "Anotação de sermão ou pregação, estudo sereno sem dúvida pessoal, crítica/desabafo sobre liderança ou igreja, reflexão teológica geral sem crise pessoal nem testemunho de vitória.",
                 },
               },
             },
@@ -139,21 +178,33 @@ Deno.serve(async (req: Request) => {
         if (jevResponse.ok) {
           const jevData = await jevResponse.json();
           const answers = jevData?.answers || jevData?.results || jevData;
-          const qDistress = answers?.indicates_deep_distress;
+          const qChoice = answers?.pastoral_intent;
 
-          let distressProb = 0;
-          if (qDistress) {
-            if (typeof qDistress.noul === "number") distressProb = qDistress.noul;
-            else if (typeof qDistress.probability === "number") distressProb = qDistress.probability;
-            else if (typeof qDistress.answer === "number") distressProb = qDistress.answer;
-            else if (qDistress.answer === true) distressProb = 1;
-          }
+          if (qChoice && qChoice.choice) {
+            const chosen = qChoice.choice as PastoralPillarChoice;
+            const conf = typeof qChoice.confidence === "number" ? qChoice.confidence : 0.85;
+            evaluatedByAi = true;
 
-          // Calibração do limiar Noul: probabilidade >= 0.50
-          if (distressProb >= 0.50) {
-            isEligible = true;
+            // Confidence-Gated Routing (TypeSafe pattern): threshold >= 0.70
+            if (chosen !== "NEUTRAL_NOTE" && conf >= 0.70) {
+              pastoralIntent = chosen;
+              intentConfidence = conf;
+              intentReason = `Classificado contextualmente como ${chosen} pelo motor JEV (TypeSafe AI, confiança: ${(conf * 100).toFixed(0)}%).`;
+              if (chosen === "CRISIS") {
+                isEligible = true;
+              }
+            } else {
+              // NEUTRAL_NOTE ou confiança abaixo de 0.70: rota segura/silenciosa
+              pastoralIntent = null;
+              intentConfidence = conf;
+              intentReason = "Relato classificado como reflexão neutra/estudo pelo motor JEV.";
+              isEligible = false;
+            }
+
+            console.log(
+              `[care-triage] JEV Choice avaliado: ${chosen} (confiança: ${conf.toFixed(2)}) -> Elegível para crise: ${isEligible}`
+            );
           }
-          console.log(`[care-triage] TypeSafe JEV avaliado. Probabilidade: ${distressProb.toFixed(3)} -> Elegível: ${isEligible}`);
         } else {
           const errText = await jevResponse.text().catch(() => "");
           console.warn("[care-triage] TypeSafe JEV erro HTTP:", jevResponse.status, errText);
@@ -163,8 +214,8 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // 4. Fallback OpenAI gpt-4o-mini (se ainda não elegível e JEV não marcou)
-    if (!isEligible && openAiApiKey) {
+    // ── 4. Fallback OpenAI gpt-4o-mini (se JEV não respondeu) ─────────────────────
+    if (!evaluatedByAi && !pastoralIntent && openAiApiKey) {
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 6000);
@@ -173,7 +224,7 @@ Deno.serve(async (req: Request) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${openAiApiKey}`,
+            Authorization: `Bearer ${openAiApiKey}`,
           },
           body: JSON.stringify({
             model: "gpt-4o-mini",
@@ -183,14 +234,20 @@ Deno.serve(async (req: Request) => {
               {
                 role: "system",
                 content:
-                  "Você é um classificador discreto e ético de triagem de cuidado para o aplicativo Bíblia Vive/Memorial. " +
-                  "Sua única função é identificar se o relato pessoal do leitor expressa dor profunda, angústia aguda, solidão sufocante, crise de desespero, esgotamento espiritual ou luto inconsolável, onde uma aproximação pastoral acolhedora ou canal de apoio (CVV) seria humanamente benéfica. " +
-                  "Retorne ESTRITAMENTE um JSON no formato: {\"eligible\": boolean}. " +
-                  "NÃO forneça explicações, diagnósticos, rótulos clínicos ou resumos.",
+                  "Você é o classificador discreto e ético dos 4 Pilares de Cuidado Pastoral para o ecossistema Bíblia Vive/Memorial.\n" +
+                  "Avalie o contexto completo do relato e classifique em uma das 5 categorias:\n" +
+                  "- \"CRISIS\": O AUTOR em primeira pessoa está em dor aguda, desespero pessoal, solidão sufocante ou ideação de desistência. (Ignore críticas à igreja ou sofrimento de terceiros).\n" +
+                  "- \"THANKSGIVING\": Testemunho de vitória, bênção recebida, conquista, emprego, livramento ou gratidão a Deus.\n" +
+                  "- \"THEOLOGICAL_QUERY\": Dúvida de estudo bíblico, pergunta hermenêutica ou reflexão exegética sincera.\n" +
+                  "- \"ANSWERED_PRAYER\": Oração ou clamor atendido por Deus.\n" +
+                  "- \"NEUTRAL_NOTE\": Anotação de sermão, estudo sereno, crítica sobre liderança/igreja, desabafo eclesiológico geral.\n\n" +
+                  "Retorne ESTRITAMENTE um JSON no formato:\n" +
+                  "{\"intent\": \"CRISIS\"|\"THANKSGIVING\"|\"THEOLOGICAL_QUERY\"|\"ANSWERED_PRAYER\"|\"NEUTRAL_NOTE\", \"confidence\": number}\n" +
+                  "NÃO inclua diagnósticos, rótulos clínicos ou resumos.",
               },
               {
                 role: "user",
-                content: `Avalie o seguinte relato de forma efêmera e confidencial:\n"""\n${text}\n"""`,
+                content: `Avalie o seguinte relato de forma confidencial:\n"""\n${text}\n"""`,
               },
             ],
           }),
@@ -200,17 +257,44 @@ Deno.serve(async (req: Request) => {
         if (aiResponse.ok) {
           const aiData = await aiResponse.json();
           const parsed = JSON.parse(aiData?.choices?.[0]?.message?.content || "{}");
-          if (Boolean(parsed.eligible)) {
-            isEligible = true;
+          const intent = parsed.intent as PastoralPillarChoice;
+          const conf = typeof parsed.confidence === "number" ? parsed.confidence : 0.85;
+          evaluatedByAi = true;
+
+          if (intent && intent !== "NEUTRAL_NOTE" && conf >= 0.70) {
+            pastoralIntent = intent;
+            intentConfidence = conf;
+            intentReason = `Classificado contextualmente como ${intent} via gpt-4o-mini (confiança: ${(conf * 100).toFixed(0)}%).`;
+            if (intent === "CRISIS") {
+              isEligible = true;
+            }
+          } else {
+            pastoralIntent = null;
+            intentConfidence = conf;
+            intentReason = "Classificado como neutro via gpt-4o-mini.";
+            isEligible = false;
           }
-          console.log(`[care-triage] OpenAI gpt-4o-mini executado -> Elegível: ${isEligible}`);
+
+          console.log(`[care-triage] OpenAI gpt-4o-mini avaliado: ${intent} (confiança: ${conf.toFixed(2)})`);
         }
       } catch (aiErr) {
         console.warn("[care-triage] Erro na avaliação OpenAI:", aiErr);
       }
     }
 
-    // 4. Se elegível e o leitor NÃO tem contato pastoral ativo, registrar Telemetria Cega (ADR 0001)
+    // ── 5. Rede de Segurança Extrema (Apenas se nenhuma IA respondeu) ─────────────
+    if (!evaluatedByAi && !pastoralIntent) {
+      const hasEmergencyCrisis = EMERGENCY_CRISIS_PATTERNS.some((pat) => pat.test(text));
+      if (hasEmergencyCrisis) {
+        isEligible = true;
+        pastoralIntent = "CRISIS";
+        intentConfidence = 0.95;
+        intentReason = "Padrão de emergência de segurança detectado em fallback offline.";
+        console.warn("[care-triage] Padrão de emergência extrema acionado sem IA.");
+      }
+    }
+
+    // ── 6. Telemetria Cega (ADR 0001) ─────────────────────────────────────────────
     if (isEligible) {
       try {
         const { data: activeContact } = await supabase
@@ -235,15 +319,26 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // 5. Retornar APENAS o booleano efêmero (INVARIANTE DE SEGURANÇA ABSOLUTA: zero texto, zero scores)
+    // ── 7. Resposta Estruturada ──────────────────────────────────────────────────
     return new Response(
-      JSON.stringify({ eligible_for_care_prompt: isEligible }),
+      JSON.stringify({
+        eligible_for_care_prompt: isEligible,
+        pastoral_intent: pastoralIntent,
+        confidence: intentConfidence,
+        reason: intentReason,
+        biblical_reference: body.bible_ref?.display || body.bible_ref?.book,
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("[care-triage] Erro fatal:", error);
     return new Response(
-      JSON.stringify({ eligible_for_care_prompt: false }),
+      JSON.stringify({
+        eligible_for_care_prompt: false,
+        pastoral_intent: null,
+        confidence: 0.0,
+        reason: "Erro interno no processamento da triagem.",
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

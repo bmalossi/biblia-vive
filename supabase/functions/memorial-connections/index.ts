@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
+import { startLangfuseTrace } from "../lib/langfuse.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +19,8 @@ interface ConnectionRequestBody {
     display?: string;
   };
   tags?: string[];
+  sessionId?: string;
+  entryId?: string;
 }
 
 interface BibleConnection {
@@ -200,24 +203,23 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // 1. Autenticação obrigatória do Leitor
+    // 1. Identificação do Leitor (autenticado ou visitante)
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Authorization header required" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    let userId = "leitor_visitante";
+    let isGuest = true;
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const token = authHeader.replace("Bearer ", "").trim();
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Sessão inválida ou expirada" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (authHeader) {
+      try {
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const token = authHeader.replace("Bearer ", "").trim();
+        const { data: userData, error: authError } = await supabase.auth.getUser(token);
+        if (!authError && userData?.user?.id) {
+          userId = userData.user.id;
+          isGuest = false;
+        }
+      } catch (_authErr) {
+        // Permite continuidade graciosa para leitores não autenticados
+      }
     }
 
     // 2. Extração dos dados do marco
@@ -228,8 +230,43 @@ Deno.serve(async (req: Request) => {
     const bibleRef = body.bibleRef?.display || "";
     const tags = Array.isArray(body.tags) ? body.tags.join(", ") : "";
 
+    // 2.1. Inicia Trace canônico no Langfuse para Observabilidade de IA
+    const trace = startLangfuseTrace({
+      name: "memorial-theological-connections",
+      userId,
+      sessionId: body.sessionId || body.entryId || userId,
+      tags: ["memorial", category, isGuest ? "visitante" : "autenticado", "canon-jev", "production"],
+      input: {
+        title,
+        category,
+        bibleRef,
+        tags: body.tags,
+        textLength: text.length,
+        textPreview: text.slice(0, 1000), // Prévia segura sem expor dados desnecessários
+      },
+      metadata: {
+        title,
+        category,
+        bibleRef,
+        client: "memorial-app",
+        isGuest,
+      },
+    });
+
     // 3. Validação anti-gibberish inicial via regex
     if (!isMeaningfulText(text)) {
+      trace.update({
+        level: "WARNING",
+        statusMessage: "Texto insuficiente ou sem padrão de reflexão (rejeitado antes do LLM)",
+        output: {
+          connections: [],
+          jev_category: "Eco_de_Linguagem",
+          empty: true,
+          reason: "insufficient_text",
+        },
+      });
+      await trace.flush();
+
       return new Response(
         JSON.stringify({
           connections: [],
@@ -246,6 +283,17 @@ Deno.serve(async (req: Request) => {
     let jevConfidence = 0.90;
 
     if (typesafeApiKey) {
+      const jevSpan = trace.span({
+        name: "typesafe-jev-classification",
+        input: {
+          model: "jev-latest",
+          category: (category || "reflexao").toUpperCase(),
+          title: title || "Sem título",
+          bibleRef: bibleRef || "Nenhuma",
+        },
+        metadata: { endpoint: "https://api.typesafe.ai/v1/systemone" },
+      });
+
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 4000);
@@ -298,6 +346,18 @@ Deno.serve(async (req: Request) => {
           // Se o JEV classificar como texto sem significado real (< 0.60), encerra imediatamente sem chamar OpenAI
           if (coherenceProb < 0.60) {
             console.log(`[memorial-connections] TypeSafe JEV detectou texto sem sentido espiritual (coerência: ${coherenceProb.toFixed(3)}). Rejeitando sem chamar OpenAI.`);
+            jevSpan.end({
+              level: "WARNING",
+              statusMessage: `Classificado como incoerente/sem sentido espiritual (prob: ${coherenceProb.toFixed(2)})`,
+              output: { coherenceProb, rejected: true },
+            });
+            trace.update({
+              level: "WARNING",
+              statusMessage: "Rejeitado na triagem teológica TypeSafe JEV",
+              output: { coherenceProb, empty: true },
+            });
+            await trace.flush();
+
             return new Response(
               JSON.stringify({
                 connections: [],
@@ -319,11 +379,27 @@ Deno.serve(async (req: Request) => {
             }
           }
           console.log(`[memorial-connections] TypeSafe JEV classificou categoria: ${jevDeterminedCategory} (confiança: ${jevConfidence})`);
+
+          jevSpan.end({
+            output: {
+              determinedCategory: jevDeterminedCategory,
+              confidence: jevConfidence,
+              coherenceProb,
+            },
+          });
         } else {
           console.warn("[memorial-connections] TypeSafe JEV status HTTP:", jevRes.status);
+          jevSpan.end({
+            level: "WARNING",
+            statusMessage: `TypeSafe JEV respondeu com HTTP ${jevRes.status}`,
+          });
         }
-      } catch (jevErr) {
+      } catch (jevErr: any) {
         console.warn("[memorial-connections] Erro ao consultar TypeSafe JEV:", jevErr);
+        jevSpan.end({
+          level: "ERROR",
+          statusMessage: jevErr?.message || "Exceção ao consultar TypeSafe JEV",
+        });
       }
     }
 
@@ -382,6 +458,23 @@ ${text}
 
 Analise com solenidade e retorne as conexões bíblicas no formato JSON estrito.`;
 
+      const generation = trace.generation({
+        name: "openai-gpt4o-mini-theology",
+        model: "gpt-4o-mini",
+        modelParameters: {
+          temperature: 0.2,
+          response_format: { type: "json_object" },
+        },
+        input: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        metadata: {
+          effectiveCategory,
+          title,
+        },
+      });
+
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 9000);
@@ -434,6 +527,26 @@ Analise com solenidade e retorne as conexões bíblicas no formato JSON estrito.
             confidence: typeof c.confidence === "number" ? c.confidence : jevConfidence,
           }));
 
+          // Observabilidade: Finaliza generation com contagem exata de tokens
+          generation.end({
+            output: parsed,
+            usage: {
+              promptTokens: aiData?.usage?.prompt_tokens,
+              completionTokens: aiData?.usage?.completion_tokens,
+              totalTokens: aiData?.usage?.total_tokens,
+            },
+          });
+
+          // Finaliza trace com o resultado completo
+          trace.update({
+            output: {
+              connectionsCount: connections.length,
+              primaryCategory,
+              primaryReference: connections[0]?.reference || null,
+            },
+          });
+          await trace.flush();
+
           return new Response(
             JSON.stringify({
               connections,
@@ -441,20 +554,62 @@ Analise com solenidade e retorne as conexões bíblicas no formato JSON estrito.
             }),
             { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
+        } else {
+          generation.end({
+            level: "ERROR",
+            statusMessage: `OpenAI retornou HTTP ${aiResponse.status}`,
+          });
         }
-      } catch (aiErr) {
+      } catch (aiErr: any) {
         console.warn("[memorial-connections] Falha ao consultar OpenAI, avaliando fallback:", aiErr);
+        generation.end({
+          level: "ERROR",
+          statusMessage: aiErr?.message || "Exceção ao invocar OpenAI API",
+        });
       }
     }
 
     // 6. Fallback somente se o texto for significativo (nunca para digitação aleatória)
     const fallback = getFallbackForCategory(effectiveCategory);
+
+    const fallbackSpan = trace.span({
+      name: "canonical-fallback-applied",
+      input: {
+        reason: openAiApiKey ? "openai_call_failed" : "no_openai_api_key_configured",
+        effectiveCategory,
+      },
+      level: "DEFAULT",
+    });
+    fallbackSpan.end({ output: fallback });
+
+    trace.update({
+      level: openAiApiKey ? "WARNING" : "DEFAULT",
+      statusMessage: openAiApiKey ? "Fallback canônico acionado devido à falha na OpenAI" : "Fallback canônico heurístico padrão",
+      output: {
+        connectionsCount: fallback.connections.length,
+        primaryCategory: fallback.jev_category,
+        fallback: true,
+      },
+    });
+    await trace.flush();
+
     return new Response(
       JSON.stringify(fallback),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err: any) {
     console.error("[memorial-connections] Exceção:", err);
+    try {
+      if (typeof trace !== "undefined" && trace) {
+        trace.update({
+          level: "ERROR",
+          statusMessage: err?.message || "Exceção fatal no processamento de conexões",
+        });
+        await trace.flush();
+      }
+    } catch (_flushErr) {
+      // ignore flush error on fatal catch
+    }
     return new Response(
       JSON.stringify({ error: err?.message || "Erro interno ao processar conexões" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
