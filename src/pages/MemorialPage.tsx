@@ -238,7 +238,7 @@ export default function MemorialPage() {
                         if (isPro) {
                             exportNotesToPDF(filteredEntries);
                         } else {
-                            navigate("/pro");
+                            navigate("/apoiar");
                         }
                     }}
                     isPro={isPro}

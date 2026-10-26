@@ -9,6 +9,7 @@ import bookContextsData from "@/data/book-contexts.json";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useChapterViews, formatViewedAt } from "@/hooks/useChapterViews";
+import { cn } from "@/lib/utils";
 
 export default function BookPage() {
   const { version, book } = useParams();
@@ -20,13 +21,13 @@ export default function BookPage() {
   const [chapterViewDates, setChapterViewDates] = useState<Record<number, Date>>({});
 
   useEffect(() => {
-    if (!selectedBook || !user?.id) {
+    if (!selectedBook) {
       setChapterViewDates({});
       return;
     }
     let cancelled = false;
     chapterViews.loadForBook(selectedBook.id).then((dates) => {
-      if (!cancelled) setChapterViewDates(dates);
+      if (!cancelled) setChapterViewDates(dates || {});
     });
     return () => { cancelled = true; };
   }, [selectedBook?.id, user?.id]);
@@ -109,12 +110,12 @@ export default function BookPage() {
             const isVisited = !!viewedAt;
             return (
               <Link
-                className={[
-                  "flex h-12 items-center justify-center rounded-lg border font-sans text-sm transition-all duration-150 ease-out btn-puffed hover:border-gold hover:bg-gold hover:text-primary-foreground",
+                className={cn(
+                  "flex h-12 items-center justify-center rounded-lg border font-sans text-sm transition-all duration-150 ease-out btn-puffed select-none",
                   isVisited
-                    ? "border-gold/40 bg-app-raised text-app-text"
-                    : "border-border bg-app-raised text-app-text",
-                ].join(" ")}
+                    ? "border-gold ring-1 ring-gold/50 bg-gold/10 text-gold dark:text-gold-light font-semibold shadow-[0_0_10px_rgba(212,175,55,0.22)] hover:border-gold hover:bg-gold hover:text-primary-foreground hover:ring-gold"
+                    : "border-border/80 bg-app-raised text-app-text-muted hover:border-gold/60 hover:text-app-text hover:bg-gold/5"
+                )}
                 key={chapter}
                 title={isVisited ? `Visitado em ${formatViewedAt(viewedAt)}` : undefined}
                 to={`/${selectedVersion}/${selectedBook.slug}/${chapter}`}

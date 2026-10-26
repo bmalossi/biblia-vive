@@ -33,8 +33,6 @@ const AdminArtigosPage = lazy(() => import("./pages/AdminArtigosPage"));
 const AdminComentariosPage = lazy(() => import("./pages/AdminComentariosPage"));
 const AdminUsuariosPage = lazy(() => import("./pages/AdminUsuariosPage"));
 const WidgetDailyVerse = lazy(() => import("./pages/WidgetDailyVerse"));
-const PricingPage = lazy(() => import("./pages/PricingPage"));
-const ProSuccessPage = lazy(() => import("./pages/ProSuccessPage"));
 const ChurchDisplayPage = lazy(() => import("./pages/ChurchDisplayPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
@@ -115,8 +113,8 @@ const App = () => (
                   <Route path="/admin/comentarios" element={<AdminComentariosPage />} />
                   <Route path="/admin/usuarios" element={<AdminUsuariosPage />} />
                   <Route path="/admin/configuracoes" element={<AdminConfiguracoesPage />} />
-                  <Route path="/pro" element={<PricingPage />} />
-                  <Route path="/pro/success" element={<ProSuccessPage />} />
+                  <Route path="/pro" element={<Navigate to="/apoiar" replace />} />
+                  <Route path="/pro/success" element={<Navigate to="/apoiar" replace />} />
                   <Route path="/widget/daily" element={<WidgetDailyVerse />} />
                   <Route path="/church-display" element={<ChurchDisplayPage />} />
                   <Route path="/conta" element={<AccountPage />} />

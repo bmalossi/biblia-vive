@@ -87,7 +87,6 @@ export default function Layout({
                 <li><Link to="/artigos" className="text-sm text-app-text-muted hover:text-gold transition-colors">Artigos</Link></li>
                 <li><Link to="/sobre" className="text-sm text-app-text-muted hover:text-gold transition-colors">Sobre Nós & Missão</Link></li>
                 <li><Link to="/apoiar" className="text-sm text-app-text-muted hover:text-gold transition-colors">Apoiar o Projeto 💙</Link></li>
-                <li><Link to="/pro" className="text-sm text-app-text-muted hover:text-gold transition-colors">Assinatura PRO</Link></li>
               </ul>
             </div>
             <div>

@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Clock } from "lucide-react";
+import { Clock, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -59,20 +59,19 @@ export function RateLimitDialog({ open, onOpenChange, resetAt, limit }: RateLimi
 
                 <p className="text-[0.8rem] text-app-text-muted/80 leading-relaxed px-2">
                     {limit <= 3
-                        ? "Usuários gratuitos têm 3 comentários por dia. Assine o PRO para comentários ilimitados."
+                        ? "Você atingiu o limite de 3 comentários gratuitos para hoje."
                         : "Para garantir a qualidade e estabilidade da extração dos comentários teológicos para todos os usuários, aplicamos este limite por hora."
                     }
                 </p>
 
                 <div className="pt-2 flex flex-col gap-3">
-                    {limit <= 3 && (
-                        <Button
-                            className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold gap-2"
-                            onClick={() => { onOpenChange(false); navigate('/pro'); }}
-                        >
-                            Assinar PRO — Comentários Ilimitados
-                        </Button>
-                    )}
+                    <Button
+                        className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold gap-2"
+                        onClick={() => { onOpenChange(false); navigate('/apoiar'); }}
+                    >
+                        <Heart className="w-4 h-4" />
+                        Apoiar a Missão
+                    </Button>
                     <Button
                         variant="outline"
                         className="w-full bg-app-raised border-border text-app-text hover:bg-app-raised/80"

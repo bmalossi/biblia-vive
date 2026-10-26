@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useCommentaryQuota } from "@/hooks/useCommentaryQuota";
-import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, Hash, HelpCircle, Lock, Quote, MessageSquare } from "lucide-react";
+import { X, Book, Link2, Languages, Loader2, AlignLeft, Info, Hash, HelpCircle, Lock, Quote, MessageSquare, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n";
@@ -373,7 +373,7 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
 
     const handleGenerateCommentary = async () => {
         if (!isPro && !hasFreeCommentary) {
-            navigate('/pro');
+            navigate('/apoiar');
             return;
         }
 
@@ -856,16 +856,17 @@ export default function StudyPanel({ bookId, chapter, verse, verseText, version,
                                                 <Lock className="h-6 w-6 text-gold" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <h3 className="text-sm font-semibold text-app-text">Recurso Exclusivo PRO</h3>
+                                                <h3 className="text-sm font-semibold text-app-text">Limite de Comentários Atingido</h3>
                                                 <p className="text-[0.75rem] text-app-text-muted leading-relaxed">
-                                                    Você já utilizou seus 3 comentários teológicos gratuitos. Assine para ter acesso a 10 comentários por hora de teólogos históricos e renomados.
+                                                    Você já utilizou seus 3 comentários teológicos gratuitos de hoje. Considere apoiar o projeto para nos ajudar a manter essa ferramenta no ar.
                                                 </p>
                                             </div>
                                             <Button
-                                                className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold"
-                                                onClick={() => navigate('/pro')}
+                                                className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold flex items-center justify-center gap-2"
+                                                onClick={() => navigate('/apoiar')}
                                             >
-                                                Assinar Plano Premium
+                                                <Heart className="w-4 h-4" />
+                                                Apoiar a Missão
                                             </Button>
                                         </div>
                                     ) : (

@@ -160,7 +160,7 @@ export default function MyNotesPage() {
                             if (isPro) {
                                 exportNotesToPDF(filtered);
                             } else {
-                                navigate('/pro');
+                                navigate('/apoiar');
                             }
                         }}
                         disabled={filtered.length === 0}

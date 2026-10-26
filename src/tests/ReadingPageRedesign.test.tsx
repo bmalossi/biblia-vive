@@ -106,6 +106,25 @@ describe("ReadingPage Redesign Components", () => {
       expect(screen.getByRole("button", { name: "Capítulo 1" })).toHaveClass("bg-[#d4a034]");
       unmountLight();
     });
+
+    it("destaca capítulos lidos com contorno dourado evidente e anel", () => {
+      render(
+        <ReadingChapterGridCard
+          totalChapters={10}
+          currentChapter={1}
+          onSelectChapter={vi.fn()}
+          visitedChapters={[2, 3]}
+        />
+      );
+
+      const ch2Btn = screen.getByRole("button", { name: /Capítulo 2/i });
+      expect(ch2Btn).toHaveClass("border-gold");
+      expect(ch2Btn).toHaveClass("ring-1");
+      expect(ch2Btn).toHaveClass("text-gold");
+
+      const ch4Btn = screen.getByRole("button", { name: "Capítulo 4" });
+      expect(ch4Btn).not.toHaveClass("border-gold");
+    });
   });
 
   describe("BookPickerModal", () => {

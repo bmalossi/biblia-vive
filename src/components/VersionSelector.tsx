@@ -43,7 +43,7 @@ export default function VersionSelector({ className }: VersionSelectorProps = {}
   const handleVersionChange = (version: BibleVersion) => {
     const info = getVersionInfo(version);
     if (info?.isPro && !isPro) {
-      navigate("/pro");
+      navigate("/apoiar");
       return;
     }
 

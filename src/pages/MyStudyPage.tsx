@@ -296,7 +296,7 @@ export default function MyStudyPage() {
                                 if (isPro) {
                                     exportNotesToPDF(filteredNotes);
                                 } else {
-                                    navigate('/pro');
+                                    navigate('/apoiar');
                                 }
                             }}
                             disabled={filteredNotes.length === 0}

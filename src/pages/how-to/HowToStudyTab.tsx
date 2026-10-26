@@ -325,9 +325,9 @@ export default function HowToStudyTab() {
           <Button
             variant="outline"
             className="border-gold/30 text-gold hover:bg-gold/10 gap-2"
-            onClick={() => navigate("/pro")}
+            onClick={() => navigate("/apoiar")}
           >
-            Conhecer o Plano PRO
+            Apoiar a Missão
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

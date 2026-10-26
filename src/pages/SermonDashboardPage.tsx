@@ -17,6 +17,7 @@ import {
   ChevronRight,
   ExternalLink,
   GraduationCap,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,7 @@ import { toast } from "sonner";
 export default function SermonDashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isTemplo, loading: subLoading, checkout } = useSubscription();
+  const { isTemplo, loading: subLoading } = useSubscription();
 
   const [sermons, setSermons] = useState<Sermon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -251,24 +252,17 @@ export default function SermonDashboardPage() {
                 Capacite o seu ministério com ferramentas do altar
               </h2>
               <p className="text-xs sm:text-sm text-app-text-muted leading-relaxed">
-                O Plano Templo foi concebido para pastores, pregadores e igrejas que buscam profundidade exegética e excelência na ministração da Palavra.
+                O Estúdio Homilético é um recurso dedicado a pastores, pregadores e líderes que buscam profundidade exegética e excelência na ministração da Palavra.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
               <Button
-                onClick={() => checkout("templo")}
+                onClick={() => navigate("/apoiar")}
                 className="w-full sm:w-auto bg-gold text-primary-foreground hover:bg-gold/90 font-semibold px-7 py-3 rounded-full shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
               >
-                <Crown className="w-4 h-4" />
-                <span>Assinar Plano Templo</span>
-              </Button>
-              <Button
-                onClick={() => navigate("/precos")}
-                variant="outline"
-                className="w-full sm:w-auto rounded-full border-border/80 hover:border-gold/50 hover:text-gold text-xs sm:text-sm px-6 py-3 cursor-pointer"
-              >
-                <span>Conhecer todos os planos</span>
+                <Heart className="w-4 h-4" />
+                <span>Apoiar a Missão</span>
               </Button>
             </div>
           </div>

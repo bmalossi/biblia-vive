@@ -322,18 +322,6 @@ export default function Header() {
     </div>
   );
 
-  /** "Assine PRO" CTA button */
-  const ProCtaButton = ({ className = "" }: { className?: string }) => (
-    <button
-      className={`flex items-center gap-1.5 rounded-full border border-gold/40 bg-transparent px-3 py-1 text-xs font-semibold text-gold transition-all hover:bg-gold/10 hover:border-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${className}`}
-      onClick={() => navigate("/pro")}
-      type="button"
-    >
-      <Crown className="w-3.5 h-3.5 text-gold" />
-      PRO
-    </button>
-  );
-
   /** Search dropdown suggestions (shared for desktop and mobile panel) */
   const SearchSuggestions = () => (
     <div
@@ -544,15 +532,9 @@ export default function Header() {
 
         <div className="flex flex-shrink-0 items-center gap-2">
 
-          {/* PRO badge or CTA — visible from md: */}
-          {!proLoading && (
-            <>
-              {isPro ? (
-                <ProBadge />
-              ) : (
-                <ProCtaButton className="hidden md:flex" />
-              )}
-            </>
+          {/* PRO badge — visible from md: */}
+          {!proLoading && isPro && (
+            <ProBadge />
           )}
 
           <Link
@@ -727,14 +709,13 @@ export default function Header() {
                     </div>
                   ) : (
                     <SheetClose asChild>
-                      <button
-                        className="w-full flex items-center justify-center gap-2 rounded-lg border border-gold/30 bg-transparent px-4 py-2 text-sm font-medium text-gold opacity-80 shadow-sm transition-all hover:bg-gold/10 hover:opacity-100"
-                        onClick={() => navigate("/pro")}
-                        type="button"
+                      <Link
+                        to="/apoiar"
+                        className="w-full flex items-center justify-center gap-2 rounded-lg border border-gold/30 bg-gold/5 px-4 py-2 text-sm font-medium text-gold opacity-90 shadow-sm transition-all hover:bg-gold/10 hover:opacity-100"
                       >
-                        <StarIcon className="h-4 w-4" />
-                        Assine PRO
-                      </button>
+                        <Heart className="h-4 w-4" />
+                        Apoiar o Projeto
+                      </Link>
                     </SheetClose>
                   )}
                 </div>

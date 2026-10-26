@@ -9,6 +9,7 @@ export interface ReadingChapterGridCardProps {
   onSelectChapter: (chapter: number) => void;
   className?: string;
   headerSlot?: React.ReactNode;
+  visitedChapters?: number[] | Record<number, any>;
 }
 
 /**
@@ -26,6 +27,7 @@ export const ReadingChapterGridCard: React.FC<ReadingChapterGridCardProps> = ({
   onSelectChapter,
   className,
   headerSlot,
+  visitedChapters,
 }) => {
   const { isDark, isSepia } = useReadingTheme();
   const activeChapterRef = useRef<HTMLButtonElement | null>(null);
@@ -123,6 +125,9 @@ export const ReadingChapterGridCard: React.FC<ReadingChapterGridCardProps> = ({
         <div className="grid grid-cols-4 gap-2.5 justify-items-center">
           {chapters.map((ch) => {
             const isActive = ch === currentChapter;
+            const isVisited = Array.isArray(visitedChapters)
+              ? visitedChapters.includes(ch)
+              : !!visitedChapters?.[ch];
             return (
               <button
                 key={ch}
@@ -130,12 +135,14 @@ export const ReadingChapterGridCard: React.FC<ReadingChapterGridCardProps> = ({
                 type="button"
                 onClick={() => onSelectChapter(ch)}
                 aria-current={isActive ? "page" : undefined}
-                aria-label={`Capítulo ${ch}`}
+                aria-label={`Capítulo ${ch}${isVisited ? " (lido)" : ""}`}
                 className={cn(
-                  "relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold border",
+                  "relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold border select-none",
                   isActive
                     ? `${activeBtnClass} scale-105`
-                    : inactiveBtnClass
+                    : isVisited
+                      ? "border-gold ring-1 ring-gold/50 bg-gold/10 text-gold dark:text-gold-light font-semibold shadow-[0_0_8px_rgba(212,175,55,0.2)] hover:border-gold hover:bg-gold hover:text-primary-foreground"
+                      : inactiveBtnClass
                 )}
               >
                 {ch}

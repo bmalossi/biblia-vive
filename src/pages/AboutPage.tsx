@@ -81,7 +81,7 @@ export default function AboutPage() {
                         <ShieldCheck className="h-8 w-8 text-gold mb-4" />
                         <h3 className="text-xl font-serif text-app-text mb-2">Transparência</h3>
                         <p className="text-sm text-app-text-muted">
-                            Não somos mantidos por nenhuma congregação denominacional específica. Somos uma plataforma cristã independente suportada em parte pelos assinantes do Bíblia Vive PRO.
+                            Não somos mantidos por nenhuma congregação denominacional específica. Somos uma plataforma cristã independente mantida de forma voluntária e com o apoio de nossa comunidade de leitores.
                         </p>
                     </div>
                 </div>

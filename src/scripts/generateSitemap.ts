@@ -15,7 +15,7 @@ xml += url("/", "daily", "1.0");
 xml += url("/busca", "weekly", "0.6");
 xml += url("/sobre", "monthly", "0.8");
 xml += url("/planos", "weekly", "0.7");
-xml += url("/pro", "monthly", "0.7");
+xml += url("/apoiar", "monthly", "0.7");
 xml += url("/compartilhar", "monthly", "0.5");
 
 VERSION_OPTIONS.forEach((version) => {

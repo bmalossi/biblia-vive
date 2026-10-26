@@ -7,7 +7,7 @@ import { toast } from "@/hooks/useToast";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
-import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle, CheckCircle } from "lucide-react";
+import { Loader2, Crown, ShieldCheck, User, Lock, CreditCard, Monitor, Upload, BookOpen, AlertTriangle, CheckCircle, Heart } from "lucide-react";
 import CommentaryQuota from "@/components/CommentaryQuota";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
@@ -231,7 +231,7 @@ export default function AccountPage() {
             <main className="mx-auto max-w-2xl px-4 py-24 space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold text-app-text">Minha Conta</h1>
-                    <p className="text-sm text-app-text-muted mt-1">Gerencie seus dados e assinatura</p>
+                    <p className="text-sm text-app-text-muted mt-1">Gerencie seus dados e preferências</p>
                 </div>
 
                 {/* ── Quick Navigation ── */}
@@ -410,25 +410,21 @@ export default function AccountPage() {
                                     )}
 
                                     {(isCanceled || subscription?.status === "none" || (!isActive && !isCanceled)) && !isCancelingAtEnd && (
-                                        <div className="p-4 rounded-xl bg-app-raised border border-border">
-                                            <p className="text-sm text-app-text-muted">
-                                                {isCanceled ? "Sua assinatura PRO foi cancelada." : "Você ainda não tem uma assinatura PRO."}
+                                        <div className="p-4 rounded-xl bg-app-raised border border-border space-y-3">
+                                            <p className="text-sm text-app-text-muted leading-relaxed">
+                                                A Bíblia Vive não possui mais planos de assinatura paga. Todas as contribuições para manter o projeto no ar são voluntárias.
                                             </p>
+                                            <button
+                                                onClick={() => navigate("/apoiar")}
+                                                className="w-full py-2.5 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 flex items-center justify-center gap-2 transition-colors"
+                                            >
+                                                <Heart className="h-4 w-4" />
+                                                Apoiar o Projeto
+                                            </button>
                                         </div>
                                     )}
 
                                     {/* Actions */}
-                                    {!isActive && (
-                                        <button
-                                            onClick={() => checkout("pro")}
-                                            disabled={subSaving}
-                                            className="w-full py-3 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
-                                        >
-                                            <Crown className="h-4 w-4" />
-                                            {isCanceled ? "Retomar Assinatura PRO" : "Assinar PRO"}
-                                        </button>
-                                    )}
-
                                     {isActive && !isCancelingAtEnd && !isLocalAdmin && (
                                         <button
                                             onClick={handleManageSubscription}
@@ -436,16 +432,6 @@ export default function AccountPage() {
                                             className="w-full py-2.5 text-sm text-app-text-muted border border-border rounded-xl hover:bg-app-surface hover:text-app-text transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                                         >
                                             {subSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Gerenciar assinatura"}
-                                        </button>
-                                    )}
-
-                                    {isCancelingAtEnd && (
-                                        <button
-                                            onClick={() => checkout("pro")}
-                                            className="w-full py-3 text-sm font-semibold bg-gold text-app-bg rounded-xl hover:bg-gold/90 flex items-center justify-center gap-2 transition-colors"
-                                        >
-                                            <Crown className="h-4 w-4" />
-                                            Retomar Assinatura PRO
                                         </button>
                                     )}
                                 </div>

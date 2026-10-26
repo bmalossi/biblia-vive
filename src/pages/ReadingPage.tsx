@@ -78,7 +78,7 @@ import { fetchChapter, getFriendlyApiError, type Chapter } from "@/lib/bibleApi"
 import { findBookBySlug, findBookGlobally, getBooksForLocale, type Book } from "@/lib/books";
 import { BibleVersion, getVersion, isBibleVersion, setVersion, VERSION_OPTIONS, getVersionLanguage } from "@/lib/themes";
 import { useSectionHeadings } from "@/hooks/useSectionHeadings";
-import { Eye, EyeOff, Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen, ChevronRight } from "lucide-react";
+import { Eye, EyeOff, Maximize2, Minimize2, Monitor, Settings, FileText, Loader2, Lock, PanelRightClose, PanelRightOpen, ChevronRight, Heart } from "lucide-react";
 import { useChurchMode } from "@/hooks/useChurchMode";
 import type { ChurchVerse } from "@/lib/churchChannel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -341,6 +341,19 @@ export default function ReadingPage() {
   // Última visualização por capítulo
   const chapterViews = useChapterViews();
   const [previousViewedAt, setPreviousViewedAt] = useState<Date | null>(null);
+  const [chapterViewDates, setChapterViewDates] = useState<Record<number, Date>>({});
+
+  useEffect(() => {
+    if (!selectedBook) {
+      setChapterViewDates({});
+      return;
+    }
+    let cancelled = false;
+    chapterViews.loadForBook(selectedBook.id).then((dates) => {
+      if (!cancelled) setChapterViewDates(dates || {});
+    });
+    return () => { cancelled = true; };
+  }, [selectedBook?.id, user?.id]);
 
   // Estados do Eco do Memorial
   const [echoResult, setEchoResult] = useState<EchoResult | null>(null);
@@ -1406,7 +1419,7 @@ export default function ReadingPage() {
 
   const handleChapterCommentary = async () => {
     if (!isPro && !hasFreeChapterCommentary && !cachedChapterCommentary) {
-      navigate('/pro');
+      navigate('/apoiar');
       return;
     }
     if (!selectedBook) return;
@@ -1790,13 +1803,16 @@ export default function ReadingPage() {
                             <div className="grid max-h-[60vh] grid-cols-5 gap-2 overflow-y-auto pr-1 sm:grid-cols-7" ref={chapterGridRef}>
                               {chapterGrid.map((item) => {
                                 const active = item === chapterNumber;
+                                const isVisited = !!chapterViewDates[item];
                                 return (
                                   <Button
                                     aria-current={active ? "true" : undefined}
                                     className={cn(
                                       active
                                         ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg font-semibold"
-                                        : "border-border/60 text-app-text-muted hover:text-app-text hover:bg-accent/40"
+                                        : isVisited
+                                          ? "border-gold ring-1 ring-gold/50 bg-gold/10 text-gold font-semibold shadow-[0_0_8px_rgba(212,175,55,0.2)]"
+                                          : "border-border/60 text-app-text-muted hover:text-app-text hover:bg-accent/40"
                                     )}
                                     data-chapter={item}
                                     key={item}
@@ -1888,7 +1904,7 @@ export default function ReadingPage() {
                             <AlertDialogDescription className="text-app-text-muted">
                               {isPro
                                 ? "Esta ação compilará todas as suas notas deste capítulo em um documento PDF formatado. Deseja iniciar o download?"
-                                : "A exportação avançada de cadernos de estudo em brochuras de PDF é um recurso exclusivo do Bíblia Vive PRO. Assine hoje para apoiar o projeto e desbloquear esta funcionalidade."}
+                                : "A exportação avançada de cadernos de estudo em brochuras de PDF está disponível para apoiadores da Bíblia Vive. Conheça como apoiar a missão."}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter className="mt-4">
@@ -1902,10 +1918,10 @@ export default function ReadingPage() {
                               </AlertDialogAction>
                             ) : (
                               <AlertDialogAction
-                                onClick={() => navigate("/pro")}
+                                onClick={() => navigate("/apoiar")}
                                 className="bg-gold text-app-bg hover:bg-gold/90 rounded-lg"
                               >
-                                Conhecer Premium
+                                Apoiar Missão
                               </AlertDialogAction>
                             )}
                           </AlertDialogFooter>
@@ -1920,7 +1936,7 @@ export default function ReadingPage() {
                         if (isTemplo) {
                           churchMode.toggleChurchMode();
                         } else {
-                          navigate('/pro');
+                          navigate('/apoiar');
                         }
                       }}
                       size="icon"
@@ -2376,6 +2392,7 @@ export default function ReadingPage() {
                   totalChapters={selectedBook.chapters}
                   currentChapter={chapterNumber}
                   onSelectChapter={(ch) => goToChapter(ch)}
+                  visitedChapters={chapterViewDates}
                   headerSlot={
                     <button
                       type="button"
@@ -2397,16 +2414,16 @@ export default function ReadingPage() {
                         <Lock className="h-4 w-4 text-gold" />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="text-xs font-semibold text-app-text">Recurso Exclusivo PRO</h3>
+                        <h3 className="text-xs font-semibold text-app-text">Limite de Comentários Atingido</h3>
                         <p className="text-xs text-app-text-muted leading-relaxed">
-                          Você já utilizou seus 3 comentários gratuitos de capítulos. Assine para ter acesso ilimitado a comentários.
+                          Você já utilizou seus 3 comentários gratuitos de capítulos de hoje. Considere apoiar a missão.
                         </p>
                       </div>
                       <Button
                         className="w-full bg-gold text-app-bg hover:bg-gold/90 font-bold text-xs py-2 h-auto rounded-lg"
-                        onClick={() => navigate('/pro')}
+                        onClick={() => navigate('/apoiar')}
                       >
-                        Assinar Plano Premium
+                        Apoiar a Missão
                       </Button>
                     </div>
                   ) : (
