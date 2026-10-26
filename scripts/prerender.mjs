@@ -1543,12 +1543,12 @@ async function prerender() {
   await fs.writeFile(path.join(sobreDir, 'index.html'), sobreHtml, 'utf-8');
   console.log('[prerender]   ✓ dist/sobre/index.html');
 
-  // /pro
-  const proHtml = replacePlaceholders(template, proMetaTags());
+  // /pro (redirect to /apoiar)
+  const proHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Redirecionando...</title><link rel="canonical" href="${CANONICAL_ORIGIN}/apoiar"><meta http-equiv="refresh" content="0;url=/apoiar"></head><body><p>Redirecionando para <a href="/apoiar">/apoiar</a>...</p></body></html>`;
   const proDir  = path.join(DIST_DIR, 'pro');
   await fs.mkdir(proDir, { recursive: true });
   await fs.writeFile(path.join(proDir, 'index.html'), proHtml, 'utf-8');
-  console.log('[prerender]   ✓ dist/pro/index.html');
+  console.log('[prerender]   ✓ dist/pro/index.html (redirect to /apoiar)');
 
   // /apoiar
   const apoiarHtml = replacePlaceholders(template, apoiarMetaTags());
@@ -1581,9 +1581,8 @@ async function prerender() {
     { loc: `${CANONICAL_ORIGIN}/como-usar`,     changefreq: 'monthly', priority: '0.7' },
     { loc: `${CANONICAL_ORIGIN}/memorial`,      changefreq: 'weekly',  priority: '0.7' },
     { loc: `${CANONICAL_ORIGIN}/sobre`,         changefreq: 'monthly', priority: '0.5' },
-    { loc: `${CANONICAL_ORIGIN}/apoiar`,        changefreq: 'monthly', priority: '0.5' },
+    { loc: `${CANONICAL_ORIGIN}/apoiar`,        changefreq: 'monthly', priority: '0.8' },
     { loc: `${CANONICAL_ORIGIN}/termos-de-uso`, changefreq: 'monthly', priority: '0.3' },
-    { loc: `${CANONICAL_ORIGIN}/pro`,           changefreq: 'weekly',  priority: '0.8' },
   ];
   for (const s of STATIC_URLS) {
     sitemapXml += sitemapUrl(s.loc, s.changefreq, s.priority);

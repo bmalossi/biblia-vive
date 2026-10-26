@@ -137,15 +137,23 @@ export const ReadingChapterGridCard: React.FC<ReadingChapterGridCardProps> = ({
                 aria-current={isActive ? "page" : undefined}
                 aria-label={`Capítulo ${ch}${isVisited ? " (lido)" : ""}`}
                 className={cn(
-                  "relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold border select-none",
+                  "relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold border select-none group",
                   isActive
                     ? `${activeBtnClass} scale-105`
                     : isVisited
-                      ? "border-gold ring-1 ring-gold/50 bg-gold/10 text-gold dark:text-gold-light font-semibold shadow-[0_0_8px_rgba(212,175,55,0.2)] hover:border-gold hover:bg-gold hover:text-primary-foreground"
+                      ? "border-gold/80 dark:border-gold/70 bg-app-raised text-app-text font-medium hover:border-gold hover:text-gold"
                       : inactiveBtnClass
                 )}
               >
-                {ch}
+                {/* Marcador de Fita Dourada */}
+                {isVisited && !isActive && (
+                  <span
+                    data-testid="ribbon-bookmark"
+                    className="absolute top-0.5 left-1/2 -translate-x-1/2 w-3 h-[2px] rounded-full bg-gold transition-transform group-hover:h-[3px]"
+                    aria-hidden="true"
+                  />
+                )}
+                <span>{ch}</span>
                 {isActive && (
                   <span
                     className={cn("absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full shadow-sm", activeDotClass)}

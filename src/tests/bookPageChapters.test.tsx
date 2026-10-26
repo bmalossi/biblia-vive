@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import BookPage from "@/pages/BookPage";
 
@@ -19,12 +19,12 @@ vi.mock("@/hooks/useChapterViews", () => ({
   formatViewedAt: (d: Date) => "26/10/2026 10:00",
 }));
 
-describe("BookPage - Marcações de Capítulos Lidos", () => {
+describe("BookPage - Marcações Editoriais de Capítulos Lidos (Marcador de Fita)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("destaca capítulos lidos com contorno dourado evidente (border-gold, ring-1, text-gold e sombra dourada)", async () => {
+  it("destaca capítulos lidos com o marcador de fita dourada e borda refinada, sem halos de IA", async () => {
     // Simula capítulos 13, 14, 15 como lidos
     mockLoadForBook.mockResolvedValue({
       13: new Date(),
@@ -41,22 +41,29 @@ describe("BookPage - Marcações de Capítulos Lidos", () => {
     );
 
     // Espera os capítulos serem renderizados
-    const ch13Link = await screen.findByRole("link", { name: "13" });
-    const ch14Link = await screen.findByRole("link", { name: "14" });
-    const ch15Link = await screen.findByRole("link", { name: "15" });
-    const ch32Link = await screen.findByRole("link", { name: "32" });
+    const ch13Link = await screen.findByRole("link", { name: /13/i });
+    const ch14Link = await screen.findByRole("link", { name: /14/i });
+    const ch15Link = await screen.findByRole("link", { name: /15/i });
+    const ch32Link = await screen.findByRole("link", { name: /32/i });
 
-    // Capítulos 13, 14, 15 (lidos) possuem contorno dourado evidente
-    expect(ch13Link).toHaveClass("border-gold");
-    expect(ch13Link).toHaveClass("ring-1");
-    expect(ch13Link).toHaveClass("text-gold");
-    expect(ch13Link).toHaveClass("bg-gold/10");
+    // Capítulos 13, 14, 15 (lidos) possuem contorno dourado refinado e o marcador de fita no topo
+    expect(ch13Link.className).toMatch(/border-gold/);
+    expect(ch13Link.className).not.toContain("ring-1");
+    expect(ch13Link.className).not.toContain("shadow-[0_0_");
 
-    expect(ch14Link).toHaveClass("border-gold");
-    expect(ch15Link).toHaveClass("border-gold");
+    const ribbon13 = within(ch13Link).getByTestId("ribbon-bookmark");
+    expect(ribbon13).toBeInTheDocument();
+    expect(ribbon13).toHaveClass("bg-gold");
 
-    // Capítulo 32 (não lido) não possui contorno dourado
-    expect(ch32Link).not.toHaveClass("border-gold");
+    const ribbon14 = within(ch14Link).getByTestId("ribbon-bookmark");
+    expect(ribbon14).toBeInTheDocument();
+
+    const ribbon15 = within(ch15Link).getByTestId("ribbon-bookmark");
+    expect(ribbon15).toBeInTheDocument();
+
+    // Capítulo 32 (não lido) não possui marcador de fita e usa borda neutra
+    expect(ch32Link).not.toHaveClass("border-gold/80");
     expect(ch32Link).toHaveClass("border-border/80");
+    expect(within(ch32Link).queryByTestId("ribbon-bookmark")).toBeNull();
   });
 });

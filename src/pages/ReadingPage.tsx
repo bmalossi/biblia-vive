@@ -338,6 +338,8 @@ export default function ReadingPage() {
     });
   }, []);
 
+  const { user, loading: authLoading } = useAuth();
+
   // Última visualização por capítulo
   const chapterViews = useChapterViews();
   const [previousViewedAt, setPreviousViewedAt] = useState<Date | null>(null);
@@ -403,7 +405,6 @@ export default function ReadingPage() {
   const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const churchMode = useChurchMode();
   const { preferences, updatePreference, resetPreferences } = useReadingPreferences({ rootId: "reading-root" });
-  const { user, loading: authLoading } = useAuth();
   const { isPro, isTemplo } = useSubscription();
   const { notes, getHighlightForVerse, getNoteForVerse, addHighlight, removeHighlight, saveNote, deleteNote } =
     useNotesHighlights(selectedBook?.id ?? '', chapterNumber);
@@ -1808,10 +1809,11 @@ export default function ReadingPage() {
                                   <Button
                                     aria-current={active ? "true" : undefined}
                                     className={cn(
+                                      "relative group",
                                       active
                                         ? "border-gold bg-gold-bg text-gold hover:bg-gold-bg font-semibold"
                                         : isVisited
-                                          ? "border-gold ring-1 ring-gold/50 bg-gold/10 text-gold font-semibold shadow-[0_0_8px_rgba(212,175,55,0.2)]"
+                                          ? "border-gold/80 dark:border-gold/70 bg-app-raised text-app-text font-medium hover:border-gold hover:text-gold"
                                           : "border-border/60 text-app-text-muted hover:text-app-text hover:bg-accent/40"
                                     )}
                                     data-chapter={item}
@@ -1824,7 +1826,14 @@ export default function ReadingPage() {
                                     type="button"
                                     variant="outline"
                                   >
-                                    {item}
+                                    {isVisited && !active && (
+                                      <span
+                                        data-testid="ribbon-bookmark"
+                                        className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-[2px] rounded-b-xs bg-gold transition-transform group-hover:h-[3px]"
+                                        aria-hidden="true"
+                                      />
+                                    )}
+                                    <span>{item}</span>
                                   </Button>
                                 );
                               })}

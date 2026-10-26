@@ -107,7 +107,7 @@ describe("ReadingPage Redesign Components", () => {
       unmountLight();
     });
 
-    it("destaca capítulos lidos com contorno dourado evidente e anel", () => {
+    it("destaca capítulos lidos com marcador de fita e borda dourada refinada", () => {
       render(
         <ReadingChapterGridCard
           totalChapters={10}
@@ -118,12 +118,12 @@ describe("ReadingPage Redesign Components", () => {
       );
 
       const ch2Btn = screen.getByRole("button", { name: /Capítulo 2/i });
-      expect(ch2Btn).toHaveClass("border-gold");
-      expect(ch2Btn).toHaveClass("ring-1");
-      expect(ch2Btn).toHaveClass("text-gold");
+      expect(ch2Btn.className).toMatch(/border-gold/);
+      expect(ch2Btn.querySelector('[data-testid="ribbon-bookmark"]')).toBeInTheDocument();
 
       const ch4Btn = screen.getByRole("button", { name: "Capítulo 4" });
-      expect(ch4Btn).not.toHaveClass("border-gold");
+      expect(ch4Btn.className).not.toMatch(/border-gold/);
+      expect(ch4Btn.querySelector('[data-testid="ribbon-bookmark"]')).toBeNull();
     });
   });
 

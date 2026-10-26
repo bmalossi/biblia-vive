@@ -134,7 +134,7 @@ async function validate() {
 
     if (sitemap.includes('/artigos')) ok('Artigos presentes no sitemap');
     if (sitemap.includes('/planos')) ok('/planos presente no sitemap');
-    if (sitemap.includes('/pro')) ok('/pro presente no sitemap');
+    if (sitemap.includes('/apoiar')) ok('/apoiar presente no sitemap');
     if (sitemap.includes('<changefreq>')) ok('changefreq definido nas entradas');
     if (sitemap.includes('<priority>')) ok('priority definido nas entradas');
   }
